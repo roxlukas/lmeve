@@ -3,7 +3,9 @@
 #################
 
 wwwroot/ccp_img/*.png
+wwwroot/ccp_img/*.jpg
 wwwroot/ccp_icons/*.png
+wwwroot/ccp_icons/*.jpg
 config/config.php
 
 
