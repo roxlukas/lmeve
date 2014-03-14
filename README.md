@@ -1,4 +1,4 @@
-ABOUT:
+<h1>ABOUT</h1>
 
 This project was started at the request of Aideron Technologies CEO in 2013. This software is basically an advanced prototype.
 Code beauty was not a priority, moreover this is not in objective PHP, just plain-old structural PHP.
@@ -8,7 +8,9 @@ More information: http://pozniak.pl/wp/?tag=lmeve
 
 This app requires EVE Online corporation API keys to function. It doesn't use CREST, which came after I retired from EVE Online.
 
-IMPORTANT:
+All Eve Related Materials are Property Of CCP Games
+
+<h1>Setup instructions</h1>
 
 There is no installer currently, so there is some setup work to get LMeve to run
 
@@ -40,9 +42,10 @@ password should be be changed in 'Settings' later.
 
   `*/15 * * * * 	[path-to-php]/php [path-to-lmeve]/bin/poller.php`
   
-CREDITS and COPYRIGHTS
+<h1>CREDITS and COPYRIGHTS</h1>
 
 LMeve by Lukasz "Lukas Rox" Pozniak
+
 LMframework v3 by 2005-2013 Lukasz Pozniak
+
 rixxjavix.css skin by Rixx Javix
-All Eve Related Materials are Property Of CCP Games
