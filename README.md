@@ -32,11 +32,12 @@ There is no installer currently, so there is some setup work to get LMeve to run
 You can download latest static data from Steve Ronuken's website: https://www.fuzzwork.co.uk/dump/
 * If necessary, change table names to lowercase using script `./data/sde-rename-lowercase.sql`
 * Access the database using phpmyadmin or other tool, go to `lmusers` table
-* Edit record for user 'admin'
-* Paste the password hash from clipboard in 'pass' field
-then you can login to application using admin/admin
-password should be be changed in 'Settings' later.
-* Add API key to `cfgapikeys` table. keyID goes to `keyID`, vCode goes to `vCode`
+* Edit record for user `admin`
+* Paste the password hash from clipboard in the `pass` field
+afterwards you will be able to login as admin/admin
+password should be be changed in `Settings` as soon as possible.
+* Add corp API key (or keys) to `cfgapikeys` table. keyID goes to `keyID`, vCode goes to `vCode`
+* Full corp API key works best, but the app will adjust the amount of visible information according to the rights it has been given.
 
 <h3>3. API Poller setup</h3>
 
