@@ -16,6 +16,8 @@ There is no installer currently, so there is some setup work to get LMeve to run
 
 <h3>1. Initial setup</h3>
 
+`index.php` and the website itself is in `./wwwroot/` directory. If you can set up your webserver root to this directory, please do so.
+
 * Go to `./config/ directory`, copy `config-dist.php` to `config.php` and set it up according to your host
 * After setting up new SALT value in config.php, generate admin password hash by using `php ./bin/passwd.php`
 * copy the password hash to clipboard
