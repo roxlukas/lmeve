@@ -16,8 +16,8 @@ There is no installer currently, so there is some setup work to get LMeve to run
 
 <h3>1. Initial setup</h3>
 
-* Go to ./config/ directory, copy config-dist.php to config.php and set it up according to your host
-* After setting up new SALT value in config.php, generate admin password hash by using php ./bin/passwd.php
+* Go to `./config/ directory`, copy `config-dist.php` to `config.php` and set it up according to your host
+* After setting up new SALT value in config.php, generate admin password hash by using `php ./bin/passwd.php`
 * copy the password hash to clipboard
 * Download current `Types` and `Icons` from EVE Online Toolkit page: http://community.eveonline.com/community/fansites/toolkit/
 * unpack all PNG files from `Types` to `./wwwroot/ccp_img/`
