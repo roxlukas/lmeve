@@ -1,0 +1,98 @@
+<?php
+//begin
+    checksession(); //check if we are called by a valid session
+//routing
+    $id=8;
+    $id2=$_GET['id2'];
+//default route
+    if ($id2=='') $id2=2;
+//submenu
+    ?>
+    <table cellpadding="0" cellspacing="2">
+    <tr>
+    <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="2" />
+        <input type="submit" value="Overview" />
+        </form></td>
+    <?php } ?>
+    <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="0" />
+        <input type="submit" value="Industry: products" />
+        </form></td>
+    <?php } ?>
+    <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="1" />
+        <input type="submit" value="Industry: characters" />
+        </form></td>
+    <?php } ?> 
+    <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="3" />
+        <input type="submit" value="PVE Activity" />
+        </form></td>
+    <?php } ?> 
+        <td id="separator" style="width: 10px;"></td>
+    <?php
+//show proper year-month buttons
+    $date=secureGETnum("date");
+    if (strlen($date)==6) {
+            $year=substr($date,0,4); $month=substr($date,4,2);
+    } else {
+            $year=date("Y"); $month=date("m");	
+    }
+    switch ($month) {
+	case 1:
+            $NEXTMONTH=2; $NEXTYEAR=$year; $PREVMONTH=12; $PREVYEAR=$year-1;
+            break;
+	case 12:
+            $NEXTMONTH=1; $NEXTYEAR=$year+1; $PREVMONTH=11; $PREVYEAR=$year;
+            break;
+	default:
+            $NEXTMONTH=$month+1; $NEXTYEAR=$year; $PREVMONTH=$month-1; $PREVYEAR=$year;
+    }
+    ?>
+        <td>
+            <form method="get" action="">
+            <input type="hidden" name="id" value="<?php echo ($id); ?>">
+            <input type="hidden" name="id2" value="<?php echo ($id2); ?>">
+            <input type="hidden" name="date" value="<?php echo(sprintf("%04d", $PREVYEAR).sprintf("%02d", $PREVMONTH)); ?>">
+            <input type="submit" value="&laquo; previous month">
+            </form>
+	</td><td>
+            <form method="get" action="">
+            <input type="hidden" name="id" value="<?php echo ($id); ?>">
+            <input type="hidden" name="id2" value="<?php echo ($id2); ?>">
+            <input type="hidden" name="date" value="<?php echo(sprintf("%04d", $NEXTYEAR).sprintf("%02d", $NEXTMONTH)); ?>">
+	    <input type="submit" value="next month &raquo;">
+            </form>			
+	</td>
+    </tr>
+    </table>
+    <?php
+//end submenu
+
+//controller
+    switch ($id2) {
+        case 0:
+            include("80.php");  //activity - industry - corp - by item
+            break;
+	case 1:
+            include("81.php");  //activity - industry - corp - by character
+            break;
+        case 2:
+            include("82.php");  //activity - overview
+            break;
+        case 3:
+            include("83.php");  //activity - overview
+            break;
+        
+    }
+?>
+
