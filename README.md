@@ -30,7 +30,7 @@ There is no installer currently, so there is some setup work to get LMeve to run
 * Import `./data/schema.sql` file before using LMeve. Remember to set the db config options in `./config/config.php`
 * Import latest static data dump (can be in other db schema for clarity, for example lmeve db in `lmeve` and static data in `sde_rubicon`)
 You can download latest static data from Steve Ronuken's website: https://www.fuzzwork.co.uk/dump/
-* If necessary, change table names to lowercase using script `./data/rename-lowercase.sql` - ToDo: add file
+* If necessary, change table names to lowercase using script `./data/sde-rename-lowercase.sql`
 * Access the database using phpmyadmin or other tool, go to `lmusers` table
 * Edit record for user 'admin'
 * Paste the password hash from clipboard in 'pass' field
@@ -51,3 +51,10 @@ password should be be changed in 'Settings' later.
 * LMframework v3 by 2005-2013 Lukasz Pozniak
 
 * rixxjavix.css skin by Bryan K. "Rixx Javix" Ward
+
+<h3>Thanks!</h3>
+
+* TheAhmosis and Razeu - it's their idea that I had the pleasure to wrap in code
+* Crysis McNally - for excellent ideas and thorough testing
+* Aideron Technologies - for excellent closed beta
+* CCP Games - for making such a great game and providing API for us, developer kind, to tinker with
