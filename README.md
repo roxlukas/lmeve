@@ -19,7 +19,7 @@ There is no installer currently, so there is some setup work to get LMeve to run
 `index.php` and the website itself is in `./wwwroot/` directory. If you can set up your webserver root to this directory, please do so.
 
 * Go to `./config/ directory`, copy `config-dist.php` to `config.php` and set it up according to your host
-* After setting up new SALT value in config.php, generate admin password hash by using `php ./bin/passwd.php`
+* After setting up new `$LM_SALT` value in `config.php`, generate admin password hash by using `php ./bin/passwd.php`
 * copy the password hash to clipboard
 * Download current `Types` and `Icons` from EVE Online Toolkit page: http://community.eveonline.com/community/fansites/toolkit/
 * unpack all PNG files from `Types` to `./wwwroot/ccp_img/`
@@ -27,8 +27,8 @@ There is no installer currently, so there is some setup work to get LMeve to run
 
 <h3>2. Database setup</h3>
 
-* Import `./data/schema.sql` file before using LMeve. Remember to set the db config options in `./config/config.php`
-* Import latest static data dump (can be in other db schema for clarity, for example lmeve db in `lmeve` and static data in `sde_rubicon`)
+* Import `./data/schema.sql` file to MySQL database before using LMeve. Remember to set the db config options in `./config/config.php`
+* Import latest static data dump (can be in different db schema for clarity, for example you can import lmeve db to `lmeve` schema and static data in `sde_rubicon`. LMeve will always use SDE schema set in `$LM_EVEDB` variable in `config.php` file)
 You can download latest static data from Steve Ronuken's website: https://www.fuzzwork.co.uk/dump/
 * If necessary, change table names to lowercase using script `./data/sde-rename-lowercase.sql`
 * Access the database using phpmyadmin or other tool, go to `lmusers` table
