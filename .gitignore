@@ -2,8 +2,8 @@
 ## LMeve specific
 #################
 
-wwwroot/ccp_img/*
-wwwroot/ccp_icons/*
+wwwroot/ccp_img/*.png
+wwwroot/ccp_icons/*.png
 config/config.php
 
 
