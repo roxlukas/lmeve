@@ -1,0 +1,55 @@
+#!/bin/bash
+mypath=/opt/lmeve
+myconfig=$mypath/config/api.txt
+myerror=$mypath/var/error.txt
+mylock=$mypath/var/poller.lock
+mytmp=$mypath/tmp
+if [ -e $mylock ]
+then
+	msg="Lock file $mylock already exists, exiting!"
+	date=`date +"%Y.%m.%d %H:%M:%S"`
+	echo $msg
+	echo "$date $msg" >> $myerror
+	exit 1
+else
+	touch $mylock
+fi
+if [ ! -e $myconfig ]
+then
+	msg="API config file $myconfig does not exist, exiting!"
+	date=`date +"%Y.%m.%d %H:%M:%S"`
+	echo $msg
+	echo "$date $msg" >> $myerror
+	exit 2
+fi
+keyid=`cat $myconfig | awk '{ print $1 }'`
+vcode=`cat $myconfig | awk '{ print $2 }'`
+
+aki=(APIKeyInfo.xml 5)
+wget -O $mytmp/${aki[0]} https://api.eveonline.com/account/${aki[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+acb=(AccountBalance.xml 60)
+wget -O $mytmp/${acb[0]} https://api.eveonline.com/corp/${acb[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+asl=(AssetList.xml 360)
+wget -O $mytmp/${asl[0]} https://api.eveonline.com/corp/${asl[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+cl=(ContactList.xml 1380)
+wget -O $mytmp/${cl[0]} https://api.eveonline.com/corp/${cl[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+ijl=(IndustryJobs.xml 15)
+wget -O $mytmp/${ijl[0]} https://api.eveonline.com/corp/${ijl[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+mo=(MarketOrders.xml 60)
+wget -O $mytmp/${mo[0]} https://api.eveonline.com/corp/${mo[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+wt=(WalletTransactions.xml 15)
+wget -O $mytmp/${wt[0]} https://api.eveonline.com/corp/${wt[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+mt=(MemberTracking.xml 60)
+wget -O $mytmp/${mt[0]} https://api.eveonline.com/corp/${mt[0]}.aspx?keyID=$keyid\&vCode=$vcode > /dev/null 2>&1
+
+#### IMPORTING ####
+
+
+rm $mylock
