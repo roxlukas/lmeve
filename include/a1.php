@@ -175,7 +175,9 @@ $nr=secureGETnum('nr');
 <script type="text/javascript">
 function loadPreview()
             {
-                ccpwgl.setResourcePath('res', 'https://web.ccpgamescdn.com/ccpwgl/res/');
+                //ccpwgl.setResourcePath('res', 'https://web.ccpgamescdn.com/ccpwgl/res/');
+                //ccpwgl.setResourcePath('res', 'https://pozniak.pl/lmeve/ccpwgl/proxy.php?fetch=');
+                ccpwgl.setResourcePath('res', 'ccpwgl/proxy.php?fetch=');
                 var canvas = document.getElementById('wglCanvas');
                 ccpwgl.initialize(canvas);
                 var scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
