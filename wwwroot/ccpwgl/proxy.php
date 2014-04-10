@@ -8,7 +8,7 @@
 
 $BASEURL='https://web.ccpgamescdn.com/ccpwgl/res/';
 
-function cache_file($url, $cache, $interval) {
+function cache_file($url, $cache, $interval) { //unused for now
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
    		$data = file_get_contents($cache);
 	} else {
@@ -25,19 +25,15 @@ function cache_file($url, $cache, $interval) {
 $addr=$_GET['fetch'];
 
 //validate!
-if (!preg_match('/^[\w\d\.\/]+$/',$addr)) die('Filter error!');
+if ( !preg_match('/^[\w\d\.\/]+$/',$addr) || preg_match('/\.\./',$addr) ) die('Filter error!');
 
 $url = $BASEURL.$addr;
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
-  //curl_setopt($ch, CURLOPT_HEADER, TRUE);
-  //curl_setopt($ch, CURLOPT_NOBODY, TRUE);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-  //curl_setopt($ch, CURLOPT_HEADERFUNCTION, '_filefield_source_remote_parse_header');
-  // Causes a warning if PHP safe mode is on.
-  //@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
   
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
   $data = curl_exec($ch);
   $info = curl_getinfo($ch,CURLINFO_CONTENT_TYPE);
   
