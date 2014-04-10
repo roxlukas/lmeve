@@ -6,6 +6,8 @@ I had plans to refactor entire project into CodeIgniter framework, but this plan
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
+Try LMeve's Database module here: http://pozniak.pl/database/index.php
+
 This app requires EVE Online corporation API keys to function. It doesn't use CREST, which came after I retired from EVE Online.
 
 All Eve Related Materials are Property Of CCP Games
