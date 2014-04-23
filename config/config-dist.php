@@ -41,4 +41,8 @@ $LM_LDAP_HOSTS = array("192.168.0.1");
 $USERSTABLE='lmusers';
 //should LMeve learn new rights 1 for development, 0 for production
 $LM_LEARNING_MODE=0;
+//use proxy for CCP WebGL assets
+$LM_CCPWGL_USEPROXY=FALSE;
+//CCP CDN URL - normally it should never be changed
+$LM_CCPWGL_URL='https://web.ccpgamescdn.com/ccpwgl/res/';
 ?>

@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Item Database'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB;
+global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY;
 include_once('materials.php');
 include_once('graphics.php');
 
@@ -175,9 +175,8 @@ $nr=secureGETnum('nr');
 <script type="text/javascript">
 function loadPreview()
             {
-                //ccpwgl.setResourcePath('res', 'https://web.ccpgamescdn.com/ccpwgl/res/');
-                //ccpwgl.setResourcePath('res', 'https://pozniak.pl/lmeve/ccpwgl/proxy.php?fetch=');
-                ccpwgl.setResourcePath('res', 'ccpwgl/proxy.php?fetch=');
+                <?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
+                ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
                 var canvas = document.getElementById('wglCanvas');
                 ccpwgl.initialize(canvas);
                 var scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');

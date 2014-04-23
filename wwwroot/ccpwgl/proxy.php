@@ -6,7 +6,9 @@
 // use: proxy.php?fetch=dx9/model/lensflare/orange.red
 //
 
-$BASEURL='https://web.ccpgamescdn.com/ccpwgl/res/';
+include_once('../../config/config.php');
+
+if (!$LM_CCPWGL_USEPROXY) die('Error: proxy is disabled.');
 
 function cache_file($url, $cache, $interval) { //unused for now
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
@@ -27,7 +29,7 @@ $addr=$_GET['fetch'];
 //validate!
 if ( !preg_match('/^[\w\d\.\/]+$/',$addr) || preg_match('/\.\./',$addr) ) die('Filter error!');
 
-$url = $BASEURL.$addr;
+$url = $LM_CCPWGL_URL.$addr;
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
