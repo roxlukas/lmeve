@@ -47,6 +47,20 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.05.06</div></td>
+<td valign="top" class="tab">
+<b>0.1.30 beta:</b><br>
+<b>Poller version 14</b>
+<ul>
+<li>
+ME and TE (formerly PE) have been adjusted to follow the changes in EVE: Kronos
+</li>
+
+
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.01.15</div></td>
 <td valign="top" class="tab">
 <b>0.1.29 beta:</b><br>

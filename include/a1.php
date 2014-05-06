@@ -442,7 +442,7 @@ if ($model) {
 		echo('<strong>ME: </strong>');
 		echo('<input type="text" id="melevel" onclick="select_all(this);" onkeyup="func(this);" size="6" value="'.$melevel.'">');		
 		echo('</td><td style="text-align: center;">');
-		echo('<strong>PE: </strong>');
+		echo('<strong>TE: </strong>');
 		echo('<input type="text" id="pelevel" onclick="select_all(this);" size="6" value="'.$pelevel.'">');		
 		echo('</td>');
 		if (checkrights("Administrator,EditMEPE")) {

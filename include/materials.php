@@ -183,6 +183,7 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
                         if (!is_null($melvl_override)) {
                             $melevel=$melvl_override;
                         }
+                        //old formulas (pre-Kronos)
                         $wasteFactor=getWasteFactor($typeID);
                         if ($melevel>=0) {
                             $multiplier=1+($wasteFactor/(1 + $melevel));
@@ -191,6 +192,11 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
                             $multiplier=1+($wasteFactor*(1 - $melevel));
                             $waste=$wasteFactor*(1 - $melevel)*100;
                         }
+                        //new formulas (post-Kronos)
+                        if ($melevel>10) $melevel=10;
+                        $multiplier=1-(0.01*$melevel);
+                        $waste=$melevel;
+                        
                         foreach($recycle as $i => $row) {
                             $recycle[$i]['quantity']=$runs*$row['quantity'];
                             $recycle[$i]['notperfect']=$runs*round($row['quantity']*$multiplier);
@@ -214,7 +220,7 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 			$waste=$wasteFactor*(1 - $melevel)*100;
 		}*/
                 $waste=$recycle[0]['waste'];
-		printf("<strong>Waste factor:</strong> %4.2f%%",$waste);
+		printf("<strong>Material reduction based on ME level:</strong> %4.2f%%",$waste);
 		
 		echo("<table class=\"lmframework\" width=\"100%\">");
 		echo("<tr colspan=\"2\"><th>Material</th><th>Quantity</th></tr>");
@@ -222,7 +228,7 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 		foreach ($recycle as $row) {
 			//$notperfect=round($row['quantity']*$multiplier);
                         $notperfect=$row['notperfect'];
-			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect} (perfect: ${row['quantity']})</td></tr>");
+			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td><strong>${notperfect}</strong> (base: ${row['quantity']})</td></tr>");
 		}
 		echo("</table>");
 	}
