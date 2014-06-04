@@ -33,6 +33,6 @@
  echo('');
 ?>
 <br/>
-<div class="copyright">LMeve Copyright &copy; 2013 Lukasz "Lukas Rox" Pozniak<br/>
-LMframework v3 Copyright &copy; 2005-2013 Lukasz Pozniak | rixxjavix.css skin by <a href="http://eveoganda.blogspot.com/" target="_blank">Rixx Javix</a><br/>
+<div class="copyright">LMeve Copyright &copy; 2013-<?php echo(date('Y')); ?> Lukasz "Lukas Rox" Pozniak<br/>
+LMframework v3 Copyright &copy; 2005-<?php echo(date('Y')); ?> Lukasz Pozniak | rixxjavix.css skin by <a href="http://eveoganda.blogspot.com/" target="_blank">Rixx Javix</a><br/>
 All <a href="?id=254">Eve Related Materials</a> are Property Of <a href="http://www.ccpgames.com/" target="_blank">CCP Games</a></div>

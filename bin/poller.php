@@ -612,6 +612,55 @@ foreach ($api_keys as $api_key) {
 		warning("StarbaseList.xml",$FEED_BLOCKED);
 	}
 	
+	//POCOS LIST: https://api.eveonline.com/corp/CustomsOffices.xml.aspx
+	//Parameters	 userID, apiKey, characterID
+	//Cache Time (minutes)	 60
+	//<rowset name="pocos" key="itemID" columns="itemID,solarSystemID,solarSystemName,reinforceHour,allowAlliance,allowStandings,standingLevel,taxRateAlliance,taxRateCorp,taxRateStandingHigh,taxRateStandingGood,taxRateStandingNeutral,taxRateStandingBad,taxRateStandingHorrible" />
+	if (!apiCheckErrors($keyid,"CustomsOffices.xml")) {
+		$ppl=get_xml_contents("https://api.eveonline.com/corp/CustomsOffices.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CustomsOffices_$keyid.xml",60*60);
+		if (isset($ppl->error)) {
+			apiSaveWarning($keyid,$ppl->error,"CustomsOffices.xml");
+		} else {
+			$rows=$ppl->result->rowset->row;
+			foreach ($rows as $row) {
+				$attrs=$row->attributes();		
+				$sql="INSERT INTO `apipocolist` VALUES(".
+				$attrs->itemID.",".
+				$attrs->solarSystemID.",".
+				ins_string($attrs->solarSystemName).",".
+				$attrs->reinforceHour.",".
+				$attrs->allowAlliance.",".
+				$attrs->allowStandings.",".
+				$attrs->standingLevel.",".
+				$attrs->taxRateAlliance.",".
+				$attrs->taxRateCorp.",".
+				$attrs->taxRateStandingHigh.",".
+				$attrs->taxRateStandingGood.",".
+				$attrs->taxRateStandingNeutral.",".
+				$attrs->taxRateStandingBad.",".
+				$attrs->taxRateStandingHorrible.",".
+				$corporationID.
+				") ON DUPLICATE KEY UPDATE 
+                 reinforceHour=".$attrs->reinforceHour.",".
+				"allowAlliance=".$attrs->allowAlliance.",".
+				"allowStandings=".$attrs->allowStandings.",".
+				"standingLevel=".$attrs->standingLevel.",".
+				"taxRateAlliance=".$attrs->taxRateAlliance.",".
+				"taxRateCorp=".$attrs->taxRateCorp.",".
+				"taxRateStandingHigh=".$attrs->taxRateStandingHigh.",".
+				"taxRateStandingGood=".$attrs->taxRateStandingGood.",".
+				"taxRateStandingNeutral=".$attrs->taxRateStandingNeutral.",".
+				"taxRateStandingBad=".$attrs->taxRateStandingBad.",".
+				"taxRateStandingHorrible=".$attrs->taxRateStandingHorrible.
+				";";
+				db_uquery($sql);
+			}
+			apiSaveOK($keyid,"CustomsOffices.xml");
+		}
+	} else {
+		warning("CustomsOffices.xml",$FEED_BLOCKED);
+	}
+	
 	/************************************************ DONE DOWN TO THIS LINE ****************************************************/
 	
 	//POS DETAILS: https://api.eveonline.com/corp/StarbaseDetail.xml.aspx

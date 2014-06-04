@@ -47,16 +47,30 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
-<div class="tytul2">2014.05.06</div></td>
+<div class="tytul2">2014.06.04</div></td>
 <td valign="top" class="tab">
 <b>0.1.30 beta:</b><br>
-<b>Poller version 14</b>
+<b>Poller version 15</b>
 <ul>
 <li>
-ME and TE (formerly PE) have been adjusted to follow the changes in EVE: Kronos
+	Rolled back ME and TE (formerly PE) formulas that were postponed until EVE Online: Crius
+	<ul>
+		<li>
+			These changes will be included when Crius is released
+		</li>
+	</ul>
 </li>
-
-
+<li>
+	New Feature: POCOs
+	<ul>
+		<li>
+			New Customs Office API endpoint in Poller (thanks, CCP FoxFour!)
+		</li>
+		<li>
+			POCOs are now visible in Inventory module
+		</li>
+	</ul>
+</li>
 </ul>
 </td></tr>
 

@@ -196,23 +196,24 @@ function showLabsAndTasks($towers) {
 }
 
 function showControlTowers($controltowers) {
-    ?>
-    <table class="lmframework" style="" id="">
-        <script type="text/javascript">rememberToggleDiv('inv_group_<?php echo($corpID.'_'.$group['groupID']); ?>');</script>
-        <tr><th style="width: 32px; padding: 0px; text-align: center;">
-            Icon
-        </th><th style="width: 150px;">
-            Control Tower Type
-        </th><th style="min-width: 160px;">
-            Location
-        </th><th style="width: 64px;">
-            State
-        </th><th style="width: 110px;">
-            Online since
-        </th>
-        </tr>
-        <?php
-        if (count($controltowers)>0) foreach ($controltowers as $row) {
+    
+        if (count($controltowers)>0) {
+			?>
+		    <table class="lmframework" style="" id="">
+			<tr><th style="width: 32px; padding: 0px; text-align: center;">
+				Icon
+			</th><th style="width: 150px;">
+				Control Tower Type
+			</th><th style="min-width: 160px;">
+				Location
+			</th><th style="width: 64px;">
+				State
+			</th><th style="width: 110px;">
+				Online since
+			</th>
+			</tr>
+			<?php
+			foreach ($controltowers as $row) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
                 <?php towershrefedit($row['itemID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
@@ -241,10 +242,104 @@ function showControlTowers($controltowers) {
             </td>
             </tr>
             <?php
+            }
+            ?>
+			</table>
+			<?php
+        } else {
+			echo('<h3>Corporation doesn\'t have any POSs</h3>');
         }
-        ?>
-        </table>
-    <?php
+        
+    
+    
+}
+
+function getPocos($where='TRUE') {
+    global $LM_EVEDB;
+    $sql="SELECT * FROM `apipocolist` apl
+    WHERE $where";
+    $raw=db_asocquery($sql);
+    return($raw);
+}
+
+function showPocos($pocos) {
+    
+        if (count($pocos)>0) {
+			?>
+			<table class="lmframework" style="" id="">
+			<tr><th style="width: 32px; padding: 0px; text-align: center;" rowspan="2">
+				Icon
+			</th><th style="width: 100px; text-align: center;" rowspan="2">
+				Location
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Reinforced Hours
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Allow Alliance
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Allow Standings
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Min Standings
+			</th><th colspan="7" style="text-align: center;">
+				Tax rates
+			</th>
+			</tr>
+			<tr>
+			<th style="width: 64px;">
+				Alliance
+			</th><th style="width: 64px; text-align: center;">
+				Corp
+			</th><th style="width: 64px; text-align: center;">
+				Excellent Standing
+			</th><th style="width: 64px; text-align: center;">
+				Good Standing
+			</th><th style="width: 64px; text-align: center;">
+				Neutral Standing
+			</th><th style="width: 64px; text-align: center;">
+				Bad Standing
+			</th><th style="width: 64px; text-align: center;">
+				Horrible Standing
+			</th>
+			</tr>
+			<?php
+			foreach ($pocos as $row) {
+            ?>
+            <tr><td width="32" style="padding: 0px; text-align: center;">
+                <?php echo("<img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" />"); ?>
+            </td><td style="">
+                <?php echo($row['solarSystemName']);  ?>
+            </td><td style="text-align: center;">
+                <?php echo( ($row['reinforceHour']-1) .'-'. ($row['reinforceHour']+1 )); ?> 
+            </td><td style="text-align: center;">
+                <?php if ($row['allowAlliance']==0) echo('No'); else echo('Yes'); ?>
+            </td><td style="text-align: center;">
+                <?php if ($row['allowStandings']==0) echo('No'); else echo('Yes'); ?> 
+            </td><td style="text-align: center;">
+                <?php echo($row['standingLevel']);  ?>
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateAlliance']);  ?>%
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateCorp']);  ?>%
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateStandingHigh']);  ?>%
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateStandingGood']);  ?>%
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateStandingNeutral']);  ?>%
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateStandingBad']);  ?>%
+            </td><td style="text-align: center;">
+                <?php echo(100 * $row['taxRateStandingHorrible']);  ?>%
+            </td>
+            </tr>
+            <?php
+            }
+            ?>
+			</table>
+			<?php
+        } else {
+			echo('<h3>Corporation doesn\'t have any POCOs</h3>');
+        }
+        
     
 }
 

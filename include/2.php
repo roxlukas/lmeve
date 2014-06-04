@@ -30,6 +30,13 @@
         <input type="submit" value="Labs & Assembly Arrays" />
         </form></td>
     <?php } ?> 
+    <?php if (checkrights("Administrator,ViewPOS")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="2" />
+        <input type="hidden" name="id2" value="6" />
+        <input type="submit" value="POCOs" />
+        </form></td>
+    <?php } ?> 
     </tr>
     </table>
     <?php
@@ -54,6 +61,9 @@
             break;
         case 5:
             include("25.php");  //Delete Labs
+            break;
+        case 6:
+            include("26.php");  //POCO list
             break;
     }
 ?>
