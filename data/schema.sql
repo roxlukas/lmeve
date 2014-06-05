@@ -1080,7 +1080,7 @@ CREATE TABLE IF NOT EXISTS `apicontactlist` (
   `contactName` varchar(128) NOT NULL,
   `standing` decimal(5,2) NOT NULL,
   `corporationID` bigint(11) NOT NULL,
-  PRIMARY KEY (`contactID`)
+  PRIMARY KEY (`contactID`,`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
