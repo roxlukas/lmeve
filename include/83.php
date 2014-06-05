@@ -110,11 +110,9 @@ $pointsDisplayed=false;
 		    <a href="#down">Scroll down</a>
 		    </div>
                 
-                    Coming sooner than soon&trade;!
-                
 		    <?php
                     
-		    /*$corps=db_asocquery("SELECT * FROM apicorps;");
+		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
                         $days="";
                         $activities="";
@@ -124,39 +122,60 @@ $pointsDisplayed=false;
 <?php
 //GRAPHING		
                     //getting data
-                        $dayss=date("t",mktime(0,0,$month,1,$year));
+                        $dayss = cal_days_in_month(CAL_GREGORIAN, $month, $year);
                         for($i=1; $i<=$dayss; $i++) {
                             $daystab[$i]['day']="$i";
                             $daystab[$i]['activity']=0;
                         }
                         
-                        $sqlact="SELECT COUNT(*) AS activity,date_format(beginProductionTime, '%e') AS day FROM
-                        apiindustryjobs aij
-                        WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
-                        AND aij.corporationID=${corp['corporationID']}
-                        GROUP BY date_format(beginProductionTime, '%e')
-                        ORDER BY date_format(beginProductionTime, '%e');";
-                        $activityGraph=db_asocquery($sqlact);
-            ?><h3>Industry Activity [jobs started]</h3> <?php
-            if (count($activityGraph)>0) {
+                        $sqlmis="SELECT COUNT(*) AS mission,date_format(date, '%e') AS day FROM
+                        apiwalletjournal awj
+                        WHERE date_format(date, '%Y%m') = '${year}${month}'
+                        AND refTypeID=33
+                        AND awj.corporationID=${corp['corporationID']}
+                        GROUP BY date_format(date, '%e')
+                        ORDER BY date_format(date, '%e');";
+                        
+                        $missionGraph=db_asocquery($sqlmis);
+                        
+                        $sqlinc="SELECT COUNT(*) AS incursion,date_format(date, '%e') AS day FROM
+                        apiwalletjournal awj
+                        WHERE date_format(date, '%Y%m') = '${year}${month}'
+                        AND refTypeID=99
+                        AND awj.corporationID=${corp['corporationID']}
+                        GROUP BY date_format(date, '%e')
+                        ORDER BY date_format(date, '%e');";
+                        
+                        $incursionGraph=db_asocquery($sqlinc);
+                        
+                        
+                        
+            ?><h3>PVE Activity [missions & incursions]</h3> <?php
+            if (count($missionGraph)>0) {
                     //reformatting data
-                        foreach ($activityGraph as $row) {
-                            $daystab[$row['day']]['activity']=$row['activity'];
+                        foreach ($missionGraph as $row) {
+                            $daystab[$row['day']]['mission']=$row['mission'];
+                        }
+                        foreach ($incursionGraph as $row) {
+                            $daystab[$row['day']]['incursion']=$row['incursion'];
                         }
                         
                     //ready to display
                         foreach($daystab as $row) {
                             $days.='"'.$row['day'].'",';
-                            $activities.=$row['activity'].',';
+                            if (!empty($row['mission'])) $missions.=$row['mission'].','; else $missions.='0,';
+                            if (!empty($row['incursion'])) $incursions.=$row['incursion'].','; else $incursions.='0,';
                         }
+                        
                     //cut trailing commas
                         $days=rtrim($days,',');
-                        $activities=rtrim($activities,',');
+                        $missions=rtrim($missions,',');
+                        $incursions=rtrim($incursions,',');
                     //display
                         ?>
                     <!--<h2>&raquo; Activity</h2>-->
                         <div>
-                        <canvas id="activity_<?php echo($corp['corporationID']); ?>" width="600" height="200"></canvas>
+                        <canvas id="pve_<?php echo($corp['corporationID']); ?>" width="600" height="200"></canvas>
                         <script type="text/javascript">
                             var data_<?php echo($corp['corporationID']); ?> = {
                                 labels : [ <?php echo($days); ?> ],
@@ -166,12 +185,19 @@ $pointsDisplayed=false;
                                            strokeColor : "rgba(151,187,205,1.0)",
                                            <?php //pointColor : "rgba(205,107,101,1.0)",
                                            //pointStrokeColor : "#fff", ?>
-                                           data : [ <?php echo($activities); ?> ]
-                                       }
+                                           data : [ <?php echo($missions); ?> ]
+                                       },
+                                       {
+                                           fillColor : "rgba(205,205,0,0.5)",
+                                           strokeColor : "rgba(205,205,101,1.0)",
+                                           <?php //pointColor : "rgba(205,107,101,1.0)",
+                                           //pointStrokeColor : "#fff", ?>
+                                           data : [ <?php echo($incursions); ?> ]
+                                       },
                                 ]
                             }
                             
-                            var ctx_<?php echo($corp['corporationID']); ?> = document.getElementById("activity_<?php echo($corp['corporationID']); ?>").getContext("2d");
+                            var ctx_<?php echo($corp['corporationID']); ?> = document.getElementById("pve_<?php echo($corp['corporationID']); ?>").getContext("2d");
                             var activityChart_<?php echo($corp['corporationID']); ?> = new Chart(ctx_<?php echo($corp['corporationID']); ?>).Bar(data_<?php echo($corp['corporationID']); ?>,bar_options);
                             
                         </script>
@@ -193,4 +219,3 @@ $pointsDisplayed=false;
 			
 		    </div><br>
 		
-*/

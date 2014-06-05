@@ -460,7 +460,6 @@ if ($model) {
 
 	/************************* END OF MATERIALS *******************************/
 
-	
 	echo('</td><td style="width: 45%; vertical-align: top;">');
 	
 	

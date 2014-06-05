@@ -93,6 +93,8 @@ function getSimpleTasks($where='TRUE') {
 function getLabsAndTasks($corporationID) {
     global $LM_EVEDB;
     $raw_towers=getControlTowers("`corporationID`=$corporationID");
+    $towers=array();
+    $labs=array();
     if (count($raw_towers)>0) {
         $raw_labs=getLabs();
         $raw_tasks=getSimpleTasks();

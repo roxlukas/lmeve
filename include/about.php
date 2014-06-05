@@ -47,7 +47,7 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
-<div class="tytul2">2014.06.04</div></td>
+<div class="tytul2">2014.06.05</div></td>
 <td valign="top" class="tab">
 <b>0.1.30 beta:</b><br>
 <b>Poller version 15</b>
@@ -68,6 +68,14 @@ Changelog:
 		</li>
 		<li>
 			POCOs are now visible in Inventory module
+		</li>
+	</ul>
+</li>
+<li>
+	New Feature: PVE activity
+	<ul>
+		<li>
+			Mission and incursion graphs are now displayed in PVE Activity under Avticity tab
 		</li>
 	</ul>
 </li>

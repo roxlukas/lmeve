@@ -14,9 +14,19 @@
         <td><form action="" method="get">
         <input type="hidden" name="id" value="<?php echo ($id); ?>" />
         <input type="hidden" name="id2" value="2" />
-        <input type="submit" value="Overview" />
+        <input type="submit" value="Industry Activity" />
         </form></td>
     <?php } ?>
+    <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="3" />
+        <input type="submit" value="PVE Activity" />
+        </form></td>
+    <?php } ?> 
+        
+        <td id="separator" style="width: 10px;"></td>
+        
     <?php if (checkrights("Administrator,ViewActivity")) { ?>
         <td><form action="" method="get">
         <input type="hidden" name="id" value="<?php echo ($id); ?>" />
@@ -31,13 +41,7 @@
         <input type="submit" value="Industry: characters" />
         </form></td>
     <?php } ?> 
-    <?php if (checkrights("Administrator,ViewActivity")) { ?>
-        <td><form action="" method="get">
-        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
-        <input type="hidden" name="id2" value="3" />
-        <input type="submit" value="PVE Activity" />
-        </form></td>
-    <?php } ?> 
+    
         <td id="separator" style="width: 10px;"></td>
     <?php
 //show proper year-month buttons

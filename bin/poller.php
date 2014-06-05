@@ -587,6 +587,8 @@ foreach ($api_keys as $api_key) {
 		if (isset($psl->error)) {
 			apiSaveWarning($keyid,$psl->error,"StarbaseList.xml");
 		} else {
+                        //clear the poS list
+                        db_uquery("DELETE FROM `apistarbaselist` WHERE `corporationID`=$corporationID;");
 			$rows=$psl->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();		
@@ -600,10 +602,10 @@ foreach ($api_keys as $api_key) {
 				ins_string($attrs->onlineTimestamp).",".
 				$attrs->standingOwnerID.",".
 				$corporationID.
-				") ON DUPLICATE KEY UPDATE 
+				");"; /* ON DUPLICATE KEY UPDATE 
                                 state=".$attrs->state.",".
 				"stateTimestamp=".ins_string($attrs->stateTimestamp).",".
-				"onlineTimestamp=".ins_string($attrs->onlineTimestamp).";";
+				"onlineTimestamp=".ins_string($attrs->onlineTimestamp).";"; */
 				db_uquery($sql);
 			}
 			apiSaveOK($keyid,"StarbaseList.xml");
@@ -621,6 +623,9 @@ foreach ($api_keys as $api_key) {
 		if (isset($ppl->error)) {
 			apiSaveWarning($keyid,$ppl->error,"CustomsOffices.xml");
 		} else {
+                        //clear the poco list
+                        db_uquery("DELETE FROM `apipocolist` WHERE `corporationID`=$corporationID;");
+                        //update the poco list
 			$rows=$ppl->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();		
@@ -640,7 +645,7 @@ foreach ($api_keys as $api_key) {
 				$attrs->taxRateStandingBad.",".
 				$attrs->taxRateStandingHorrible.",".
 				$corporationID.
-				") ON DUPLICATE KEY UPDATE 
+				");"; /* ON DUPLICATE KEY UPDATE 
                  reinforceHour=".$attrs->reinforceHour.",".
 				"allowAlliance=".$attrs->allowAlliance.",".
 				"allowStandings=".$attrs->allowStandings.",".
@@ -652,7 +657,7 @@ foreach ($api_keys as $api_key) {
 				"taxRateStandingNeutral=".$attrs->taxRateStandingNeutral.",".
 				"taxRateStandingBad=".$attrs->taxRateStandingBad.",".
 				"taxRateStandingHorrible=".$attrs->taxRateStandingHorrible.
-				";";
+				";";*/
 				db_uquery($sql);
 			}
 			apiSaveOK($keyid,"CustomsOffices.xml");

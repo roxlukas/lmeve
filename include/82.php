@@ -103,7 +103,7 @@ $pointsDisplayed=false;
                     </script>
 		<a name="top"></a>
 		    <div class="tytul">
-			Activity Overview for <?php echo("$year-$month"); ?><br>
+			Industry Activity for <?php echo("$year-$month"); ?><br>
 		    </div>
 		
 		    <div class="tekst">
@@ -127,7 +127,7 @@ $pointsDisplayed=false;
 <?php
 //GRAPHING		
                     //getting data
-                        $dayss=date("t",mktime(0,0,$month,1,$year));
+                        $dayss = cal_days_in_month(CAL_GREGORIAN, $month, $year);
                         for($i=1; $i<=$dayss; $i++) {
                             $daystab[$i]['day']="$i";
                             $daystab[$i]['activity']=0;
@@ -150,7 +150,7 @@ $pointsDisplayed=false;
                     //ready to display
                         foreach($daystab as $row) {
                             $days.='"'.$row['day'].'",';
-                            $activities.=$row['activity'].',';
+                            if (!empty($row['activity'])) $activities.=$row['activity'].','; else $activities.='0,';
                         }
                     //cut trailing commas
                         $days=rtrim($days,',');
