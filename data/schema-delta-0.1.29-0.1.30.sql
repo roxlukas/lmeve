@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `apipocolist` (
-  `itemID` int(11) NOT NULL AUTO_INCREMENT,
+  `itemID` bigint(20) NOT NULL,
   `solarSystemID` int(11) NOT NULL,
   `solarSystemName` varchar(256) NOT NULL,
   `reinforceHour` int(11) NOT NULL,
