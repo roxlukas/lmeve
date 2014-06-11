@@ -276,7 +276,7 @@ function showPocos($pocos) {
     
         if (count($pocos)>0) {
 			?>
-			<table class="lmframework" style="" id="">
+			<table class="lmframework" style="width: 984px;" id="pocos">
 			<tr><th style="width: 32px; padding: 0px; text-align: center;" rowspan="2">
 				Icon
 			</th><th style="width: 100px; text-align: center;" rowspan="2">
@@ -350,7 +350,7 @@ function showPocos($pocos) {
 			</table>
 			<?php
         } else {
-		echo('<table class="lmframework" style="width: 100%"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
+		echo('<table class="lmframework" style="width: 984px;"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
         }
         
     
@@ -358,7 +358,7 @@ function showPocos($pocos) {
 
 function getStock($where='TRUE') {
     global $LM_EVEDB;
-    $sql="SELECT cfs.*,itp.`typeName`,apa.*,apl.`locationName`,app.`max` as price,itp.`groupID`, igp.`groupName` 
+    $sql="SELECT cfs.*,itp.`typeName`,apa.*,apl.`itemName` AS locationName,app.`max` as price,itp.`groupID`, igp.`groupName` 
         FROM `cfgstock` cfs
         JOIN $LM_EVEDB.`invtypes` itp
         ON cfs.`typeID`=itp.`typeID`
@@ -368,14 +368,8 @@ function getStock($where='TRUE') {
         ON cfs.`typeID`=app.`typeID`
         JOIN `apiassets` apa
         ON cfs.`typeID`=apa.`typeID`
-        LEFT JOIN (
-          SELECT `solarSystemID` AS `locationID`, `solarSystemName` AS `locationName` FROM $LM_EVEDB.`mapsolarsystems`
-          UNION
-          SELECT `stationID` AS `locationID`, `stationName` AS `locationName` FROM $LM_EVEDB.`stastations`
-          UNION
-          SELECT `stationID` AS `locationID`, `stationName` AS `locationName` FROM `apiconquerablestationslist`
-        ) apl
-        ON apa.`locationID`=apl.`locationID`
+        LEFT JOIN $LM_EVEDB.`mapdenormalize` apl
+        ON apa.`locationID`=apl.`itemID`
         WHERE $where AND (app.type='buy' OR app.type IS NULL)
         ORDER BY itp.`groupID`, itp.`typeName`;";
     //echo("DEBUG: $sql");
