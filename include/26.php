@@ -30,7 +30,7 @@ $corps=db_asocquery("SELECT * FROM apicorps;");
 foreach ($corps as $corp) { //begin corps loop
     echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
     
-    $pocos=getPocos("`corporationID`=${corp['corporationID']}");
+    $pocos=getPocos("apo.`corporationID`=${corp['corporationID']}");
     
     //echo("DEBUG: <pre>"); print_r($pocos); echo('</pre>');
     ?>

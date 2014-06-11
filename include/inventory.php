@@ -255,10 +255,18 @@ function showControlTowers($controltowers) {
     
     
 }
-
+/*
+select (pow(:x-x,2)+pow(:y-y,2)+pow(:z-z,2)) distance,itemName,itemID,typeID
+from mapDenormalize
+where solarsystemid=:solarsystemid
+order by distance asc
+limit 1
+ */
 function getPocos($where='TRUE') {
     global $LM_EVEDB;
-    $sql="SELECT * FROM `apipocolist` apl
+    $sql="SELECT apo.*,apl.itemName FROM `apipocolist` apo
+    LEFT JOIN `apilocations` apl
+    ON apo.`itemID`=apl.`itemID`
     WHERE $where";
     $raw=db_asocquery($sql);
     return($raw);
@@ -306,9 +314,12 @@ function showPocos($pocos) {
 			foreach ($pocos as $row) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
-                <?php echo("<img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" />"); ?>
+                <?php echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>"); ?>
             </td><td style="">
-                <?php echo($row['solarSystemName']);  ?>
+                <?php if (is_null($row['itemName'])) echo($row['solarSystemName']); else {
+                    preg_match('/^Customs Office \(([-_\w\s]+)\)/',$row['itemName'],$m);
+                    echo($m[1]);
+                } ?>
             </td><td style="text-align: center;">
                 <?php echo( ($row['reinforceHour']-1) .'-'. ($row['reinforceHour']+1 )); ?> 
             </td><td style="text-align: center;">
@@ -357,7 +368,13 @@ function getStock($where='TRUE') {
         ON cfs.`typeID`=app.`typeID`
         JOIN `apiassets` apa
         ON cfs.`typeID`=apa.`typeID`
-        LEFT JOIN `apilocations` apl
+        LEFT JOIN (
+          SELECT `solarSystemID` AS `locationID`, `solarSystemName` AS `locationName` FROM $LM_EVEDB.`mapsolarsystems`
+          UNION
+          SELECT `stationID` AS `locationID`, `stationName` AS `locationName` FROM $LM_EVEDB.`stastations`
+          UNION
+          SELECT `stationID` AS `locationID`, `stationName` AS `locationName` FROM `apiconquerablestationslist`
+        ) apl
         ON apa.`locationID`=apl.`locationID`
         WHERE $where AND (app.type='buy' OR app.type IS NULL)
         ORDER BY itp.`groupID`, itp.`typeName`;";

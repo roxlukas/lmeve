@@ -47,6 +47,34 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.06.11</div></td>
+<td valign="top" class="tab">
+<b>0.1.31 beta:</b><br>
+<b>Poller version 16</b>
+<ul>
+<li>
+	New Feature: POCOs
+	<ul>
+		<li>
+			Locations API implemented in Poller
+		</li>
+		<li>
+			POCOs now show which planet they are on (using Locations API)
+		</li>
+	</ul>
+</li>
+<li>
+	New Feature: PVE activity
+	<ul>
+		<li>
+			Ratting graph is now displayed along Missions and Incursions in PVE Activity under Activity tab
+		</li>
+	</ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.06.05</div></td>
 <td valign="top" class="tab">
 <b>0.1.30 beta:</b><br>
@@ -75,7 +103,7 @@ Changelog:
 	New Feature: PVE activity
 	<ul>
 		<li>
-			Mission and incursion graphs are now displayed in PVE Activity under Avticity tab
+			Mission and incursion graphs are now displayed in PVE Activity under Activity tab
 		</li>
 	</ul>
 </li>

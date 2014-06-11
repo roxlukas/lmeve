@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="15";
+$POLLER_VERSION="16";
 set_time_limit(880); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
 $mypath=str_replace('\\','/',dirname(__FILE__));
@@ -911,43 +911,45 @@ foreach ($api_keys as $api_key) {
 	//Base URL	https://api.eveonline.com/corp/Locations.xml.aspx
 	//Parameters	 userID, apiKey, ids
 	//Cache Time (minutes)	 1440
-	//This feed REQUIRES a list of IDS, for example from AssetList
+	//This feed REQUIRES a list of IDS, for example from Poco List
 	
-	//SHIT. I didnt have to do all this... all I had to do was to merge stastations and mapsolarsystems... sigh...
-	
-	/*$result=db_asocquery("SELECT DISTINCT `locationID` FROM `apiassets`;");
+	$result=db_asocquery("SELECT DISTINCT `itemID` FROM `apipocolist` WHERE `corporationID`=$corporationID;");
 	$ids="";
 	foreach ($result as $row) {
-		$ids="${row['installerID']},$ids";
+		$ids="${row['itemID']},$ids";
 	}
 	//cut the last comma
 	$ids = substr_replace($ids ,"",-1);
 	//if list of IDs isnt empty, ask EVE API for names
 	
-	if (!apiCheckErrors($keyid,"Locations.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/Locations.xml.aspx?keyID=${keyid}&vCode=${vcode}&ids=${ids}","${mycache}/Locations$keyid.xml",1440*60);
-		if (isset($dat->error)) {
-			apiSaveWarning($keyid,$dat->error,"Locations.xml");
-		} else {
-			db_uquery("DELETE FROM `apilocations` WHERE corporationID=$corporationID;");
-			$rows=$dat->result->rowset->row;
-			foreach ($rows as $row) {
-				$attrs=$row->attributes();			
-				$sql="INSERT INTO `apilocations` VALUES(".
-				$attrs->itemID.",".
-				ins_string($attrs->itemName).",".
-				$attrs->x.",".
-				$attrs->y.",".
-				$attrs->z.",".
-				$corporationID.
-				");";
-				db_uquery($sql);
-			}
-			apiSaveOK($keyid,"Locations.xml");
-		}
-	} else {
-		warning("Locations.xml",$FEED_BLOCKED);
-	}*/
+        if (count($result)>0) {
+            if (!apiCheckErrors($keyid,"Locations.xml")) {
+                    $url="https://api.eveonline.com/corp/Locations.xml.aspx?keyID=${keyid}&vCode=${vcode}&ids=${ids}";
+                    inform("Locations.xml", $url);
+                    $dat=get_xml_contents($url,"${mycache}/Locations$keyid.xml",1440*60);
+                    if (isset($dat->error)) {
+                            apiSaveWarning($keyid,$dat->error,"Locations.xml");
+                    } else {
+                            db_uquery("DELETE FROM `apilocations` WHERE corporationID=$corporationID;");
+                            $rows=$dat->result->rowset->row;
+                            foreach ($rows as $row) {
+                                    $attrs=$row->attributes();			
+                                    $sql="INSERT INTO `apilocations` VALUES(".
+                                    $attrs->itemID.",".
+                                    ins_string($attrs->itemName).",".
+                                    $attrs->x.",".
+                                    $attrs->y.",".
+                                    $attrs->z.",".
+                                    $corporationID.
+                                    ");";
+                                    db_uquery($sql);
+                            }
+                            apiSaveOK($keyid,"Locations.xml");
+                    }
+            } else {
+                    warning("Locations.xml",$FEED_BLOCKED);
+            }
+        }
 	
 	//Base URL	https://api.eveonline.com/corp/Medals.xml.aspx
 	//Parameters	 userID, apiKey, characterID

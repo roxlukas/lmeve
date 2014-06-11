@@ -148,9 +148,17 @@ $pointsDisplayed=false;
                         
                         $incursionGraph=db_asocquery($sqlinc);
                         
+                        $sqlrat="SELECT COUNT(*) AS ratting,date_format(date, '%e') AS day FROM
+                        apiwalletjournal awj
+                        WHERE date_format(date, '%Y%m') = '${year}${month}'
+                        AND refTypeID=85
+                        AND awj.corporationID=${corp['corporationID']}
+                        GROUP BY date_format(date, '%e')
+                        ORDER BY date_format(date, '%e');";
                         
+                        $rattingGraph=db_asocquery($sqlrat);
                         
-            ?><h3>PVE Activity [missions & incursions]</h3> <?php
+            ?><h3>PVE Activity [missions, incursions, ratting]</h3> <?php
             if (count($missionGraph)>0) {
                     //reformatting data
                         foreach ($missionGraph as $row) {
@@ -159,18 +167,23 @@ $pointsDisplayed=false;
                         foreach ($incursionGraph as $row) {
                             $daystab[$row['day']]['incursion']=$row['incursion'];
                         }
+                        foreach ($rattingGraph as $row) {
+                            $daystab[$row['day']]['ratting']=$row['ratting'];
+                        }
                         
                     //ready to display
                         foreach($daystab as $row) {
                             $days.='"'.$row['day'].'",';
                             if (!empty($row['mission'])) $missions.=$row['mission'].','; else $missions.='0,';
                             if (!empty($row['incursion'])) $incursions.=$row['incursion'].','; else $incursions.='0,';
+                            if (!empty($row['ratting'])) $ratting.=$row['ratting'].','; else $ratting.='0,';
                         }
                         
                     //cut trailing commas
                         $days=rtrim($days,',');
                         $missions=rtrim($missions,',');
                         $incursions=rtrim($incursions,',');
+                        $ratting=rtrim($ratting,',');
                     //display
                         ?>
                     <!--<h2>&raquo; Activity</h2>-->
@@ -193,6 +206,13 @@ $pointsDisplayed=false;
                                            <?php //pointColor : "rgba(205,107,101,1.0)",
                                            //pointStrokeColor : "#fff", ?>
                                            data : [ <?php echo($incursions); ?> ]
+                                       },
+                                       {
+                                           fillColor : "rgba(205,0,0,0.5)",
+                                           strokeColor : "rgba(205,101,101,1.0)",
+                                           <?php //pointColor : "rgba(205,107,101,1.0)",
+                                           //pointStrokeColor : "#fff", ?>
+                                           data : [ <?php echo($ratting); ?> ]
                                        },
                                 ]
                             }

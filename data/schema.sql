@@ -1468,12 +1468,15 @@ CREATE TABLE IF NOT EXISTS `apiindustryjobs` (
 --
 -- Struktura tabeli dla  `apilocations`
 --
-
 CREATE TABLE IF NOT EXISTS `apilocations` (
-  `locationID` int(11) NOT NULL,
-  `locationName` varchar(256) NOT NULL,
-  PRIMARY KEY (`locationID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+	`itemID` BIGINT(20) NOT NULL,
+	`itemName` VARCHAR(256) NOT NULL,
+	`x` DOUBLE NOT NULL,
+	`y` DOUBLE NOT NULL,
+	`z` DOUBLE NOT NULL,
+	`corporationID` INT(11) NOT NULL,
+	PRIMARY KEY (`itemID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
 
 --
 -- Zrzut danych tabeli `apilocations`
