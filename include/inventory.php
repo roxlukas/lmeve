@@ -249,7 +249,7 @@ function showControlTowers($controltowers) {
 			</table>
 			<?php
         } else {
-			echo('<h3>Corporation doesn\'t have any POSs</h3>');
+		echo('<table class="lmframework" style="width: 564px;"><tr><th style="text-align: center;">Corporation doesn\'t have any POSes</th</tr></table>');
         }
         
     
@@ -350,7 +350,7 @@ function showPocos($pocos) {
 			</table>
 			<?php
         } else {
-			echo('<h3>Corporation doesn\'t have any POCOs</h3>');
+		echo('<table class="lmframework" style="width: 100%"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
         }
         
     
