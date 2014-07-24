@@ -8,7 +8,7 @@
         include_once('../include/yaml_blueprints.php');
         
     echo("Using $LM_EVEDB.\r\n");
-/*
+
     echo('Calling updateYamlTypeIDs(), please wait... ');
 	updateYamlTypeIDs();
     echo("done\r\n");
@@ -24,7 +24,7 @@
     echo('Calling updateYamlBlueprints(), please wait... ');   
         updateYamlBlueprints();
     echo("done\r\n");
-*/ 
+
     echo('Calling recreateLegacyTables(), please wait... '); 
         recreateLegacyTables();
     echo("done\r\n");
