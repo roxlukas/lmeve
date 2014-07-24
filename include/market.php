@@ -153,7 +153,7 @@ function showBuybackOrder($row) {
 	$order_fullhash=longhash($row['orderSerialized'].$row['timestmp']);
 
 	foreach($items as $item) {
-		//$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invtypes` WHERE `typeID`=${item['typeID']};");
+		//$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`=${item['typeID']};");
 		//$typeName=$typeName[0][0];
 		//$items=$items.$item['quantity'].'x '.$typeName.'<br />';
 		$value+=$item['quantity']*$item['unitprice'];
@@ -228,7 +228,7 @@ function showBuybackOrder($row) {
 		echo('<table border="0" cellspacing="2" cellpadding="0">');
 		echo('<tr><td class="tab-header">Material</td><td class="tab-header">Quantity</td></tr>');
 		foreach($items as $item) {
-			$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invtypes` WHERE `typeID`=${item['typeID']};");
+			$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`=${item['typeID']};");
 			$typeName=$typeName[0][0];
 			echo('<tr><td class="tab"><a href="?id=10&id2=1&nr='.$item['typeID'].'"><img src="ccp_img/'.$item['typeID'].'_32.png" style="width: 16px; height: 16px; vertical-align: text-bottom;" /> '.$typeName.'</td><td class="tab" style="text-align: right;"> '.number_format($item['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP).'</td></tr>');
 		}
@@ -248,11 +248,11 @@ function getMarketOrders($where) {
         FROM apimarketorders amo
         JOIN apicorpmembers acm
         ON amo.`charID`=acm.`characterID`
-        JOIN $LM_EVEDB.invtypes itp
+        JOIN $LM_EVEDB.invTypes itp
         ON amo.`typeID`=itp.`typeID`
-        JOIN $LM_EVEDB.stastations sta
+        JOIN $LM_EVEDB.staStations sta
         ON amo.`stationID`=sta.`stationID`
-        JOIN $LM_EVEDB.mapsolarsystems mss
+        JOIN $LM_EVEDB.mapSolarSystems mss
         ON sta.solarSystemID=mss.solarSystemID
         $where
         ORDER BY itp.`typeName`;");
@@ -353,9 +353,9 @@ function getBuyCalc() {
     global $LM_EVEDB;
     $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, igp.`groupName`, apr.`max`
     FROM `cfgbuying` AS buy
-    JOIN $LM_EVEDB.`invtypes` AS itp
+    JOIN $LM_EVEDB.`invTypes` AS itp
     ON buy.`typeID`=itp.`typeID`
-    JOIN $LM_EVEDB.`invgroups` AS igp
+    JOIN $LM_EVEDB.`invGroups` AS igp
     ON itp.`groupID`=igp.`groupID`
     JOIN `apiprices` AS apr
     ON buy.`typeID`=apr.`typeID`

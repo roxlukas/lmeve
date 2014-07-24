@@ -1,4 +1,4 @@
-<?
+<?php
 //$granted=-1;
 include_once("ldap.php");
 include_once("db.php");

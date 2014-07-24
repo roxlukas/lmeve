@@ -1,4 +1,4 @@
-<?
+<?php
 		function formatowanie($adm, $granted, $wyk, $zal) {
 			$wyl=0;
 			if ($adm==-1) {					//jesli nikt nie przyjal

@@ -26,9 +26,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	FROM lmtasks lmt
 	JOIN apicorpmembers acm
 	ON acm.characterID=lmt.characterID
-	JOIN $LM_EVEDB.invtypes itp
+	JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
-	JOIN $LM_EVEDB.ramactivities rac
+	JOIN $LM_EVEDB.ramActivities rac
 	ON lmt.activityID=rac.activityID
 	WHERE $MYTASKS AND $SELECTEDCHAR
 	AND ((singleton=1 AND date_format(lmt.taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0))
@@ -36,7 +36,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	LEFT JOIN	
 	(SELECT lmt.taskID, SUM(aij.runs)*itp.portionSize AS runsDone, COUNT(*) AS jobsDone
 	FROM lmtasks lmt
-	JOIN $LM_EVEDB.invtypes itp
+	JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
@@ -62,7 +62,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	FROM lmtasks lmt
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-        JOIN $LM_EVEDB.invtypes itp
+        JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
 	WHERE aij.completed=1 AND date_format(beginProductionTime, '%Y%m') = '${year}${month}'
 	AND $MYTASKS AND $SELECTEDCHAR
@@ -75,7 +75,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	FROM lmtasks lmt
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-        JOIN $LM_EVEDB.invtypes itp
+        JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
 	WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}' AND aij.endProductionTime < UTC_TIMESTAMP()
 	AND $MYTASKS AND $SELECTEDCHAR
@@ -365,9 +365,9 @@ function getCurrentJobs($MYTASKS, $SELECTEDCHAR, $ORDERBY) {
 	FROM apiindustryjobs aij
         JOIN apicorpmembers acm
 	ON acm.characterID=aij.installerID
-	JOIN $LM_EVEDB.invtypes itp
+	JOIN $LM_EVEDB.invTypes itp
 	ON aij.outputTypeID=itp.typeID
-	JOIN $LM_EVEDB.ramactivities rac
+	JOIN $LM_EVEDB.ramActivities rac
 	ON aij.activityID=rac.activityID
 	WHERE $MYTASKS AND $SELECTEDCHAR
 	AND aij.`endProductionTime` > UTC_TIMESTAMP()

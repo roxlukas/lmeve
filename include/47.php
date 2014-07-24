@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewMessages")) { //"Administrator,ViewOverview"
@@ -15,7 +15,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 			Messages<br>
 		    </div>
 		    
-<?
+<?php
 		    $nr=$_GET['nr'];
 		    if (!ctype_digit($nr)) {
 				die("Wrong parameter nr.");

@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
@@ -36,10 +36,10 @@ function althrefedit($nr) {
 	    <?php
 			if (!empty($query)) {
 				$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, ibt.`blueprintTypeID`, iit.`productTypeID`, ibt.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel
-				FROM $LM_EVEDB.`invtypes` itp
-				LEFT JOIN $LM_EVEDB.`invblueprinttypes` ibt
+				FROM $LM_EVEDB.`invTypes` itp
+				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` ibt
 				ON itp.typeID=ibt.blueprintTypeID
-				LEFT JOIN $LM_EVEDB.`invblueprinttypes` iit
+				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit
 				ON itp.typeID=iit.productTypeID
 				WHERE `typeName` LIKE '%$query%'
 				AND ( (ibt.`blueprintTypeID` IS NOT NULL) OR (iit.`productTypeID` IS NOT NULL) )
@@ -62,7 +62,7 @@ function althrefedit($nr) {
 		
 		</tr></table>
 	    
-	<?
+	<?php
 
 	
 	/*function hrefedit($nr,$date) {
@@ -83,7 +83,7 @@ function althrefedit($nr) {
 				<b>Actions</b>
 			</td>
 			</tr>
-			<?
+			<?php
 				//var_dump($tasklist);
 				foreach($items as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');

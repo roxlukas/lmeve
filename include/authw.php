@@ -1,4 +1,4 @@
-<?
+<?php
 if ((isset($granted))&&($granted>-1)) {
 
 /*

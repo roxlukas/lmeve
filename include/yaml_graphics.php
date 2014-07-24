@@ -8,22 +8,30 @@ include_once('spyc/Spyc.php');
  * @global $LM_EVEDB - EVE Static Data db name
  */
 function updateYamlTypeIDs() {
-    /*
-CREATE TABLE IF NOT EXISTS `yamltypeids` (
-  `typeID` int(11) NOT NULL,
-  `graphicID` int(11) NULL,
-  `iconID` int(11) NULL,
-  `radius` decimal(30,2) NULL,
-  `soundID` int(11) NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8; 
-    */
     global $LM_EVEDB;
-    $typeIDs = Spyc::YAMLLoad("../data/$LM_EVEDB/typeIDs.yaml");
+    
+    $file="../data/$LM_EVEDB/typeIDs.yaml";
+    
+    if (!file_exists($file)) {
+        echo("File $file does not exist. Make sure YAML files from EVE SDE are in appropriate directories.");
+        return FALSE;
+    }
+    
+    $create="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`yamlTypeIDs` (
+      `typeID` int(11) NOT NULL,
+      `graphicID` int(11) NULL,
+      `iconID` int(11) NULL,
+      `radius` decimal(30,2) NULL,
+      `soundID` int(11) NULL,
+      PRIMARY KEY (`typeID`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+    db_uquery($create);
+    
+    $typeIDs = Spyc::YAMLLoad($file);
     if (!empty($typeIDs)) {
-        db_uquery("TRUNCATE TABLE `yamltypeids`;");
+        db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlTypeIDs`;");
     } else return false;
-    $biginsert="INSERT INTO `yamltypeids` VALUES ";
+    $biginsert="INSERT INTO `$LM_EVEDB`.`yamlTypeIDs` VALUES ";
     foreach($typeIDs as $typeID => $row) {
         if (!isset($row['graphicID'])) $graphicID='NULL'; else $graphicID=addslashes($row['graphicID']);
         if (!isset($row['iconID'])) $iconID='NULL'; else $iconID=addslashes($row['iconID']);
@@ -42,26 +50,34 @@ CREATE TABLE IF NOT EXISTS `yamltypeids` (
  * @global $LM_EVEDB - EVE Static Data db name
  */
 function updateYamlGraphicIDs() {
-    /*
-CREATE TABLE IF NOT EXISTS `yamlgraphicids` (
-  `graphicID` int(11) NULL,
-  `colorScheme` varchar(256) NULL,
-  `description` varchar(256) NULL,
-  `graphicFile` varchar(512) NULL,
-  `graphicName` varchar(256) NULL,
-  `graphicType` varchar(256) NULL,
-  `gfxRaceID` varchar(64) NULL,
-  `collidable` boolean NULL,
-  `directoryID` int(11) NULL,
-  PRIMARY KEY (`graphicID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8; 
-    */
     global $LM_EVEDB;
-    $graphicIDs = Spyc::YAMLLoad("../data/$LM_EVEDB/graphicIDs.yaml");
+    
+    $file="../data/$LM_EVEDB/graphicIDs.yaml";
+    
+    if (!file_exists($file)) {
+        echo("File $file does not exist. Make sure YAML files from EVE SDE are in appropriate directories.");
+        return FALSE;
+    }
+    
+    $create="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`yamlGraphicIDs` (
+      `graphicID` int(11) NULL,
+      `colorScheme` varchar(256) NULL,
+      `description` varchar(256) NULL,
+      `graphicFile` varchar(512) NULL,
+      `graphicName` varchar(256) NULL,
+      `graphicType` varchar(256) NULL,
+      `gfxRaceID` varchar(64) NULL,
+      `collidable` boolean NULL,
+      `directoryID` int(11) NULL,
+      PRIMARY KEY (`graphicID`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+    db_uquery($create);
+    
+    $graphicIDs = Spyc::YAMLLoad($file);
     if (!empty($graphicIDs)) {
-        db_uquery("TRUNCATE TABLE `yamlgraphicids`;");
+        db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlGraphicIDs`;");
     } else return false;
-    $biginsert="INSERT INTO `yamlgraphicids` VALUES ";
+    $biginsert="INSERT INTO `$LM_EVEDB`.`yamlGraphicIDs` VALUES ";
     foreach($graphicIDs as $graphicID => $row) {
         if (!isset($row['colorScheme'])) $colorScheme='NULL'; else $colorScheme="'".addslashes($row['colorScheme'])."'";
         if (!isset($row['description'])) $description='NULL'; else $description="'".addslashes($row['description'])."'";
@@ -81,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `yamlgraphicids` (
 /**
  * Fetches resource file names for CCP WebGL from manually created `ccpwglmapping` table
  * 
+ * @deprecated
  * @param type $typeID
  * @return array typeID, shipModel, background, thrusters or false if not found
  */
@@ -98,7 +115,8 @@ function getResourceFromMapping($typeID) {
  * @return array typeID, shipModel, background, thrusters or false if not found
  */
 function getResourceFromYaml($typeID) {
-    $modelinfo=db_asocquery("SELECT * FROM `yamltypeids` yti JOIN `yamlgraphicids` ygi ON yti.`graphicID`=ygi.`graphicID` WHERE yti.`typeID`=$typeID;");
+    global $LM_EVEDB;
+    $modelinfo=db_asocquery("SELECT * FROM `$LM_EVEDB`.`yamlTypeIDs` yti JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi ON yti.`graphicID`=ygi.`graphicID` WHERE yti.`typeID`=$typeID;");
     if (count($modelinfo)==1) {
         $model=$modelinfo[0];
         $returns['typeID']=$typeID;

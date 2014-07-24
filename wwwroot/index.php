@@ -1,4 +1,4 @@
-<?
+<?php
 /**********************************************************************************
 								LM Framework v3
 								
@@ -43,7 +43,7 @@ include_once("lang.php");  //translations
 include_once("menu.php");  //menu
 include_once("template.php");  //templates
 
-$lmver="0.1.31 beta";
+$lmver="0.1.40 beta";
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  

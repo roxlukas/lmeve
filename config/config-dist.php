@@ -1,4 +1,4 @@
-<?
+<?php
 //APP NAME - for example "Aideron Technologies' LMeve"
 $LM_APP_NAME='LMeve';
 //locked

@@ -64,7 +64,7 @@ function template_main() {
 	<table class="tab-container">
 	<tr><td width="100%" class="tab-horizbar">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
-		<tr><td width="50%" align="left"><div class="top">Logged in as:<b> <?
+		<tr><td width="50%" align="left"><div class="top">Logged in as:<b> <?php
 			echo(getusername());
 		?></b><br></div></td>
 		<td width="50%"><div class="top2"><a href="?id=5"><img src="img/settings.gif" alt="Settings" style="vertical-align: middle;"></a><a href="index.php?logoff=1"><img src="img/log.gif" alt="Log off" style="vertical-align: middle;"> <b>Log off</b></a>
@@ -83,7 +83,7 @@ function template_main() {
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 	
-	<? //draw menu
+	<?php //draw menu
 	if (!isset($_GET['id'])) {
 		$id=getprefs();
 		$id=$id['defaultPage'];
@@ -190,7 +190,7 @@ function template_login() {
 	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
 	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
 	<title><?php echo($LM_APP_NAME); ?> - Please log in</title>
-	<?
+	<?php
 	applycss($LM_DEFAULT_CSS);
 	?>
 	</head>
@@ -237,7 +237,7 @@ function template_badlogon() {
 	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
 	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
 	<title><?php echo($LM_APP_NAME); ?> - Please log in</title>
-	<?
+	<?php
 	applycss($LM_DEFAULT_CSS);
 	?>
 	<link rel="icon" href="favicon.ico" type="image/ico">
@@ -254,12 +254,12 @@ function template_badlogon() {
 	</td></tr>
 	</table>
 	</center>
-	<?
+	<?php
 	 include('copyright.php');
 	?>
 	</body>
 	</html>
-	<?
+	<?php
 }
 
 function template_logout() {

@@ -1,8 +1,8 @@
-<?
-$TIME_OUT='Czas na wykonanie zlecenia min±³.';
+<?php
+$TIME_OUT='Czas na wykonanie zlecenia minï¿½ï¿½.';
 $WARN_MSG='To zlecenie wymaga pilnej uwagi!';
 $WARN_INCOMPLETE='To zlecenie jest niekompletne!';
-$NOT_DONE='Zlecenie nie zosta³o jeszcze wykonane.';
-$DONE='To zlecenie zosta³o wykonane.';
-$LOGIN_AGAIN='B£¡D: ZALOGUJ SIÊ PONOWNIE';
+$NOT_DONE='Zlecenie nie zostaï¿½o jeszcze wykonane.';
+$DONE='To zlecenie zostaï¿½o wykonane.';
+$LOGIN_AGAIN='Bï¿½ï¿½D: ZALOGUJ SIï¿½ PONOWNIE';
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewAllTasks,EditTasks")) { //"Administrator,ViewOverview"
@@ -98,7 +98,7 @@ $nr=secureGETnum("nr");
 		<?php } ?>
 		</tr></table>
 	    
-	<?
+	<?php
 		
 	$MYTASKS='TRUE';
 	

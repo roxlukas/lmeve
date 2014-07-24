@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewOwnCharacters,ViewAllCharacters")) { //"Administrator,ViewOverview"
@@ -28,7 +28,7 @@ if (strlen($date)==6) {
 			<?php echo($PANELNAME); ?><br>
 		    </div>
 		    
-<?
+<?php
 
 		    $nr=$_GET['nr'];
 		    if (!ctype_digit($nr)) {
@@ -60,7 +60,7 @@ if (strlen($date)==6) {
 		    $corp=$corp[0];
 		    $stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
 			FROM `apiindustryjobs` aij
-			JOIN $LM_EVEDB.`ramactivities` rac
+			JOIN $LM_EVEDB.`ramActivities` rac
 			ON aij.activityID=rac.activityID
 			WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
 			AND aij.installerID=${char['characterID']}
@@ -69,8 +69,8 @@ if (strlen($date)==6) {
 			
 			$sql="SELECT `typeID` , `typeName` , `name` , `installerID`, rac.activityName, SUM(runs)*portionSize AS runCount, COUNT(jobID) AS jobsCount
 FROM apiindustryjobs aij
-JOIN $LM_EVEDB.ramactivities rac ON aij.`activityID` = rac.`activityID`
-JOIN $LM_EVEDB.invtypes inv ON aij.`outputTypeID` = inv.`typeID`
+JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
+JOIN $LM_EVEDB.invTypes inv ON aij.`outputTypeID` = inv.`typeID`
 JOIN apicorpmembers acm ON aij.`installerID` = acm.`characterID`
 WHERE rac.`activityID` IS NOT NULL
 AND date_format(`beginProductionTime`, '%Y%m') = '${year}${month}'

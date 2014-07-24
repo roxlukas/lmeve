@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewMessages")) { //"Administrator,ViewOverview"
@@ -12,7 +12,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 ?>		    <div class="tytul">
 			Messages<br>
 		    </div>
-		<?
+		<?php
 
 		$nr=$_GET['nr'];
 		if (!ctype_digit($nr)) {
@@ -33,7 +33,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 			echo('Message deleted.<br><br>');
 			echo('<script type="text/javascript">location.href="index.php?id=4";</script>');
 		} else {
-			$do_logu=sprintf("<b>Brak uprawnieñ</b> przy próbie skasowania wiadomo¶ci ID=<b>%d</b> login: <b>%s</b>.",$nr,$user[$_SESSION['granted']]);
+			$do_logu=sprintf("<b>Brak uprawnieï¿½</b> przy prï¿½bie skasowania wiadomoï¿½ci ID=<b>%d</b> login: <b>%s</b>.",$nr,$user[$_SESSION['granted']]);
 			loguj("../var/access.txt",$do_logu);
 			echo('Permission denied.<br><br>');
 		}

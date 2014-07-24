@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
@@ -125,8 +125,8 @@ if ($mychars==1) {
 			
 				$sql="SELECT `typeID` , `typeName` , `name` , `installerID`, rac.activityName, rac.activityID, SUM(runs)*portionSize AS runCount, COUNT(jobID) AS jobsCount
 FROM apiindustryjobs aij
-JOIN $LM_EVEDB.ramactivities rac ON aij.`activityID` = rac.`activityID`
-JOIN $LM_EVEDB.invtypes inv ON aij.outputTypeID = inv.typeID
+JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
+JOIN $LM_EVEDB.invTypes inv ON aij.outputTypeID = inv.typeID
 JOIN apicorpmembers acm ON aij.installerID = acm.characterID
 WHERE rac.activityID IS NOT NULL
 AND aij.corporationID = ${corp['corporationID']}
@@ -163,7 +163,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 					<a href="?id=8&id2=0&mychars=<?php if ($mychars==1) echo(1); else echo(0); ?>">Item Types</a>
 				</th>
 				</tr>
-			   <?
+			   <?php
 
 			foreach($rearrange as $row) {
 				echo('<tr><td>');
@@ -189,7 +189,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			?>
 
 			</table>
-			<? 
+			<?php 
 			
 	}//end corps loop
 		?>

@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewOreValues")) { //"Administrator,ViewOverview"
@@ -17,9 +17,9 @@ function dbhrefedit($nr) {
 }
 
 $sql="SELECT itp.`typeID`, itp.`typeName`, itp.`volume`, itp.`portionSize`, itm.`materialTypeID` AS mineralID, itm.`quantity`, apr.`max` AS price
-FROM $LM_EVEDB.`invtypes` itp
-JOIN $LM_EVEDB.`invgroups` igp ON itp.`groupID` = igp.`groupID` 
-JOIN $LM_EVEDB.`invtypematerials` itm ON itp.`typeID` = itm.`typeID`
+FROM $LM_EVEDB.`invTypes` itp
+JOIN $LM_EVEDB.`invGroups` igp ON itp.`groupID` = igp.`groupID` 
+JOIN $LM_EVEDB.`invTypeMaterials` itm ON itp.`typeID` = itm.`typeID`
 JOIN `apiprices` apr ON itm.`materialTypeID` = apr.`typeID`
 WHERE igp.`categoryID` = 25
 AND itp.`marketGroupID` IS NOT NULL

@@ -1,4 +1,4 @@
-<?
+<?php
 checksession(); //check if we are called by a valid session
 	    $f=$_GET['id2'];
 	    switch ($f) {

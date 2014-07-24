@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 /*if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
@@ -12,7 +12,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 		    <div class="tytul">
 			Messages<br>
 		    </div>
-		<?
+		<?php
 		$admini=getusers();
 		//$i=$_GET['nr'];
 

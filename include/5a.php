@@ -10,7 +10,7 @@ $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Edit hours-per-point'; //Panel name (optional)
 //standard header ends here
 global $LM_EVEDB;
-$points=db_asocquery("SELECT rac.`activityName`,cpt.* FROM $LM_EVEDB.`ramactivities` rac JOIN `cfgpoints` cpt ON rac.`activityID`=cpt.`activityID` ORDER BY `activityName`;");
+$points=db_asocquery("SELECT rac.`activityName`,cpt.* FROM $LM_EVEDB.`ramActivities` rac JOIN `cfgpoints` cpt ON rac.`activityID`=cpt.`activityID` ORDER BY `activityName`;");
 
 function pointshrefedit($nr) {
     echo("<a href=\"index.php?id=5&id2=11&nr=$nr\" title=\"Click to edit this activity\">");

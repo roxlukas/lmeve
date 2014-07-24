@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 /*if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
@@ -19,7 +19,7 @@ Settings
 
 <h2>Server Statistics</h2>
 <b>Server time:</b>
-<?
+<?php
 	echo('<a href="#" title="');
 	echo(date('d.m.Y G:i:s'));
 	echo('">');
@@ -29,7 +29,7 @@ Settings
 ?>
 <br>
 <b>Server uptime: </b>
-<?
+<?php
 	$uptime=exec('uptime');
 	$up2=explode('up',$uptime);
 	$tmp=explode(',',$up2[1]);

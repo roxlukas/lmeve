@@ -1,4 +1,4 @@
-<?
+<?php
 if ($_SESSION['status']!=1) die("Wrong script call. <a href=\"index.php\">LMeve</a>");
 	    $f=$_GET['id2'];
 	    switch ($f) {

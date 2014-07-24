@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditWiki")) { //"Administrator,ViewOverview"
@@ -18,7 +18,7 @@ global $LM_EVEDB;
 	    </span>
             </span><span>Deleting: <strong><?php echo(stripslashes($wikipage)); ?></strong></span><br />
             
-<?
+<?php
 
 	$do=$_GET['do'];
 		

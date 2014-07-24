@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewBuyCalc")) { //"Administrator,ViewOverview"
@@ -15,7 +15,7 @@ global $LM_EVEDB;
 
 $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, apr.`max`
 		FROM `cfgbuying` AS buy
-		JOIN $LM_EVEDB.`invtypes` AS itp
+		JOIN $LM_EVEDB.`invTypes` AS itp
 		ON buy.`typeID`=itp.`typeID`
 		JOIN `apiprices` AS apr
 		ON buy.`typeID`=apr.`typeID`

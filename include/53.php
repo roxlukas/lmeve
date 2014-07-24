@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 /*if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
@@ -45,7 +45,7 @@ if (checkpass($oldpass)) {
 <input type="hidden" name="id2" value="2">
 <input type="submit" value="OK">
 </form>
-		<?
+		<?php
 	}
 } else {
 	$ip = $_SERVER['REMOTE_ADDR'];
@@ -62,7 +62,7 @@ if (checkpass($oldpass)) {
 <input type="hidden" name="id2" value="2">
 <input type="submit" value="OK">
 </form>
-	<?
+	<?php
 }
 
 ?>

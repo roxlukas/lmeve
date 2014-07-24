@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator")) { //"Administrator,ViewOverview"
@@ -13,7 +13,7 @@ $PANELNAME='Settings'; //Panel name (optional)
 ?>		    <div class="tytul">
 			Settings<br>
 		    </div>
-		<?
+		<?php
 		$blad=0;
 
 		$templink=secureGETstr('link',4096); //zbierz zmienne od przegladarki

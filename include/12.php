@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
@@ -95,14 +95,14 @@ if ($new) {
 			
 			if ($autoadd==1) {
 			    $sql="SELECT itp.`typeID`, itp.`typeName`, iit.`blueprintTypeID`, iit.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel, itp.`groupID`, ing.`categoryID`, imt.`parentTypeID`, iit1.`blueprintTypeID` AS bpoT1TypeID, itp.`portionSize`
-				FROM $LM_EVEDB.`invtypes` itp
-				JOIN $LM_EVEDB.`invgroups` ing
+				FROM $LM_EVEDB.`invTypes` itp
+				JOIN $LM_EVEDB.`invGroups` ing
 				ON itp.`groupID`=ing.`groupID`
-				LEFT JOIN $LM_EVEDB.`invblueprinttypes` iit
+				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit
 				ON itp.`typeID`=iit.`productTypeID`
-				JOIN $LM_EVEDB.`invmetatypes` imt
+				JOIN $LM_EVEDB.`invMetaTypes` imt
 				ON itp.`typeID`=imt.`typeID`
-				LEFT JOIN $LM_EVEDB.`invblueprinttypes` iit1
+				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit1
 				ON imt.`parentTypeID`=iit1.`productTypeID`
 				WHERE itp.`typeID`=$typeID
 				AND imt.`metaGroupID`=2

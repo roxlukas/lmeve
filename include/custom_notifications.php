@@ -6,7 +6,7 @@
 	
 	Contact: pozniak.lukasz@gmail.com
 	
-	Copyright (c) 2005-2013, £ukasz PoŸniak
+	Copyright (c) 2005-2013, ï¿½ukasz Poï¿½niak
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification,

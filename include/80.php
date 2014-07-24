@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
@@ -112,8 +112,8 @@ if ($mychars==1) {
 
 $sql="SELECT `typeID` , `typeName` , `name` , `installerID`, rac.`activityID`, rac.`activityName` , SUM(runs)*portionSize AS runCount, COUNT(jobID) AS jobsCount
 FROM apiindustryjobs aij
-JOIN $LM_EVEDB.ramactivities rac ON aij.`activityID` = rac.`activityID`
-JOIN $LM_EVEDB.invtypes inv ON aij.outputTypeID = inv.typeID
+JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
+JOIN $LM_EVEDB.invTypes inv ON aij.outputTypeID = inv.typeID
 JOIN apicorpmembers acm ON aij.installerID = acm.characterID
 AND aij.corporationID = ${corp['corporationID']}
 AND date_format(beginProductionTime, '%Y%m') = '${year}${month}'
@@ -216,7 +216,7 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 			?>
 
 			</table>
-			<? 
+			<?php 
 			
 	}//end corps loop
 		?>

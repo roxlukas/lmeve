@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
@@ -60,7 +60,7 @@ $runs=secureGETnum('runs');
 						
 			//now we fill the drop down lists with characters and industry activities
 			$chars=db_asocquery("SELECT characterID, name FROM `apicorpmembers` ORDER BY name;");
-			$activities=db_asocquery("SELECT `activityID`, `activityName` FROM $LM_EVEDB.`ramactivities` WHERE `published`=1 AND `activityID`>0 ORDER BY activityName;");
+			$activities=db_asocquery("SELECT `activityID`, `activityName` FROM $LM_EVEDB.`ramActivities` WHERE `published`=1 AND `activityID`>0 ORDER BY activityName;");
                         $labs=db_asocquery("SELECT lml.* FROM `lmlabs` lml ORDER BY lml.`structureName`;");
 
 		    echo('<form method="get" action="">');
@@ -75,13 +75,13 @@ $runs=secureGETnum('runs');
 		    echo('Item:<br></td><td width="200" class="tab">');
 		    if ((!$new)||(isset($task['activityID']))) {
 				//variables are set, so we can dig DB for a typeName
-				/*$typeName=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invtypes` WHERE `typeID`=${task['typeID']}");
+				/*$typeName=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE `typeID`=${task['typeID']}");
 				$typeName=$typeName[0]['typeName'];*/
 				$typeName=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, ibt.`blueprintTypeID`, iit.`productTypeID`, ibt.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel
-				FROM $LM_EVEDB.`invtypes` itp
-				LEFT JOIN $LM_EVEDB.`invblueprinttypes` ibt
+				FROM $LM_EVEDB.`invTypes` itp
+				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` ibt
 				ON itp.typeID=ibt.blueprintTypeID
-				LEFT JOIN $LM_EVEDB.`invblueprinttypes` iit
+				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit
 				ON itp.typeID=iit.productTypeID
 				WHERE `typeID`=${task['typeID']}
 				AND ( (ibt.`blueprintTypeID` IS NOT NULL) OR (iit.`productTypeID` IS NOT NULL) )

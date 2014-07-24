@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditRoles")) { //"Administrator,ViewOverview"
@@ -40,7 +40,7 @@ global $USERSTABLE;
 
 	    
 	    
-	<?
+	<?php
 	
 	$roles=db_asocquery("SELECT * from lmroles;");
 	
@@ -58,7 +58,7 @@ global $USERSTABLE;
 					<b>Role</b>
 				</td>
 				</tr>
-			   <?
+			   <?php
 			
 			foreach($roles as $row) {
 				echo('<tr><td class="tab">');

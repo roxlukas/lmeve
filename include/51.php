@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator")) { //"Administrator,ViewOverview"
@@ -21,7 +21,7 @@ Settings
 <input type="submit" value="Close">
 </form>
 <a href="#down">Scroll down</a><br>
-<?
+<?php
 //echo('<textarea cols="80" rows="25">');
 echo(czytajlog("../var/access.txt"));
 //echo('</textarea>');

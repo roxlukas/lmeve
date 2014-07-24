@@ -1,4 +1,4 @@
-<?
+<?php
 set_include_path("../include");
 date_default_timezone_set("Europe/Paris");
 include_once('../config/config.php'); //load config file

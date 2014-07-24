@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewWallet")) { //"Administrator,ViewOverview"
@@ -329,7 +329,7 @@ WHERE corporationID=${corp['corporationID']}";
 			$sql="SELECT SUM(wage) AS wages FROM (SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
 SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
 FROM `apiindustryjobs` aij
-JOIN $LM_EVEDB.`ramactivities` rac
+JOIN $LM_EVEDB.`ramActivities` rac
 ON aij.activityID=rac.activityID
 JOIN cfgpoints cpt
 ON aij.activityID=cpt.activityID
@@ -387,7 +387,7 @@ ORDER BY art.refTypeName;";
 				Net
 		    </th>
 		    </tr>
-		   <?
+		   <?php
 		foreach($wallet_divisions as $row) {
 		    echo('<tr><td>');
 		    echo($row['description']);
@@ -444,7 +444,7 @@ ORDER BY art.refTypeName;";
 		    </td>
 		    </tr>
 		    
-		    <?
+		    <?php
 		foreach($journal as $row) {
 		    echo('<tr><td style="text-align: left;">');
 		    echo($row['refTypeName']);
@@ -478,7 +478,7 @@ ORDER BY art.refTypeName;";
 		
 		</table> 
 		    
-		 <? 
+		 <?php 
 		  
 	}//end corps loop
 		?>

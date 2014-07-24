@@ -35,7 +35,7 @@ global $LM_EVEDB;
             return;
         }
         $data=db_asocquery("SELECT rac.`activityName`,cpt.*
-                FROM $LM_EVEDB.`ramactivities` rac
+                FROM $LM_EVEDB.`ramActivities` rac
                 JOIN `cfgpoints` cpt
                 ON rac.`activityID`=cpt.`activityID`
                 WHERE cpt.`activityID`=$nr;");

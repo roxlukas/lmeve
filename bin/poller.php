@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="16";
+$POLLER_VERSION="17";
 set_time_limit(880); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
 $mypath=str_replace('\\','/',dirname(__FILE__));
@@ -13,9 +13,9 @@ $MAX_ERRORS=10; //ignore first x errors
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
 
 date_default_timezone_set('Europe/Warsaw');
-set_include_path("$mypath/../include");
-include_once("log.php");
-include_once("db.php");
+//set_include_path("$mypath/../include");
+include_once("$mypath/../include/log.php");
+include_once("$mypath/../include/db.php");
 
 function microtime_float()
 {
@@ -147,7 +147,7 @@ function get_xml_contents($url, $cache, $interval) {
 	global $httplog;
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
    		$data = file_get_contents($cache);
-		$xml_data=new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="0">Cached</error><cachedUntil></cachedUntil></eveapi>');
+		$xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="0">Cached</error><cachedUntil></cachedUntil></eveapi>');
 	} else {
                  $ctx = stream_context_create(array(
                         'http' => array (
@@ -163,7 +163,7 @@ function get_xml_contents($url, $cache, $interval) {
                     if ($http_code!=200) {
                             //http errors
                             if (empty($http_code)) $http_code=500;
-                            $xml_data=new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="'.$http_code.'">HTTP ERROR! Return code: '.$http_response_header[0].'</error><cachedUntil></cachedUntil></eveapi>');
+                            $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="'.$http_code.'">HTTP ERROR! Return code: '.$http_response_header[0].'</error><cachedUntil></cachedUntil></eveapi>');
                             //additional logging!!
                             loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
                     } else {
@@ -171,12 +171,12 @@ function get_xml_contents($url, $cache, $interval) {
                             $xml_data = simplexml_load_file( $cache );
                             if ($xml_data === false) {
                                     //parser errors
-                                    $xml_data=new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="500">XML Parser error </error><cachedUntil></cachedUntil></eveapi>');
+                                    $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="500">XML Parser error </error><cachedUntil></cachedUntil></eveapi>');
                             }
                     }
                 } else {
                     //network problem?
-                    $xml_data=new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="500">NETWORK PROBLEM!</error><cachedUntil></cachedUntil></eveapi>');
+                    $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="500">NETWORK PROBLEM!</error><cachedUntil></cachedUntil></eveapi>');
                     loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nNETWORK PROBLEM!\r\n");
                 }
    	}
@@ -255,6 +255,112 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 			}
 		}
 	}
+        
+         
+       function criusInsert($attrs,$corporationID) {
+           //// INSERT TO CRIUS TABLE                   
+				$sql="INSERT INTO apiindustryjobscrius VALUES (".
+				$attrs->jobID.",".
+                                $attrs->installerID.",".
+                                ins_string($attrs->installerName).",".
+                                $attrs->facilityID.",".
+                                $attrs->solarSystemID.",".
+                                ins_string($attrs->solarSystemName).",".
+                                $attrs->stationID.",".
+                                $attrs->activityID.",".
+                                $attrs->blueprintID.",".
+                                $attrs->blueprintTypeID.",".
+                                ins_string($attrs->blueprintTypeName).",".
+                                $attrs->blueprintLocationID.",".
+                                $attrs->outputLocationID.",".
+                                $attrs->runs.",".
+                                $attrs->cost.",".
+                                $attrs->teamID.",".
+                                $attrs->licensedRuns.",".
+                                $attrs->probability.",".
+                                $attrs->productTypeID.",".
+                                ins_string($attrs->productTypeName).",".
+                                $attrs->status.",".
+                                $attrs->timeInSeconds.",".
+                                ins_string($attrs->startDate).",".
+                                ins_string($attrs->endDate).",".
+                                ins_string($attrs->pauseDate).",".
+                                ins_string($attrs->completedDate).",".
+                                $attrs->completedCharacterID.",".
+				$corporationID.
+				") ON DUPLICATE KEY UPDATE".
+				" status=".$attrs->status.
+				",completedDate=".ins_string($attrs->completedDate).
+				",completedCharacterID=".$attrs->completedCharacterID;
+				db_uquery($sql);
+//// INSERT TO COMPATIBILITY TABLE
+                                //FIELD TRANSLATION
+                                if ($attrs->productTypeID!=0) $productTypeID=$attrs->productTypeID; else $productTypeID=$attrs->blueprintTypeID;
+                                switch($attrs->status) {
+                                    case 1: //in progress
+                                        $completed=0;
+                                        $completedSuccessfully=0;
+                                        $completedStatus=0;
+                                        break;
+                                    case 104: //finished
+                                        $completed=1;
+                                        $completedSuccessfully=0;
+                                        $completedStatus=1;
+                                        break;
+                                    case 105: //failed
+                                        $completed=1;
+                                        $completedSuccessfully=0;
+                                        $completedStatus=0;
+                                        break;
+                                    default:
+                                        $completed=0;
+                                        $completedSuccessfully=0;
+                                        $completedStatus=0;
+                                }
+                                
+                                //QUERY
+                                $sql2="INSERT INTO apiindustryjobs VALUES (".
+				$attrs->jobID.",".
+				$attrs->facilityID.",".
+				$attrs->blueprintLocationID.",".
+				$attrs->blueprintID.",".
+				$attrs->blueprintLocationID.",".
+				"1,".
+				"0,".
+				"0,".
+				$attrs->licensedRuns.",".
+				$attrs->outputLocationID.",".
+				$attrs->installerID.",".
+				$attrs->runs.",".
+				$attrs->licensedRuns.",".
+				$attrs->solarSystemID.",".
+				$attrs->blueprintLocationID.",".
+				"0,".
+				"0,".
+				"0,".
+				"0,".
+				$attrs->blueprintTypeID.",".
+				$productTypeID.",".
+				"0,".
+				"0,".
+				$completed.",".
+				$completedSuccessfully.",".
+				"0,".
+				"0,".
+				$attrs->activityID.",".
+				$completedStatus.",".
+				ins_string($attrs->startDate).",".
+				ins_string($attrs->startDate).",".
+				ins_string($attrs->endDate).",".
+				ins_string($attrs->pauseDate).",".
+				$corporationID.
+				") ON DUPLICATE KEY UPDATE".
+				" completed=".$completed.
+				",completedSuccessfully=".$completedSuccessfully.
+				",completedStatus=".$completedStatus;
+				db_uquery($sql2);
+       }
+       
 
 /*************************************************************************************************/
 
@@ -325,9 +431,57 @@ foreach ($api_keys as $api_key) {
 	} else {
 		warning("MemberTracking.xml",$FEED_BLOCKED);
 	}
-	
+        
+	/* CRIUS CHANGES
+            Added /corp/Facilities.xml.aspx (cache: 1 hour)
+            Returns a list of all outpost and POS industrial facilities your corporation owns.
+
+            Added /corp/IndustryJobsHistory.xml.aspx (cache: 6 hours)
+            Returns a list of running and completed jobs for your corporation, up to 90 days or 10000 rows.
+
+            Added /char/IndustryJobsHistory.xml.aspx (cache: 6 hours)
+            Returns a list of running and completed jobs for your character, up to 90 days or 10000 rows.
+
+            Modified /corp/IndustryJobs.xml.aspx (cache: 15 minutes)
+            Returns a list of running jobs for your corporation, up to 90 days or 10000 rows.
+
+            Modified /char/IndustryJobs.xml.aspx (cache: 15 minutes)
+            Returns a list of running jobs for your character, up to 90 days or 10000 rows.
+        */
+        
 	//POLL INDUSTRY JOBS
-	if (!apiCheckErrors($keyid,"IndustryJobs.xml")) {
+        /*
+         * corp_IndustryJobs.xml
+         * 
+         * jobID,installerID,installerName,facilityID,solarSystemID,solarSystemName,stationID,
+         * activityID,blueprintID,blueprintTypeID,blueprintTypeName,blueprintLocationID,
+         * outputLocationID,runs,cost,teamID,licensedRuns,probability,productTypeID,productTypeName,
+         * status,timeInSeconds,startDate,endDate,pauseDate,completedDate,completedCharacterID
+         * 
+	 * <row jobID="226177178" installerID="170029085" installerName="Raksha Delam" facilityID="1015061849537" solarSystemID="30002797" solarSystemName="Kaunokka" stationID="1015061829404" activityID="3" blueprintID="1002679594531" blueprintTypeID="2047" blueprintTypeName="Damage Control I Blueprint" blueprintLocationID="1015061849537" outputLocationID="1015061849537" runs="10" cost="122795.0000" teamID="0" licensedRuns="200" probability="1" productTypeID="0" productTypeName="" status="1" timeInSeconds="374400" startDate="6/29/2014 4:08:46 AM" endDate="7/3/2014 12:08:46 PM" pauseDate="1/1/0001 12:00:00 AM" completedDate="1/1/0001 12:00:00 AM" completedCharacterID="0"/>
+         * 
+         * 
+         * 
+         * corp_IndustryJobsHistory.xml
+         * 
+         * jobID,installerID,installerName,facilityID,solarSystemID,solarSystemName,stationID,
+         * activityID,blueprintID,blueprintTypeID,blueprintTypeName,blueprintLocationID,
+         * outputLocationID,runs,cost,teamID,licensedRuns,probability,productTypeID,productTypeName,
+         * status,timeInSeconds,startDate,endDate,pauseDate,completedDate,completedCharacterID
+         * 
+         * <row jobID="226177166" installerID="90471974" installerName="Anton Renard" facilityID="1015061849557" solarSystemID="30002797" solarSystemName="Kaunokka" stationID="1015061829404" activityID="1" blueprintID="1013075909250" blueprintTypeID="3187" blueprintTypeName="Neutron Blaster Cannon II Blueprint" blueprintLocationID="1015061849557" outputLocationID="1015061849557" runs="10" cost="1257015.0000" teamID="0" licensedRuns="10" probability="1" productTypeID="0" productTypeName="" status="1" timeInSeconds="34775" startDate="6/29/2014 4:01:59 AM" endDate="6/29/2014 1:41:34 PM" pauseDate="1/1/0001 12:00:00 AM" completedDate="1/1/0001 12:00:00 AM" completedCharacterID="0"/>
+         * 
+         * 
+         * 
+         * corp_facilities.xml
+         * 
+         * facilityID,typeID,typeName,solarSystemID,solarSystemName,regionID,regionName,starbaseModifier,tax
+         * 
+         * <row facilityID="1015061849081" typeID="28351" typeName="Design Laboratory" solarSystemID="30002797" solarSystemName="Kaunokka" regionID="10000033" regionName="The Citadel" starbaseModifier="0.94" tax="0"/>		
+         * 
+         */
+        
+        if (!apiCheckErrors($keyid,"IndustryJobs.xml")) {
 		$ijl=get_xml_contents("https://api.eveonline.com/corp/IndustryJobs.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobs_$keyid.xml",15*60);
 		if (isset($ijl->error)) {
 			apiSaveWarning($keyid,$ijl->error,"IndustryJobs.xml");
@@ -335,52 +489,30 @@ foreach ($api_keys as $api_key) {
 			$rows=$ijl->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();
-				$sql="INSERT INTO apiindustryjobs VALUES (".
-				$attrs->jobID.",".
-				$attrs->assemblyLineID.",".
-				$attrs->containerID.",".
-				$attrs->installedItemID.",".
-				$attrs->installedItemLocationID.",".
-				$attrs->installedItemQuantity.",".
-				$attrs->installedItemProductivityLevel.",".
-				$attrs->installedItemMaterialLevel.",".
-				$attrs->installedItemLicensedProductionRunsRemaining.",".
-				$attrs->outputLocationID.",".
-				$attrs->installerID.",".
-				$attrs->runs.",".
-				$attrs->licensedProductionRuns.",".
-				$attrs->installedInSolarSystemID.",".
-				$attrs->containerLocationID.",".
-				$attrs->materialMultiplier.",".
-				$attrs->charMaterialMultiplier.",".
-				$attrs->timeMultiplier.",".
-				$attrs->charTimeMultiplier.",".
-				$attrs->installedItemTypeID.",".
-				$attrs->outputTypeID.",".
-				$attrs->containerTypeID.",".
-				$attrs->installedItemCopy.",".
-				$attrs->completed.",".
-				$attrs->completedSuccessfully.",".
-				$attrs->installedItemFlag.",".
-				$attrs->outputFlag.",".
-				$attrs->activityID.",".
-				$attrs->completedStatus.",".
-				ins_string($attrs->installTime).",".
-				ins_string($attrs->beginProductionTime).",".
-				ins_string($attrs->endProductionTime).",".
-				ins_string($attrs->pauseProductionTime).",".
-				$corporationID.
-				") ON DUPLICATE KEY UPDATE".
-				" completed=".$attrs->completed.
-				",completedSuccessfully=".$attrs->completedSuccessfully.
-				",completedStatus=".$attrs->completedStatus;
-				db_uquery($sql);
+                                criusInsert($attrs,$corporationID);
 			}
 			apiSaveOK($keyid,"IndustryJobs.xml");
 		}
 	} else {
 		warning("IndustryJobs.xml",$FEED_BLOCKED);
+	}        
+        //Crius new endpoint - jobs history
+        if (!apiCheckErrors($keyid,"IndustryJobsHistory")) {
+		$ijl=get_xml_contents("https://api.eveonline.com/corp/IndustryJobsHistory.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobsHistory_$keyid.xml",6*60*60);
+		if (isset($ijl->error)) {
+			apiSaveWarning($keyid,$ijl->error,"IndustryJobsHistory.xml");
+		} else {
+			$rows=$ijl->result->rowset->row;
+			foreach ($rows as $row) {
+				$attrs=$row->attributes();
+				criusInsert($attrs,$corporationID);
+			}
+			apiSaveOK($keyid,"IndustryJobsHistory.xml");
+		}
+	} else {
+		warning("IndustryJobsHistory.xml",$FEED_BLOCKED);
 	}
+        
 	
 	//CORP SHEET: https://api.eveonline.com/corp/CorporationSheet.xml.aspx
 	//Parameters	 userID, apiKey, characterID OR corporationID

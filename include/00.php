@@ -1,4 +1,4 @@
-<? 
+<?php 
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
@@ -93,7 +93,7 @@ $pointsDisplayed=false;
 
 
 		    <?php
-		    $points=db_asocquery("SELECT rac.`activityName`,cpt.* FROM $LM_EVEDB.`ramactivities` rac JOIN `cfgpoints` cpt ON rac.`activityID`=cpt.`activityID` ORDER BY `activityName`;");
+		    $points=db_asocquery("SELECT rac.`activityName`,cpt.* FROM $LM_EVEDB.`ramActivities` rac JOIN `cfgpoints` cpt ON rac.`activityID`=cpt.`activityID` ORDER BY `activityName`;");
 		    $ONEPOINT=15000000; //it should be loaded from DB, static for now
 		    		    
 		    
@@ -118,7 +118,7 @@ $(function() {
 <?php				
 				$stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs, SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
 	FROM `apiindustryjobs` aij
-	JOIN $LM_EVEDB.`ramactivities` rac
+	JOIN $LM_EVEDB.`ramActivities` rac
 	ON aij.activityID=rac.activityID
 	WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
 	AND aij.corporationID=${corp['corporationID']}
@@ -200,7 +200,7 @@ $(function() {
 				$sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
 	SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
 	FROM `apiindustryjobs` aij
-	JOIN $LM_EVEDB.`ramactivities` rac
+	JOIN $LM_EVEDB.`ramActivities` rac
 	ON aij.activityID=rac.activityID
 	JOIN cfgpoints cpt
 	ON aij.activityID=cpt.activityID
@@ -252,7 +252,7 @@ $(function() {
 					<b>ISK</b>
 				</td>
 				</tr>
-			   <?
+			   <?php
                         $mychars=getMyChars(true);   
                         //var_dump($mychars);
 			$totals['ISK']=0.0;
@@ -409,7 +409,7 @@ $(function() {
 				</th>
 			</tr>
 			</table>
-			<? 
+			<?php 
 			
 	}//end corps loop
 		?>

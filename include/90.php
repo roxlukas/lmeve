@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewOwnCharacters,ViewAllCharacters,EditCharacters")) { //"Administrator,ViewOverview"
@@ -39,7 +39,7 @@ global $USERSTABLE;
 
 	    
 	    
-	<?
+	<?php
 	
 	if (!checkrights("Administrator,ViewAllCharacters")) {
 		$WHERE='WHERE lmu.userID='.$_SESSION[granted];
@@ -105,7 +105,7 @@ global $USERSTABLE;
 				<b>Characters</b>
 			</th>
 			</tr>
-			<?
+			<?php
 				foreach($rearrange as $row) {
 					echo('<tr><td class="tab"  style="text-align: center;">');
                                         if ($row['active']==0) echo('<img src="ccp_icons/38_16_169.png" alt="[x]" style="vertical-align: middle;" />');

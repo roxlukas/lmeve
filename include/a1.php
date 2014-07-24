@@ -12,7 +12,7 @@ $PANELNAME='Item Database'; //Panel name (optional)
 
 global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY;
 include_once('materials.php');
-include_once('graphics.php');
+include_once('yaml_graphics.php');
 
 $nr=secureGETnum('nr');
 
@@ -442,7 +442,7 @@ if ($model) {
 		echo('<strong>ME: </strong>');
 		echo('<input type="text" id="melevel" onclick="select_all(this);" onkeyup="func(this);" size="6" value="'.$melevel.'">');		
 		echo('</td><td style="text-align: center;">');
-		echo('<strong>PE: </strong>');
+		echo('<strong>TE: </strong>');
 		echo('<input type="text" id="pelevel" onclick="select_all(this);" size="6" value="'.$pelevel.'">');		
 		echo('</td>');
 		if (checkrights("Administrator,EditMEPE")) {
@@ -460,6 +460,7 @@ if ($model) {
 
 	/************************* END OF MATERIALS *******************************/
 
+	
 	echo('</td><td style="width: 45%; vertical-align: top;">');
 	
 	

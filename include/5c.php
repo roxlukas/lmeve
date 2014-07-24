@@ -15,7 +15,7 @@ global $LM_EVEDB;
 			<?php echo($PANELNAME); ?><br>
 		    </div>
 		    
-<?
+<?php
 		$new=FALSE;
 		$nr=$_GET['nr'];
 		if (!ctype_digit($nr)) {

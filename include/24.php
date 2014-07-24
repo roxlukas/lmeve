@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditPOS")) { //"Administrator,ViewOverview"
@@ -48,7 +48,7 @@ include_once 'inventory.php';
 			echo('structureTypeID cannot be empty.');
 			return;
 		} else {
-                        $types=db_asocquery("SELECT * FROM $LM_EVEDB.`invtypes` WHERE `groupID` IN (397,413) AND `typeID`=$structureTypeID;");
+                        $types=db_asocquery("SELECT * FROM $LM_EVEDB.`invTypes` WHERE `groupID` IN (397,413) AND `typeID`=$structureTypeID;");
                         if (count($types)==0) {
                             echo('structureTypeID outside permitted range.');
                             return;

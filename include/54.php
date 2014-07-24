@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 /*if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
@@ -22,7 +22,7 @@ Settings
 <table border="0" cellspacing="2" cellpadding="0">
 
 <tr><td>Default tab after logon:</td><td><select name="prefs1">
-<?
+<?php
 
 $prefs=getprefs();
 
@@ -44,7 +44,7 @@ foreach ($menu as $i => $menuitem) {
 <tr>
 <td valign="top">CSS stylesheet:</td><td>
 <select name="prefs3">
-<?
+<?php
 $dir=scandir('./css');
 foreach ($dir as $entry) {
 	if (preg_match('/css$/',$entry)) {

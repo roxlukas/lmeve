@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewDatabase")) { //"Administrator,ViewOverview"
@@ -22,12 +22,12 @@ $marketGroupID=secureGETnum('marketGroupID');
 	<?php
 		if (!empty($query)) {
 				/*$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`
-				FROM $LM_EVEDB.`invtypes` itp			
+				FROM $LM_EVEDB.`invTypes` itp			
 				WHERE `typeName` LIKE '%$query%'
 				AND published = 1
 				ORDER BY `typeName`;");*/
                                 $items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, itp.`published`
-				FROM $LM_EVEDB.`invtypes` itp			
+				FROM $LM_EVEDB.`invTypes` itp			
 				WHERE `typeName` LIKE '%$query%'
 				ORDER BY `typeName`;");
 		}
@@ -38,7 +38,7 @@ $marketGroupID=secureGETnum('marketGroupID');
 			$whereparentgroup="parentGroupID IS NULL";
 		}
 		
-		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`invmarketgroups` WHERE $whereparentgroup ;");
+		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE $whereparentgroup ;");
 
 		?>
 	    <table cellpadding="0" cellspacing="2">
@@ -55,7 +55,7 @@ $marketGroupID=secureGETnum('marketGroupID');
 		
 		</tr></table>
 	    
-	<?
+	<?php
 
 	
 	function hrefedit_item($nr) {
@@ -73,7 +73,7 @@ $marketGroupID=secureGETnum('marketGroupID');
 				<b>Name</b>
 			</td>
 			</tr>
-			<?
+			<?php
 				foreach($items as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 						hrefedit_item($row['typeID']);

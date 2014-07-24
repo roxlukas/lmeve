@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewMessages")) { //"Administrator,ViewOverview"
@@ -40,7 +40,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 				---
 		    </td></tr>
 
-		<?
+		<?php
 
 		foreach($message as $row) {
 		  $wyl=0;

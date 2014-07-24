@@ -1,4 +1,4 @@
-<?
+<?php
 /**********************************************************************************
 								LM Framework v3
 								
@@ -35,7 +35,7 @@
 
 <br>
 <div class="tekst">
-<?
+<?php
 include('../config/config.php'); //wczytaj nastawy konfiguracji
 ?>
 <table width="90%" border="0" cellspacing="2" cellpadding="0">
@@ -213,7 +213,7 @@ New CSS skin by famous Rixx Javix (<a href="https://twitter.com/RixxJavix" targe
     
 <!-- end of changelog -->
 
-<?
+<?php
 
 //HISTORIA ZMIAN
 
@@ -727,7 +727,7 @@ Fixed a bug in SQL schema - no PRIMARY KEY in apiwalletjournal table caused poll
 New corp feeds: AssetList.xml FacWarStats.xml ContainerLog.xml ContactList.xml
 </li>
 <li>
-To decode Asset locations new database table was merged from Static Data Dump: mapsolarsystems + stastations
+To decode Asset locations new database table was merged from Static Data Dump: mapSolarSystems + staStations
 </li>
 <li>
 Statistics added on Timesheet
@@ -870,7 +870,7 @@ no GUI yet
 </ul>
 </td></tr>
 
-<?
+<?php
 echo('<tr><td><a href="?id=254">Close complete history</a></td></tr>');
 } else {
 	echo('<tr><td><a href="?id=254&history=1">Show complete history</a></td></tr>');

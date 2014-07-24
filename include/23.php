@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditPOS")) { //"Administrator,ViewOverview"
@@ -52,7 +52,7 @@ include_once 'inventory.php';
 						
 			//fill the drop down lists with pos and structures
                         $towers=getControlTowers("TRUE ORDER BY `moonName`");
-                        $types=db_asocquery("SELECT * FROM $LM_EVEDB.`invtypes` WHERE `groupID` IN (397,413) ORDER BY `typeName`;");
+                        $types=db_asocquery("SELECT * FROM $LM_EVEDB.`invTypes` WHERE `groupID` IN (397,413) ORDER BY `typeName`;");
 			
 		    echo('<form method="get" action="">');
 		    echo('<input type="hidden" name="id" value="2">');

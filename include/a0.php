@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewDatabase")) { //"Administrator,ViewOverview"
@@ -27,13 +27,13 @@ if (!empty($marketGroupID)) {
 	<?php
 		if (!empty($marketGroupID)) {
 				$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`
-				FROM $LM_EVEDB.`invtypes` itp			
+				FROM $LM_EVEDB.`invTypes` itp			
 				WHERE `marketGroupID` $wheremarket
 				AND published = 1
 				LIMIT 50;");
 		}
 		
-		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`invmarketgroups` WHERE `parentGroupID` $wheremarket ;");
+		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE `parentGroupID` $wheremarket ;");
 
 		?>
 	    <table cellpadding="0" cellspacing="2">
@@ -50,7 +50,7 @@ if (!empty($marketGroupID)) {
 		
 		</tr></table>
 	    
-	<?
+	<?php
 
 	
 	function hrefedit_item($nr) {
@@ -64,7 +64,7 @@ if (!empty($marketGroupID)) {
 	function getMarketNode($marketGroupID) {
 		global $LM_EVEDB;
 		if (empty($marketGroupID)) return;
-		$data=db_asocquery("SELECT * FROM $LM_EVEDB.`invmarketgroups` WHERE `marketGroupID` = $marketGroupID ;");
+		$data=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE `marketGroupID` = $marketGroupID ;");
 		if (sizeof($data)==1) return($data[0]); else return;
 	}
 	
@@ -91,7 +91,7 @@ if (!empty($marketGroupID)) {
 				<b>Name</b>
 			</td>
 			</tr>
-	<?
+	<?php
 	if (!empty($marketGroupID)) {
 		/*
 			<tr><td class="tab">
@@ -108,7 +108,7 @@ if (!empty($marketGroupID)) {
 				<b><a href="?id=10&id2=0&marketGroupID=<?php echo($parentGroupID); ?>">..</a></b>
 			</td>
 			</tr>
-		<?
+		<?php
 	}
 	
 	if (sizeof($groups)>0) {		

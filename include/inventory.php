@@ -26,11 +26,11 @@ function getControlTowers($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT asl.*,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
     FROM `apistarbaselist` asl
-    JOIN $LM_EVEDB.`invnames` ssn
+    JOIN $LM_EVEDB.`invNames` ssn
     ON asl.`locationID`=ssn.`itemID`
-    JOIN $LM_EVEDB.`invnames` ssm
+    JOIN $LM_EVEDB.`invNames` ssm
     ON asl.`moonID`=ssm.`itemID`
-    JOIN $LM_EVEDB.`invtypes` itp
+    JOIN $LM_EVEDB.`invTypes` itp
     ON asl.`typeID`=itp.`typeID`
     WHERE $where;";
     //echo("DEBUG: $sql");
@@ -42,7 +42,7 @@ function getLabs($where='TRUE') {
     global $LM_EVEDB;
     $sql_labs="SELECT lml.*,itp.`typeName`
     FROM `lmlabs` lml
-    JOIN $LM_EVEDB.`invtypes` itp
+    JOIN $LM_EVEDB.`invTypes` itp
     ON lml.`structureTypeID`=itp.`typeID`
     WHERE $where
     ORDER BY lml.parentTowerID,lml.structureName;";
@@ -54,7 +54,7 @@ function getLabDetails($structureID) {
     global $LM_EVEDB;
     $sql="SELECT lml.*,itp.`typeName`
     FROM `lmlabs` lml
-    JOIN $LM_EVEDB.`invtypes` itp
+    JOIN $LM_EVEDB.`invTypes` itp
     ON lml.`structureTypeID`=itp.`typeID`
     WHERE `structureID`=$structureID
     ORDER BY lml.parentTowerID,lml.structureName;";
@@ -81,7 +81,7 @@ function getLabDetails($structureID) {
 function getSimpleTasks($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT lmt.*,itp.`typeName`,acm.`name` AS characterName FROM `lmtasks` lmt
-    JOIN $LM_EVEDB.`invtypes` itp
+    JOIN $LM_EVEDB.`invTypes` itp
     ON lmt.`typeID`=itp.`typeID`
     LEFT JOIN `apicorpmembers` acm
     ON lmt.`characterID`=acm.`characterID`
@@ -360,15 +360,15 @@ function getStock($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT cfs.*,itp.`typeName`,apa.*,apl.`itemName` AS locationName,app.`max` as price,itp.`groupID`, igp.`groupName` 
         FROM `cfgstock` cfs
-        JOIN $LM_EVEDB.`invtypes` itp
+        JOIN $LM_EVEDB.`invTypes` itp
         ON cfs.`typeID`=itp.`typeID`
-        JOIN $LM_EVEDB.`invgroups` igp
+        JOIN $LM_EVEDB.`invGroups` igp
         ON itp.`groupID`=igp.`groupID`
         LEFT JOIN `apiprices` app
         ON cfs.`typeID`=app.`typeID`
         JOIN `apiassets` apa
         ON cfs.`typeID`=apa.`typeID`
-        LEFT JOIN $LM_EVEDB.`mapdenormalize` apl
+        LEFT JOIN $LM_EVEDB.`mapDenormalize` apl
         ON apa.`locationID`=apl.`itemID`
         WHERE $where AND (app.type='buy' OR app.type IS NULL)
         ORDER BY itp.`groupID`, itp.`typeName`;";

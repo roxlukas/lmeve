@@ -1,4 +1,4 @@
-<?
+<?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditRoles")) { //"Administrator,ViewOverview"
@@ -16,7 +16,7 @@ global $USERSTABLE;
 			<?php echo($PANELNAME); ?><br>
 		    </div>
 		    
-<?
+<?php
  $new=FALSE;
 		    $nr=$_GET['nr'];
 		    if (!ctype_digit($nr)) {

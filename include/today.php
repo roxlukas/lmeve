@@ -1,4 +1,4 @@
-<?
+<?php
 /**********************************************************************************
 								LM Framework v3
 								
@@ -51,10 +51,10 @@ $PANELNAME='Today'; //Panel name (optional)
 	<?php
 		include("checkpoller.php");
 	?>
-	<h1><?
+	<h1><?php
 		printf("%s",date('Y'));
 	?></h1>
-	<h2><?
+	<h2><?php
 		$dnityg=array('Sunday',
 		'Monday',
 		'Tuesday',
@@ -79,7 +79,7 @@ $PANELNAME='Today'; //Panel name (optional)
 		$d=date('d');
 		$mi=date('m');
 		printf("%s, %s %s",$dnityg[$dow], str2num($d), $miesiace[str2num($mi)]);
-	?></h2><?
+	?></h2><?php
 		$message=message("WHERE `msgto`=${_SESSION['granted']} AND `msgread`=0");
 		$nowe_wiad=0;
 		foreach($message as $row) {
@@ -107,7 +107,7 @@ $PANELNAME='Today'; //Panel name (optional)
 		
 		
 		<h2>Messages</h2>
-		<?
+		<?php
 if($nowe_wiad==1) {
 
 		function hrefedit2($nr) {
@@ -130,7 +130,7 @@ if($nowe_wiad==1) {
 } else {
 ?>
 <a href="index.php?id=4">No new messages.</a><br>
-<?
+<?php
 }
 		?>
 <br>
