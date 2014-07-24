@@ -44,10 +44,10 @@ $nr=secureGETnum('nr');
 		if (checkrights("Administrator,EditTasks")) {
 			echo('<td  style="width: 35%;">');
 			$tasks=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, ibt.`blueprintTypeID`, iit.`productTypeID`, ibt.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel
-			FROM $LM_EVEDB.`invtypes` itp
-			LEFT JOIN $LM_EVEDB.`invblueprinttypes` ibt
+			FROM $LM_EVEDB.`invTypes` itp
+			LEFT JOIN $LM_EVEDB.`invBlueprintTypes` ibt
 			ON itp.typeID=ibt.blueprintTypeID
-			LEFT JOIN $LM_EVEDB.`invblueprinttypes` iit
+			LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit
 			ON itp.typeID=iit.productTypeID
 			WHERE `typeID`=$nr
 			AND ( (ibt.`blueprintTypeID` IS NOT NULL) OR (iit.`productTypeID` IS NOT NULL) )
@@ -70,7 +70,7 @@ $nr=secureGETnum('nr');
 			}
 			echo('</td>');
 		}
-                $hasMarketGroup=db_asocquery("SELECT * FROM $LM_EVEDB.`invtypes` WHERE `typeID`=$nr AND `marketGroupID` IS NOT NULL;");
+                $hasMarketGroup=db_asocquery("SELECT * FROM $LM_EVEDB.`invTypes` WHERE `typeID`=$nr AND `marketGroupID` IS NOT NULL;");
 		if (count($hasMarketGroup)>0) {
 			$pricesDisabled='';
 		} else {
@@ -125,8 +125,8 @@ $nr=secureGETnum('nr');
 		<?php
 	
 		$item=db_asocquery("SELECT itp.*,igp.`categoryID`
-		FROM $LM_EVEDB.`invtypes` itp
-                JOIN $LM_EVEDB.`invgroups` igp
+		FROM $LM_EVEDB.`invTypes` itp
+                JOIN $LM_EVEDB.`invGroups` igp
                 ON itp.`groupID`=igp.`groupID`
 		WHERE `typeID` = $nr ;");
 		$item=$item[0];
@@ -134,14 +134,14 @@ $nr=secureGETnum('nr');
 	function getMarketNode($marketGroupID) {
 		global $LM_EVEDB;
 		if (empty($marketGroupID)) return;
-		$data=db_asocquery("SELECT * FROM $LM_EVEDB.`invmarketgroups` WHERE `marketGroupID` = $marketGroupID ;");
+		$data=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE `marketGroupID` = $marketGroupID ;");
 		if (sizeof($data)==1) return($data[0]); else return;
 	}
 	
-	$blueprint=db_query("SELECT * FROM $LM_EVEDB.`invblueprinttypes` WHERE `productTypeID` = $nr;");
+	$blueprint=db_query("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `productTypeID` = $nr;");
 	$techLevel=$blueprint[0][4];
 	$wasteFactor=$blueprint[0][11]/100;
-	$produceditem=db_query("SELECT * FROM $LM_EVEDB.`invblueprinttypes` WHERE `blueprintTypeID` = $nr;");
+	$produceditem=db_query("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `blueprintTypeID` = $nr;");
 	
 	$node=getMarketNode($item['marketGroupID']);
 	$breadcrumbs="&gt; ${item['typeName']}";
@@ -490,8 +490,8 @@ if ($model) {
 	}
 
 	$sql="SELECT valueFloat,valueInt,displayName,description
-	FROM $LM_EVEDB.`dgmtypeattributes` AS dta
-	JOIN $LM_EVEDB.`dgmattributetypes` AS da
+	FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
+	JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
 	ON dta.attributeID=da.attributeID
 	WHERE dta.typeID=$nr
 	AND displayName != '';";
@@ -501,20 +501,20 @@ if ($model) {
 			$element[0]=sprintf("%6.1f%%",100*(1.0-$element[0]));
 		}
 		if (eregi(".*skill required$", $element[2], $regs)) {
-			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invtypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$skill[0][0]);
 		}
 		if ($element[2]=="Used with (chargegroup)") {
-			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invgroups` WHERE groupID = ${element[1]};");
+			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
 			$element[0]=sprintf("%s",$groupid[0][0]);
 		}
 		if (eregi(".*Can be fitted to$", $element[2], $regs)) {
-			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invgroups` WHERE groupID = ${element[1]};");
+			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
 			$element[0]=sprintf("%s",$groupid[0][0]);
 		}
 		//Jump Drive Fuel Need
 		if (strstr("Jump Drive Fuel Need",$element[2])) {
-			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invtypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_img/${element[1]}_32.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$fuel[0][0]);
 		}
 		if (eregi(".*duration$", $element[2], $regs)) {
@@ -530,11 +530,11 @@ if ($model) {
 			$element[0]=sprintf("%d MB/s",$element[0]);
 		}
 		if (strstr("Planet Type Restriction",$element[2])) {
-			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invtypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$planettype[0][0]);
 		}
 		if (strstr("Can be fitted to",$element[2])) {
-			if (!empty($element[1])) $fittedto=db_query("SELECT typeName FROM $LM_EVEDB.`invtypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $fittedto=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"> %s</a>",$element[1],$fittedto[0][0]);
 		}
 		//if (eregi(".*Damage Resistance$", $element[2], $regs)) {
@@ -548,7 +548,7 @@ if ($model) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
 		if (strstr("Consumption Type",$element[2])) {
-			$type=db_query("SELECT typeName FROM $LM_EVEDB.invtypes WHERE typeID = ${element[1]};");
+			$type=db_query("SELECT typeName FROM $LM_EVEDB.invTypes WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/51_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$element[1],$type[0][0]);
 		}
 		//echo("<tr><td><b>${element[2]}</b><br /><i>${element[1]}</i></td><td>${element[0]}</td></tr>");

@@ -9,13 +9,13 @@
  */
 function getBlueprintByProduct($typeID) {
 	global $LM_EVEDB;
-	$blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invblueprinttypes` WHERE `productTypeID` = $typeID;");
+	$blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `productTypeID` = $typeID;");
 	//$techLevel=$blueprint[0][4];
 	//$wasteFactor=$blueprint[0][11]/100;
 	if (count($blueprint)==1) {
             return $blueprint[0];
 	} else { //blueprint not found... maybe given typeID is a blueprint itself??
-            $blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invblueprinttypes` WHERE `blueprintTypeID` = $typeID;");
+            $blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `blueprintTypeID` = $typeID;");
             if (count($blueprint)==1) {
                 //ha! it's blueprint all right! told you!!
                 return $blueprint[0];
@@ -35,10 +35,10 @@ function getBlueprintByProduct($typeID) {
  */
 function getT1BPOforT2BPO($typeID) {
         global $LM_EVEDB;
-        $blueprint=db_asocquery("SELECT t1.* FROM $LM_EVEDB.`invblueprinttypes` t1 
-                JOIN $LM_EVEDB.`invmetatypes` imt
+        $blueprint=db_asocquery("SELECT t1.* FROM $LM_EVEDB.`invBlueprintTypes` t1 
+                JOIN $LM_EVEDB.`invMetaTypes` imt
                 ON t1.`productTypeID`=imt.`parentTypeID`
-                JOIN $LM_EVEDB.`invblueprinttypes` t2
+                JOIN $LM_EVEDB.`invBlueprintTypes` t2
                 ON imt.`typeID`=t2.`productTypeID`
                 WHERE t2.`blueprintTypeID` = $typeID
                 AND t2.`techLevel`=2;");
@@ -58,7 +58,7 @@ function getT1BPOforT2BPO($typeID) {
  */
 function getPortionSize($typeID) {
     global $LM_EVEDB;
-    $portionSize=db_asocquery("SELECT `portionSize` FROM $LM_EVEDB.`invtypes` WHERE `typeID`=$typeID");
+    $portionSize=db_asocquery("SELECT `portionSize` FROM $LM_EVEDB.`invTypes` WHERE `typeID`=$typeID");
     if (count($portionSize)==1) {
 	return $portionSize[0]['portionSize'];
     } else {
@@ -85,7 +85,7 @@ function getMEPE($typeID) {
 
 function getBlueprint($typeID) {
 	global $LM_EVEDB;
-	$blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invblueprinttypes` WHERE `blueprintTypeID` = $typeID;");
+	$blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `blueprintTypeID` = $typeID;");
 	//$techLevel=$blueprint[0][4];
 	//$wasteFactor=$blueprint[0][11]/100;
 	if (count($blueprint)==1) {
@@ -105,8 +105,8 @@ function getBlueprint($typeID) {
 function getRecycleMaterials($typeID) {
 	global $LM_EVEDB;
 	$sql="SELECT inv.typeName, mat.quantity, inv.typeID
-		FROM $LM_EVEDB.`invtypematerials` AS mat
-		JOIN $LM_EVEDB.`invtypes` AS inv
+		FROM $LM_EVEDB.`invTypeMaterials` AS mat
+		JOIN $LM_EVEDB.`invTypes` AS inv
 		ON mat.materialTypeID = inv.typeID
 		WHERE mat.typeID=$typeID";
 	$recycle=db_asocquery($sql);
@@ -241,10 +241,10 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 function getSkills($typeID,$activityID) {
 	global $LM_EVEDB;
 	$sql="SELECT itp.typeName, mat.quantity, mat.damagePerJob, itp.typeID
-		FROM $LM_EVEDB.`ramtyperequirements` AS mat
-		JOIN $LM_EVEDB.`invtypes` AS itp
+		FROM $LM_EVEDB.`ramTypeRequirements` AS mat
+		JOIN $LM_EVEDB.`invTypes` AS itp
 		ON mat.requiredTypeID = itp.typeID
-		JOIN $LM_EVEDB.`invgroups` AS igr
+		JOIN $LM_EVEDB.`invGroups` AS igr
 		ON itp.groupID=igr.groupID
 		WHERE mat.typeID=$typeID
 		AND igr.categoryID = 16
@@ -293,10 +293,10 @@ function getExtraMats($typeID,$activityID,$runs=1) {
 	$BPtypeID=$bpo['blueprintTypeID'];
         if (empty($BPtypeID)) return false;
 	$sql="SELECT itp.typeName, $runs * mat.quantity AS quantity, mat.damagePerJob, itp.typeID, mat.recycle
-		FROM $LM_EVEDB.`ramtyperequirements` AS mat
-		JOIN $LM_EVEDB.`invtypes` AS itp
+		FROM $LM_EVEDB.`ramTypeRequirements` AS mat
+		JOIN $LM_EVEDB.`invTypes` AS itp
 		ON mat.requiredTypeID = itp.typeID
-		JOIN $LM_EVEDB.`invgroups` AS igr
+		JOIN $LM_EVEDB.`invGroups` AS igr
 		ON itp.groupID=igr.groupID
 		WHERE mat.typeID=$BPtypeID
 		AND igr.categoryID != 16
@@ -567,7 +567,7 @@ function calcInventionCost($typeID) {
     //CategoryID = 6 - ships - have 1 run
     //GroupID = 330 - cloaks - have 1 run
     //GroupID = 773 - 782 - rigs - have 1 run
-    $stats=db_asocquery("SELECT it.`groupID`,ig.`categoryID`,it.`typeID` FROM $LM_EVEDB.`invtypes` it JOIN $LM_EVEDB.`invgroups` ig ON it.`groupID`=ig.`groupID` WHERE `typeID`=$typeID;");
+    $stats=db_asocquery("SELECT it.`groupID`,ig.`categoryID`,it.`typeID` FROM $LM_EVEDB.`invTypes` it JOIN $LM_EVEDB.`invGroups` ig ON it.`groupID`=ig.`groupID` WHERE `typeID`=$typeID;");
     $stats=$stats[0];
     //BPC Runs
     if ($stats['categoryID']==6 || $stats['groupID']==330 || ($stats['groupID'] >= 773 && $stats['groupID'] <= 782) ) {

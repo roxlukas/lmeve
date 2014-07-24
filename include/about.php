@@ -47,6 +47,33 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.07.24</div></td>
+<td valign="top" class="tab">
+<b>0.1.40 beta:</b><br>
+<b>Poller version 17</b>
+<ul>
+<li>
+	Crius changes in material counting formula
+</li>
+<li>
+	EVE API poller adjusted to changes
+        <ul>
+            <li>Changes in /corp/IndustryJobs.xml</li>
+            <li>New endpoint /corp/IndustryJobsHistory.xml</li>
+        </ul>
+</li>
+<li>YAML importer now imports blueprints.yaml</li>
+<li>Fixes in poller and shared libraries</li>
+<li>Code fixes:
+    <ul>
+        <li>short php open tags changed into long open tags</li>
+        <li>static data tables now use CamelCase as in Fuzzysteve's conversion</li>
+    </ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.06.11</div></td>
 <td valign="top" class="tab">
 <b>0.1.31 beta:</b><br>
