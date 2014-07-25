@@ -23,13 +23,14 @@ There is no installer currently, so there is some setup work to get LMeve to run
 `index.php` and the website itself is in `./wwwroot/` directory. If you can set up your webserver root to this directory, please do so.
 
 *Example:*
-  `Alias /lmeve /opt/lmeve/wwwroot
+
+  ```Alias /lmeve /opt/lmeve/wwwroot
         <Directory /opt/lmeve/wwwroot>
                 Order allow,deny
                 Allow from all
                 Require all granted
                 Options FollowSymLinks
-        </Directory>`
+        </Directory>```
 
 * Go to `./config/ directory`, copy `config-dist.php` to `config.php`
 * Set up database credentials and db schemas
