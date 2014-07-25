@@ -10,7 +10,7 @@ $LM_IPCONTROL=1;
 //maximum session cookie time
 $LM_SESSION=3600;
 //cookie path. must have a trailing slash, for example: /lmeve/
-$LM_COOKIEPATH='/lmeve/wwwroot/';
+$LM_COOKIEPATH='/';
 //debug database queries? (include additional information in error messages)
 $LM_DEBUG=1;
 $LM_DBENGINE='MYSQL'; //MYSQL || PGSQL
