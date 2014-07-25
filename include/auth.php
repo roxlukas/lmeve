@@ -243,17 +243,17 @@ function setpass($newpass) {
 
 /****************************** CZʌ� AUTORYZUJ�CA ******************************/
 
-function auth_user($slogin,$password) {
+function auth_user($login,$password) {
 	global $USERSTABLE;
 	$_SESSION['LOGIN_REALM']='local';
 	//LDAP
-	if (ldap_auth($slogin, $password)) {
+	if (ldap_auth($login, $password)) {
                 //if password is valid in LDAP, we only have to check if user exists in the DB
-                $sql="SELECT `userID` FROM `$USERSTABLE` WHERE login='$slogin' AND act=1;";
+                $sql="SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND act=1;";
         } else {
                 //if LDAP didn't work, we check both login and passwd
                 $password=hashpass($password);
-                $sql="SELECT `userID` FROM `$USERSTABLE` WHERE login='$slogin' AND pass='$password' AND act=1;";
+                $sql="SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND pass='$password' AND act=1;";
         }
 	//END LDAP
 	$result=db_query($sql);

@@ -2,7 +2,7 @@
 //YAML - graphics related functions
 include_once('spyc/Spyc.php');
 
-function updateYamlCertificates() {
+function updateYamlCertificates($silent=true) {
     global $LM_EVEDB;
     $file="../data/$LM_EVEDB/certificates.yaml";
     
@@ -65,6 +65,8 @@ function updateYamlCertificates() {
     $certificatesraw=str_replace('description: ', "description: ingore\r\n        ", $certificatesraw);
     //another bug in "reccommended for" parsing. workaround:
     $certificatesraw=str_replace('    - ', "        - ", $certificatesraw); 
+    
+    if (!$silent) echo('loading YAML...');
     $certificates = Spyc::YAMLLoadString($certificatesraw);
     
     //if data loaded correctly, prepare tables by clearing them
@@ -125,6 +127,8 @@ function updateYamlCertificates() {
     $yamlCrtMasteriesinsert=rtrim($yamlCrtMasteriesinsert,',').";";
     
     //execute big inserts
+    if (!$silent) echo('insert to DB...');
+    
     db_uquery($yamlCrtCertificatesinsert);
     db_uquery($yamlCrtRecommendationsinsert);
     db_uquery($yamlCrtSkillsinsert);

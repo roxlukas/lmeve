@@ -197,24 +197,24 @@ function template_login() {
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
 	<br>
-	<form method="post" action="">
+	<form name="loginform" id="loginform" method="post" action="">
 	
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td align="left"><br>User:</td></tr>
+	<tr><td align="left"><br><label for="user_login">User:</label></td></tr>
 	<tr><td><div class="tcen">
-			<input name="param[slogin]" size=20 type="text" value="" style="width: 140px">
+			<input name="login" id="user_login" size=20 type="text" value="" style="width: 140px" autocapitalize="off">
 		</div>
 	</td></tr>
-	<tr><td align="left">Password:</td></tr>
+	<tr><td align="left"><label for="user_pass">Password:</label></td></tr>
 	<tr><td><div class="tcen">
-		<input name="param[password]" size="20" type="password" style="width: 140px">
+		<input name="password" id="user_pass" size="20" type="password" style="width: 140px" autocapitalize="off">
 		<br><br>
 		</div>
 	</td></tr>
 	<tr><td><div class="tcen">
-			<input name="login" type="submit" value="Log in"><br>&nbsp;
+			<input name="logon" type="submit" value="Log in"><br>&nbsp;
 		 </div>
 	</td></tr>
 	</table>

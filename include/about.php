@@ -49,6 +49,30 @@ Changelog:
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.07.24</div></td>
 <td valign="top" class="tab">
+<b>0.1.41 beta:</b><br>
+<b>Poller version 17</b>
+<ul>
+<li>
+	Field name changes in login template, autocapitalize=off for Safari in iOS
+</li>
+<li>
+	Fix in "Ore Value" chart - Crius SDE has compressed ores mixed with uncompressed. Solution: filter added in SQL query.
+</li>
+<li>
+	YAML importer now imports ship Traits and Bonuses from typeIDs.yaml
+</li>
+<li>
+	"Database" now shows ship Traits and Bonuses
+</li>
+<li>
+	"Database" now shows other meta types of the same item
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
+<div class="tytul2">2014.07.24</div></td>
+<td valign="top" class="tab">
 <b>0.1.40 beta:</b><br>
 <b>Poller version 17</b>
 <ul>
@@ -63,9 +87,9 @@ Changelog:
         </ul>
 </li>
 <li>YAML importer now imports blueprints.yaml</li>
-<li>Fixes in poller and shared libraries</li>
 <li>Code fixes:
     <ul>
+        <li>fixes in include_once relative paths in poller and CLI scripts</li>
         <li>short php open tags changed into long open tags</li>
         <li>static data tables now use CamelCase as in Fuzzysteve's conversion</li>
     </ul>
@@ -136,6 +160,20 @@ Changelog:
 </li>
 </ul>
 </td></tr>
+
+
+
+ 
+    
+<!-- end of changelog -->
+
+<?php
+
+//HISTORIA ZMIAN
+
+$history=$_GET['history'];
+if (isset($history)) {
+?>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.01.15</div></td>
@@ -235,18 +273,6 @@ New CSS skin by famous Rixx Javix (<a href="https://twitter.com/RixxJavix" targe
 </li>
 </ul>
 </td></tr>  
-
- 
-    
-<!-- end of changelog -->
-
-<?php
-
-//HISTORIA ZMIAN
-
-$history=$_GET['history'];
-if (isset($history)) {
-?>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2013.11.22</div></td>

@@ -22,6 +22,7 @@ JOIN $LM_EVEDB.`invGroups` igp ON itp.`groupID` = igp.`groupID`
 JOIN $LM_EVEDB.`invTypeMaterials` itm ON itp.`typeID` = itm.`typeID`
 JOIN `apiprices` apr ON itm.`materialTypeID` = apr.`typeID`
 WHERE igp.`categoryID` = 25
+AND itp.`typeName` NOT LIKE 'Compressed%'
 AND itp.`marketGroupID` IS NOT NULL
 AND itp.`volume` < 50
 AND apr.`type`='buy'

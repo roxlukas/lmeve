@@ -1,13 +1,14 @@
 <?php
 //YAML - graphics related functions
 include_once('spyc/Spyc.php');
+include_once('yaml_common.php');
 
 /**
  * Updates typeID information from typeIDs.yaml file
  * 
  * @global $LM_EVEDB - EVE Static Data db name
  */
-function updateYamlTypeIDs() {
+function updateYamlTypeIDs($silent=true) {
     global $LM_EVEDB;
     
     $file="../data/$LM_EVEDB/typeIDs.yaml";
@@ -17,7 +18,7 @@ function updateYamlTypeIDs() {
         return FALSE;
     }
     
-    $create="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`yamlTypeIDs` (
+    $createyamlTypeIDs="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`yamlTypeIDs` (
       `typeID` int(11) NOT NULL,
       `graphicID` int(11) NULL,
       `iconID` int(11) NULL,
@@ -25,22 +26,58 @@ function updateYamlTypeIDs() {
       `soundID` int(11) NULL,
       PRIMARY KEY (`typeID`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    db_uquery($create);
+    db_uquery($createyamlTypeIDs);
     
-    $typeIDs = Spyc::YAMLLoad($file);
+    $createyamlInvTraits="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`yamlInvTraits` (
+      `typeID` int(11) DEFAULT NULL,
+      `skillID` int(11) DEFAULT NULL,
+      `bonus` double DEFAULT NULL,
+      `bonusText` text,
+      `unitID` int(11) DEFAULT NULL
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+    db_uquery($createyamlInvTraits);
+    
+    if (!$silent) echo('Converting YAML compact in-line notation...');
+    $fileraw=file_get_contents($file);
+    $fileraw=str_replace('bonusText: ', "bonusText: ingore\r\n                    ", $fileraw);
+    
+    if (!$silent) echo('loading YAML...');
+    $typeIDs = Spyc::YAMLLoadString($fileraw);
+    
+    //$typeIDs = Spyc::YAMLLoad($file);
     if (!empty($typeIDs)) {
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlTypeIDs`;");
+        db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlInvTraits`;");
     } else return false;
-    $biginsert="INSERT INTO `$LM_EVEDB`.`yamlTypeIDs` VALUES ";
+    
+    $biginsertTypeIDs="INSERT INTO `$LM_EVEDB`.`yamlTypeIDs` VALUES ";
+    $biginsertTraits="INSERT INTO `$LM_EVEDB`.`yamlInvTraits` VALUES ";
     foreach($typeIDs as $typeID => $row) {
-        if (!isset($row['graphicID'])) $graphicID='NULL'; else $graphicID=addslashes($row['graphicID']);
-        if (!isset($row['iconID'])) $iconID='NULL'; else $iconID=addslashes($row['iconID']);
-        if (!isset($row['radius'])) $radius='NULL'; else $radius=addslashes($row['radius']);
-        if (!isset($row['soundID'])) $soundID='NULL'; else $soundID=addslashes($row['soundID']);
-        $biginsert.="($typeID, $graphicID, $iconID, $radius, $soundID),";
+        $graphicID=yaml_prepare($row['graphicID']);
+        $iconID=yaml_prepare($row['iconID']);
+        $radius=yaml_prepare($row['radius']);
+        $soundID=yaml_prepare($row['soundID']);
+        $biginsertTypeIDs.="($typeID, $graphicID, $iconID, $radius, $soundID),";
+        if (is_array($row['traits'])) { //if there are traits
+            foreach ($row['traits'] as $skillID => $traits) {
+                foreach ($traits as $trait) {
+                    $bonus=yaml_prepare($trait['bonus']);
+                    $bonusText=yaml_prepare($trait['bonusText']);
+                    $unitID=yaml_prepare($trait['unitID']);
+                    $biginsertTraits.="($typeID, $skillID, $bonus, '$bonusText', $unitID),";
+                }
+            }
+        }
     }
-    $biginsert=rtrim($biginsert,',').";";
-    db_uquery($biginsert);
+    
+    $biginsertTypeIDs=rtrim($biginsertTypeIDs,',').";";
+    $biginsertTraits=rtrim($biginsertTraits,',').";";
+    
+    if (!$silent) echo('insert to DB...');
+    
+    db_uquery($biginsertTypeIDs);
+    db_uquery($biginsertTraits);
+    
     return true;
 }
 
@@ -49,7 +86,7 @@ function updateYamlTypeIDs() {
  * 
  * @global $LM_EVEDB - EVE Static Data db name
  */
-function updateYamlGraphicIDs() {
+function updateYamlGraphicIDs($silent=true) {
     global $LM_EVEDB;
     
     $file="../data/$LM_EVEDB/graphicIDs.yaml";
@@ -73,7 +110,9 @@ function updateYamlGraphicIDs() {
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     db_uquery($create);
     
+    if (!$silent) echo('loading YAML...');
     $graphicIDs = Spyc::YAMLLoad($file);
+    
     if (!empty($graphicIDs)) {
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlGraphicIDs`;");
     } else return false;
@@ -90,6 +129,7 @@ function updateYamlGraphicIDs() {
         $biginsert.="($graphicID, $colorScheme, $description, $graphicFile, $graphicName, $graphicType, $gfxRaceID, $collidable, $directoryID),";
     }
     $biginsert=rtrim($biginsert,',').";";
+    if (!$silent) echo('insert to DB...');
     db_uquery($biginsert);
     return true;
 }

@@ -4,9 +4,7 @@ This project was started at the request of Aideron Technologies CEO in 2013. Thi
 Code beauty was not a priority, moreover this is not in objective PHP, just plain-old structural PHP.
 I had plans to refactor entire project into CodeIgniter framework, but this plan is currently on hold.
 
-Current version for EVE: Crius is 0.1.40 (check the "Releases" page). The trunk code is unstable and shouldn't be used in production.
-
-Known issue in 0.1.40: Kits feature isn't working properly. Patch will be released soon.
+Current version for EVE: Crius is 0.1.41 (check the "Releases" page). The trunk code is unstable and shouldn't be used in production.
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
@@ -36,7 +34,7 @@ There is no installer currently, so there is some setup work to get LMeve to run
 * Import latest static data dump (can be put in different db schema for clarity, for example you can import lmeve db to `lmeve` schema and static data in `sde_crius`. LMeve will always use SDE schema set in `$LM_EVEDB` variable in `config.php` file)
 You can download latest static data from Steve Ronuken's website: https://www.fuzzwork.co.uk/dump/
 * Copy all YAML files (the yare included in Steve Ronuken's mysql package, or from official Static Data Export) to `./data/<static_data_schema_name>/`
-* Run `php ./bin/update_yaml.php`
+* Run `php ./bin/update_yaml.php --all`
 * Add corp API key (or keys) to `cfgapikeys` table. keyID goes to `keyID`, vCode goes to `vCode`
 * Full corp API key works best, but the app will adjust the amount of visible information according to the rights it has been given.
 

@@ -16,6 +16,10 @@ include_once('yaml_graphics.php');
 
 $nr=secureGETnum('nr');
 
+function hrefedit_item($nr) {
+		echo("<a href=\"index.php?id=10&id2=1&nr=$nr\">");
+	}
+
 ?>	    
 		<script type="text/javascript" src="ajax.js"></script>
 		<div class="tytul">
@@ -324,6 +328,34 @@ if ($model) {
 </h2></td>
 </tr>
 <tr><td class="tab" colspan="2">
+<?php
+//TRAITS, BONUSES, DESCRIPTION
+	$traitData=db_asocquery("SELECT yit.*, eun.displayName
+                FROM `$LM_EVEDB`.`yamlInvTraits` yit
+                LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+                ON yit.`unitID`=eun.`unitID`
+                WHERE `typeID`=$nr AND `skillID`=-1;");
+        $bonusData=db_asocquery("SELECT yit.*, eun.displayName
+                FROM `$LM_EVEDB`.`yamlInvTraits` yit
+                LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+                ON yit.`unitID`=eun.`unitID`
+                WHERE `typeID`=$nr AND `skillID`!=-1;");
+	
+	if (count($traitData) > 0) {
+		echo('<strong>Traits</strong><br/><ul>');
+                foreach($traitData as $row) {
+                    echo("<li>".$row['bonus'].$row['displayName']." ".$row['bonusText']."</li>");
+                }
+                echo('</ul>');
+	} 
+        if (count($bonusData) > 0) {
+		echo('<strong>Bonuses</strong><br/><ul>');
+                foreach($bonusData as $row) {
+                    echo("<li>".$row['bonus'].$row['displayName']." ".$row['bonusText']." per level</li>");
+                }
+                echo('</ul>');
+	} 
+?>
 <strong>Description</strong><br/>
 <?php 
 	$descript=strip_tags($item['description'],'<b><i>');
@@ -386,8 +418,9 @@ if ($model) {
                 </table>
             <?php
         }
+ 
         
-	
+//MANUFACTURING	
 	/************************* Manufacturing panel *******************************/
 	//if itemID has a bluperint, it is manufacturable
 	
@@ -460,6 +493,63 @@ if ($model) {
 
 	/************************* END OF MATERIALS *******************************/
 
+//META TYPES
+	$metaTypes=db_asocquery("SELECT DISTINCT * FROM 
+                (SELECT imt.*,inv.`typeName`
+                FROM `$LM_EVEDB`.`invMetaTypes` imt
+                JOIN `$LM_EVEDB`.`invTypes` inv
+                ON imt.`typeID`=inv.`typeID`
+                WHERE imt.`parentTypeID`=$nr
+                UNION
+                SELECT inv.`typeID`,0,1,inv.`typeName`
+                FROM `$LM_EVEDB`.`invTypes` inv
+                JOIN `$LM_EVEDB`.`invMetaTypes` imt
+                ON inv.`typeID`=imt.`parentTypeID`
+                WHERE inv.`typeID`=$nr
+                UNION
+                SELECT imtc.*,inv.`typeName`
+                FROM `$LM_EVEDB`.`invMetaTypes` imtp
+                JOIN `$LM_EVEDB`.`invMetaTypes` imtc
+                ON imtp.`parentTypeID`=imtc.`parentTypeID`
+                JOIN `$LM_EVEDB`.`invTypes` inv
+                ON imtc.`typeID`=inv.`typeID`
+                WHERE imtp.`typeID`=$nr
+                UNION
+                SELECT inv.`typeID`,0,1,inv.`typeName`
+                FROM `$LM_EVEDB`.`invMetaTypes` imtp
+                JOIN `$LM_EVEDB`.`invMetaTypes` imtc
+                ON imtp.`parentTypeID`=imtc.`parentTypeID`
+                JOIN `$LM_EVEDB`.`invTypes` inv
+                ON imtc.`parentTypeID`=inv.`typeID`
+                WHERE imtp.`typeID`=$nr) AS metaTypes
+                ORDER BY `typeName`;");
+	
+	if (count($metaTypes) > 0) {
+
+		?>
+		<table class="lmframework" style="width:100%;">
+                    <tr><th colspan="5">Meta types</th></tr>
+		<!--<tr><th>
+		Icon
+		</th><th>
+		Type Name
+		</th></tr>-->
+		<?php
+       
+		foreach($metaTypes as $row) {
+			echo('<tr><td width="32" style="padding: 0px; text-align: center;">');
+				hrefedit_item($row['typeID']);
+				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo('</a>');
+			echo('</td><td>');
+				hrefedit_item($row['typeID']);
+				echo($row['typeName']);
+				echo('</a>');
+			echo('</td></tr>');
+		}
+        ?> </table> <?php
+	}
+        
 	
 	echo('</td><td style="width: 45%; vertical-align: top;">');
 	

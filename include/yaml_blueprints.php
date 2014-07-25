@@ -4,7 +4,7 @@
 include_once('spyc/Spyc.php');
 include_once('yaml_common.php');
 
-function updateYamlBlueprints() {
+function updateYamlBlueprints($silent=true) {
     global $LM_EVEDB;
     
     $file="../data/$LM_EVEDB/blueprints.yaml";
@@ -54,6 +54,7 @@ function updateYamlBlueprints() {
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     db_uquery($createyamlBlueprintSkills);
     
+    if (!$silent) echo('loading YAML...');
     $blueprints = Spyc::YAMLLoad($file);
     if (!empty($blueprints)) {
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlBlueprintTypes`;");
@@ -109,6 +110,8 @@ function updateYamlBlueprints() {
     $bigyamlBlueprintMaterials=rtrim($bigyamlBlueprintMaterials,',').";";
     $bigyamlBlueprintSkills=rtrim($bigyamlBlueprintSkills,',').";";
     //exec queries
+    if (!$silent) echo('insert to DB...');
+    
     db_uquery($bigyamlBlueprintTypes);
     db_uquery($bigyamlBlueprintProducts);
     db_uquery($bigyamlBlueprintMaterials);

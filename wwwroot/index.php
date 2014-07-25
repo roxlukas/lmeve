@@ -43,7 +43,7 @@ include_once("lang.php");  //translations
 include_once("menu.php");  //menu
 include_once("template.php");  //templates
 
-$lmver="0.1.40 beta";
+$lmver="0.1.41 beta";
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  
@@ -83,10 +83,10 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 	template_locked();
 } else { 			 //APP NOT LOCKED
 	if ($_SESSION['status']==0) { //NOT LOGGED ON
-		if (empty($_POST['param'][slogin])&&empty($_SESSION["status"])) { //NO LOGIN DATA? DISPLAY PROMPT
+		if (empty($_POST['login'])&&empty($_SESSION["status"])) { //NO LOGIN DATA? DISPLAY PROMPT
 			template_login();
 		} else { //FILLED DATA? CHECK CREDENTIALS
-			$granted=auth_user(addslashes($_POST['param'][slogin]),addslashes($_POST['param'][password]));
+			$granted=auth_user(addslashes($_POST['login']),addslashes($_POST['password']));
 			if ($granted>-1) { //LOGIN SUCCESS?
 				$_SESSION["granted"]=$granted;
 				$_SESSION["status"]=1;
@@ -95,7 +95,7 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 				template_main();
 			} else { //LOGIN FAILURE?
 				//WRITE TO LOG FILE
-				$uzytk=htmlspecialchars($_POST['param'][slogin]);
+				$uzytk=htmlspecialchars($_POST['login']);
 				$do_logu=sprintf("<b>Bad logon!</b> login: <b>%s</b>.",$uzytk);
 				loguj("../var/access.txt",$do_logu);
 				$_SESSION['status']=0;
