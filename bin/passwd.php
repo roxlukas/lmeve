@@ -20,7 +20,7 @@ if ($users==0) {
     db_uquery("INSERT IGNORE INTO `lmuserroles` VALUES ($userid,$roleid);");
 } else {
     echo("User 'admin' already exists. New password is 'admin'".PHP_EOL);
-    db_uquery("UPDATE `$USERSTABLE` SET `pass`='$pwd' WHERE login='admin';");
+    db_uquery("UPDATE `$USERSTABLE` SET `pass`='$pwd',`act`=1 WHERE login='admin';");
 }
 echo("Login to LMeve, go to Settings and change admin password immediately".PHP_EOL);
 ?>
