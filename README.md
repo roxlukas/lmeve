@@ -4,7 +4,7 @@ This project was started at the request of Aideron Technologies CEO in 2013. Thi
 Code beauty was not a priority, moreover this is not in objective PHP, just plain-old structural PHP.
 I had plans to refactor entire project into CodeIgniter framework, but this plan is currently on hold.
 
-Current version for EVE: Crius is 0.1.41 (check the "Releases" page). The trunk code is unstable and shouldn't be used in production.
+Current version for EVE: Crius is 0.1.41a (check the "Releases" page). The trunk code is unstable and shouldn't be used in production.
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
@@ -22,11 +22,16 @@ There is no installer currently, so there is some setup work to get LMeve to run
 
 `index.php` and the website itself is in `./wwwroot/` directory. If you can set up your webserver root to this directory, please do so.
 
-* Go to `./config/ directory`, copy `config-dist.php` to `config.php` and set it up according to your host
-* After setting up new `$LM_SALT` value in `config.php`, generate admin password by using `php ./bin/passwd.php`
+* Go to `./config/ directory`, copy `config-dist.php` to `config.php`
+* Set up database credentials and db schemas
+* Set up a random new `$LM_SALT` value, save config.php
+* For multi-site deployment, make sure correct cookie path is set in $LM_COOKIEPATH, for single LMeve deployment you can leave the default
+* generate admin password by using `php ./bin/passwd.php`
 * Download current `Types` and `Icons` from EVE Online Toolkit page: http://community.eveonline.com/community/fansites/toolkit/
 * unpack all PNG files from `Types` to `./wwwroot/ccp_img/`
+  * symlinks should work, too: `ln -s /opt/Types/ ccp_img`
 * unpack all PNG files from `Icons` to `./wwwroot/ccp_icons/`
+  * symlinks should work, too: `ln -s /opt/Icons/items/ ccp_icons`
 
 <h3>2. Database setup</h3>
 
