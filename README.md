@@ -24,13 +24,15 @@ There is no installer currently, so there is some setup work to get LMeve to run
 
 *Example:*
 
-  ```Alias /lmeve /opt/lmeve/wwwroot
-        <Directory /opt/lmeve/wwwroot>
-                Order allow,deny
-                Allow from all
-                Require all granted
-                Options FollowSymLinks
-        </Directory>```
+```
+Alias /lmeve /opt/lmeve/wwwroot
+<Directory /opt/lmeve/wwwroot>
+    Order allow,deny
+    Allow from all
+    Require all granted
+    Options FollowSymLinks
+</Directory>
+```
 
 * Go to `./config/ directory`, copy `config-dist.php` to `config.php`
 * Set up database credentials and db schemas
