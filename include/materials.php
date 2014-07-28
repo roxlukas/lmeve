@@ -169,8 +169,8 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
                         }
                         switch ($techLevel) {
                                 case 2:
-                                        if (!isset($melevel)) $melevel=-4;
-                                        if (!isset($pelevel)) $pelevel=-4;
+                                        if (!isset($melevel)) $melevel=2;
+                                        if (!isset($pelevel)) $pelevel=2;
                                         break;
                                 case 3:
                                         if (!isset($melevel)) $melevel=0;
@@ -380,7 +380,7 @@ function displayKit2($recycle,$materials,$melevel,$wasteFactor,$location) { //NE
         echo("<table class=\"lmframework\" width=\"100%\">");
 	//echo("<tr><th colspan=\"2\" style=\"width: 100%\">Mobile Laboratory / Assembly Array</th></tr>");
         echo("<tr><th colspan=\"2\" style=\"width: 100%\">Location</th></tr>");
-        echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"ccp_img/${location['structureTypeID']}_32.png\" title=\"${location['structureTypeName']}\"></td><td style=\"width: 95%;\"><strong>${location['structureName']}</strong><br/>${location['moonName']}</td></tr>");
+        echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"ccp_img/${location['typeID']}_32.png\" title=\"${location['typeName']}\"></td><td style=\"width: 95%;\"><strong>${location['itemName']}</strong><br/>${location['moonName']}</td></tr>");
 	echo("</table>");		
     }
     if ($materials!=false) {

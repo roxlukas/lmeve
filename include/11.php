@@ -10,6 +10,8 @@ $MENUITEM=1; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Edit Tasks'; //Panel name (optional)
 //standard header ends here
 
+include_once 'inventory.php';
+
 global $LM_EVEDB;
 
 $rights_edittasks=checkrights("Administrator,EditTasks");
@@ -61,7 +63,7 @@ $runs=secureGETnum('runs');
 			//now we fill the drop down lists with characters and industry activities
 			$chars=db_asocquery("SELECT characterID, name FROM `apicorpmembers` ORDER BY name;");
 			$activities=db_asocquery("SELECT `activityID`, `activityName` FROM $LM_EVEDB.`ramActivities` WHERE `published`=1 AND `activityID`>0 ORDER BY activityName;");
-                        $labs=db_asocquery("SELECT lml.* FROM `lmlabs` lml ORDER BY lml.`structureName`;");
+                        $labs=getLabs();
 
 		    echo('<form method="get" action="">');
 		    echo('<input type="hidden" name="id" value="1">');
@@ -122,8 +124,8 @@ $runs=secureGETnum('runs');
                     if (is_null($row['structureID'])) $select='selected'; else $select='';
 		    echo("<option value=\"null\" $select>- none -</option>");
 		    foreach($labs as $row) {
-				if ($row['structureID']==$task['structureID']) $select='selected'; else $select='';
-				echo("<option value=\"${row['structureID']}\" $select>".stripslashes($row['structureName'])."</option>");
+				if ($row['facilityID']==$task['structureID']) $select='selected'; else $select='';
+				echo("<option value=\"${row['facilityID']}\" $select>".stripslashes($row['itemName'])."</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');

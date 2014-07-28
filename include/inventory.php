@@ -24,7 +24,7 @@ function toonhrefedit($nr) {
 
 function getControlTowers($where='TRUE') {
     global $LM_EVEDB;
-    $sql="SELECT asl.*,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
+    $sql="SELECT asl.*,apl.itemName,apl.x,apl.y,apl.z,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
     FROM `apistarbaselist` asl
     JOIN $LM_EVEDB.`invNames` ssn
     ON asl.`locationID`=ssn.`itemID`
@@ -32,6 +32,8 @@ function getControlTowers($where='TRUE') {
     ON asl.`moonID`=ssm.`itemID`
     JOIN $LM_EVEDB.`invTypes` itp
     ON asl.`typeID`=itp.`typeID`
+    LEFT JOIN `apilocations` apl
+    ON asl.`itemID`=apl.`itemID`
     WHERE $where;";
     //echo("DEBUG: $sql");
     $rawdata=db_asocquery($sql);
@@ -40,28 +42,30 @@ function getControlTowers($where='TRUE') {
 
 function getLabs($where='TRUE') {
     global $LM_EVEDB;
-    $sql_labs="SELECT lml.*,itp.`typeName`
-    FROM `lmlabs` lml
-    JOIN $LM_EVEDB.`invTypes` itp
-    ON lml.`structureTypeID`=itp.`typeID`
+    $sql_labs="SELECT apf.*,apl.itemName
+    FROM `apifacilities` apf
+    JOIN `apilocations` apl
+    ON apf.`facilityID`=apl.`itemID`
     WHERE $where
-    ORDER BY lml.parentTowerID,lml.structureName;";
+    ORDER BY apl.itemName;";
+    //echo("DEBUG: $sql_labs<br/>");
     $rawlabdata=db_asocquery($sql_labs);
     return $rawlabdata;
 }
 
-function getLabDetails($structureID) {
+function getLabDetails($facilityID) {
     global $LM_EVEDB;
-    $sql="SELECT lml.*,itp.`typeName`
-    FROM `lmlabs` lml
-    JOIN $LM_EVEDB.`invTypes` itp
-    ON lml.`structureTypeID`=itp.`typeID`
-    WHERE `structureID`=$structureID
-    ORDER BY lml.parentTowerID,lml.structureName;";
+    $sql="SELECT apf.*,apl.*
+    FROM `apifacilities` apf
+    JOIN `apilocations` apl
+    ON apf.`facilityID`=apl.`itemID`
+    WHERE `facilityID`=$facilityID;";
+    
     $raw=db_asocquery($sql);
     if (count($raw)>0) {
         $raw=$raw[0];
-        $ct=getControlTowers("asl.`itemID`=${raw['parentTowerID']}");
+        $x=$raw['x']; $y=$raw['y']; $z=$raw['z']; 
+        $ct=getControlTowers("SQRT(POW($x-apl.x,2)+POW($y-apl.y,2)+POW($z-apl.z,2)) < 30000");
         if (count($ct)>0) {
             //typeName solarSystemName moonName
             $raw['towerTypeName']=$ct[0]['typeName'];
@@ -92,30 +96,37 @@ function getSimpleTasks($where='TRUE') {
 
 function getLabsAndTasks($corporationID) {
     global $LM_EVEDB;
-    $raw_towers=getControlTowers("`corporationID`=$corporationID");
+    $raw_towers=getControlTowers("asl.`corporationID`=$corporationID");
+    
     $towers=array();
     $labs=array();
     if (count($raw_towers)>0) {
-        $raw_labs=getLabs();
         $raw_tasks=getSimpleTasks();
         foreach($raw_towers as $tower) {
+            //var_dump($tower);
+            $x=$tower[x];
+            $y=$tower[y];
+            $z=$tower[z];
+            $raw_labs=getLabs("SQRT(POW($x-apl.x,2)+POW($y-apl.y,2)+POW($z-apl.z,2)) < 30000");
+            //var_dump($raw_labs);
             $towers[$tower['itemID']]=$tower;
-        }
-        foreach($raw_labs as $lab) {
-            if (array_key_exists($lab['parentTowerID'], $towers)) {
-                $towers[$lab['parentTowerID']]['labs'][$lab['structureID']]=$lab;
-                $labs[$lab['structureID']]=$lab;
+            foreach($raw_labs as $lab) {
+                $towers[$tower['itemID']]['labs'][$lab['facilityID']]=$lab;
+                $labs[$lab['facilityID']]['towerID']=$tower['itemID'];
             }
         }
+   
+        
         foreach($raw_tasks as $task) {
             if (!is_null($task['structureID']) && array_key_exists($task['structureID'], $labs)) {
-                //echo($task['structureID'].",");
-                $parentTowerID=$labs[$task['structureID']]['parentTowerID'];
-                $towers[$parentTowerID]['labs'][$task['structureID']]['users'][$task['characterID']]=$task['characterName'];
-                $towers[$parentTowerID]['labs'][$task['structureID']]['products'][$task['typeID']]=$task['typeName'];
+                $towerID=$labs[$task['structureID']]['towerID'];
+                $towers[$towerID]['labs'][$task['structureID']]['users'][$task['characterID']]=$task['characterName'];
+                $towers[$towerID]['labs'][$task['structureID']]['products'][$task['typeID']]=$task['typeName'];
             }
         }
+        
     }
+    //var_dump($towers);
     return $towers;
 }
 
@@ -128,7 +139,7 @@ function showLabsAndTasks($towers) {
         ?>
         <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
             <tr><th colspan="5" style="text-align: center;">
-                <?php echo($tower['moonName']); ?>
+                <?php echo($tower['moonName'].' ("'.$tower['itemName'].'")'); ?>
             </th>
             </tr>
             <tr><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
@@ -147,15 +158,15 @@ function showLabsAndTasks($towers) {
             if (count($tower['labs'])>0) foreach ($tower['labs'] as $row) {
                 ?>
                 <tr><td width="32" style="padding: 0px; text-align: center;">
-                    <?php dbhrefedit($row['structureTypeID']); echo("<img src=\"ccp_img/${row['structureTypeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                    <?php dbhrefedit($row['typeID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
                 </td><td>
-                    <?php if ($rights_editpos) labshrefedit($row['structureID']);
-                    echo(stripslashes($row['structureName']));
-                    if ($rights_editpos) echo('</a>'); ?> 
+                    <?php 
+                    echo(stripslashes($row['itemName']));
+                     ?> 
                 </td><td style="">
-                    <?php if ($rights_editpos) labshrefedit($row['structureID']);
-                    echo(stripslashes($row['typeName'])); 
-                    if ($rights_editpos) echo('</a>'); ?>
+                    <?php
+                    dbhrefedit($row['typeID']); echo(stripslashes($row['typeName']));  echo('</a>');
+                     ?>
                 </td><td style="">
                     <?php 
                     if (count($row['users'])>0) foreach ($row['users'] as $user => $name) {
@@ -177,19 +188,8 @@ function showLabsAndTasks($towers) {
                 <?php
             }
             ?>
-                <tr><td>
                 
-                </td><td style="text-align: center;">
-                    <input type="button" onclick="location.href='?id=2&id2=3&nr=new&parent=<?php echo($tower['itemID']); ?>'" value="Add Lab" />
-                </td><td>
-
-                </td><td>
-
-                </td><td>
-
-                </td>
-                </tr>
-            </table>
+            </table><br/>
         <?php
         }
     } else {
@@ -204,9 +204,11 @@ function showControlTowers($controltowers) {
 		    <table class="lmframework" style="" id="">
 			<tr><th style="width: 32px; padding: 0px; text-align: center;">
 				Icon
-			</th><th style="width: 150px;">
+			</th><th style="">
+				Name
+			</th><th style="">
 				Control Tower Type
-			</th><th style="min-width: 160px;">
+			</th><th style="min-width: 120px;">
 				Location
 			</th><th style="width: 64px;">
 				State
@@ -219,6 +221,9 @@ function showControlTowers($controltowers) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
                 <?php towershrefedit($row['itemID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+            </td><td>
+                <?php towershrefedit($row['itemID']);
+                echo($row['itemName']); echo('</a>'); ?>
             </td><td>
                 <?php towershrefedit($row['itemID']);
                 echo($row['typeName']); echo('</a>'); ?>

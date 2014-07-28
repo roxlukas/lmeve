@@ -1301,7 +1301,7 @@ CREATE TABLE IF NOT EXISTS `lmtasks` (
   `runs` int(11) NOT NULL,
   `taskCreateTimestamp` datetime NOT NULL,
   `singleton` tinyint(3) NOT NULL,
-  `structureID` int(11) DEFAULT NULL,
+  `structureID` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`taskID`),
   KEY `characterID` (`characterID`),
   KEY `activityID` (`activityID`),
@@ -30423,3 +30423,18 @@ INSERT INTO `yamltypeids` (`typeID`, `graphicID`, `iconID`, `radius`, `soundID`)
 (33805, 1052, NULL, 199.86, NULL),
 (33806, 1058, NULL, 250, NULL),
 (33809, NULL, 21186, NULL, NULL);
+
+
+CREATE TABLE IF NOT EXISTS `apifacilities` (
+  `facilityID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `typeName` varchar(255) NOT NULL,
+  `solarSystemID` int(11) NOT NULL,
+  `solarSystemName` varchar(255) NOT NULL,
+  `regionID` int(11) NOT NULL,
+  `regionName` varchar(255) NOT NULL,
+  `starbaseModifier` decimal(20,2) NOT NULL,
+  `tax` decimal(20,2) NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`facilityID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

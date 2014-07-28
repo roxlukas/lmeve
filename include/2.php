@@ -27,7 +27,7 @@
         <td><form action="" method="get">
         <input type="hidden" name="id" value="2" />
         <input type="hidden" name="id2" value="2" />
-        <input type="submit" value="Labs & Assembly Arrays" />
+        <input type="submit" value="Industry Facilities" />
         </form></td>
     <?php } ?> 
     <?php if (checkrights("Administrator,ViewPOS")) { ?>
@@ -53,7 +53,7 @@
         case 2:
             include("22.php");  //Labs
             break;
-        case 3:
+        /* case 3:
             include("23.php");  //Edit Labs
             break;
         case 4:
@@ -61,7 +61,7 @@
             break;
         case 5:
             include("25.php");  //Delete Labs
-            break;
+            break; */
         case 6:
             include("26.php");  //POCO list
             break;

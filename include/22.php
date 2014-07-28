@@ -7,7 +7,7 @@ if (!checkrights("Administrator,ViewPOS")) { //"Administrator,ViewOverview"
 	return;
 }
 $MENUITEM=2; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Mobile Laboratories & Assembly Arrays'; //Panel name (optional)
+$PANELNAME='Industry Facilities'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB;

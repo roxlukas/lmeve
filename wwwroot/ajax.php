@@ -48,7 +48,7 @@ if ($act=='') $act=0;
                         $melevel=0;
                         break;
                     case 2:
-                        $melevel=-4;
+                        $melevel=2;
                         break;
                     default:
                         $melevel=0;
@@ -92,7 +92,7 @@ if ($act=='') $act=0;
                         $melevel=0;
                         break;
                     case 2:
-                        $melevel=-4;
+                        $melevel=2;
                         break;
                     default:
                         $melevel=0;

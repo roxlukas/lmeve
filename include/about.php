@@ -47,6 +47,34 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.07.28</div></td>
+<td valign="top" class="tab">
+<b>0.1.42 beta:</b><br>
+<b>Poller version 18</b>
+<ul>
+<li>
+	Facilities.xml.aspx endpoint added
+</li>
+<li>
+	Facilities and Starbases are now queried for in Locations endpoint
+</li>
+<li>
+	POS list in Inventory now shows Tower Name
+</li>
+<li>
+	"Mobile Laboratiores & Assembly Arrays" renamed to "Industry Facilities" in Inventory
+</li>
+<li>
+    "Industry Facilities" now show Facilites obtained from new API endpoint instead of manual editing (thanks again, CCP FoxFour!)
+</li>
+<li>
+    Default ME and TE for Tech II have been adjusted to 2 (used to be -4)
+</li>
+</ul>
+</td></tr>
+
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.07.24</div></td>
 <td valign="top" class="tab">
 <b>0.1.41 beta:</b><br>

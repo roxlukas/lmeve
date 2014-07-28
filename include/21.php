@@ -22,7 +22,7 @@ include_once 'inventory.php';
     $corps=db_asocquery("SELECT * FROM apicorps;");
     foreach ($corps as $corp) { //begin corps loop
         echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
-        showControlTowers(getControlTowers("corporationID=${corp['corporationID']}"));
+        showControlTowers(getControlTowers("asl.`corporationID`=${corp['corporationID']}"));
     }//end corps loop
 ?>
 <a href="#top">Scroll up</a>

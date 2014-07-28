@@ -1,6 +1,6 @@
 <?php
-$POLLER_VERSION="17";
-set_time_limit(880); //poller can work for up to 15 minutes 
+$POLLER_VERSION="18";
+set_time_limit(900-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
 $mypath=str_replace('\\','/',dirname(__FILE__));
 $mylog=$mypath."/../var/poller.txt";
@@ -513,6 +513,38 @@ foreach ($api_keys as $api_key) {
 		warning("IndustryJobsHistory.xml",$FEED_BLOCKED);
 	}
         
+        //CRIUS FACILITIES ENDPOINT
+        // /corp/Facilities.xml.aspx
+        // Cache: 60 min
+        if (!apiCheckErrors($keyid,"Facilities.xml")) {
+		$fac=get_xml_contents("https://api.eveonline.com/corp/Facilities.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Facilities_$keyid.xml",60*60);
+		if (isset($fac->error)) {
+			apiSaveWarning($keyid,$fac->error,"Facilities.xml");
+		} else {
+			db_uquery("DELETE FROM apifacilities WHERE corporationID=$corporationID;");
+			$rows=$fac->result->rowset->row;
+			foreach ($rows as $row) {
+//,typeID,typeName,solarSystemID,solarSystemName,regionID,regionName,starbaseModifier,tax,corporationID
+				$attrs=$row->attributes();
+				$sql="INSERT IGNORE INTO apifacilities VALUES (".
+				$attrs->facilityID.",".
+                                $attrs->typeID.",".
+				ins_string($attrs->typeName).",".
+				$attrs->solarSystemID.",".
+                                ins_string($attrs->solarSystemName).",".
+                                $attrs->regionID.",".
+                                ins_string($attrs->regionName).",".
+                                $attrs->starbaseModifier.",".
+                                $attrs->tax.",".
+				$corporationID.
+				");";
+				db_uquery($sql);
+			}
+			apiSaveOK($keyid,"Facilities.xml");
+		}
+	} else {
+		warning("Facilities.xml",$FEED_BLOCKED);
+	}
 	
 	//CORP SHEET: https://api.eveonline.com/corp/CorporationSheet.xml.aspx
 	//Parameters	 userID, apiKey, characterID OR corporationID
@@ -1045,7 +1077,14 @@ foreach ($api_keys as $api_key) {
 	//Cache Time (minutes)	 1440
 	//This feed REQUIRES a list of IDS, for example from Poco List
 	
-	$result=db_asocquery("SELECT DISTINCT `itemID` FROM `apipocolist` WHERE `corporationID`=$corporationID;");
+	$result=db_asocquery("SELECT DISTINCT `itemID` FROM `apipocolist`
+                WHERE `corporationID`=$corporationID
+                UNION
+                SELECT DISTINCT `facilityID` FROM `apifacilities`
+                WHERE `corporationID`=$corporationID
+                UNION
+                SELECT DISTINCT `itemID` FROM `apistarbaselist`
+                WHERE `corporationID`=$corporationID;");
 	$ids="";
 	foreach ($result as $row) {
 		$ids="${row['itemID']},$ids";

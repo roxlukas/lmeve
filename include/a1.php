@@ -434,8 +434,8 @@ if ($model) {
 		}
 		switch ($techLevel) {
 			case 2:
-				if (!isset($melevel)) $melevel=-4;
-				if (!isset($pelevel)) $pelevel=-4;
+				if (!isset($melevel)) $melevel=2;
+				if (!isset($pelevel)) $pelevel=2;
 				break;
 			case 3:
 				if (!isset($melevel)) $melevel=0;
