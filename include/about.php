@@ -47,6 +47,37 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.07.29</div></td>
+<td valign="top" class="tab">
+<b>0.1.43 beta:</b><br>
+<b>Poller version 18</b>
+<ul>
+<li>
+	Bug fixes in "Database"
+        <ul>
+            <li>
+                    Fixed material requirements so it is compatible with Crius
+            </li>
+            <li>
+                    Fixed Invention and Manufacturing cost estimation
+            </li>
+            <li>
+                    Links in Bonuses and Traits are now translated, so they correctly point to LMeve "Database"
+            </li>
+        </ul>
+</li>
+<li>
+	Bug fix in "Activity"
+        <ul>
+            <li>
+                    Incursions and Ratting graphs were not displayed, if there wasn't at least 1 mission run in a given month.
+            </li>
+        </ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.07.28</div></td>
 <td valign="top" class="tab">
 <b>0.1.42 beta:</b><br>
@@ -125,6 +156,22 @@ Changelog:
 </ul>
 </td></tr>
 
+
+
+
+
+ 
+    
+<!-- end of changelog -->
+
+<?php
+
+//HISTORIA ZMIAN
+
+$history=$_GET['history'];
+if (isset($history)) {
+?>
+
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.06.11</div></td>
 <td valign="top" class="tab">
@@ -188,20 +235,6 @@ Changelog:
 </li>
 </ul>
 </td></tr>
-
-
-
- 
-    
-<!-- end of changelog -->
-
-<?php
-
-//HISTORIA ZMIAN
-
-$history=$_GET['history'];
-if (isset($history)) {
-?>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.01.15</div></td>

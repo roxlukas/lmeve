@@ -19,6 +19,10 @@ $nr=secureGETnum('nr');
 function hrefedit_item($nr) {
 		echo("<a href=\"index.php?id=10&id2=1&nr=$nr\">");
 	}
+        
+function url_replace($input) {
+    return "<a href=\"index.php?id=10&id2=1&nr=".$input[1]."\">";
+}
 
 ?>	    
 		<script type="text/javascript" src="ajax.js"></script>
@@ -343,20 +347,20 @@ if ($model) {
 	
 	if (count($traitData) > 0) {
 		echo('<strong>Traits</strong><br/><ul>');
-                foreach($traitData as $row) {
-                    echo("<li>".$row['bonus'].$row['displayName']." ".$row['bonusText']."</li>");
+                foreach($traitData as $row) { //<a href=showinfo:3307>
+                    echo("<li>".$row['bonus'].$row['displayName']." ".preg_replace_callback('/\<a href=showinfo:(\d+)\>/',url_replace,$row['bonusText'] )."</li>");
                 }
                 echo('</ul>');
 	} 
         if (count($bonusData) > 0) {
 		echo('<strong>Bonuses</strong><br/><ul>');
                 foreach($bonusData as $row) {
-                    echo("<li>".$row['bonus'].$row['displayName']." ".$row['bonusText']." per level</li>");
+                    echo("<li>".$row['bonus'].$row['displayName']." ".preg_replace_callback('/\<a href=showinfo:(\d+)\>/',url_replace,$row['bonusText'] )." per level</li>");
                 }
                 echo('</ul>');
 	} 
 ?>
-<strong>Description</strong><br/>
+<strong>Description</strong><br/><br/>
 <?php 
 	$descript=strip_tags($item['description'],'<b><i>');
 	$descript=str_replace("\r",'',$descript);

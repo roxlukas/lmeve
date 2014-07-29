@@ -117,17 +117,21 @@ function getRecycleMaterials($typeID) {
 	}	
 }
 
+/**
+ * Pre Crius function - deprecated
+ * 
+ * @deprecated
+ */
 //getBaseMaterials($typeID) - get recyclable (base) materials for typeID
 //$typeID - ITEM typeID
-function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
-        //echo("getBaseMaterials() DEBUG: typeID='$typeID', runs='$runs' <br/>");
+function getBaseMaterialsOld($typeID,$runs=1,$melvl_override=null) {
 	global $LM_EVEDB;
 	$recycle=getRecycleMaterials($typeID);
 	$bpo=getBlueprintByProduct($typeID);
         
-	//echo('DEBUG: $bpo=');var_dump($bpo);echo('<br>');
-	$materials=getExtraMats($typeID,1); //get extra mats for manufacturing (activityID = 1)
-	//echo('DEBUG: $materials=');var_dump($materials);echo('<br>');
+        //deprecated! no extra mats anymore
+	//$materials=getExtraMats($typeID,1); //get extra mats for manufacturing (activityID = 1)
+
 	
 	$techLevel=$bpo['techLevel'];
 	
@@ -183,7 +187,7 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
                         if (!is_null($melvl_override)) {
                             $melevel=$melvl_override;
                         }
-                        //old formulas (pre-Kronos)
+                        //old formulas (pre-Crius)
                         $wasteFactor=getWasteFactor($typeID);
                         if ($melevel>=0) {
                             $multiplier=1+($wasteFactor/(1 + $melevel));
@@ -192,7 +196,7 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
                             $multiplier=1+($wasteFactor*(1 - $melevel));
                             $waste=$wasteFactor*(1 - $melevel)*100;
                         }
-                        //new formulas (post-Kronos)
+                        //new formulas (post-Crius)
                         if ($melevel>10) $melevel=10;
                         $multiplier=1-(0.01*$melevel);
                         $waste=$melevel;
@@ -206,6 +210,56 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null) {
 			return $recycle;
 		}
          return false;
+}
+
+function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
+	global $LM_EVEDB;
+	
+	$bpo=getBlueprintByProduct($typeID);      
+	$techLevel=$bpo['techLevel'];
+        
+        $materials=db_asocquery("SELECT rtr.`requiredTypeID` AS typeID, itp.`typeName`, rtr.`quantity`, rtr.`damagePerJob`, rtr.`recycle`
+        FROM `$LM_EVEDB`.`ramTypeRequirements` rtr
+        JOIN `$LM_EVEDB`.`invTypes` itp
+        ON rtr.`requiredTypeID` = itp.`typeID`
+        WHERE rtr.`typeID` = $typeID
+        AND `activityID` = $activityID
+        ORDER BY rtr.`requiredTypeID`;");
+	
+	if ($set=getMEPE($typeID)) {
+                $melevel=$set['me'];
+                $pelevel=$set['pe'];
+        }
+        switch ($techLevel) {
+                case 2:
+                        if (!isset($melevel)) $melevel=2;
+                        if (!isset($pelevel)) $pelevel=2;
+                        break;
+                case 3:
+                        if (!isset($melevel)) $melevel=0;
+                        if (!isset($pelevel)) $pelevel=0;
+                        break;
+                default:
+                        if (!isset($melevel)) $melevel=0;
+                        if (!isset($pelevel)) $pelevel=0;
+        }
+        if (!is_null($melvl_override)) {
+            $melevel=$melvl_override;
+        }
+
+        //new formulas (post-Crius)
+        if ($melevel>10) $melevel=10;
+        $multiplier=1-(0.01*$melevel);
+        $waste=$melevel;
+
+        foreach($materials as $i => $row) {
+            $materials[$i]['quantity']=$runs*$row['quantity'];
+            $materials[$i]['notperfect']=$runs*round($row['quantity']*$multiplier);
+            $materials[$i]['waste']=$waste;
+        }
+        //end ME modification
+        return $materials;
+
 }
 
 function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
@@ -239,16 +293,15 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 //$typeID - ITEM typeID
 //$activityID - ID of activity: 1-Manufacturing 5-Copying 8-Invention, etc.
 function getSkills($typeID,$activityID) {
+    $bpo=getBlueprintByProduct($typeID);
+    $bpoID=$bpo['blueprintTypeID'];
 	global $LM_EVEDB;
-	$sql="SELECT itp.typeName, mat.quantity, mat.damagePerJob, itp.typeID
-		FROM $LM_EVEDB.`ramTypeRequirements` AS mat
-		JOIN $LM_EVEDB.`invTypes` AS itp
-		ON mat.requiredTypeID = itp.typeID
-		JOIN $LM_EVEDB.`invGroups` AS igr
-		ON itp.groupID=igr.groupID
-		WHERE mat.typeID=$typeID
-		AND igr.categoryID = 16
-		AND mat.activityID = $activityID";
+	$sql="SELECT ybs.`skillTypeID`, ybs.`level`, itp.`typeName`
+        FROM `$LM_EVEDB`.`yamlBlueprintSkills` ybs
+        JOIN `$LM_EVEDB`.`invTypes` itp
+        ON ybs.`skillTypeID`=itp.`typeID`
+	WHERE `blueprintTypeID`=$bpoID
+        AND `activityID` = $activityID";
 	$skills=db_asocquery($sql); //Skills
 	if (count($skills)>0) {
 		return $skills;
@@ -262,8 +315,7 @@ function displaySkills($skills) {
 			echo("<table class=\"lmframework\" width=\"100%\">");
 			echo("<tr colspan=\"2\"><th>Skill</th><th>Required level</th></tr>");
 			foreach ($skills as $row) {
-				$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
-				if ($row['quantity']>0)	echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['quantity']}</td></tr>");
+				if ($row['level']>0)	echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['skillTypeID']}\"><img src=\"ccp_img/${row['skillTypeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['level']}</td></tr>");
 			}
 			echo("</table>");
 		}
@@ -271,13 +323,14 @@ function displaySkills($skills) {
 }
 
 /**
- * Get extra materials for typeID and activityID
+ * Get extra materials for typeID and activityID - deprecated
  * 
  * @global type $LM_EVEDB
  * @param type $typeID - typeID of item in question
  * @param type $activityID - ID of activity: 1-Manufacturing 5-Copying 8-Invention, etc.
  * @param type $runs - how many production runs? (default = 1)
  * @return mixed array with materials or false if there are none
+ * @deprecated
  */
 function getExtraMats($typeID,$activityID,$runs=1) {
         //echo("getExtraMats() DEBUG: typeID='$typeID', activityID='$activityID', runs='$runs' <br/>");
@@ -310,6 +363,13 @@ function getExtraMats($typeID,$activityID,$runs=1) {
 	//Extra Materials [0]=typeName [1]=quantity [2]=damagePerJob [3]=typeID [4]=recycle
 }
 
+/**
+ * Deprecated
+ * 
+ * @param type $materials
+ * @return type 
+ * @deprecated
+ */
 function displayExtraMats($materials) {
 	if ($materials!=false) {
 			echo("<table class=\"lmframework\" width=\"100%\">");
@@ -475,9 +535,7 @@ function calcManufacturingCost($typeID) {
     $returns=array();
     $returns['price']=0;
     $returns['accurate']=true;
-    
-    $baseMats=getBaseMaterials($typeID);
-    $extraMats=getExtraMats($typeID, 1);
+
     $techLevel=getTechLevel($typeID);
     
     //ME and PE settings
@@ -487,7 +545,7 @@ function calcManufacturingCost($typeID) {
     }
     switch ($techLevel) {
         case 2:
-            if (!isset($melevel)) $melevel=-4;
+            if (!isset($melevel)) $melevel=2;
             break;
 	case 3:
             if (!isset($melevel)) $melevel=0;
@@ -495,27 +553,15 @@ function calcManufacturingCost($typeID) {
 	default:
             if (!isset($melevel)) $melevel=0;
     }
-    //echo("DEBUG: ME level = $melevel<br/>");  
+ 
+    $baseMats=getBaseMaterials($typeID,1,$melevel);
     
-    //Waste factors
-    $baseWaste=getWasteFactor($typeID);
-    if ($melevel>=0) {
-	$multiplier=1+($baseWaste/(1 + $melevel));
-    } else {
-	$multiplier=1+($baseWaste*(1 - $melevel));
-    }
-    
+   
     //form a complete material list
     if($baseMats) {
         foreach ($baseMats as $mat) {
             //echo("${mat['typeName']} = ${mat['quantity']} * $multiplier = ".$mat['quantity']*$multiplier."<br/>");
-            $completeMats[$mat['typeID']]['qty']+=$mat['quantity']*$multiplier;
-            $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
-        }
-    }
-    if ($extraMats) {
-        foreach ($extraMats as $mat) {
-            $completeMats[$mat['typeID']]['qty']+=$mat['quantity']*$mat['damagePerJob'];
+            $completeMats[$mat['typeID']]['qty']+=$mat['notperfect'];
             $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
         }
     }
@@ -601,17 +647,19 @@ function calcInventionCost($typeID) {
         $invchance=0.2;
     } 
     
-    $extraMats=getExtraMats($bptypeID, 8);
+    $extraMats=getBaseMaterials($bptypeID, 1, 0, 8);
     //form a complete material list
     if ($extraMats) {
         foreach ($extraMats as $mat) {
             //Data Interface workaround
-            if (strpos($mat['typeName'],'Data Interface')===false) {
-                $completeMats[$mat['typeID']]['qty']+=$mat['quantity']*$mat['damagePerJob'];
+            if ($mat['damagePerJob'] > 0) {
+                $completeMats[$mat['typeID']]['qty']+=$mat['quantity'];
                 $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
             }
         }
     }
+    
+   
     if (count($completeMats)>0) {
         foreach ($completeMats as $id => $mat) {
             if ($unitPrice=getEveCentralPrice($id,'sell','min')) {             

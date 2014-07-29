@@ -22,7 +22,7 @@ if ($act=='') $act=0;
             }
             $typeID=secureGETnum('typeID');
             $melevel=secureGETnum('melevel');
-            displayExtraMats(getExtraMats($typeID,1));
+            //displayExtraMats(getExtraMats($typeID,1));
             displayBaseMaterials(getBaseMaterials($typeID, 1, $melevel));
             break;
         case 'GET_QUOTE':

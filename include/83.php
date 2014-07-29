@@ -159,7 +159,7 @@ $pointsDisplayed=false;
                         $rattingGraph=db_asocquery($sqlrat);
                         
             ?><h3>PVE Activity [missions, incursions, ratting]</h3> <?php
-            if (count($missionGraph)>0) {
+            if (count($missionGraph)>0 || count($incursionGraph)>0 || count($rattingGraph)>0) {
                     //reformatting data
                         foreach ($missionGraph as $row) {
                             $daystab[$row['day']]['mission']=$row['mission'];
