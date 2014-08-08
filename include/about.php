@@ -60,6 +60,7 @@ Changelog:
 </li>
 <li>
 	New IndustryJobs.xml endpoint does not return productTypeID until the job is delivered, so it's now updated using data from IndustryJobsHistory.xml
+        Additionally, if manufacturing job has its productTypeID=0, it is looked up in blueprints.yaml table at insert time.
 </li>
 <li>
 	Bug fix in "Database"

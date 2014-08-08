@@ -42,23 +42,23 @@ function microtime_float()
     return ((float)$usec + (float)$sec);
 }
 
-function critical($what,$error) {
+function critical($origin,$error) {
 	global $mylog,$mylock;
-	$message="[CRITICAL] $what: $error\n";
+	$message="[CRITICAL] $origin: $error\n";
 	loguj($mylog,$message);
 	die($message);	
 }
 
-function warning($what,$error) {
+function warning($origin,$errorText) {
 	global $mylog;
-	$message="[WARNING] $what: $error\n";
+	$message="[WARNING] $origin: $errorText\n";
 	echo($message);
 	loguj($mylog,$message);	
 }
 
-function inform($what,$error) {
+function inform($origin,$errorText) {
 	global $mylog;
-	$message="[INFORM] $what: $error\n";
+	$message="[INFORM] $origin: $errorText\n";
 	echo($message);
 	loguj($mylog,$message);	
 }
@@ -363,7 +363,26 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
         
          
        function criusInsert($attrs,$corporationID) {
-           //// INSERT TO CRIUS TABLE                   
+           global $LM_EVEDB;
+           //FIELD TRANSLATION
+                                
+                                if ($attrs->productTypeID != 0) {
+                                    $productTypeID=$attrs->productTypeID;
+                                } else {
+                                    switch($attrs->activityID) {
+                                        case 1:
+                                            //inform("IndustryJobs.xml", "Looking up productTypeID");
+                                            $dbq=db_asocquery("SELECT `productTypeID` FROM `$LM_EVEDB`.`yamlBlueprintProducts` WHERE `blueprintTypeID`=".$attrs->blueprintTypeID." AND `activityID`=1;");
+                                            $productTypeID=$dbq[0]['productTypeID'];
+                                            //inform("IndustryJobs.xml", "productTypeID=$productTypeID");
+                                            break;
+                                        default:
+                                            $productTypeID=$attrs->blueprintTypeID;
+                                            break;
+                                    }
+                                    
+                                }
+           //// INSERT TO CRIUS TABLE
 				$sql="INSERT INTO apiindustryjobscrius VALUES (".
 				$attrs->jobID.",".
                                 $attrs->installerID.",".
@@ -383,7 +402,7 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
                                 $attrs->teamID.",".
                                 $attrs->licensedRuns.",".
                                 $attrs->probability.",".
-                                $attrs->productTypeID.",".
+                                $productTypeID.",".
                                 ins_string($attrs->productTypeName).",".
                                 $attrs->status.",".
                                 $attrs->timeInSeconds.",".
@@ -401,8 +420,8 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
                                 ",productTypeName=".ins_string($attrs->productTypeName);
 				db_uquery($sql);
 //// INSERT TO COMPATIBILITY TABLE
-                                //FIELD TRANSLATION
-                                if ($attrs->productTypeID != 0) $productTypeID=$attrs->productTypeID; else $productTypeID=$attrs->blueprintTypeID;
+                                
+                                
                                 switch($attrs->status) {
                                     case 1: //in progress
                                         $completed=0;
@@ -1328,7 +1347,7 @@ WHERE acm.`installerID` IS NULL;");
 	*/
 } //END MAIN LOOP
 
-inform("Main","Polling global feeds...");
+inform("Main","Polling public API feeds...");
 
 //Base URL	$API_BASEURL/eve/ConquerableStationList.xml.aspx
 //Parameters	 none

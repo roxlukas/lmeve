@@ -43,7 +43,7 @@ include_once("lang.php");  //translations
 include_once("menu.php");  //menu
 include_once("template.php");  //templates
 
-$lmver="0.1.43 beta";
+$lmver="0.1.44 beta";
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  
