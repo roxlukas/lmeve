@@ -52,7 +52,7 @@ if (strlen($date)==6) {
 		?>
 		<a name="top"></a>
 		    <div class="tytul">
-			Industry Overview for <?php echo("$year-$month"); ?><br>
+			Industry Statistics for <?php echo("$year-$month"); ?><br>
 		    </div>
 		
 		    <div class="tekst">

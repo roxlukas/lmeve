@@ -374,13 +374,14 @@ if ($model) {
 <?php
 //PRICE DATA
 	$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=$nr;");
+        $crestPriceData=db_asocquery("SELECT * FROM `crestmarketprices` WHERE `typeID`=$nr;");
 	
 	if (count($priceData) > 0) {
 		$when=db_asocquery("SELECT `date` FROM `apistatus` WHERE `fileName`='eve-central.com/marketstat.xml';");
 		$when=$when[0]['date'];	
 		?>
 		<table class="lmframework" style="width:100%;">
-                    <tr><th colspan="5">Price checks (updated: <?php echo($when); ?>)</th></tr>
+                    <tr><th colspan="5">eve-central.com prices (updated: <?php echo($when); ?>)</th></tr>
 		<tr><th>
 		Type
 		</th><th>
@@ -412,6 +413,28 @@ if ($model) {
 		}
         ?> </table> <?php
 	} 
+        if (count($crestPriceData) > 0) {
+		$when=db_asocquery("SELECT `date` FROM `apistatus` WHERE `fileName`='CREST /market/prices/';");
+		$when=$when[0]['date'];	
+		?>
+		<table class="lmframework" style="width:100%;">
+                    <tr><th colspan="2">CREST price data (updated: <?php echo($when); ?>)</th></tr>
+		<tr><th>
+		Adjusted Price
+		</th><th>
+		Average Price
+		</th></tr>
+		<?php
+		foreach($crestPriceData as $row) {
+			echo('<tr><td class="tab">');
+				echo(number_format($row['adjustedPrice'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+			echo('</td><td class="tab">');
+				echo(number_format($row['averagePrice'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+			echo('</td></tr>');
+		}
+        ?> </table> <?php
+	} 
+        
         if ($pricesDisabled!='disabled') {
             ?>
 		<table class="lmframework" style="width:100%;">
@@ -571,7 +594,9 @@ if ($model) {
 	echo("<tr><td class=\"tab\"><b>Volume (unpacked):</b></td><td class=\"tab\">".number_format($item['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup></td></tr>");
 	echo("<tr><td class=\"tab\"><b>Cargohold:</b></td><td class=\"tab\">".number_format($item['capacity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup></td></tr>");
 	echo("<tr><td class=\"tab\"><b>Baseprice:</b></td><td class=\"tab\">".number_format($item['basePrice'], 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</td></tr>");
-
+        if ($item['portionSize']>1) $items='items'; else $items='item';
+        echo("<tr><td class=\"tab\"><b>Portion size:</b></td><td class=\"tab\">".$item['portionSize']." $items</td></tr>");
+        
 	if (count($blueprint) > 0 ) {
 		$blueprint=$blueprint[0];
 		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> look up</a></td></tr>");
@@ -602,9 +627,16 @@ if ($model) {
 			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
 			$element[0]=sprintf("%s",$groupid[0][0]);
 		}
-		if (eregi(".*Can be fitted to$", $element[2], $regs)) {
-			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
-			$element[0]=sprintf("%s",$groupid[0][0]);
+		if (strstr("Can be fitted to",$element[2])) {
+			if (!empty($element[0])) {
+                            $groupid=db_asocquery("SELECT `groupName` FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[0]};");
+                            if (!empty($groupid)) {
+                                $element[0]=$groupid[0]['groupName'];
+                            } else {
+                                $groupid=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[0]};");
+                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$element[0],$groupid[0]['typeName']);
+                            }
+                        }
 		}
 		//Jump Drive Fuel Need
 		if (strstr("Jump Drive Fuel Need",$element[2])) {
@@ -614,8 +646,8 @@ if ($model) {
 		if (eregi(".*duration$", $element[2], $regs)) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
-		if (strstr("Drone Capacity",$element[2])) {
-			$element[0]=sprintf("%d m<sup>3</sup>",$element[0]);
+		if (eregi("Drone Capacity|.*Bay Capacity|.*Hangar Capacity|.*Hold Capacity", $element[2], $regs)) {
+			$element[0]=number_format($element[0], 0, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup>";
 		}
 		if (eregi(".*Velocity$", $element[2], $regs)) {
 			$element[0]=sprintf("%d m/s",$element[0]);
@@ -627,10 +659,10 @@ if ($model) {
 			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$planettype[0][0]);
 		}
-		if (strstr("Can be fitted to",$element[2])) {
+		/*if (strstr("Can be fitted to",$element[2])) {
 			if (!empty($element[1])) $fittedto=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"> %s</a>",$element[1],$fittedto[0][0]);
-		}
+		}*/
 		//if (eregi(".*Damage Resistance$", $element[2], $regs)) {
 		//	$element[0]=sprintf("%d %%",100*(1.0-$element[0]));
 		//}

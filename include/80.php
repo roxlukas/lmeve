@@ -7,7 +7,7 @@ if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
 	return;
 }
 $MENUITEM=8; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Overview'; //Panel name (optional)
+$PANELNAME='Statistics'; //Panel name (optional)
 //standard header ends here
 
 include('tasks.php');
@@ -43,7 +43,7 @@ if (strlen($date)==6) {
 		?>
 		<a name="top"></a>
 		    <div class="tytul">
-			Industry Overview for <?php echo("$year-$month"); ?><br>
+			Industry Statistics for <?php echo("$year-$month"); ?><br>
 		    </div>
 		
 		    <div class="tekst">

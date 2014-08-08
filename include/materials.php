@@ -532,6 +532,8 @@ function getEveCentralPrice($typeID,$type='sell',$minmax='min') {
  * @return array $return['quote'] (float) - calculated quote; $return['accurate'] (boolean) - is the price accurate?
  */
 function calcManufacturingCost($typeID) {
+    global $LM_EVEDB;
+    
     $returns=array();
     $returns['price']=0;
     $returns['accurate']=true;
@@ -555,7 +557,9 @@ function calcManufacturingCost($typeID) {
     }
  
     $baseMats=getBaseMaterials($typeID,1,$melevel);
-    
+    $portionSize=db_query("SELECT `portionSize` FROM `$LM_EVEDB`.`invTypes` WHERE `typeID`=$typeID");
+    $portionSize=$portionSize[0][0];
+    if (!isset($portionSize)) $portionSize=1;
    
     //form a complete material list
     if($baseMats) {
@@ -584,6 +588,8 @@ function calcManufacturingCost($typeID) {
                 }
             }
         }
+        $returns['price']=$returns['price']/$portionSize;
+        $returns['portionSize']=$portionSize;
         return $returns;
     } else {
         return false;
@@ -613,8 +619,11 @@ function calcInventionCost($typeID) {
     //CategoryID = 6 - ships - have 1 run
     //GroupID = 330 - cloaks - have 1 run
     //GroupID = 773 - 782 - rigs - have 1 run
-    $stats=db_asocquery("SELECT it.`groupID`,ig.`categoryID`,it.`typeID` FROM $LM_EVEDB.`invTypes` it JOIN $LM_EVEDB.`invGroups` ig ON it.`groupID`=ig.`groupID` WHERE `typeID`=$typeID;");
+    $stats=db_asocquery("SELECT it.`portionSize`,it.`groupID`,ig.`categoryID`,it.`typeID` FROM $LM_EVEDB.`invTypes` it JOIN $LM_EVEDB.`invGroups` ig ON it.`groupID`=ig.`groupID` WHERE `typeID`=$typeID;");
     $stats=$stats[0];
+    
+    $portionSize=$stats['portionSize'];
+    if (!isset($portionSize)) $portionSize=1;
     //BPC Runs
     if ($stats['categoryID']==6 || $stats['groupID']==330 || ($stats['groupID'] >= 773 && $stats['groupID'] <= 782) ) {
         $bpcruns=1;
@@ -669,7 +678,7 @@ function calcInventionCost($typeID) {
                 //echo("Missing price: ${mat['typeName']}<br/>");
             }
         }
-        $returns['price']=($returns['price']/$invchance)/$bpcruns;
+        $returns['price']=(($returns['price']/$invchance)/$bpcruns)/$portionSize;
         return $returns;
     } else {
         return false;
@@ -693,12 +702,20 @@ function displayCosts($typeID) {
         <table class="lmframework" style="width: 100%;">
         <tr><th colspan="3">Production cost estimation</th></tr>
         <?php if ($mancost) { ?>
-        <tr><td><strong>Manufacturing</strong></td><td><div title="This quote covers manufacturing cost of a single item."><?php echo(number_format($mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td><td><div title="If LMeve has prices for all the ingredients, then the result will show as 'complete'. If one or more prices is missing, the result will show as 'prices missing'"><?php if ($mancost['accurate']) echo('Complete'); else echo('Some prices missing');  ?></div></td></tr>
+        <tr><td><strong>Materials</strong></td><td><div title="This quote covers manufacturing cost of a single item."><?php echo(number_format($mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td><td><div title="If LMeve has prices for all the ingredients, then the result will show as 'complete'. If one or more prices is missing, the result will show as 'prices missing'"><?php if ($mancost['accurate']) echo('Complete'); else echo('Some prices missing');  ?></div></td></tr>
         <?php }
         if ($invcost) { ?>
-        <tr><td><!--<img title="Invention cost formula correctly assumes number of runs on the BPC, but uses a hardcoded 50% invention chance. Accurate invention chance will be implemented soon." src="img/exc.gif" /> --><strong>Invention</strong></td><td><div title="This quote covers invention cost of successful invention of a single T2 BPC, divided by the number of runs on this T2 BPC."><?php echo(number_format($invcost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td><td><div title="If LMeve has prices for all the ingredients, then the result will show as 'complete'. If one or more prices is missing, the result will show as 'prices missing'"><?php if ($invcost['accurate']) echo('Complete'); else echo('Some prices missing');  ?></div></td></tr>
+        <tr><td><strong>Invention</strong></td><td><div title="This quote covers invention cost of successful invention of a single T2 BPC, divided by the number of runs on this T2 BPC."><?php echo(number_format($invcost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td><td><div title="If LMeve has prices for all the ingredients, then the result will show as 'complete'. If one or more prices is missing, the result will show as 'prices missing'"><?php if ($invcost['accurate']) echo('Complete'); else echo('Some prices missing');  ?></div></td></tr>
         <?php } ?>
-        <tr><td><strong>Total</strong></td><td colspan="2"><div title="This quote is a sum of Manufacturing and Invention quotes."><strong><?php echo(number_format($mancost['price']+$invcost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</strong></div></td></tr>
+        <tr><td><strong>Manufacturing</strong></td><td colspan="2"><div title="This quote is NPC manufacturing fee (introduced in Crius). This will differ between systems! Assuming average system cost index=<?php echo(number_format(sqrt(1/5431), 4, $DECIMAL_SEP, $THOUSAND_SEP)); ?>."><?php echo(number_format(sqrt(1/5431)*$mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td></tr>
+        <tr><td><strong>Total</strong></td><td colspan="2"><div title="This quote is a sum of Materials and Invention quotes."><strong><?php echo(number_format($mancost['price']+$invcost['price']+sqrt(1/5431)*$mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</strong></div></td></tr>
+        <?php
+        if ($mancost['portionSize']>1) {
+            ?>
+        <tr><td colspan="3"><i><img src="ccp_icons/38_16_208.png" style="width: 16px; height: 16px; float: left;" /> Notice: minimum batch size: <?php echo($mancost['portionSize']); ?> items</i></td></tr>
+            <?php
+        }
+        ?>
         </table>
         <?php  
     }

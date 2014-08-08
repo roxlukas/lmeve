@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="18";
+$POLLER_VERSION="19";
 set_time_limit(900-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
 $mypath=str_replace('\\','/',dirname(__FILE__));
@@ -9,6 +9,25 @@ $mylock=$mypath."/../var/poller.lock";
 $mycache=$mypath."/../var";
 $mytmp=$mypath."/../tmp";
 $MAX_ERRORS=10; //ignore first x errors
+
+/**
+ * API Server configuration
+ * 
+ * You can either use Tranquility URLs, or Singularity's:
+ * 
+ * NOTE: No trailing slash!!
+ * 
+ * TRANQ:
+ * $API_BASEURL="https://api.eveonline.com"; 
+ * $CREST_BASEURL="http://public-crest.eveonline.com";
+ * 
+ * SISI:
+ * Get TEST API Keys here: https://community.testeveonline.com/support/api-key 
+ * $API_BASEURL="https://api.testeveonline.com"; 
+ * $CREST_BASEURL="http://public-crest-sisi.testeveonline.com";
+ */
+$API_BASEURL="https://api.eveonline.com"; 
+$CREST_BASEURL="http://public-crest.eveonline.com";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
 
@@ -84,7 +103,12 @@ function apiSaveWarning($keyID,$error,$fileName) {
                 } else {
                     $errcount='0';
                 }
-		db_uquery("UPDATE `apistatus` SET date=NOW(), errorCode=$errorCode, errorCount=$errcount, errorMessage='$errorMessage' WHERE keyID='$keyID' AND fileName='$fileName';");
+                if (!(strtolower($errorMessage)==='cached')) {
+                    $setdate='date=NOW(),';
+                } else {
+                    $setdate='';
+                }
+		db_uquery("UPDATE `apistatus` SET $setdate errorCode=$errorCode, errorCount=$errcount, errorMessage='$errorMessage' WHERE keyID='$keyID' AND fileName='$fileName';");
 	}
 	if ($errorCode > 0)	warning($fileName,"ERROR $errorCode: $errorMessage");
 }
@@ -182,8 +206,89 @@ function get_xml_contents($url, $cache, $interval) {
    	}
 	return $xml_data;
 }
+
+class crestError {
+    private $errorCode=0;
+    private $errorText='';
+    public $error='';
+   
+    public function __toString () {
+        return $this->errorText;
+    }
+    
+    public function getErrorCode() {
+        return $this->errorCode;
+    }
+
+    public function setErrorCode($errorCode) {
+        $this->errorCode = $errorCode;
+    }
+
+    public function getErrorText() {
+        return $this->errorText;
+    }
+
+    public function setErrorText($errorText) {
+        $this->errorText = $errorText;
+    }
+
+    public function __construct($errorCode, $errorText) {
+        $this->setErrorCode($errorCode);
+        $this->setErrorText($errorText);
+        $this->error=$errorText;
+    }
+    
+    public function attributes() {
+        $ret = new stdClass();
+        $ret->code=$this->getErrorCode();
+        return $ret;
+    }
+}
+
+function get_crest_contents($url, $cache, $interval) {
+	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
+	//thus we cut 20 seconds
+	if ($interval>20) $interval=$interval-20;
+	global $httplog;
+	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
+   		$data = file_get_contents($cache);
+                $ret=new crestError(0,'Cached');
+                return $ret;
+	} else {
+                 $ctx = stream_context_create(array(
+                        'http' => array (
+                            'ignore_errors' => TRUE
+                         )
+                    ));
+                $data=file_get_contents($url, FALSE, $ctx); 
+   		//$data = file_get_contents($url);
+   		//if ($data === false) {
+                if (!empty($http_response_header)) {
+                    $http_parse=explode(' ',$http_response_header[0]);
+                    $http_code=$http_parse[1];
+                    if ($http_code!=200) {
+                            //http errors
+                            if (empty($http_code)) {
+                                $ret=new crestError($http_code,'HTTP Errors');
+                                return $ret;
+                            }
+                            //additional logging!!
+                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
+                    } else {
+                            file_put_contents($cache, $data, LOCK_EX);
+                    }
+                } else {
+                    //network problem?
+                    loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nNETWORK PROBLEM!\r\n");
+                    $ret=new crestError(500,'Network problems');
+                    return $ret;
+                }
+   	}
+	$json_data = json_decode($data);
+        return $json_data;
+}
 /*
-PHP Warning:  file_get_contents(https://api.eveonline.com/account/APIKeyInfo.xml.aspx?keyID=1141058&vCode=zd6cxEv98sMKyxOTwRiqkh3fYRGlYiDPBBEGVNM5vcwGTWSn6jPLb5KVuTEkWpPL): 
+PHP Warning:  file_get_contents($API_BASEURL/account/APIKeyInfo.xml.aspx?keyID=1141058&vCode=zd6cxEv98sMKyxOTwRiqkh3fYRGlYiDPBBEGVNM5vcwGTWSn6jPLb5KVuTEkWpPL): 
  * failed to open stream: php_network_getaddresses: getaddrinfo failed: No address associated with hostname in /home/lukas/lmeve/bin/poller.php on line 157
 PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 160
 PHP Notice:  Undefined offset: 1 in /home/lukas/lmeve/bin/poller.php on line 161
@@ -291,11 +396,13 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 				") ON DUPLICATE KEY UPDATE".
 				" status=".$attrs->status.
 				",completedDate=".ins_string($attrs->completedDate).
-				",completedCharacterID=".$attrs->completedCharacterID;
+				",completedCharacterID=".$attrs->completedCharacterID.
+                                ",productTypeID=".$attrs->productTypeID.
+                                ",productTypeName=".ins_string($attrs->productTypeName);
 				db_uquery($sql);
 //// INSERT TO COMPATIBILITY TABLE
                                 //FIELD TRANSLATION
-                                if ($attrs->productTypeID!=0) $productTypeID=$attrs->productTypeID; else $productTypeID=$attrs->blueprintTypeID;
+                                if ($attrs->productTypeID != 0) $productTypeID=$attrs->productTypeID; else $productTypeID=$attrs->blueprintTypeID;
                                 switch($attrs->status) {
                                     case 1: //in progress
                                         $completed=0;
@@ -357,7 +464,8 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 				") ON DUPLICATE KEY UPDATE".
 				" completed=".$completed.
 				",completedSuccessfully=".$completedSuccessfully.
-				",completedStatus=".$completedStatus;
+				",completedStatus=".$completedStatus.
+                                ",outputTypeID=".$productTypeID;
 				db_uquery($sql2);
        }
        
@@ -384,7 +492,7 @@ foreach ($api_keys as $api_key) {
 	inform("Main","Polling keyID $keyid...");
 	
 	if (!apiCheckErrors($keyid,"APIKeyInfo.xml")) {
-		$aki=get_xml_contents("https://api.eveonline.com/account/APIKeyInfo.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/APIKeyInfo_$keyid.xml",0*60);
+		$aki=get_xml_contents("$API_BASEURL/account/APIKeyInfo.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/APIKeyInfo_$keyid.xml",0*60);
 		if (isset($aki->error)) {
 			apiSaveWarning($keyid,$aki->error,"APIKeyInfo.xml");
 			continue;
@@ -407,7 +515,7 @@ foreach ($api_keys as $api_key) {
 	
 	//POLL CORP MEMBER NAMES
 	if (!apiCheckErrors($keyid,"MemberTracking.xml")) {
-		$mtr=get_xml_contents("https://api.eveonline.com/corp/MemberTracking.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/MemberTracking_$keyid.xml",60*60);
+		$mtr=get_xml_contents("$API_BASEURL/corp/MemberTracking.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/MemberTracking_$keyid.xml",60*60);
 		if (isset($mtr->error)) {
 			apiSaveWarning($keyid,$mtr->error,"MemberTracking.xml");
 		} else {
@@ -482,7 +590,7 @@ foreach ($api_keys as $api_key) {
          */
         
         if (!apiCheckErrors($keyid,"IndustryJobs.xml")) {
-		$ijl=get_xml_contents("https://api.eveonline.com/corp/IndustryJobs.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobs_$keyid.xml",15*60);
+		$ijl=get_xml_contents("$API_BASEURL/corp/IndustryJobs.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobs_$keyid.xml",15*60);
 		if (isset($ijl->error)) {
 			apiSaveWarning($keyid,$ijl->error,"IndustryJobs.xml");
 		} else {
@@ -498,7 +606,7 @@ foreach ($api_keys as $api_key) {
 	}        
         //Crius new endpoint - jobs history
         if (!apiCheckErrors($keyid,"IndustryJobsHistory")) {
-		$ijl=get_xml_contents("https://api.eveonline.com/corp/IndustryJobsHistory.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobsHistory_$keyid.xml",6*60*60);
+		$ijl=get_xml_contents("$API_BASEURL/corp/IndustryJobsHistory.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobsHistory_$keyid.xml",6*60*60);
 		if (isset($ijl->error)) {
 			apiSaveWarning($keyid,$ijl->error,"IndustryJobsHistory.xml");
 		} else {
@@ -517,7 +625,7 @@ foreach ($api_keys as $api_key) {
         // /corp/Facilities.xml.aspx
         // Cache: 60 min
         if (!apiCheckErrors($keyid,"Facilities.xml")) {
-		$fac=get_xml_contents("https://api.eveonline.com/corp/Facilities.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Facilities_$keyid.xml",60*60);
+		$fac=get_xml_contents("$API_BASEURL/corp/Facilities.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Facilities_$keyid.xml",60*60);
 		if (isset($fac->error)) {
 			apiSaveWarning($keyid,$fac->error,"Facilities.xml");
 		} else {
@@ -546,11 +654,11 @@ foreach ($api_keys as $api_key) {
 		warning("Facilities.xml",$FEED_BLOCKED);
 	}
 	
-	//CORP SHEET: https://api.eveonline.com/corp/CorporationSheet.xml.aspx
+	//CORP SHEET: $API_BASEURL/corp/CorporationSheet.xml.aspx
 	//Parameters	 userID, apiKey, characterID OR corporationID
 	//Cache Time (minutes)	 360
 	if (!apiCheckErrors($keyid,"CorporationSheet.xml")) {
-		$csh=get_xml_contents("https://api.eveonline.com/corp/CorporationSheet.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CorporationSheet_$keyid.xml",360*60);
+		$csh=get_xml_contents("$API_BASEURL/corp/CorporationSheet.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CorporationSheet_$keyid.xml",360*60);
 		if (isset($csh->error)) {
 			apiSaveWarning($keyid,$csh->error,"CorporationSheet.xml");
 		} else {
@@ -620,7 +728,7 @@ foreach ($api_keys as $api_key) {
 		warning("CorporationSheet.xml",$FEED_BLOCKED);
 	}
 	
-	//WALLET JOURNAL: 	https://api.eveonline.com/corp/WalletJournal.xml.aspx
+	//WALLET JOURNAL: 	$API_BASEURL/corp/WalletJournal.xml.aspx
 	//Parameters	 userID, apiKey, characterID, (rowCount)
 	//Cache Time (minutes)	 15
 	$MAXROWS=256; //maximum number of rows from Journal 50-2560
@@ -629,7 +737,7 @@ foreach ($api_keys as $api_key) {
 		foreach($accountKeys as $acct) {
 			$accountKey=$acct['accountKey'];
 			if (!apiCheckErrors($keyid,"WalletJournal_$accountKey.xml")) {
-				$wlj=get_xml_contents("https://api.eveonline.com/corp/WalletJournal.xml.aspx?keyID=${keyid}&vCode=${vcode}&accountKey=$accountKey&rowCount=${MAXROWS}","${mycache}/WalletJournal_${keyid}_${accountKey}.xml",15*60);
+				$wlj=get_xml_contents("$API_BASEURL/corp/WalletJournal.xml.aspx?keyID=${keyid}&vCode=${vcode}&accountKey=$accountKey&rowCount=${MAXROWS}","${mycache}/WalletJournal_${keyid}_${accountKey}.xml",15*60);
 				if (isset($wlj->error)) {
 					apiSaveWarning($keyid,$wlj->error,"WalletJournal_$accountKey.xml");
 				} else {
@@ -661,7 +769,7 @@ foreach ($api_keys as $api_key) {
 			}
 		}
 	}
-	//WALLET TRANSACTIONS: https://api.eveonline.com/corp/WalletTransactions.xml.aspx
+	//WALLET TRANSACTIONS: $API_BASEURL/corp/WalletTransactions.xml.aspx
 	//Parameters	 userID, apiKey, accountKey --characterID-- 
 	//Cache Time (minutes)	 15
 	$accountKeys=db_asocquery("SELECT accountKey FROM apicorps acs JOIN apiwalletdivisions awd ON acs.corporationID=awd.corporationID WHERE keyID=$keyid;");
@@ -669,7 +777,7 @@ foreach ($api_keys as $api_key) {
 		foreach($accountKeys as $acct) {
 			$accountKey=$acct['accountKey'];
 			if (!apiCheckErrors($keyid,"WalletTransactions_$accountKey.xml")) {
-				$wlt=get_xml_contents("https://api.eveonline.com/corp/WalletTransactions.xml.aspx?keyID=${keyid}&vCode=${vcode}&accountKey=$accountKey","${mycache}/WalletTransactions_${keyid}_${accountKey}.xml",15*60);
+				$wlt=get_xml_contents("$API_BASEURL/corp/WalletTransactions.xml.aspx?keyID=${keyid}&vCode=${vcode}&accountKey=$accountKey","${mycache}/WalletTransactions_${keyid}_${accountKey}.xml",15*60);
 				if (isset($wlt->error)) {
 					apiSaveWarning($keyid,$wlt->error,"WalletTransactions_$accountKey.xml");
 				} else {
@@ -705,11 +813,11 @@ foreach ($api_keys as $api_key) {
 		}
 	}
 
-	//MARKET ORDERS: https://api.eveonline.com/corp/MarketOrders.xml.aspx
+	//MARKET ORDERS: $API_BASEURL/corp/MarketOrders.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	if (!apiCheckErrors($keyid,"MarketOrders.xml")) {
-		$mao=get_xml_contents("https://api.eveonline.com/corp/MarketOrders.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/MarketOrders$keyid.xml",60*60);
+		$mao=get_xml_contents("$API_BASEURL/corp/MarketOrders.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/MarketOrders$keyid.xml",60*60);
 		if (isset($mao->error)) {
 			apiSaveWarning($keyid,$mao->error,"MarketOrders.xml");
 		} else {
@@ -743,11 +851,11 @@ foreach ($api_keys as $api_key) {
 		warning("MarketOrders.xml",$FEED_BLOCKED);
 	}
 	
-	//POS LIST: https://api.eveonline.com/corp/StarbaseList.xml.aspx
+	//POS LIST: $API_BASEURL/corp/StarbaseList.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 360
 	if (!apiCheckErrors($keyid,"StarbaseList.xml")) {
-		$psl=get_xml_contents("https://api.eveonline.com/corp/StarbaseList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/StarbaseList_$keyid.xml",15*60);
+		$psl=get_xml_contents("$API_BASEURL/corp/StarbaseList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/StarbaseList_$keyid.xml",15*60);
 		if (isset($psl->error)) {
 			apiSaveWarning($keyid,$psl->error,"StarbaseList.xml");
 		} else {
@@ -778,12 +886,12 @@ foreach ($api_keys as $api_key) {
 		warning("StarbaseList.xml",$FEED_BLOCKED);
 	}
 	
-	//POCOS LIST: https://api.eveonline.com/corp/CustomsOffices.xml.aspx
+	//POCOS LIST: $API_BASEURL/corp/CustomsOffices.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	//<rowset name="pocos" key="itemID" columns="itemID,solarSystemID,solarSystemName,reinforceHour,allowAlliance,allowStandings,standingLevel,taxRateAlliance,taxRateCorp,taxRateStandingHigh,taxRateStandingGood,taxRateStandingNeutral,taxRateStandingBad,taxRateStandingHorrible" />
 	if (!apiCheckErrors($keyid,"CustomsOffices.xml")) {
-		$ppl=get_xml_contents("https://api.eveonline.com/corp/CustomsOffices.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CustomsOffices_$keyid.xml",60*60);
+		$ppl=get_xml_contents("$API_BASEURL/corp/CustomsOffices.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CustomsOffices_$keyid.xml",60*60);
 		if (isset($ppl->error)) {
 			apiSaveWarning($keyid,$ppl->error,"CustomsOffices.xml");
 		} else {
@@ -832,20 +940,20 @@ foreach ($api_keys as $api_key) {
 	
 	/************************************************ DONE DOWN TO THIS LINE ****************************************************/
 	
-	//POS DETAILS: https://api.eveonline.com/corp/StarbaseDetail.xml.aspx
+	//POS DETAILS: $API_BASEURL/corp/StarbaseDetail.xml.aspx
 	//Parameters	 keyID, vCode, itemID
 	//Cache Time (minutes)	 1380
 	//Needs specific ID from list! Need to get POS list first.
-	/*$psd=get_xml_contents("https://api.eveonline.com/corp/StarbaseDetail.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/StarbaseDetail_$keyid.xml",1380*60);
+	/*$psd=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/StarbaseDetail_$keyid.xml",1380*60);
 	if (isset($psd->error)) {
 		warning("StarbaseDetail.xml",$psd->error);
 	}*/
 	
-	//Base URL	https://api.eveonline.com/corp/AccountBalance.xml.aspx
+	//Base URL	$API_BASEURL/corp/AccountBalance.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	if (!apiCheckErrors($keyid,"AccountBalance.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/AccountBalance.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/AccountBalance_$keyid.xml",60*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/AccountBalance.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/AccountBalance_$keyid.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"AccountBalance.xml");
 		} else {
@@ -867,11 +975,11 @@ foreach ($api_keys as $api_key) {
 		warning("AccountBalance.xml",$FEED_BLOCKED);
 	}
 	
-	//Base URL	https://api.eveonline.com/corp/ContactList.xml.aspx
+	//Base URL	$API_BASEURL/corp/ContactList.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 1380
 	if (!apiCheckErrors($keyid,"ContactList.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/ContactList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/ContactList_$keyid.xml",1380*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/ContactList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/ContactList_$keyid.xml",1380*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"ContactList.xml");
 		} else {
@@ -893,11 +1001,11 @@ foreach ($api_keys as $api_key) {
 		warning("ContactList.xml",$FEED_BLOCKED);
 	}
 	
-	//Base URL	https://api.eveonline.com/corp/Contracts.xml.aspx
+	//Base URL	$API_BASEURL/corp/Contracts.xml.aspx
 	//Parameters	 userID, apiKey
 	//Cache Time (minutes)	 15
 	if (!apiCheckErrors($keyid,"Contracts.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/Contracts.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Contracts_$keyid.xml",15*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/Contracts.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Contracts_$keyid.xml",15*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"Contracts.xml");
 		} else {
@@ -950,7 +1058,7 @@ foreach ($api_keys as $api_key) {
 	//for each contract - fetch items, inert to DB
 	//maybe it will work without php checking? i.e. max_value as sub query?
 	//it works!! if there is a not-null value. A record with all zeros will do just fine.
-	//ContractItems: https://api.eveonline.com/corp/ContractItems.xml.aspx
+	//ContractItems: $API_BASEURL/corp/ContractItems.xml.aspx
 	//Parameters	 userID, apiKey, contractID 
 	//Cache Time (minutes)	 15
 	$contracts=db_asocquery("SELECT `contractID` FROM apicontracts WHERE `contractID` > (SELECT MAX(`contractID`) FROM `apicontractitems`) AND `type`!='Courier';");
@@ -958,7 +1066,7 @@ foreach ($api_keys as $api_key) {
 		foreach($contracts as $con) {
 			$contractID=$con['contractID'];
 			if (!apiCheckErrors($keyid,"ContractItems.xml")) {
-				$cit=get_xml_contents("https://api.eveonline.com/corp/ContractItems.xml.aspx?keyID=${keyid}&vCode=${vcode}&contractID=$contractID","${mycache}/ContractItems_${keyid}.xml",0);
+				$cit=get_xml_contents("$API_BASEURL/corp/ContractItems.xml.aspx?keyID=${keyid}&vCode=${vcode}&contractID=$contractID","${mycache}/ContractItems_${keyid}.xml",0);
 				if (isset($cit->error)) {
 					apiSaveWarning($keyid,$cit->error,"ContractItems.xml");
 				} else {
@@ -985,11 +1093,11 @@ foreach ($api_keys as $api_key) {
 	}
 	
 	
-	//Base URL	https://api.eveonline.com/corp/ContainerLog.xml.aspx
+	//Base URL	$API_BASEURL/corp/ContainerLog.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 Modified Short Cache
 	if (!apiCheckErrors($keyid,"ContainerLog.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/ContainerLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/ContainerLog$keyid.xml",180*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/ContainerLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/ContainerLog$keyid.xml",180*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"ContainerLog.xml");
 		} else {
@@ -1021,11 +1129,11 @@ foreach ($api_keys as $api_key) {
 		warning("ContainerLog.xml",$FEED_BLOCKED);
 	}
 	
-	//Base URL	https://api.eveonline.com/corp/FacWarStats.xml.aspx
+	//Base URL	$API_BASEURL/corp/FacWarStats.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	if (!apiCheckErrors($keyid,"FacWarStats.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/FacWarStats.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/FacWarStats$keyid.xml",60*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/FacWarStats.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/FacWarStats$keyid.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"FacWarStats.xml");
 		} else {
@@ -1054,12 +1162,12 @@ foreach ($api_keys as $api_key) {
 		warning("FacWarStats.xml",$FEED_BLOCKED);
 	}
 	
-	//ASSET LIST: https://api.eveonline.com/corp/AssetList.xml.aspx
+	//ASSET LIST: $API_BASEURL/corp/AssetList.xml.aspx
 	//Parameters	 keyID, vCode, [characterID]
 	//Cache Time (minutes)	 360
 	
 	if (!apiCheckErrors($keyid,"AssetList.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/AssetList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/AssetList_$keyid.xml",360*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/AssetList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/AssetList_$keyid.xml",360*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"AssetList.xml");
 		} else {
@@ -1072,7 +1180,7 @@ foreach ($api_keys as $api_key) {
 		warning("AssetList.xml",$FEED_BLOCKED);
 	}
 	
-	//Base URL	https://api.eveonline.com/corp/Locations.xml.aspx
+	//Base URL	$API_BASEURL/corp/Locations.xml.aspx
 	//Parameters	 userID, apiKey, ids
 	//Cache Time (minutes)	 1440
 	//This feed REQUIRES a list of IDS, for example from Poco List
@@ -1095,8 +1203,8 @@ foreach ($api_keys as $api_key) {
 	
         if (count($result)>0) {
             if (!apiCheckErrors($keyid,"Locations.xml")) {
-                    $url="https://api.eveonline.com/corp/Locations.xml.aspx?keyID=${keyid}&vCode=${vcode}&ids=${ids}";
-                    inform("Locations.xml", $url);
+                    $url="$API_BASEURL/corp/Locations.xml.aspx?keyID=${keyid}&vCode=${vcode}&ids=${ids}";
+                    //inform("Locations.xml", $url);
                     $dat=get_xml_contents($url,"${mycache}/Locations$keyid.xml",1440*60);
                     if (isset($dat->error)) {
                             apiSaveWarning($keyid,$dat->error,"Locations.xml");
@@ -1122,47 +1230,47 @@ foreach ($api_keys as $api_key) {
             }
         }
 	
-	//Base URL	https://api.eveonline.com/corp/Medals.xml.aspx
+	//Base URL	$API_BASEURL/corp/Medals.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//Base URL	https://api.eveonline.com/corp/MemberMedals.xml.aspx
+	//Base URL	$API_BASEURL/corp/MemberMedals.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//Base URL	https://api.eveonline.com/corp/MemberSecurity.xml.aspx
+	//Base URL	$API_BASEURL/corp/MemberSecurity.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//Base URL	https://api.eveonline.com/corp/MemberSecurityLog.xml.aspx
+	//Base URL	$API_BASEURL/corp/MemberSecurityLog.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//Base URL	https://api.eveonline.com/corp/Standings.xml.aspx
+	//Base URL	$API_BASEURL/corp/Standings.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//Base URL	https://api.eveonline.com/corp/OutpostList.xml.aspx
+	//Base URL	$API_BASEURL/corp/OutpostList.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 1380
 	
-	//Base URL	https://api.eveonline.com/corp/OutpostServiceDetail.xml.aspx
+	//Base URL	$API_BASEURL/corp/OutpostServiceDetail.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 1380
 	
-	//Base URL	https://api.eveonline.com/corp/Shareholders.xml.aspx
+	//Base URL	$API_BASEURL/corp/Shareholders.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//Base URL	https://api.eveonline.com/corp/Titles.xml.aspx
+	//Base URL	$API_BASEURL/corp/Titles.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	
-	//KILLBOARD: https://api.eveonline.com/corp/KillLog.xml.aspx
+	//KILLBOARD: $API_BASEURL/corp/KillLog.xml.aspx
 	//Parameters	 userID, apiKey, beforeKillID, characterID
 	//Cache Time (minutes)	 60
         if (!apiCheckErrors($keyid,"KillLog.xml")) {
-		$klg=get_xml_contents("https://api.eveonline.com/corp/KillLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/KillLog_$keyid.xml",60*60);
+		$klg=get_xml_contents("$API_BASEURL/corp/KillLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/KillLog_$keyid.xml",60*60);
                 if (isset($klg->error)) {
                       apiSaveWarning($keyid,$klg->error,"KillLog.xml");
                 }
@@ -1174,7 +1282,7 @@ foreach ($api_keys as $api_key) {
 		
 	/*//*********************************************** NEW API PARSE BLOCK
 	if (!apiCheckErrors($keyid,"EXPORT.xml")) {
-		$dat=get_xml_contents("https://api.eveonline.com/corp/EXPORT.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/EXPORT_$keyid.xml",15*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/EXPORT.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/EXPORT_$keyid.xml",15*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"EXPORT.xml");
 		} else {
@@ -1205,7 +1313,7 @@ WHERE acm.`installerID` IS NULL;");
 	$unknownIDs = substr_replace($unknownIDs ,"",-1);
 	//if list of IDs isnt empty, ask EVE API for names
 	if (!empty($unknownIDs)) {
-		$ecn=get_xml_contents("https://api.eveonline.com/eve/CharacterName.xml.aspx?IDs=${unknownIDs}","${mycache}/CharacterName_$keyid.xml",5*60);
+		$ecn=get_xml_contents("$API_BASEURL/eve/CharacterName.xml.aspx?IDs=${unknownIDs}","${mycache}/CharacterName_$keyid.xml",5*60);
 		if (isset($ecn->error)) {
 			warning("CharacterName.xml",$ecn->error);
 		} else {
@@ -1222,11 +1330,11 @@ WHERE acm.`installerID` IS NULL;");
 
 inform("Main","Polling global feeds...");
 
-//Base URL	https://api.eveonline.com/eve/ConquerableStationList.xml.aspx
+//Base URL	$API_BASEURL/eve/ConquerableStationList.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 1 (1440)
 if (!apiCheckErrors($keyid,"ConquerableStationList.xml")) {
-	$dat=get_xml_contents("https://api.eveonline.com/eve/ConquerableStationList.xml.aspx","${mycache}/ConquerableStationList.xml",1440*60);
+	$dat=get_xml_contents("$API_BASEURL/eve/ConquerableStationList.xml.aspx","${mycache}/ConquerableStationList.xml",1440*60);
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat->error,"ConquerableStationList.xml");
 	} else {
@@ -1250,19 +1358,19 @@ if (!apiCheckErrors($keyid,"ConquerableStationList.xml")) {
 	warning("ConquerableStationList.xml",$FEED_BLOCKED);
 }
 
-//Base URL	https://api.eveonline.com/eve/AllianceList.xml.aspx
+//Base URL	$API_BASEURL/eve/AllianceList.xml.aspx
 //Parameters	 version
 //Cache Time (minutes)	 1 (1440)
 
-//Base URL	https://api.eveonline.com/eve/CertificateTree.xml.aspx
+//Base URL	$API_BASEURL/eve/CertificateTree.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 1 (1440)
 
-//Base URL	https://api.eveonline.com/eve/ErrorList.xml.aspx
+//Base URL	$API_BASEURL/eve/ErrorList.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 60 (1440)
 if (!apiCheckErrors(0,"ErrorList.xml")) {
-	$dat=get_xml_contents("https://api.eveonline.com/eve/ErrorList.xml.aspx","${mycache}/ErrorList.xml",1440*60);
+	$dat=get_xml_contents("$API_BASEURL/eve/ErrorList.xml.aspx","${mycache}/ErrorList.xml",1440*60);
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat->error,"ErrorList.xml");
 	} else {
@@ -1282,19 +1390,19 @@ if (!apiCheckErrors(0,"ErrorList.xml")) {
 	warning("ErrorList.xml",$FEED_BLOCKED);
 }
 
-//Base URL	https://api.eveonline.com/eve/FacWarStats.xml.aspx
+//Base URL	$API_BASEURL/eve/FacWarStats.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 60
 
-//Base URL	https://api.eveonline.com/eve/FacWarTopStats.xml.aspx
+//Base URL	$API_BASEURL/eve/FacWarTopStats.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 60
 
-//Base URL	https://api.eveonline.com/eve/RefTypes.xml.aspx
+//Base URL	$API_BASEURL/eve/RefTypes.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 1440
 if (!apiCheckErrors(0,"RefTypes.xml")) {
-	$dat=get_xml_contents("https://api.eveonline.com/eve/RefTypes.xml.aspx","${mycache}/RefTypes.xml",1440*60);
+	$dat=get_xml_contents("$API_BASEURL/eve/RefTypes.xml.aspx","${mycache}/RefTypes.xml",1440*60);
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat->error,"RefTypes.xml");
 	} else {
@@ -1314,25 +1422,60 @@ if (!apiCheckErrors(0,"RefTypes.xml")) {
 	warning("RefTypes.xml",$FEED_BLOCKED);
 }
 
-//Base URL	https://api.eveonline.com/eve/SkillTree.xml.aspx
+//Base URL	$API_BASEURL/eve/SkillTree.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 1440
 
-//Base URL	https://api.eveonline.com/server/ServerStatus.xml.aspx/
+//Base URL	$API_BASEURL/server/ServerStatus.xml.aspx/
 //Parameters	 none
 //Cache Time (minutes)	 3
 
-//Base URL	https://api.eveonline.com/map/Jumps.xml.aspx
+//Base URL	$API_BASEURL/map/Jumps.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 60
 
-//Base URL	https://api.eveonline.com/map/Kills.xml.aspx
+//Base URL	$API_BASEURL/map/Kills.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 60
 
-//Base URL	https://api.eveonline.com/map/FacWarSystems.xml.aspx
+//Base URL	$API_BASEURL/map/FacWarSystems.xml.aspx
 //Parameters	 none
 //Cache Time (minutes)	 60 (1440)
+
+/******************** CREST PUBLIC FEEDS **************************/
+
+inform("Main","Polling public CREST feeds...");
+
+//Base URL	$API_BASEURL/eve/RefTypes.xml.aspx
+//Parameters	 none
+//Cache Time (minutes)	 23*60
+
+if (!apiCheckErrors(0,"CREST /market/prices/")) {
+	$dat=get_crest_contents("$CREST_BASEURL/market/prices/","${mycache}/crest_market_prices.xml",23*60*60);
+	if (isset($dat->error)) {
+		apiSaveWarning(0,$dat,"CREST /market/prices/");
+	} else {
+		db_uquery("DELETE FROM crestmarketprices WHERE true;");
+		$rows=$dat->items;
+		foreach ($rows as $row) {
+                    if (!isset($row->adjustedPrice)) $row->adjustedPrice=0.0;
+                    if (!isset($row->averagePrice)) $row->averagePrice=0.0;
+                    //typeID (type->id), adjustedPrice, averagePrice
+			$sql="INSERT INTO crestmarketprices VALUES(".
+			$row->type->id.",".
+			$row->adjustedPrice.",".
+                        $row->averagePrice.
+			");";
+			db_uquery($sql);
+		}
+                //var_dump($dat);
+		apiSaveOK(0,"CREST /market/prices/");
+	}
+} else {
+	warning("CREST /market/prices/",$FEED_BLOCKED);
+}
+
+/******************** EVE-CENTRAL PUBLIC FEEDS **************************/
 
 inform("Main","Polling eve-central.com feeds...");
 

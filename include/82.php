@@ -7,7 +7,7 @@ if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview
 	return;
 }
 $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Timesheet'; //Panel name (optional)
+$PANELNAME='Statistics'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB;
@@ -103,7 +103,7 @@ $pointsDisplayed=false;
                     </script>
 		<a name="top"></a>
 		    <div class="tytul">
-			Industry Activity for <?php echo("$year-$month"); ?><br>
+			Industry Statistics for <?php echo("$year-$month"); ?><br>
 		    </div>
 		
 		    <div class="tekst">

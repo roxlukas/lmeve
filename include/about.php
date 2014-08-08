@@ -47,6 +47,30 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.08.06</div></td>
+<td valign="top" class="tab">
+<b>0.1.44 beta:</b><br>
+<b>Poller version 19</b>
+<ul>
+<li>
+	First CREST endpoint in poller: /market/prices/
+</li>
+<li>
+	Poller no longer updates the last update timestamp in "apistatus" table, when using cached data.
+</li>
+<li>
+	New IndustryJobs.xml endpoint does not return productTypeID until the job is delivered, so it's now updated using data from IndustryJobsHistory.xml
+</li>
+<li>
+	Bug fix in "Database"
+</li>
+<li>
+	Prices obtained from CREST are now visible in "Database"
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.07.29</div></td>
 <td valign="top" class="tab">
 <b>0.1.43 beta:</b><br>
