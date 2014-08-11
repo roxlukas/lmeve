@@ -42,6 +42,7 @@ include_once('auth.php'); //authentication and authorization
 include_once("lang.php");  //translations
 include_once("menu.php");  //menu
 include_once("template.php");  //templates
+include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 
 $lmver="0.1.44 beta";
 

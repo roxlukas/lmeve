@@ -28,7 +28,9 @@ $DECIMAL_SEP=".";
 $LM_DEFAULT_CSS="css/rixxjavix.css";
 //force SSL
 $LM_FORCE_SSL=FALSE;
-//LMeve will use static data from this database. Static data table names should be in lowercase!
+//use CSRF tokens in forms
+$LM_SECUREFORMS=TRUE;
+//LMeve will use static data from this database.
 $LM_EVEDB='eve_rub130_dbo';
 //Buy calculator can show colored hints green - we buy, yellow - we have enough, red - we have way more than enough - we dont buy
 $LM_BUYCALC_SHOWHINTS=TRUE;

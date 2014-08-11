@@ -44,12 +44,11 @@ global $USERSTABLE;
 				<?php }
 			}
 
-		    echo('<form method="get" action="">');
-		    echo('<input type="hidden" name="id" value="7">');
-		    echo('<input type="hidden" name="id2" value="5">');
+		    echo('<form method="post" action="?id=7&id2=5">');
 		    echo('<input type="hidden" name="nr" value="');
 		    echo($nr);
 		    echo('">');
+                    token_generate();
 		    echo('<table border="0" cellspacing="2" cellpadding=""><tr><td width="150" class="tab">');
 		    echo('Role Name:<br></td><td width="200" class="tab"><input type="text" name="roleName" size="25" value="');
 		    echo(stripslashes($role['roleName']));
