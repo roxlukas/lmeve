@@ -30,6 +30,8 @@ $LM_DEFAULT_CSS="css/rixxjavix.css";
 $LM_FORCE_SSL=FALSE;
 //use CSRF tokens in forms
 $LM_SECUREFORMS=TRUE;
+//CSRF token expiry time (in seconds)
+$LM_SECUREFORMSEXPIRY=300;
 //LMeve will use static data from this database.
 $LM_EVEDB='eve_rub130_dbo';
 //Buy calculator can show colored hints green - we buy, yellow - we have enough, red - we have way more than enough - we dont buy

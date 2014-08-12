@@ -17,7 +17,7 @@ $PANELNAME='Roles'; //Panel name (optional)
 		    </div>
 		    <?php
 		$nr=secureGETnum('nr');
-		$do=$_GET['do'];		
+		$do=$_POST['do'];		
 		
 		if (db_count("SELECT `roleID` from `lmroles` WHERE `roleID`=$nr")==0) die("Such record does not exist.");
 		
@@ -35,6 +35,7 @@ $PANELNAME='Roles'; //Panel name (optional)
 		
 		
 	if ($do==1) {
+            if (!token_verify()) die("Invalid or expired token.");
 			db_uquery("DELETE FROM `lmrolerights` WHERE `roleID`=$nr");
 			db_uquery("DELETE FROM `lmuserroles` WHERE `roleID`=$nr");
 			db_uquery("DELETE FROM `lmroles` WHERE `roleID`=$nr");
@@ -64,10 +65,10 @@ $PANELNAME='Roles'; //Panel name (optional)
 			if ($ileuser>0) echo("There is $ileuser users using this role.<br>");
 		?>
 		<table border="0"><tr><td>
-		<form type="get" action=""><?php
+		<form method="post" action="?id=7&id2=6"><?php
 		echo("<input type=\"hidden\" name=\"nr\" value=\"$nr\">");
-		?><input type="hidden" name="id" value="7">
-		<input type="hidden" name="id2" value="6">
+                token_generate();
+		?>
 		<input type="hidden" name="do" value="1">
 		<input type="submit" value="Yes">
 		</form></td><td>
