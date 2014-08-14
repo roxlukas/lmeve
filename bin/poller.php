@@ -1224,7 +1224,7 @@ foreach ($api_keys as $api_key) {
             if (!apiCheckErrors($keyid,"Locations.xml")) {
                     $url="$API_BASEURL/corp/Locations.xml.aspx?keyID=${keyid}&vCode=${vcode}&ids=${ids}";
                     //inform("Locations.xml", $url);
-                    $dat=get_xml_contents($url,"${mycache}/Locations$keyid.xml",1440*60);
+                    $dat=get_xml_contents($url,"${mycache}/Locations$keyid.xml",60*60);
                     if (isset($dat->error)) {
                             apiSaveWarning($keyid,$dat->error,"Locations.xml");
                     } else {

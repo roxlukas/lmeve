@@ -111,7 +111,7 @@ if ($act=='') $act=0;
             //$melevel=0;
             echo('<div style="width: 400px;">');
 //            displayExtraMats(getExtraMats($typeID,$activityID,$runs));
-            displayKit2(getBaseMaterials($typeID,$runs),getExtraMats($typeID,$activityID,$runs),$melevel,getWasteFactor($typeID),$location);
+            displayKit2(getBaseMaterials($typeID,$runs,null,$activityID),array(),$melevel,getWasteFactor($typeID),$location);
             echo('</div>');
             break;
 	default:

@@ -449,8 +449,8 @@ function displayKit2($recycle,$materials,$melevel,$wasteFactor,$location) { //NE
 			foreach ($materials as $row) {
                             //data interface workaround
                             if (strpos($row['typeName'],'Data Interface')!==false) $row['quantity']=1;
-				//$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
-				if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
+			    //$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
+			    if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
 			}
 			echo("</table>");
     }
@@ -470,6 +470,7 @@ function displayKit2($recycle,$materials,$melevel,$wasteFactor,$location) { //NE
 		//draw Material list
 		foreach ($recycle as $row) {
 			//$notperfect=round($row['quantity']*$multiplier);
+                        if (strpos($row['typeName'],'Data Interface')!==false) $row['notperfect']=1;
                         $notperfect=$row['notperfect'];
 			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect}</td></tr>");
 		}
