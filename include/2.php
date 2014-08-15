@@ -53,15 +53,9 @@
         case 2:
             include("22.php");  //Labs
             break;
-        /* case 3:
-            include("23.php");  //Edit Labs
+        case 3:
+            include("23.php");  //Lab kits
             break;
-        case 4:
-            include("24.php");  //Save Labs
-            break;
-        case 5:
-            include("25.php");  //Delete Labs
-            break; */
         case 6:
             include("26.php");  //POCO list
             break;

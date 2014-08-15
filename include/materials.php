@@ -386,59 +386,14 @@ function displayExtraMats($materials) {
 /**
  * Draw a HTML table with kit data (kit is a complete set of ingredients for a given amount of industry jobs)
  * 
- * @param type $recycle - base materials
- * @param type $materials - extra materials
- * @param type $melevel - ME level
- * @param type $wasteFactor - waste factor
- * @deprecated
+ * @param array $recycle - base materials
+ * @param array $materials - extra materials - not used post Crius
+ * @param int $melevel - ME level - not used post Crius (calculated in GetBaseMaterials)
+ * @param double $wasteFactor - waste factor - not used post Crius
  */
-function displayKit($recycle,$materials,$melevel,$wasteFactor) { //OLD!!
-    if ($materials!=false) {
-			echo("<table class=\"lmframework\" width=\"100%\">");
-			echo("<tr colspan=\"2\"><th style=\"width: 67%\">Extra Materials</th><th>Quantity</th></tr>");
-			foreach ($materials as $row) {
-                            //data interface workaround
-                            if (strpos($row['typeName'],'Data Interface')!==false) $row['quantity']=1;
-				//$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
-				if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
-			}
-			echo("</table>");
-    }
-    if ($recycle!=false) {
-		/*if ($melevel>=0) {
-			$multiplier=1+($wasteFactor/(1 + $melevel));
-			$waste=$wasteFactor/(1 + $melevel)*100;
-		} else {
-			$multiplier=1+($wasteFactor*(1 - $melevel));
-			$waste=$wasteFactor*(1 - $melevel)*100;
-		}*/
-	
-		//printf("<strong>Waste factor:</strong> %4.2f%%",$waste);
-		
-		echo("<table class=\"lmframework\" width=\"100%\">");
-		echo("<tr colspan=\"2\"><th style=\"width: 67%\">Materials</th><th>Quantity</th></tr>");
-		//draw Material list
-		foreach ($recycle as $row) {
-			//$notperfect=round($row['quantity']*$multiplier);
-                        $notperfect=$row['notperfect'];
-			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect}</td></tr>");
-		}
-		echo("</table>");
-	}
-}
-
-/**
- * Draw a HTML table with kit data (kit is a complete set of ingredients for a given amount of industry jobs)
- * 
- * @param type $recycle - base materials
- * @param type $materials - extra materials
- * @param type $melevel - ME level
- * @param type $wasteFactor - waste factor
- */
-function displayKit2($recycle,$materials,$melevel,$wasteFactor,$location) { //NEW!
+function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$location=false) { //NEW!
     if ($location) {
         echo("<table class=\"lmframework\" width=\"100%\">");
-	//echo("<tr><th colspan=\"2\" style=\"width: 100%\">Mobile Laboratory / Assembly Array</th></tr>");
         echo("<tr><th colspan=\"2\" style=\"width: 100%\">Location</th></tr>");
         echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"ccp_img/${location['typeID']}_32.png\" title=\"${location['typeName']}\"></td><td style=\"width: 95%;\"><strong>${location['itemName']}</strong><br/>${location['moonName']}</td></tr>");
 	echo("</table>");		
@@ -449,22 +404,11 @@ function displayKit2($recycle,$materials,$melevel,$wasteFactor,$location) { //NE
 			foreach ($materials as $row) {
                             //data interface workaround
                             if (strpos($row['typeName'],'Data Interface')!==false) $row['quantity']=1;
-			    //$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
 			    if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
 			}
 			echo("</table>");
     }
     if ($recycle!=false) {
-		/*if ($melevel>=0) {
-			$multiplier=1+($wasteFactor/(1 + $melevel));
-			$waste=$wasteFactor/(1 + $melevel)*100;
-		} else {
-			$multiplier=1+($wasteFactor*(1 - $melevel));
-			$waste=$wasteFactor*(1 - $melevel)*100;
-		}*/
-	
-		//printf("<strong>Waste factor:</strong> %4.2f%%",$waste);
-		
 		echo("<table class=\"lmframework\" width=\"100%\">");
 		echo("<tr colspan=\"2\"><th style=\"width: 67%\">Materials</th><th>Quantity</th></tr>");
 		//draw Material list
@@ -475,7 +419,39 @@ function displayKit2($recycle,$materials,$melevel,$wasteFactor,$location) { //NE
 			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect}</td></tr>");
 		}
 		echo("</table>");
-	}
+    }
+}
+
+function displayFacilityKit($tasks) {
+    $materials=array();
+    if (count($tasks)>0) {
+        foreach ($tasks as $task) {
+                $typeID=$task['typeID'];
+                $activityID=$task['activityID'];
+                $structureID=$task['structureID'];
+                $runs=$task['runs'];
+
+                if ($portionSize=getPortionSize($typeID)) {
+                    $runs=$runs/$portionSize;
+                }
+                if (!isset($activityID)) $activityID=1;
+
+                $tempmats=getBaseMaterials($typeID,$runs,null,$activityID);
+                foreach ($tempmats as $tempmat) {
+                    $requiredTypeID=$tempmat['typeID'];
+                    $materials[$requiredTypeID]['typeID']=$requiredTypeID;
+                    $materials[$requiredTypeID]['typeName']=$tempmat['typeName'];
+                    $materials[$requiredTypeID]['quantity']+=$tempmat['quantity'];
+                    $materials[$requiredTypeID]['notperfect']+=$tempmat['notperfect'];
+                    $materials[$requiredTypeID]['waste']=$tempmat['waste'];
+                }
+         }
+     } else {
+         echo('<h3>No materials required for this Facility</h3>');
+     }
+     echo('<div style="width:400px;">');
+     displayKit2($materials,null,null,null,getLabDetails($structureID));
+     echo('</div>');
 }
 
 /**

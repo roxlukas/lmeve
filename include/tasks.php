@@ -88,6 +88,13 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	return(db_asocquery($sql));
 }
 
+function getTasksByLab($nr) {
+    $year=date("Y"); $month=date("m");
+    $tasks=db_asocquery("SELECT * FROM `lmtasks` WHERE `structureID`=$nr
+    AND ((singleton=1 AND date_format(taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0));");
+    return ($tasks);
+}
+
 /**
  * getTask() get task information from db for a specific character
  *

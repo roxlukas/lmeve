@@ -15,7 +15,7 @@ function towershrefedit($nr) {
 }
 
 function labshrefedit($nr) {
-    echo("<a href=\"index.php?id=2&id2=3&nr=$nr\"  title=\"Click to edit Lab/Array\">");
+    echo("<a href=\"index.php?id=2&id2=3&nr=$nr\"  title=\"Click to show kit for this Lab/Array\">");
 }
 
 function toonhrefedit($nr) {
@@ -138,7 +138,7 @@ function showLabsAndTasks($towers) {
         if (true) { 
         ?>
         <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
-            <tr><th colspan="5" style="text-align: center;">
+            <tr><th colspan="6" style="text-align: center;">
                 <?php echo($tower['moonName'].' ("'.$tower['itemName'].'")'); ?>
             </th>
             </tr>
@@ -152,17 +152,19 @@ function showLabsAndTasks($towers) {
                 Users
             </th><th style="width: 20%; min-width: 128px;">
                 Products
+            </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
+                Kit
             </th>
             </tr>
             <?php
-            if (count($tower['labs'])>0) foreach ($tower['labs'] as $row) {
+            if (count($tower['labs'])>0) foreach ($tower['labs'] as $facilityID => $row) {
                 ?>
                 <tr><td width="32" style="padding: 0px; text-align: center;">
                     <?php dbhrefedit($row['typeID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
                 </td><td>
                     <?php 
-                    echo(stripslashes($row['itemName']));
-                     ?> 
+                    labshrefedit($facilityID); echo(stripslashes($row['itemName'])); echo('</a>');
+                     ?>
                 </td><td style="">
                     <?php
                     dbhrefedit($row['typeID']); echo(stripslashes($row['typeName']));  echo('</a>');
@@ -183,6 +185,10 @@ function showLabsAndTasks($towers) {
                         echo('</a>');
                     }
                     ?> 
+                </td><td>
+                    <?php 
+                    labshrefedit($facilityID); echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" /></span>"); echo('</a>');
+                     ?> 
                 </td>
                 </tr>
                 <?php
