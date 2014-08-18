@@ -45,6 +45,7 @@ global $LM_EVEDB;
     }
     
     echo('<form method="post" action="?id=5&id2=12&nr='.$nr.'">');
+    token_generate();
 		    echo('<table border="0" cellspacing="2" cellpadding=""><tr><td width="150" class="tab">');
 		    echo('Activity:<br></td><td width="200" class="tab">');
                         echo($data['activityName']);

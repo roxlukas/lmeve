@@ -18,6 +18,7 @@ Settings
 <div class="tleft">
 <h2>Edit links</h2><br>
 <form method="post" action="?id=5&id2=7">
+<?php token_generate(); ?>
 <!--<input type="hidden" name="id" value="5">
 <input type="hidden" name="id2" value="7">-->
 <table border="0" cellspacing="2" cellpadding="0"><tr><td width="150" class="tab">

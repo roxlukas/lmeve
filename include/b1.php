@@ -15,6 +15,7 @@ global $LM_EVEDB;
 
 ?>
 <form action="?id=11&id2=2" method="post">
+    <?php    token_generate(); ?>
             <span class="tytul">
 		<?php echo($PANELNAME); ?>
 	    </span><span>Editing: <strong><?php echo(stripslashes($wikipage)); ?></strong> <input type="submit" value="Save" /> <input type="button" value="View page" onclick="location.href='?id=11&id2=0&wikipage=<?php echo($wikipage); ?>'" /></span><br />

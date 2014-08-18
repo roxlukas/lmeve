@@ -60,7 +60,6 @@ function template_main() {
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
-	<br>
 	<table class="tab-container">
 	<tr><td width="100%" class="tab-horizbar">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">

@@ -16,14 +16,14 @@ global $LM_EVEDB;
 		<?php echo($PANELNAME); ?><br>
 	    </div>
 	<?php
-
+            if (!token_verify()) die("Invalid or expired token.");
 		$new=FALSE;
-		$nr=$_GET['nr'];
+		$nr=$_POST['nr'];
 		if (!ctype_digit($nr)) {
 			if ($nr=='new') {
 				$new=TRUE;				
 			} else {
-					die("Wrong parameter nr.");
+				die("Wrong parameter nr.");
 			}
 		}
 		if (!$new) {

@@ -13,6 +13,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 			Messages<br>
 		    </div>
 		<?php
+                if (!token_verify()) die("Invalid or expired token.");
 		$admini=getusers();
 		//$i=$_GET['nr'];
 

@@ -398,6 +398,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
 	<script type="text/javascript" src="skrypty.js"></script>
 	<!--<form method="post" action="index.php?id=3&id2=2" onsubmit="return confirm('Are you sure you want to submit this order?');">-->
 	<form method="post" action="index.php?id=3&id2=2">
+        <?php token_generate(); ?>
 	<table width="100%" cellspacing="2" cellpadding="0"><tr><td style="width: 70%; text-align: left; vertical-align: top;">
 	<?php
 		$tabindex=1;

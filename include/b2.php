@@ -12,6 +12,8 @@ $PANELNAME='Wiki'; //Panel name (optional)
 
 global $LM_EVEDB;
 
+if (!token_verify()) die("Invalid or expired token.");
+
 ?>
             <span class="tytul">
 		<?php echo($PANELNAME); ?>

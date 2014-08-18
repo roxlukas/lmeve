@@ -24,7 +24,7 @@ $PANELNAME='Roles'; //Panel name (optional)
 		if ($nr==1) {
 			echo('Cannot delete Administrator role.');
 			?>
-			<form type="get" action="">
+			<form method="get" action="">
 			<input type="hidden" name="id" value="7">
 			<input type="hidden" name="id2" value="1">
 			<input type="submit" value="OK">
@@ -36,13 +36,14 @@ $PANELNAME='Roles'; //Panel name (optional)
 		
 	if ($do==1) {
             if (!token_verify()) die("Invalid or expired token.");
+            
 			db_uquery("DELETE FROM `lmrolerights` WHERE `roleID`=$nr");
 			db_uquery("DELETE FROM `lmuserroles` WHERE `roleID`=$nr");
 			db_uquery("DELETE FROM `lmroles` WHERE `roleID`=$nr");
 			echo('Role has been removed.<br><br>');
 			echo('<script type="text/javascript">location.href="index.php?id=7&id2=1";</script>');
 	?>
-		<form type="get" action="">
+		<form method="get" action="">
 		<input type="hidden" name="id" value="7">
 		<input type="hidden" name="id2" value="1">
 		<input type="submit" value="OK">
@@ -72,7 +73,7 @@ $PANELNAME='Roles'; //Panel name (optional)
 		<input type="hidden" name="do" value="1">
 		<input type="submit" value="Yes">
 		</form></td><td>
-		<form type="get" action="">
+		<form method="get" action="">
 		<input type="hidden" name="id" value="7">
 		<input type="hidden" name="id2" value="1">
 		<input type="submit" value="No">

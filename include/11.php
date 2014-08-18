@@ -45,6 +45,7 @@ $runs=secureGETnum('runs');
 				$task=$task[0];
 				if ($rights_edittasks) { ?>
 				<form action="" method="get">
+                                <?php token_generate(); ?>
 				<input type="hidden" name="id" value="1">
 				<input type="hidden" name="id2" value="4">
 				<input type="hidden" name="nr" value="<?php echo($nr); ?>">
@@ -65,9 +66,8 @@ $runs=secureGETnum('runs');
 			$activities=db_asocquery("SELECT `activityID`, `activityName` FROM $LM_EVEDB.`ramActivities` WHERE `published`=1 AND `activityID`>0 ORDER BY activityName;");
                         $labs=getLabs();
 
-		    echo('<form method="get" action="">');
-		    echo('<input type="hidden" name="id" value="1">');
-		    echo('<input type="hidden" name="id2" value="2">');
+		    echo('<form method="post" action="?id=1&id2=2">');
+                    token_generate();
 		    echo('<input type="hidden" name="nr" value="');
 		    echo($nr);
 		    echo('">');

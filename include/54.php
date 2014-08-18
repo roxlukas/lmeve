@@ -16,11 +16,9 @@ Settings
 </div><div class="tleft">
 <h2>Preferences</h2>
 <input type="button" onclick="gohref('?id=5&id2=2');" value="Change password"><br><br>
-<form method="get" action="">
-<input type="hidden" name="id" value="5">
-<input type="hidden" name="id2" value="5">
+<form method="post" action="?id=5&id2=5">
 <table border="0" cellspacing="2" cellpadding="0">
-
+<?php  token_generate(); ?>
 <tr><td>Default tab after logon:</td><td><select name="prefs1">
 <?php
 

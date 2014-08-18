@@ -15,7 +15,7 @@ $PANELNAME='Edit Tasks'; //Panel name (optional)
 	    </div>
 	<?php
 
-		$nr=$_GET['nr'];	
+		$nr=$_REQUEST['nr'];	
 		        
 		if (!ctype_digit($nr)) {
 			die("Wrong parameter nr.");
@@ -25,9 +25,11 @@ $PANELNAME='Edit Tasks'; //Panel name (optional)
 			echo("Such record does not exist.");
 			return;
 		}
-		$do=$_GET['do'];
+		$do=$_POST['do'];
 			
 	if ($do==1) {
+                        if (!token_verify()) die("Invalid or expired token.");
+                        
 			$task=db_asocquery("SELECT * FROM `lmtasks` WHERE `taskID`=$nr");
 			$task=$task[0];
 			
@@ -36,6 +38,7 @@ $PANELNAME='Edit Tasks'; //Panel name (optional)
 			echo('Task has been deleted.');
 		
 		?>
+                <form method="get" action="">
 		<input type="hidden" name="id" value="1">
 		<input type="hidden" name="id2" value="0">
 		<input type="hidden" name="nr" value="<?php echo($task['characterID']); ?>">
@@ -49,15 +52,15 @@ $PANELNAME='Edit Tasks'; //Panel name (optional)
 		Are you sure to delete this task?<br/>
 		
 		<table border="0"><tr><td>
-		<form type="get" action=""><?php
+		<form method="post" action="?id=1&id2=4"><?php
 		echo("<input type=\"hidden\" name=\"nr\" value=\"$nr\">");
-		?><input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
-		<input type="hidden" name="id2" value="4">
+                token_generate();
+		?>
 		<input type="hidden" name="do" value="1">
 		<input type="submit" value="Yes">
 		</form></td><td>
-		<form type="get" action="">
-		<input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
+		<form method="get" action="">
+		<input type="hidden" name="id" value="1">
 		<input type="submit" value="No">
 		</form></td></tr></table>
 		<?php

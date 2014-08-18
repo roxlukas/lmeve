@@ -24,6 +24,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 		    $txt=secureGETstr('txt',4096);
 			$admini=getusers();
 		    echo('<form method="post" action="?id=4&id2=2">');
+                    token_generate();
 		    echo('<input type="hidden" name="nr" value="new"><input type="hidden" name="id" value="4"><input type="hidden" name="id2" value="2"><br>');
 
 		    echo('<table border="0" cellspacing="2" cellpadding="">');

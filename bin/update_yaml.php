@@ -7,6 +7,12 @@
         include_once('../include/yaml_certificates.php');
         include_once('../include/yaml_blueprints.php');
         
+        $updateTypeIDs=FALSE;
+        $updateGraphicIDs=FALSE;
+        $updateCertificates=FALSE;
+        $updateBlueprints=FALSE;
+        $updateLegacy=FALSE;
+        
         //--usage, --help, /? - display usage (argc==1 || argc==2)
         //--all - update all
         //--typeIDs - update typeIDs
@@ -17,7 +23,7 @@
         
         echo('LMeve YAML static data updater'.PHP_EOL.'(c) 2014 by Lukasz "Lukas Rox" Pozniak'.PHP_EOL.PHP_EOL);
         
-        if ($argc==2 && $argv[1]=='-all') {
+        if ($argc==2 && $argv[1]=='--all') {
             $updateTypeIDs=TRUE;
             $updateGraphicIDs=TRUE;
             $updateCertificates=TRUE;

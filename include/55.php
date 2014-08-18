@@ -14,7 +14,7 @@ $PANELNAME='Settings'; //Panel name (optional)
 			Settings<br>
 		    </div>
 		<?php
-	
+                if (!token_verify()) die("Invalid or expired token.");
 		
 		$prefs['defaultPage']=secureGETnum('prefs1');
 		$prefs['css']=$css=secureGETstr('prefs3',50);

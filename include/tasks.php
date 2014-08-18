@@ -204,6 +204,7 @@ function showTasks($tasklist) {
 			echo('</td><td>');
 			if ($rights) edittaskhrefedit($row['taskID']);
 				echo($row['activityName']);
+                                echo("&nbsp;<img src=\"ccp_icons/38_16_208.png\" style=\"vertical-align: middle;\" />");
 			if ($rights) echo('</a>');
                         echo('</td><td style="padding: 0px; width: 32px;">');
 			itemhrefedit($row['typeID']);

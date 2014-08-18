@@ -1,6 +1,7 @@
 body {
-	background: url('../img/aideron-robotics_rixx.jpg') #0e1e28 no-repeat center top;
-	margin-top: 90px;
+	/*background: url('../img/aideron-robotics_rixx.jpg') #0e1e28 no-repeat center top;*/
+        background: #0e1e28 no-repeat center top;
+	margin: 0px;
 }
 body,p,td,div,a,span {
 	font-family:"helvetica ce","arial ce",helvetica,arial,sans-serif;
@@ -355,7 +356,7 @@ img {
 .tab-container {
 	border-spacing: 0;
         border-collapse: collapse;
-        width: 90%;
+        width: 100%;
         box-shadow: rgba(0,0,0,0.15) 3px 3px 9px 5px;
 }
 

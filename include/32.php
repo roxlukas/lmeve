@@ -13,6 +13,8 @@ $PANELNAME='Buy Calculator'; //Panel name (optional)
 include("market.php");
 global $LM_EVEDB;
 
+if (!token_verify()) die("Invalid or expired token.");
+
 $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, apr.`max`
 		FROM `cfgbuying` AS buy
 		JOIN $LM_EVEDB.`invTypes` AS itp

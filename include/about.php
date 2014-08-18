@@ -47,6 +47,21 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.08.18</div></td>
+<td valign="top" class="tab">
+<b>0.1.45 beta:</b><br>
+<b>Poller version 19</b>
+<ul>
+<li>
+	New Feature: Location Kits. Players doing POS logistic don't want to know individual tasks being run in each POS Facility. Instead, they would like to know the materials required for all users of the specific facility. Well, now they know :-)
+</li>
+<li>
+	Security update: CSRF protection added to all forms.
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.08.06</div></td>
 <td valign="top" class="tab">
 <b>0.1.44 beta:</b><br>

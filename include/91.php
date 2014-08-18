@@ -47,9 +47,8 @@ global $USERSTABLE;
 			$logins=db_asocquery("SELECT userID, login FROM $USERSTABLE ORDER BY login;");
 			$chars=db_asocquery("SELECT characterID, name FROM `apicorpmembers` ORDER BY name;");
 
-		    echo('<form method="get" action="">');
-		    echo('<input type="hidden" name="id" value="9">');
-		    echo('<input type="hidden" name="id2" value="2">');
+		    echo('<form method="post" action="?id=9&id2=2">');
+                    token_generate();
 		    echo('<input type="hidden" name="nr" value="');
 		    echo($nr);
 		    echo('">');

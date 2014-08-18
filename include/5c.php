@@ -16,6 +16,9 @@ global $LM_EVEDB;
 		    </div>
 		    
 <?php
+
+                if (!token_verify()) die("Invalid or expired token.");
+
 		$new=FALSE;
 		$nr=$_GET['nr'];
 		if (!ctype_digit($nr)) {

@@ -35,9 +35,8 @@ global $USERSTABLE;
 			}
 		    $user=$user[0];
 
-		    echo('<form method="get" action="">');
-		    echo('<input type="hidden" name="id" value="7">');
-		    echo('<input type="hidden" name="id2" value="3">');
+		    echo('<form method="post" action="?id=7&id2=3">');
+                    token_generate();
 		    echo('<input type="hidden" name="nr" value="');
 		    echo($nr);
 		    echo('">');

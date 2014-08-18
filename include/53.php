@@ -20,6 +20,7 @@ Settings
 //$oldpass=addslashes($_GET["oldpass"]);
 //$newpass=addslashes($_GET["newpass"]);
 //$newpass2=addslashes($_GET["newpass2"]);
+if (!token_verify()) die("Invalid or expired token.");
 
 $oldpass=secureGETstr("oldpass");
 $newpass=secureGETstr("newpass");

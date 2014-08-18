@@ -14,6 +14,8 @@ $PANELNAME='Settings'; //Panel name (optional)
 			Settings<br>
 		    </div>
 		<?php
+                if (!token_verify()) die("Invalid or expired token.");
+                
 		$blad=0;
 
 		$templink=secureGETstr('link',4096); //zbierz zmienne od przegladarki

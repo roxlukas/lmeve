@@ -19,6 +19,7 @@ Settings
 <h2>Change password</h2><br>
 <form method="post" action="?id=5&id2=3">
 <?php
+token_generate();
 //<input type="hidden" name="force_relog" value="yes">
 ?>
 <table border="0" cellspacing="2" cellpadding="0"><tr><td width="150" class="tab">

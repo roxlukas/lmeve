@@ -446,12 +446,14 @@ function displayFacilityKit($tasks) {
                     $materials[$requiredTypeID]['waste']=$tempmat['waste'];
                 }
          }
+         echo('<div style="width:400px;">');
+         //$materials=array_msort($materials, array('typeName'=>SORT_ASC));
+         displayKit2($materials,null,null,null,getLabDetails($structureID));
+         echo('</div>');
      } else {
          echo('<h3>No materials required for this Facility</h3>');
      }
-     echo('<div style="width:400px;">');
-     displayKit2($materials,null,null,null,getLabDetails($structureID));
-     echo('</div>');
+    
 }
 
 /**
