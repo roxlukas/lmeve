@@ -58,6 +58,12 @@ Changelog:
 <li>
 	Security update: CSRF protection added to all forms.
 </li>
+<li>
+	Bug fix in YAML updater: -all and --all are not exactly the same thing.
+</li>
+<li>
+	Bug fix in Kit builder: invention post Crius uses Base Materials instead of Extra Materials.
+</li>
 </ul>
 </td></tr>
 
