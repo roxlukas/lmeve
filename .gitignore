@@ -6,6 +6,8 @@ wwwroot/ccp_img/*.png
 wwwroot/ccp_img/*.jpg
 wwwroot/ccp_icons/*.png
 wwwroot/ccp_icons/*.jpg
+wwwroot/css/aideron.css
+wwwroot/img/aideron-robotics.jpg
 config/config.php
 
 
