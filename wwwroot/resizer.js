@@ -5,7 +5,7 @@
 	
 	Contact: pozniak.lukasz@gmail.com
 	
-	Copyright (c) 2005-2013, £ukasz PoŸniak
+	Copyright (c) 2005-2013, ï¿½ukasz Poï¿½niak
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification,
@@ -30,17 +30,12 @@
 
 **********************************************************************************/
 
-
-/*if (screen.width > 1024) {
-	document.write(" <img src=\"img/spacer.gif\" width=\"1\" height=\"540\" alt=\"\"><br> ");
+function _resize() {
+    document.getElementById('tab-main').style.height=$(window).height()-205+"px";
 }
-if (screen.width == 1024) {
-	document.write(" <img src=\"img/spacer.gif\" width=\"1\" height=\"440\" alt=\"\"><br> ");
-}
-if (screen.width < 1024) {
-	document.write(" <img src=\"img/spacer.gif\" width=\"1\" height=\"300\" alt=\"\"><br> ");
-}*/
 
-document.write('<img src="img/spacer.gif" width="1" height="');
-document.write(screen.height-378);
-document.write('" alt=""><br>');
+window.onresize = function(event) {
+    _resize();
+};
+
+_resize();

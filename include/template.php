@@ -116,10 +116,8 @@ function template_main() {
 	<input type="submit" value="Edit">
 	</form></div>
 	<?php } ?>
-		</td><td width="1" class="tab-links">
-			  <script type="text/javascript" src="resizer.js"></script>
 		</td>
-		<td width="80%" class="tab-main" valign="top">
+		<td width="80%" class="tab-main" id="tab-main" valign="top">
 			<?php
 				showTabContents($id);
 			?>
@@ -135,7 +133,7 @@ function template_main() {
 	<?php
 	include("copyright.php");
 	?>
-	
+	<script type="text/javascript" src="resizer.js"></script>
 	</center>
 	</body>
 	</html>

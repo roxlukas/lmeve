@@ -1,5 +1,5 @@
 body {
-	background: url('../img/mining_operation.jpg') #000000 no-repeat center top;
+	background: url('../img/crius-hero.jpg') #000000 no-repeat center top;
 	/*background-size: cover;*/
 	margin-top: 48px;
 }
@@ -36,10 +36,10 @@ select {
 /* end of fixed checkbox formatting */
 
 a {
-	color: #fa9e0e;
+	color: #87CFE1;
 }
 a:hover {
-	color: #fa9e0e;
+	color: #87CFE1;
 	text-decoration: underline;
 }
 img {
