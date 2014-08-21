@@ -16,13 +16,13 @@ global $USERSTABLE;
 
 <table cellpadding="0" cellspacing="2">
 	    <tr>
-            <!--    
+               
 	    <td><form action="" method="get">
 		<input type="hidden" name="id" value="9">
 		<input type="hidden" name="id2" value="4">
 		<input type="submit" value="Add characters using API KEY">
 		</form></td>
-            -->
+           
 	    <?php if (checkrights("Administrator,EditCharacters")) { ?>
 	    <td><form action="" method="get">
 		<input type="hidden" name="id" value="9">

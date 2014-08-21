@@ -14,13 +14,28 @@ $PANELNAME='Characters'; //Panel name (optional)
 ?>	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
-	    <h2>Coming sooner than soon<sup>tm</sup></h2>
+	    <h2>Input your personal API Key to link characters to your account</h2>
+            Set this permission for your key: <strong>Private Information -> CharacterInfo</strong> (Access mask: 16777216)<br/>
+            <strong>Your personal API Key will not be stored in LMeve.</strong><br/>
 	<?php
 
 //API IMPORT HERE
 
 	?>
-	<form action="" method="get">
-	<input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
+    
+	<form action="?id=9&id2=5" method="post">
+        <?php token_generate(); ?>
+            <table class="lmframework">
+                <tr><td>Key ID:</td><td><input type="text" name="keyid" value="" size="12"></td></tr>
+                <tr><td>Verification:</td><td><input type="text" name="verification" value="" size="64"></td></tr>
+            </table>
+    <table><tr><td>    
 	<input type="submit" value="OK">
 	</form>
+    </td><td>
+        <form method="get" action="">
+		<input type="hidden" name="id" value="9" />
+		<input type="hidden" name="id2" value="0" />
+		<input type="submit" value="Cancel" />
+        </form>
+    </td></tr></table>

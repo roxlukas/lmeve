@@ -26,5 +26,7 @@ checksession(); //check if we are called by a valid session
 		case 6:
 		include("96.php");  //Show Basic Info about character
 		break;
+            
+                
 	    }
 ?>
