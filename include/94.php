@@ -14,9 +14,9 @@ $PANELNAME='Characters'; //Panel name (optional)
 ?>	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
-	    <h2>Input your personal API Key to link characters to your account</h2>
-            Set this permission for your key: <strong>Private Information -> CharacterInfo</strong> (Access mask: 16777216)<br/>
-            <strong>Your personal API Key will not be stored in LMeve.</strong><br/>
+	    <img src="ccp_icons/2_64_16.png"  alt="Characters" style="float: left;"/><h2>Input your personal API Key to link characters to LMeve account</h2>
+            <img src="ccp_icons/38_16_208.png" alt="(!) " style="float: left;"/><a href="https://community.eveonline.com/support/api-key/CreatePredefined?accessMask=16777216" target="_blank">Click this link to go to EVE Online Support site</a> and generate a predefined key with an access mask of 16777216<br/><br/>
+            <strong style="color: red;">Your personal API Key will not be stored in LMeve.</strong><br/><br/>
 	<?php
 
 //API IMPORT HERE

@@ -20,7 +20,7 @@ global $USERSTABLE;
 	    <td><form action="" method="get">
 		<input type="hidden" name="id" value="9">
 		<input type="hidden" name="id2" value="4">
-		<input type="submit" value="Add characters using API KEY">
+		<input type="submit" value="Link characters using API KEY">
 		</form></td>
            
 	    <?php if (checkrights("Administrator,EditCharacters")) { ?>
@@ -28,7 +28,7 @@ global $USERSTABLE;
 		<input type="hidden" name="id" value="9">
 		<input type="hidden" name="id2" value="1">
 		<input type="hidden" name="nr" value="new">
-		<input type="submit" value="Connect character manually">
+		<input type="submit" value="Link characters manually">
 		</form></td>
 		<?php } ?>
 		</tr></table>

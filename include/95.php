@@ -122,7 +122,7 @@ $connected=connectCharacters($final_chars);
     if ($connected>0) {
         echo("<h3>$connected character(s) have been linked to your LMEve account.</h3>"); 
     } else {
-        echo('<h3>No characters linked!</h3> Try again later, or contact LMeve admins.');
+        echo('<h3>No characters linked!</h3> If characters are eligible, but do not show in corporation API (last column), please try again later.');
     }
 ?>
                 <form method="get" action="">
