@@ -28,6 +28,7 @@ $MAX_ERRORS=10; //ignore first x errors
  */
 $API_BASEURL="https://api.eveonline.com"; 
 $CREST_BASEURL="http://public-crest.eveonline.com";
+$USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
 
@@ -147,7 +148,7 @@ function lock_unset($lock) {
 	}
 } 
 
-function cache_file($url, $cache, $interval) { //DEPRECATED
+function cache_file($url, $cache, $interval) { //DEPRECATED, do not use!
 	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
 	//thus we cut 20 seconds
 	if ($interval>20) $interval=$interval-20;
@@ -168,14 +169,16 @@ function get_xml_contents($url, $cache, $interval) {
 	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
 	//thus we cut 20 seconds
 	if ($interval>20) $interval=$interval-20;
-	global $httplog;
+	global $httplog,$USER_AGENT;
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
    		$data = file_get_contents($cache);
 		$xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="0">Cached</error><cachedUntil></cachedUntil></eveapi>');
 	} else {
                  $ctx = stream_context_create(array(
                         'http' => array (
-                            'ignore_errors' => TRUE
+                            'ignore_errors' => TRUE,
+                            'method'=>"GET",
+                            'header'=>"User-Agent: $USER_AGENT\r\n"
                          )
                     ));
                 $data=file_get_contents($url, FALSE, $ctx); 
@@ -249,7 +252,7 @@ function get_crest_contents($url, $cache, $interval) {
 	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
 	//thus we cut 20 seconds
 	if ($interval>20) $interval=$interval-20;
-	global $httplog;
+	global $httplog,$USER_AGENT;
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
    		$data = file_get_contents($cache);
                 $ret=new crestError(0,'Cached');
@@ -257,7 +260,9 @@ function get_crest_contents($url, $cache, $interval) {
 	} else {
                  $ctx = stream_context_create(array(
                         'http' => array (
-                            'ignore_errors' => TRUE
+                            'ignore_errors' => TRUE,
+                            'method'=>"GET",
+                            'header'=>"User-Agent: $USER_AGENT\r\n"
                          )
                     ));
                 $data=file_get_contents($url, FALSE, $ctx); 
