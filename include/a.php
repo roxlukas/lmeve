@@ -27,6 +27,15 @@
     </form>
     </td>
     <?php } ?>
+    <?php if (checkrights("Administrator,ViewProfitCalc")) { ?>
+    <td>
+    <form method="get" action="">
+    <input type="hidden" name="id" value="10" />
+    <input type="hidden" name="id2" value="8" />
+    <input type="submit" value="Profit Calculator" />
+    </form>
+    </td>
+    <?php } ?>
     </tr></table>
     <?php
 //end submenu
@@ -56,6 +65,9 @@
 		break;
                 case 7:
 		include("a7.php");  //Ore Values Table
+		break;
+                case 8:
+		include("a8.php");  //Profit Calculator
 		break;
 	    }
 ?>

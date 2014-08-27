@@ -699,4 +699,13 @@ function displayCosts($typeID) {
         <?php  
     }
 }
+
+function calcTotalCosts($typeID) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    //Manufacturing costs
+    $mancost=calcManufacturingCost($typeID);
+    $invcost=calcInventionCost($typeID);
+    $npccost=sqrt(1/5431)*$mancost['price'];
+    return $mancost['price']+$invcost['price']+$npccost;
+}
 ?>
