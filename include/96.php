@@ -52,8 +52,8 @@ if (strlen($date)==6) {
 				echo("Such record does not exist.");
 				return;
 			}
-			$year=date("Y");
-			$month=date("m");
+			//$year=date("Y");
+			//$month=date("m");
 			$char=db_asocquery("SELECT * from `apicorpmembers` WHERE `characterID`=$nr");
 			$char=$char[0];
 			$corp=db_asocquery("SELECT * from `apicorps` WHERE `corporationID`=${char['corporationID']}");

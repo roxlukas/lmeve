@@ -213,7 +213,11 @@ $(function() {
 	
 	
 				$data=db_asocquery($sql_all);
-				
+                                
+                                //echo("<pre>DB=\n");
+                                //var_dump($data);
+				//echo("</pre>");
+                                
 				$rearrange=array();
 				
 				foreach($data as $row) {
@@ -225,7 +229,9 @@ $(function() {
 					$rearrange[$row['characterID']]['characterID']=$row['characterID'];
 				}
 				
-				//var_dump($rearrange);
+				//echo("<pre>rearrange=\n");
+                                //var_dump($rearrange);
+				//echo("</pre>");
 				
 				?>
 				
@@ -259,8 +265,8 @@ $(function() {
 			$totals['Copying']=0.0;
 			$totals['Invention']=0.0;
 			$totals['Manufacturing']=0.0;
-			$totals['Researching Material Productivity']=0.0;
-			$totals['Researching Time Productivity']=0.0;
+			$totals['Researching Material Efficiency']=0.0;
+			$totals['Researching Time Efficiency']=0.0;
 			$totals['Reverse Engineering']=0.0;
 			$totals['totalpoints']=0.0;
                         if ($mychars) {
@@ -290,12 +296,12 @@ $(function() {
                                     $totals['Manufacturing']+=$row['activities']['Manufacturing']['points'];
                                     echo('</td><td style="text-align: center;">');
                                     //charhrefedit($row['characterID']);
-                                    echo(number_format($row['activities']['Researching Material Productivity']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
-                                    $totals['Researching Material Productivity']+=$row['activities']['Researching Material Productivity']['points'];
+                                    echo(number_format($row['activities']['Researching Material Efficiency']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                    $totals['Researching Material Efficiency']+=$row['activities']['Researching Material Efficiency']['points'];
                                     echo('</td><td style="text-align: center;">');
                                     //charhrefedit($row['characterID']);
-                                    echo(number_format($row['activities']['Researching Time Productivity']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
-                                    $totals['Researching Time Productivity']+=$row['activities']['Researching Time Productivity']['points'];
+                                    echo(number_format($row['activities']['Researching Time Efficiency']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                    $totals['Researching Time Efficiency']+=$row['activities']['Researching Time Efficiency']['points'];
                                     echo('</td><td style="text-align: center;">');
                                     //charhrefedit($row['characterID']);
                                     echo(number_format($row['activities']['Reverse Engineering']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
@@ -325,9 +331,9 @@ $(function() {
 				</th><th width="64" style="text-align: center;">
 					<b><?php echo(number_format($totals['Manufacturing'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="64" style="text-align: center;">
-					<b><?php echo(number_format($totals['Researching Material Productivity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+					<b><?php echo(number_format($totals['Researching Material Efficiency'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="64" style="text-align: center;">
-					<b><?php echo(number_format($totals['Researching Time Productivity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+					<b><?php echo(number_format($totals['Researching Time Efficiency'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="64" style="text-align: center;">
 					<b><?php echo(number_format($totals['Reverse Engineering'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="48" style="text-align: center;">
@@ -363,12 +369,12 @@ $(function() {
                                     $totals['Manufacturing']+=$row['activities']['Manufacturing']['points'];
                                     echo('</td><td style="text-align: center;">');
                                     //charhrefedit($row['characterID']);
-                                    echo(number_format($row['activities']['Researching Material Productivity']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
-                                    $totals['Researching Material Productivity']+=$row['activities']['Researching Material Productivity']['points'];
+                                    echo(number_format($row['activities']['Researching Material Efficiency']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                    $totals['Researching Material Efficiency']+=$row['activities']['Researching Material Efficiency']['points'];
                                     echo('</td><td style="text-align: center;">');
                                     //charhrefedit($row['characterID']);
-                                    echo(number_format($row['activities']['Researching Time Productivity']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
-                                    $totals['Researching Time Productivity']+=$row['activities']['Researching Time Productivity']['points'];
+                                    echo(number_format($row['activities']['Researching Time Efficiency']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                    $totals['Researching Time Efficiency']+=$row['activities']['Researching Time Efficiency']['points'];
                                     echo('</td><td style="text-align: center;">');
                                     //charhrefedit($row['characterID']);
                                     echo(number_format($row['activities']['Reverse Engineering']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
@@ -397,9 +403,9 @@ $(function() {
 				</th><th width="64" style="text-align: center;">
 					<b><?php echo(number_format($totals['Manufacturing'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="64" style="text-align: center;">
-					<b><?php echo(number_format($totals['Researching Material Productivity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+					<b><?php echo(number_format($totals['Researching Material Efficiency'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="64" style="text-align: center;">
-					<b><?php echo(number_format($totals['Researching Time Productivity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+					<b><?php echo(number_format($totals['Researching Time Efficiency'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="64" style="text-align: center;">
 					<b><?php echo(number_format($totals['Reverse Engineering'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 				</th><th width="48" style="text-align: center;">
