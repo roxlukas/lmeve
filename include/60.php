@@ -240,22 +240,7 @@ if (count($walletGraphIncomes)>0 || count($walletGraphOutcomes)>0) {
                         <?php
 }
 //TABLES                    
-			$sql="SELECT DISTINCT * FROM (
-SELECT b.buy,s.sell,s.sell-b.buy AS total,s.corporationID,s.accountKey FROM 
-(SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
-WHERE transactionType='sell'
-AND corporationID=${corp['corporationID']}
-AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
-GROUP BY corporationID,accountKey) AS s
-LEFT JOIN
-(SELECT SUM(price*quantity) AS buy,accountKey,corporationID FROM `apiwallettransactions`
-WHERE transactionType='buy'
-AND corporationID=${corp['corporationID']}
-AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
-GROUP BY corporationID,accountKey) AS b
-ON s.accountKey=b.accountKey
-UNION ALL
-SELECT b.buy,s.sell,s.sell-b.buy AS total,s.corporationID,s.accountKey FROM 
+			$sql="SELECT coalesce(b.buy,0) as buy,coalesce(s.sell,0) as sell,coalesce(s.sell-b.buy,s.sell,-b.buy) AS total,coalesce(s.corporationID,b.corporationID) as corporationID,coalesce(s.accountKey,b.accountKey) as accountKey FROM 
 (SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
 WHERE transactionType='sell'
 AND corporationID=${corp['corporationID']}
@@ -267,7 +252,7 @@ WHERE transactionType='buy'
 AND corporationID=${corp['corporationID']}
 AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
 GROUP BY corporationID,accountKey) AS b
-ON s.accountKey=b.accountKey) AS raw_summary";
+ON s.accountKey=b.accountKey";
 			$wallet_summaries_raw=db_asocquery($sql);
 			
 			$sql="SELECT SUM(awj.amount) AS amount,awj.refTypeID,awj.accountKey FROM
