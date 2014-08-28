@@ -23,7 +23,7 @@
     <form method="get" action="">
     <input type="hidden" name="id" value="10" />
     <input type="hidden" name="id2" value="7" />
-    <input type="submit" value="Ore Values" />
+    <input type="submit" value="Ore Chart" />
     </form>
     </td>
     <?php } ?>
@@ -32,7 +32,16 @@
     <form method="get" action="">
     <input type="hidden" name="id" value="10" />
     <input type="hidden" name="id2" value="8" />
-    <input type="submit" value="Profit Calculator" />
+    <input type="submit" value="Profit Explorer" />
+    </form>
+    </td>
+    <?php } ?>
+    <?php if (checkrights("Administrator,ViewProfitCalc")) { ?>
+    <td>
+    <form method="get" action="">
+    <input type="hidden" name="id" value="10" />
+    <input type="hidden" name="id2" value="9" />
+    <input type="submit" value="Profit Chart" title="WARNING: it can take very long time to load!"/>
     </form>
     </td>
     <?php } ?>
@@ -67,7 +76,10 @@
 		include("a7.php");  //Ore Values Table
 		break;
                 case 8:
-		include("a8.php");  //Profit Calculator
+		include("a8.php");  //Profit Explorer
+		break;
+                case 9:
+		include("a9.php");  //Profit Chart
 		break;
 	    }
 ?>

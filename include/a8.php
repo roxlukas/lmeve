@@ -7,7 +7,7 @@ if (!checkrights("Administrator,ViewProfitCalc")) { //"Administrator,ViewOvervie
 	return;
 }
 $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Item Database - Profit Calculator'; //Panel name (optional)
+$PANELNAME='Profit Explorer'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB;
@@ -21,6 +21,20 @@ if (!empty($marketGroupID)) {
 } else {
 	$wheremarket="IS NULL";
 }
+
+//BEGIN Clientside sorting:
+?>
+  <script type="text/javascript" src="jquery-tablesorter/jquery.tablesorter.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="jquery-tablesorter/blue/style.css">
+  <script type="text/javascript">
+    $(document).ready(function() { 
+        $("#items").tablesorter({ 
+            headers: { 0: { sorter: false } } 
+        }); 
+    });
+  </script>
+<?php
+//END Clientside sorting
 ?>
 	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
@@ -29,28 +43,19 @@ if (!empty($marketGroupID)) {
 	<?php
 		if (!empty($marketGroupID)) {
 				$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`
-				FROM $LM_EVEDB.`invTypes` itp			
+				FROM `$LM_EVEDB`.`invTypes` itp
+                                JOIN `$LM_EVEDB`.`yamlBlueprintProducts` ybp
+                                ON itp.`typeID`=ybp.`productTypeID`
 				WHERE `marketGroupID` $wheremarket
-				AND published = 1
+				AND itp.`published` = 1
+                                AND ybp.`activityID` = 1
 				LIMIT 50;");
 		}
 		
 		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE `parentGroupID` $wheremarket ;");
 
 		?>
-	    <table cellpadding="0" cellspacing="2">
-	    <tr>
 	    
-	    <td>
-		<form method="get" action="">
-		<input type="text" name="query" value="<?php echo(stripslashes($query)); ?>" size="20">
-		<input type="hidden" name="id" value="10">
-		<input type="hidden" name="id2" value="2">
-	    <input type="submit" value="Search">
-		</form>
-		</td>
-		
-		</tr></table>
 	    
 	<?php
 
@@ -86,8 +91,8 @@ if (!empty($marketGroupID)) {
 	}
 
 	?>
-			<table class="lmframework" cellspacing="2" cellpadding="0">
-			<tr><th>
+			<table id="items" class="lmframework tablesorter" cellspacing="2" cellpadding="0" style="min-width:600px;">
+			<thead><tr><th>
 				<b>Icon</b>
 			</th><th>
 				<b>Name</b>
@@ -113,7 +118,7 @@ if (!empty($marketGroupID)) {
 			</tr>
 		<?php
 	}
-	
+	?> </thead> <?php
 	if (sizeof($groups)>0) {		
 				foreach($groups as $row) {
 					echo('<tr><td style="padding: 0px; width: 32px;">');
