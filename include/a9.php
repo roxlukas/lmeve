@@ -156,7 +156,7 @@ if (!empty($marketGroupID)) {
 	}
 
 	?>
-			<table id="items" class="lmframework tablesorter" cellspacing="2" cellpadding="0" style="min-width:600px;">
+			<table id="items" class="lmframework tablesorter" cellspacing="2" cellpadding="0" style="min-width:700px; width: 90%;">
 			<thead><tr><th>
 				<b>Icon</b>
 			</th><th>
@@ -168,7 +168,11 @@ if (!empty($marketGroupID)) {
 			</th><th>
 				<b>Market volume</b>
 			</th><th>
+				<b>Unit Profit</b>
+			</th><th>
 				<b>Profit [%]</b>
+			</th><th>
+				<b>Market Profitability</b>
 			</th>
 			</tr>
 	</thead> <?php
@@ -177,7 +181,8 @@ if (!empty($marketGroupID)) {
                 foreach($items as $row) {
                         //$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='sell';");
                         $cost=calcTotalCosts($row['typeID']);
-                        $profit=100*($row['min']-$cost)/$cost;
+                        $unitprofit=$row['min']-$cost;
+                        $profit=100*($unitprofit)/$cost;
 
                         echo('<tr><td style="padding: 0px; width: 32px;">');
                                 hrefedit_item($row['typeID']);
@@ -188,13 +193,17 @@ if (!empty($marketGroupID)) {
                                 echo($row['typeName']);
                                 echo('</a>');
                         echo('</td><td style="text-align:right;">');
-                                echo(number_format($cost, 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                echo(number_format($cost, 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
                         echo('</td><td style="text-align:right;">');
-                                echo(number_format($row['min'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                echo(number_format($row['min'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
                         echo('</td><td style="text-align:right;">');
                                 echo(number_format($row['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
                         echo('</td><td style="text-align:right;">');
-                                echo(number_format($profit, 1, $DECIMAL_SEP, $THOUSAND_SEP).'%');
+                                echo(number_format($unitprofit, 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                        echo('</td><td style="text-align:right;">');
+                                echo(number_format($profit, 1, $DECIMAL_SEP, $THOUSAND_SEP).' %');
+                        echo('</td><td style="text-align:right;">');
+                                echo(number_format($unitprofit*$row['volume']/1000000000, 1, $DECIMAL_SEP, $THOUSAND_SEP).' B ISK');
                         echo('</td>');
                         echo('</tr>');
                 }

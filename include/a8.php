@@ -91,7 +91,7 @@ if (!empty($marketGroupID)) {
 	}
 
 	?>
-			<table id="items" class="lmframework tablesorter" cellspacing="2" cellpadding="0" style="min-width:600px;">
+			<table id="items" class="lmframework tablesorter" cellspacing="2" cellpadding="0" style="min-width:700px; width: 90%;">
 			<thead><tr><th>
 				<b>Icon</b>
 			</th><th>
@@ -103,7 +103,11 @@ if (!empty($marketGroupID)) {
 			</th><th>
 				<b>Market volume</b>
 			</th><th>
+				<b>Unit Profit</b>
+			</th><th>
 				<b>Profit [%]</b>
+			</th><th>
+				<b>Market Profitability</b>
 			</th>
 			</tr>
 	<?php
@@ -114,7 +118,7 @@ if (!empty($marketGroupID)) {
 				<b><a href="?id=10&id2=8&marketGroupID=<?php echo($parentGroupID); ?>"><img src="ccp_icons/23_64_1.png" style="width: 32px; height: 32px;" title="Parent Group" /></a></b>
 			</td><td>
 				<b><a href="?id=10&id2=8&marketGroupID=<?php echo($parentGroupID); ?>">..</a></b>
-                        </td><td></td><td></td><td></td><td></td>
+                        </td><td></td><td></td><td></td><td></td><td></td><td></td>
 			</tr>
 		<?php
 	}
@@ -129,35 +133,42 @@ if (!empty($marketGroupID)) {
 						hrefedit_group($row['marketGroupID']);
 						echo($row['marketGroupName']);
 						echo('</a>');
-					echo('</td><td></td><td></td><td></td><td></td>');
+					echo('</td><td></td><td></td><td><td></td><td></td></td><td></td>');
 					echo('</tr>');
 				}
 	}
 
 	if (sizeof($items)>0) {
 				foreach($items as $row) {
-                                        $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='sell';");
+                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='sell';");
+                                    if ($priceData[0]['min'] > 0) {
                                         $cost=calcTotalCosts($row['typeID']);
-                                        $profit=100*($priceData[0]['min']-$cost)/$cost;
-                                        
-					echo('<tr><td style="padding: 0px; width: 32px;">');
-						hrefedit_item($row['typeID']);
-						echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />");
-						echo('</a>');
-					echo('</td><td>');
-						hrefedit_item($row['typeID']);
-						echo($row['typeName']);
-						echo('</a>');
-					echo('</td><td style="text-align:right;">');
-                                                echo(number_format($cost, 2, $DECIMAL_SEP, $THOUSAND_SEP));
-					echo('</td><td style="text-align:right;">');
-                                                echo(number_format($priceData[0]['min'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
-					echo('</td><td style="text-align:right;">');
+                                        $unitprofit=$priceData[0]['min']-$cost;
+                                        $profit=100*($unitprofit)/$cost;
+
+                                        echo('<tr><td style="padding: 0px; width: 32px;">');
+                                                hrefedit_item($row['typeID']);
+                                                echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />");
+                                                echo('</a>');
+                                        echo('</td><td>');
+                                                hrefedit_item($row['typeID']);
+                                                echo($row['typeName']);
+                                                echo('</a>');
+                                        echo('</td><td style="text-align:right;">');
+                                                echo(number_format($cost, 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                                        echo('</td><td style="text-align:right;">');
+                                                echo(number_format($priceData[0]['min'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                                        echo('</td><td style="text-align:right;">');
                                                 echo(number_format($priceData[0]['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
-					echo('</td><td style="text-align:right;">');
+                                        echo('</td><td style="text-align:right;">');
+                                                echo(number_format($unitprofit, 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                                        echo('</td><td style="text-align:right;">');
                                                 echo(number_format($profit, 1, $DECIMAL_SEP, $THOUSAND_SEP).'%');
-					echo('</td>');
-					echo('</tr>');
+                                        echo('</td><td style="text-align:right;">');
+                                                echo(number_format($unitprofit*$priceData[0]['volume']/1000000000, 1, $DECIMAL_SEP, $THOUSAND_SEP).' B ISK');
+                                        echo('</td>');
+                                        echo('</tr>');
+                                    }
 				}
 	}
 	
