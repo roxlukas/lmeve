@@ -47,6 +47,28 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.08.28</div></td>
+<td valign="top" class="tab">
+<b>0.1.46 beta:</b><br>
+<b>Poller version 19</b>
+<ul>
+<li>
+	New Feature: Profit Explorer & Profit chart - these will be available under Database.
+</li>
+<li>
+	New Feature: API character Self-register. Users can link characters to their LMeve username using their personal API keys
+</li>
+<li>
+	Change recommended by CCP: Poller now puts its user agent in HTTP headers
+</li>
+<li>
+        Bug fixes
+</li>
+</ul>
+</td></tr>
+
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.08.18</div></td>
 <td valign="top" class="tab">
 <b>0.1.45 beta:</b><br>

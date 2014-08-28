@@ -44,7 +44,7 @@ include_once("menu.php");  //menu
 include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 
-$lmver="0.1.45 beta";
+$lmver="0.1.46 beta";
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  

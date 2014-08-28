@@ -4,7 +4,7 @@ This project was started at the request of Aideron Technologies CEO in 2013. Thi
 Code beauty was not a priority, moreover this is not in objective PHP, just plain-old structural PHP.
 I had plans to refactor entire project into CodeIgniter framework, but this plan is currently on hold.
 
-Current version for EVE: Crius is 0.1.45 (check the "Releases" page). The trunk code is unstable and shouldn't be used in production.
+For the most current version check the "Releases" page. The trunk code is unstable and is not recommended to run on production.
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
