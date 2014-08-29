@@ -140,8 +140,9 @@ function template_main() {
 	<?php
 }
 
-function template_locked() {
+function template_locked($msg=null) {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
+        if (is_null($msg)) $msg=$LANG['MAINTENANCE'];
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
@@ -160,7 +161,7 @@ function template_locked() {
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td><br><div class="tcen"><?php echo($LANG['MAINTENANCE']); ?>
+	<tr><td><br><div class="tcen"><?php echo($msg); ?>
 	</div></td></tr>
 	<tr><td><div class="tcen"><br>
 		 <form method="get" action="">
@@ -179,7 +180,7 @@ function template_locked() {
 }
 
 function template_login() {
-	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
+	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG,$SSOENABLED;
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
@@ -211,7 +212,10 @@ function template_login() {
 		</div>
 	</td></tr>
 	<tr><td><div class="tcen">
-			<input name="logon" type="submit" value="Log in"><br>&nbsp;
+			<input name="logon" type="submit" value="Log in"><br/>
+			<?php if ($SSOENABLED) { ?> <hr style="opacity: 0.2;" />
+			<a href="ssologin.php"><img src="img/EVE_SSO_Login_Buttons_Small_White.png"></a>
+			<?php } ?>
 		 </div>
 	</td></tr>
 	</table>

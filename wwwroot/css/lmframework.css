@@ -305,6 +305,8 @@ img {
 .login {
 	background-color: #85a5cf;
 	background: url('../img/bg.gif');
+	padding: 10px;
+	border-radius: 5px;
 }
 
 .tab-horizbar {

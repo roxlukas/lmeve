@@ -30,6 +30,13 @@ $LM_DEFAULT_CSS="css/rixxjavix.css";
 $LM_FORCE_SSL=FALSE;
 //use CSRF tokens in forms
 $LM_SECUREFORMS=TRUE;
+//use EVE SSO - see https://wiki.eveonline.com/en/wiki/EVE_SSO_Documentation
+$SSOENABLED=FALSE;
+$SSO_REDIRECT_URL='https://lmeve.com/ssologin.php';
+$SSO_CLIENT_ID='sso_client_id';
+$SSO_CLIENT_SECRET='sso_client_secret';
+//Auth server can be either https://login.eveonline.com for Tranquility, or https://sisilogin.testeveonline.com when trying to use Sisi.
+$SSO_AUTH_SERVER='https://login.testeveonline.com';
 //CSRF token expiry time (in seconds)
 $LM_SECUREFORMSEXPIRY=300;
 //LMeve will use static data from this database.

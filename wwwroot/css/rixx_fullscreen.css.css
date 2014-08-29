@@ -315,6 +315,7 @@ img {
 .login {
 	background: rgba(29,44,56,0.75);
 	padding: 10px;
+	border-radius: 5px;
 }
 
 .tab-horizbar {

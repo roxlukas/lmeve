@@ -18,12 +18,12 @@ function token_generate($returnString=FALSE) {
     }
 }
 
-function token_verify() {
+function token_verify($form_token=null) {
     global $LM_SECUREFORMS;
     if (!$LM_SECUREFORMS) {
         return TRUE;
     } else {
-        $form_token=$_POST['form-token'];
+        if (is_null($form_token)) $form_token=$_POST['form-token'];
         $timestamp=time();
         if (count($_SESSION['form-tokens'])>0) {
             foreach($_SESSION['form-tokens'] as $key => $token) {
@@ -33,13 +33,9 @@ function token_verify() {
                 }
              }
         } else {
-            //echo('DEBUG: no tokens in session.<br />');
-            //var_dump($_SESSION['form-tokens']);
             return FALSE;
         }
     }
-    //echo('DEBUG: token not found.');
-    //var_dump($_SESSION['form-tokens']);
     return FALSE;
 }
 
