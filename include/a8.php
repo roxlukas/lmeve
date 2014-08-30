@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Profit Explorer'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB;
+global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_SELL,$EC_BUY_OR_SELL_FOR_SELL;
 
 include_once('materials.php'); //material related subroutines
 
@@ -140,10 +140,10 @@ if (!empty($marketGroupID)) {
 
 	if (sizeof($items)>0) {
 				foreach($items as $row) {
-                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='sell';");
-                                    if ($priceData[0]['min'] > 0) {
+                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`=$EC_BUY_OR_SELL_FOR_SELL;");
+                                    if ($priceData[0][$EC_PRICE_TO_USE_FOR_SELL] > 0) {
                                         $cost=calcTotalCosts($row['typeID']);
-                                        $unitprofit=$priceData[0]['min']-$cost;
+                                        $unitprofit=$priceData[0][$EC_PRICE_TO_USE_FOR_SELL]-$cost;
                                         $profit=100*($unitprofit)/$cost;
 
                                         echo('<tr><td style="padding: 0px; width: 32px;">');
@@ -157,7 +157,7 @@ if (!empty($marketGroupID)) {
                                         echo('</td><td style="text-align:right;">');
                                                 echo(number_format($cost, 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
                                         echo('</td><td style="text-align:right;">');
-                                                echo(number_format($priceData[0]['min'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                                                echo(number_format($priceData[0][$EC_PRICE_TO_USE_FOR_SELL], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
                                         echo('</td><td style="text-align:right;">');
                                                 echo(number_format($priceData[0]['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
                                         echo('</td><td style="text-align:right;">');
