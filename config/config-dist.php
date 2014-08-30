@@ -56,4 +56,10 @@ $LM_LEARNING_MODE=0;
 $LM_CCPWGL_USEPROXY=FALSE;
 //CCP CDN URL - normally it should never be changed
 $LM_CCPWGL_URL='https://web.ccpgamescdn.com/ccpwgl/res/';
+//TODO: Make the below 2 variables values in a database table or something maybe?
+//What EVE Central price to use for profit explorer manufacturing costs
+$EC_PRICE_TO_USE_FOR_MAN='min';
+//What EVE Central price to use for profit explorer market price
+$EC_BUY_OR_SELL_FOR_SELL='sell';
+$EC_PRICE_TO_USE_FOR_SELL='min';
 ?>
