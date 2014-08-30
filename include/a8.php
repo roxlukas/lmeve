@@ -140,7 +140,7 @@ if (!empty($marketGroupID)) {
 
 	if (sizeof($items)>0) {
 				foreach($items as $row) {
-                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`=$EC_BUY_OR_SELL_FOR_SELL;");
+                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='$EC_BUY_OR_SELL_FOR_SELL';");
                                     if ($priceData[0][$EC_PRICE_TO_USE_FOR_SELL] > 0) {
                                         $cost=calcTotalCosts($row['typeID']);
                                         $unitprofit=$priceData[0][$EC_PRICE_TO_USE_FOR_SELL]-$cost;
