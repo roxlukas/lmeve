@@ -200,17 +200,17 @@ function template_login() {
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td align="left"><br><label for="user_login">User:</label></td></tr>
+	<tr><td align="left">&nbsp;<!--<br><label for="user_login">User:</label>--></td></tr>
 	<tr><td><div class="tcen">
-			<input name="login" id="user_login" size=20 type="text" value="" style="width: 140px" autocapitalize="off">
+			<input name="login" placeholder="Login" id="user_login" size=20 type="text" value="" style="width: 140px" autocapitalize="off">
 		</div>
 	</td></tr>
-	<tr><td align="left"><label for="user_pass">Password:</label></td></tr>
+	<tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
-		<input name="password" id="user_pass" size="20" type="password" style="width: 140px" autocapitalize="off">
-		<br><br>
+                        <input name="password" placeholder="Password" id="user_pass" size="20" type="password" style="width: 140px" autocapitalize="off">
 		</div>
 	</td></tr>
+        <tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
 			<input name="logon" type="submit" value="Log in"><br/>
 			<?php if ($SSOENABLED) { ?> <hr style="opacity: 0.2;" />
