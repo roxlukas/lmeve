@@ -511,7 +511,7 @@ function getEveCentralPrice($typeID,$type='sell',$minmax='min') {
  * @return array $return['quote'] (float) - calculated quote; $return['accurate'] (boolean) - is the price accurate?
  */
 function calcManufacturingCost($typeID) {
-    global $LM_EVEDB;
+    global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_MAN;
     
     $returns=array();
     $returns['price']=0;
@@ -558,7 +558,7 @@ function calcManufacturingCost($typeID) {
                 $returns['price']+=$mat['qty']*$subcost['price'];
                 $returns['accurate']=$subcost['accurate']&&$returns['accurate'];
             } else {
-                if ($unitPrice=getEveCentralPrice($id,'sell','min')) {  
+                if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {  
                     //echo("$id - $unitPrice<br/>");
                     $returns['price']+=$mat['qty']*$unitPrice;
                 } else {
@@ -582,7 +582,7 @@ function calcManufacturingCost($typeID) {
  * @return array $return['quote'] (float) - calculated quote; $return['accurate'] (boolean) - is the price accurate?
  */
 function calcInventionCost($typeID) {
-    global $LM_EVEDB;
+    global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_MAN;
     $returns=array();
     $returns['price']=0;
     $returns['accurate']=true;
@@ -650,7 +650,7 @@ function calcInventionCost($typeID) {
    
     if (count($completeMats)>0) {
         foreach ($completeMats as $id => $mat) {
-            if ($unitPrice=getEveCentralPrice($id,'sell','min')) {             
+            if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {             
                 $returns['price']+=$mat['qty']*$unitPrice;
             } else {
                 $returns['accurate']=false;
