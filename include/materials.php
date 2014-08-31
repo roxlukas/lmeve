@@ -558,7 +558,7 @@ function calcManufacturingCost($typeID) {
                 $returns['price']+=$mat['qty']*$subcost['price'];
                 $returns['accurate']=$subcost['accurate']&&$returns['accurate'];
             } else {
-                if ($unitPrice=getEveCentralPrice($id,'sell',$EC_PRICE_TO_USE_FOR_MAN)) {  
+                if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {  
                     //echo("$id - $unitPrice<br/>");
                     $returns['price']+=$mat['qty']*$unitPrice;
                 } else {
@@ -650,7 +650,7 @@ function calcInventionCost($typeID) {
    
     if (count($completeMats)>0) {
         foreach ($completeMats as $id => $mat) {
-            if ($unitPrice=getEveCentralPrice($id,'sell',$EC_PRICE_TO_USE_FOR_MAN)) {             
+            if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {             
                 $returns['price']+=$mat['qty']*$unitPrice;
             } else {
                 $returns['accurate']=false;

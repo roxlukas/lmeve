@@ -51,8 +51,7 @@ $LM_CCPWGL_USEPROXY=FALSE;
 $LM_CCPWGL_URL='https://web.ccpgamescdn.com/ccpwgl/res/';
 //TODO: Make the below 2 variables values in a database table or something maybe?
 //What EVE Central price to use for profit explorer manufacturing costs
-$EC_PRICE_TO_USE_FOR_MAN='min';
+$EC_PRICE_TO_USE_FOR_MAN=array('type' => 'sell', 'price' => 'min');
 //What EVE Central price to use for profit explorer market price
-$EC_BUY_OR_SELL_FOR_SELL='sell';
-$EC_PRICE_TO_USE_FOR_SELL='min';
+$EC_PRICE_TO_USE_FOR_SELL=array('type' => 'sell', 'price' => 'min');
 ?>
