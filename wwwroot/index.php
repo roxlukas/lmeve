@@ -110,6 +110,7 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 			$_SESSION["status"]=0;
 			$_SESSION["granted"]=-1;
 			unset($_SESSION['ip']);
+                        unset($_SESSION['form-tokens']);
 			template_logout();
 		} else { //MAIN WINDOW
 			updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);

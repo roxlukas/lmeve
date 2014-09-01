@@ -52,12 +52,12 @@ if (!$SSOENABLED) {
                 header("Location: https://$SSO_AUTH_SERVER/oauth/authorize/?response_type=code&redirect_uri=$SSO_REDIRECT_URL&client_id=$SSO_CLIENT_ID&scope=&state=$SSO_NONCE");
             } else {
                 //secondly, receive callback from SSO AUTH SERVER
-                $state=$_GET['state'];
-                if (!isset($state) || !token_verify($state)) {
+                $state=str_replace(' ','+',$_GET['state']);
+                if (!token_verify($state)) {
                     //error occured, bail
                     template_locked("Invalid incoming redirect from SSO login site.");
                     die();
-                } 
+                }
                 //we have the code now, lets get the login token
                 $AUTH=base64_encode("$SSO_CLIENT_ID:$SSO_CLIENT_SECRET");
                 $postdata = http_build_query(
@@ -108,9 +108,11 @@ if (!$SSOENABLED) {
                 $CHARACTERID=$verify->CharacterID;
                 $char=db_query("SELECT lmu.`userID`
                         FROM `lmchars` lmc
+                        JOIN `apicorpmembers` acm
+                        ON lmc.`charID`=acm.`characterID`
                         JOIN `$USERSTABLE` lmu
                         ON lmc.`userID`=lmu.`userID`
-                        WHERE lmu.`charID`=$CHARACTERID AND lmu.`act`=1;");
+                        WHERE lmc.`charID`=$CHARACTERID AND lmu.`act`=1;");
                 if (!count($char)==1) {
                     //unkown character, bail!
                     template_locked("Unknown characterID. Is the selected character linked with your LMeve account?");
