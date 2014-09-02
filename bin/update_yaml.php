@@ -1,11 +1,14 @@
 <?php
 	date_default_timezone_set('Europe/Warsaw');
 	//set_include_path("../include");
-	include_once("../include/log.php");
-	include_once("../include/db.php");
-	include_once('../include/yaml_graphics.php');
-        include_once('../include/yaml_certificates.php');
-        include_once('../include/yaml_blueprints.php');
+        error_reporting(E_ALL ^ E_NOTICE);
+        
+        $mypath=str_replace('\\','/',dirname(__FILE__));
+	include_once("$mypath/../include/log.php");
+	include_once("$mypath/../include/db.php");
+	include_once("$mypath/../include/yaml_graphics.php");
+        include_once("$mypath/../include/yaml_certificates.php");
+        include_once("$mypath/../include/yaml_blueprints.php");
         
         $updateTypeIDs=FALSE;
         $updateGraphicIDs=FALSE;
