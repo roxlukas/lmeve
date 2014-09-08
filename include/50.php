@@ -27,7 +27,22 @@ Settings
 	echo('</a>');
 
 ?>
-<br>
+<br/>
+<b>Login realm:</b> <?php 
+    switch ($_SESSION['LOGIN_REALM']) {
+        case 'local':
+            echo('LMeve internal database');
+            break;
+        case 'LDAP':
+            echo('External LDAP server');
+            break;
+        case 'EVE_SSO':
+            echo('EVE Online Single Sign-On');
+            break;
+        default:
+            echo($_SESSION['LOGIN_REALM']);
+    }
+?><br/>
 <b>Server uptime: </b>
 <?php
 	$uptime=exec('uptime');
@@ -41,9 +56,9 @@ Settings
 
 	echo('<b>Maximum session idle time:</b> ');
 	if ($LM_SESSION < 60) {
-		printf("%d seconds<br>",$LM_SESSION);
+		printf("%d seconds<br/>",$LM_SESSION);
 	} else {
-		printf("%d minutes<br>",$LM_SESSION/60);
+		printf("%d minutes<br/>",$LM_SESSION/60);
 	}
 
 if (checkrights("Administrator,ViewAPIStats")) { 

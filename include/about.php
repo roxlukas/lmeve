@@ -47,6 +47,21 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.09.02</div></td>
+<td valign="top" class="tab">
+<b>0.1.47 beta:</b><br>
+<b>Poller version 19</b>
+<ul>
+<li>
+	New Feature: EVE Online Single Sign-On
+</li>
+<li>
+        Bug fixes
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.08.28</div></td>
 <td valign="top" class="tab">
 <b>0.1.46 beta:</b><br>

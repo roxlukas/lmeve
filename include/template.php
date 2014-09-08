@@ -140,8 +140,9 @@ function template_main() {
 	<?php
 }
 
-function template_locked() {
+function template_locked($msg=null) {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
+        if (is_null($msg)) $msg=$LANG['MAINTENANCE'];
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
@@ -160,7 +161,7 @@ function template_locked() {
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td><br><div class="tcen"><?php echo($LANG['MAINTENANCE']); ?>
+	<tr><td><br><div class="tcen"><?php echo($msg); ?>
 	</div></td></tr>
 	<tr><td><div class="tcen"><br>
 		 <form method="get" action="">
@@ -179,7 +180,7 @@ function template_locked() {
 }
 
 function template_login() {
-	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
+	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG,$SSOENABLED;
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
@@ -199,19 +200,22 @@ function template_login() {
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td align="left"><br><label for="user_login">User:</label></td></tr>
+	<tr><td align="left">&nbsp;<!--<br><label for="user_login">User:</label>--></td></tr>
 	<tr><td><div class="tcen">
-			<input name="login" id="user_login" size=20 type="text" value="" style="width: 140px" autocapitalize="off">
+			<input name="login" placeholder="Login" id="user_login" size=20 type="text" value="" style="width: 140px" autocapitalize="off">
 		</div>
 	</td></tr>
-	<tr><td align="left"><label for="user_pass">Password:</label></td></tr>
+	<tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
-		<input name="password" id="user_pass" size="20" type="password" style="width: 140px" autocapitalize="off">
-		<br><br>
+                        <input name="password" placeholder="Password" id="user_pass" size="20" type="password" style="width: 140px" autocapitalize="off">
 		</div>
 	</td></tr>
+        <tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
-			<input name="logon" type="submit" value="Log in"><br>&nbsp;
+			<input name="logon" type="submit" value="Log in"><br/>
+			<?php if ($SSOENABLED) { ?> <hr style="opacity: 0.2;" />
+			<a href="ssologin.php"><img src="img/EVE_SSO_Login_Buttons_Small_White.png"></a>
+			<?php } ?>
 		 </div>
 	</td></tr>
 	</table>

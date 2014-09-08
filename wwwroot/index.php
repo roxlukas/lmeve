@@ -44,7 +44,7 @@ include_once("menu.php");  //menu
 include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 
-$lmver="0.1.46 beta";
+$lmver="0.1.47 beta";
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  
@@ -99,17 +99,14 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 				$uzytk=htmlspecialchars($_POST['login']);
 				$do_logu=sprintf("<b>Bad logon!</b> login: <b>%s</b>.",$uzytk);
 				loguj("../var/access.txt",$do_logu);
-				$_SESSION['status']=0;
-				$_SESSION['granted']=-1;
+				$_SESSION=array();
 				//DISPLAY BAD LOGON
 				template_badlogon();
 			}
 		}
 	} else if ($_SESSION['status']==1) { //LOGGED ON
 		if ($_GET['logoff']==1) { //TRYING TO LOG OUT?
-			$_SESSION["status"]=0;
-			$_SESSION["granted"]=-1;
-			unset($_SESSION['ip']);
+			$_SESSION=array();
 			template_logout();
 		} else { //MAIN WINDOW
 			updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
