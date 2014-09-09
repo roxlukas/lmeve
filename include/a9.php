@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Profit Chart'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB;
+global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_SELL;
 
 include_once('materials.php'); //material related subroutines
 
@@ -141,7 +141,7 @@ if (!empty($marketGroupID)) {
                 ON itp.`typeID`=app.`typeID`
 		WHERE itp.`published` = 1
                 AND ybp.`activityID` = 1
-                AND app.`type` = ${EC_PRICE_TO_USE_FOR_SELL['type']}
+                AND app.`type` = '${EC_PRICE_TO_USE_FOR_SELL['type']}'
                 AND app.${EC_PRICE_TO_USE_FOR_SELL['price']} > 0
                 ORDER BY itp.`typeName`
                 ;");
