@@ -41,7 +41,7 @@ function checkApiKey($key) {
     } else return FALSE;
 }
 
-function RESTfulError($msg,$http_error_code=200) {
+function RESTfulError($msg,$http_error_code=400) {
     header("HTTP/1.0 $http_error_code");
     echo(json_encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
     die();
@@ -54,7 +54,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             $typeID=secureGETnum('typeID');
             $meLevel=secureGETnum('meLevel');
             if (empty($meLevel)) $meLevel=0;
-            if (empty($typeID)) RESTfulError('Missing typeID parameter.',424);
+            if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
             echo(json_encode(formatMaterials(getBaseMaterials($typeID, 1, $meLevel))));
             break;
         case 'TASKS':
