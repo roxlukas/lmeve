@@ -21,6 +21,7 @@ global $LM_EVEDB;
        
                 setConfigItem('iskPerPoint', secureGETnum('iskPerPoint'));
                 setConfigItem('marketRegion', secureGETnum('marketRegion'));
+                if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
 		
 		?>
 		<br>

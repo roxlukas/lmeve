@@ -47,6 +47,8 @@ function RESTfulError($msg,$http_error_code=400) {
     die();
 }
 
+if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",400);
+
 if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
 
     switch ($endpoint) {

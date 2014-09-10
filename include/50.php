@@ -85,6 +85,10 @@ Settings
                                 <input type="text" size="32" name="iskPerPoint" value="<?=getConfigItem('iskPerPoint','15000000')?>" />
                         </td></tr>
                         <tr><td width="150" class="tab">
+                            Enable Northbound API:<br></td><td width="200" class="tab">
+                                <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('northboundApi')=='enabled') echo('checked'); ?> />
+                        </td></tr>
+                        <tr><td width="150" class="tab">
                             Get market prices from:<br></td><td width="200" class="tab">
                                 <select name="marketRegion"> <?php
                                 $regions=db_asocquery("SELECT `regionID`,`regionName` FROM `$LM_EVEDB`.`mapRegions` ORDER BY `regionName`;");
