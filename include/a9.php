@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Profit Chart'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB;
+global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_SELL;
 
 include_once('materials.php'); //material related subroutines
 
@@ -131,7 +131,7 @@ if (!empty($marketGroupID)) {
         
 		
 		
-            $items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, app.`min`, app.`volume`
+            $items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, app.${EC_PRICE_TO_USE_FOR_SELL['price']}, app.`volume`
 		FROM `$LM_EVEDB`.`invTypes` itp
                 JOIN `$LM_EVEDB`.`yamlBlueprintProducts` ybp
                 ON itp.`typeID`=ybp.`productTypeID`
@@ -141,8 +141,8 @@ if (!empty($marketGroupID)) {
                 ON itp.`typeID`=app.`typeID`
 		WHERE itp.`published` = 1
                 AND ybp.`activityID` = 1
-                AND app.`type` = 'sell'
-                AND app.`min` > 0
+                AND app.`type` = '${EC_PRICE_TO_USE_FOR_SELL['type']}'
+                AND app.${EC_PRICE_TO_USE_FOR_SELL['price']} > 0
                 ORDER BY itp.`typeName`
                 ;");
 
@@ -172,7 +172,7 @@ if (!empty($marketGroupID)) {
 			</th><th>
 				<b>Profit [%]</b>
 			</th><th>
-				<b>Market Profitability</b>
+				<b>Market Profitability (B isk)</b>
 			</th>
 			</tr>
 	</thead> <?php
@@ -181,7 +181,7 @@ if (!empty($marketGroupID)) {
                 foreach($items as $row) {
                         //$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='sell';");
                         $cost=calcTotalCosts($row['typeID']);
-                        $unitprofit=$row['min']-$cost;
+                        $unitprofit=$row[$EC_PRICE_TO_USE_FOR_SELL['price']]-$cost;
                         $profit=100*($unitprofit)/$cost;
 
                         echo('<tr><td style="padding: 0px; width: 32px;">');
@@ -195,7 +195,7 @@ if (!empty($marketGroupID)) {
                         echo('</td><td style="text-align:right;">');
                                 echo(number_format($cost, 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
                         echo('</td><td style="text-align:right;">');
-                                echo(number_format($row['min'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                                echo(number_format($row[$EC_PRICE_TO_USE_FOR_SELL['price']], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
                         echo('</td><td style="text-align:right;">');
                                 echo(number_format($row['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
                         echo('</td><td style="text-align:right;">');
@@ -203,7 +203,7 @@ if (!empty($marketGroupID)) {
                         echo('</td><td style="text-align:right;">');
                                 echo(number_format($profit, 1, $DECIMAL_SEP, $THOUSAND_SEP).' %');
                         echo('</td><td style="text-align:right;">');
-                                echo(number_format($unitprofit*$row['volume']/1000000000, 1, $DECIMAL_SEP, $THOUSAND_SEP).' B ISK');
+                                echo(number_format($unitprofit*$row['volume']/1000000000, 1, $DECIMAL_SEP, $THOUSAND_SEP));
                         echo('</td>');
                         echo('</tr>');
                 }
