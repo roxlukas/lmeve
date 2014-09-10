@@ -19,12 +19,12 @@ $PANELNAME='Settings'; //Panel name (optional)
 		$blad=0;
 
 		$templink=secureGETstr('link',4096); //zbierz zmienne od przegladarki
-
+                setConfigItem('leftSidebar', $templink);
 		
-			$sql="UPDATE `linki` SET
+			/*$sql="UPDATE `linki` SET
 			link='$templink'
 			WHERE TRUE;";
-			db_uquery($sql);
+			db_uquery($sql);*/
 			echo('Links have been saved.<br><br>');
 		?>
 		<br>

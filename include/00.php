@@ -94,7 +94,7 @@ $pointsDisplayed=false;
 
 		    <?php
 		    $points=db_asocquery("SELECT rac.`activityName`,cpt.* FROM $LM_EVEDB.`ramActivities` rac JOIN `cfgpoints` cpt ON rac.`activityID`=cpt.`activityID` ORDER BY `activityName`;");
-		    $ONEPOINT=15000000; //it should be loaded from DB, static for now
+		    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
 		    		    
 		    
 		    		    
@@ -151,7 +151,11 @@ $(function() {
 					}
 					echo('</table>');
                                         
-					echo("<strong>1 point = ".number_format($ONEPOINT, 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</strong><br/>");
+					echo("<strong>1 point = ".number_format($ONEPOINT, 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</strong>");
+                                        if (checkrights("Administrator")) { ?>
+                                            <input type="button" value="Edit" onclick="location.href='?id=5&id2=0';">
+                                        <?php }
+                                        echo('<br/>');
                                         $pointsDisplayed=true;
                     }
 					echo('</td><td width="60%" style="vertical-align: top;">');

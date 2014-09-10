@@ -25,10 +25,14 @@ Settings
 Links:<br>
 </td><td width="200" class="tab">
 <textarea id="link" name="link" cols="80" rows="25"><?php 
+//backward compatibility
 $sql="SELECT * FROM linki LIMIT 1;";
 $linki=db_asocquery($sql);
 $linki=$linki[0]['link'];
-echo(stripslashes(htmlspecialchars_decode($linki)));
+//now use new config table
+$sidebar=getConfigItem('leftSidebar',$linki);
+
+echo(stripslashes(htmlspecialchars_decode($sidebar)));
 ?></textarea>
 </td></tr>
 </table>

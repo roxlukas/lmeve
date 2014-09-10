@@ -36,11 +36,11 @@ $PANELNAME='Settings'; //Panel name (optional)
 			echo('Status has been reset.');
 		
 		?>
-		<input type="hidden" name="id" value="5">
-		<input type="hidden" name="id2" value="0">
+		<input type="hidden" name="id" value="8">
+		<input type="hidden" name="id2" value="4">
 		<input type="submit" value="OK">
 		</form>
-		<script type="text/javascript">location.href="index.php?id=5&id2=0";</script>
+		<script type="text/javascript">location.href="index.php?id=8&id2=4";</script>
 		<?php
 	} else {
 		?>
@@ -50,13 +50,14 @@ $PANELNAME='Settings'; //Panel name (optional)
 		<table border="0"><tr><td>
 		<form type="get" action=""><?php
 		echo("<input type=\"hidden\" name=\"nr\" value=\"$nr\">");
-		?><input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
-		<input type="hidden" name="id2" value="8">
-		<input type="hidden" name="do" value="1">
+		?><input type="hidden" name="id" value="5"/>
+		<input type="hidden" name="id2" value="8"/>
+		<input type="hidden" name="do" value="1"/>
 		<input type="submit" value="Yes">
 		</form></td><td>
 		<form type="get" action="">
-		<input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
+		<input type="hidden" name="id" value="8"/>
+                <input type="hidden" name="id2" value="4"/>
 		<input type="submit" value="No">
 		</form></td></tr></table>
 		<?php

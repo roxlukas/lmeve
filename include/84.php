@@ -1,32 +1,20 @@
 <?php 
 //standard header for each included file
-checksession(); //check if we are called by a valid session
-if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
+checksession(); //check if we are called by a valid sessionif (checkrights("Administrator,ViewAPIStats")) {
+if (!checkrights("Administrator,ViewAPIStats")) { //"Administrator,ViewOverview"
 	global $LANG;
 	echo("<h2>${LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Statistics'; //Panel name (optional)
+$PANELNAME='PVE Statistics'; //Panel name (optional)
 //standard header ends here
+?>
 
-global $LM_EVEDB;
-include_once('tasks.php');
-$width=600;
-
-$date=secureGETnum("date");
-
-if (strlen($date)==6) {
-	$year=substr($date,0,4);
-	$month=substr($date,4,2);
-} else {
-	$year=date("Y");
-	$month=date("m");	
-}
-
-$pointsDisplayed=false;
-	    
-		?>
+<h2>EVE API Statistics</h2>
+	<?php
+		include("checkpoller.php");  
+	?>
 <script type="text/javascript" src="chart.js/Chart.min.js"></script>
                 <script type="text/javascript">
                             pie_options = {
@@ -101,98 +89,99 @@ $pointsDisplayed=false;
                                     onAnimationComplete : null
                             }
                     </script>
-		<a name="top"></a>
-		    <div class="tytul">
-			Industry Statistics for <?php echo("$year-$month"); ?><br>
-		    </div>
-		
-		    <div class="tekst">
-		    
-		    <?php
-		    
-		    ?>
-		    <a href="#down">Scroll down</a>
-		    </div>
-                
-
-
-		    <?php
-		    $corps=db_asocquery("SELECT * FROM apicorps;");
-		    foreach ($corps as $corp) { //begin corps loop
-                        $days="";
-                        $activities="";
-				echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
-?>
-
-<?php
+                    <?php
 //GRAPHING		
                     //getting data
-                        $dayss = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-                        for($i=1; $i<=$dayss; $i++) {
-                            $daystab[$i]['day']="$i";
-                            $daystab[$i]['activity']=0;
-                        }
-                        
-                        $sqlact="SELECT COUNT(*) AS activity,date_format(beginProductionTime, '%e') AS day FROM
-                        apiindustryjobs aij
-                        WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
-                        AND aij.corporationID=${corp['corporationID']}
-                        GROUP BY date_format(beginProductionTime, '%e')
-                        ORDER BY date_format(beginProductionTime, '%e');";
-                        $activityGraph=db_asocquery($sqlact);
-            ?><h3>Industry Activity [jobs started]</h3> <?php
-            if (count($activityGraph)>0) {
-                    //reformatting data
-                        foreach ($activityGraph as $row) {
-                            $daystab[$row['day']]['activity']=$row['activity'];
-                        }
-                        
+                    $samples=30;
+                    $period=15;
+                    $cycles=''; $times='';
+                    for($i=$samples-1; $i>=0; $i--) {
+                        $cycles.=''.$i*$period.',';
+                    }    
+                    $stats=db_asocquery("SELECT * FROM (SELECT * 
+                    FROM `apipollerstats` 
+                    ORDER BY `statDateTime` DESC 
+                    LIMIT 0 , $samples) AS a ORDER BY `statDateTime`;");
                     //ready to display
-                        foreach($daystab as $row) {
-                            $days.='"'.$row['day'].'",';
-                            if (!empty($row['activity'])) $activities.=$row['activity'].','; else $activities.='0,';
+                        foreach($stats as $row) {
+                            $times.=$row['pollerSeconds'].',';
                         }
                     //cut trailing commas
-                        $days=rtrim($days,',');
-                        $activities=rtrim($activities,',');
+                        $cycles=rtrim($cycles,',');
+                        $times=rtrim($times,',');
                     //display
                         ?>
-                    <!--<h2>&raquo; Activity</h2>-->
-                        <div>
-                        <canvas id="activity_<?php echo($corp['corporationID']); ?>" width="600" height="200"></canvas>
+<h3>Poller statistics [seconds]</h3>
+    <div>
+                        <canvas id="statsCanvas" width="600" height="200"></canvas>
                         <script type="text/javascript">
-                            var data_<?php echo($corp['corporationID']); ?> = {
-                                labels : [ <?php echo($days); ?> ],
+                            var data = {
+                                labels : [ <?php echo($cycles); ?> ],
                                 datasets : [
                                        {
                                            fillColor : "rgba(151,187,205,0.5)",
                                            strokeColor : "rgba(151,187,205,1.0)",
-                                           <?php //pointColor : "rgba(205,107,101,1.0)",
-                                           //pointStrokeColor : "#fff", ?>
-                                           data : [ <?php echo($activities); ?> ]
+                                           data : [ <?php echo($times); ?> ]
                                        }
                                 ]
                             }
                             
-                            var ctx_<?php echo($corp['corporationID']); ?> = document.getElementById("activity_<?php echo($corp['corporationID']); ?>").getContext("2d");
-                            var activityChart_<?php echo($corp['corporationID']); ?> = new Chart(ctx_<?php echo($corp['corporationID']); ?>).Bar(data_<?php echo($corp['corporationID']); ?>,bar_options);
+                            var ctx= document.getElementById("statsCanvas").getContext("2d");
+                            var apiChart = new Chart(ctx).Line(data,bar_options);
                             
                         </script>
-                        </div>
-                    </div>
-                    <!--<h2>Timesheet</h2>-->
-                <?php                                
-            } else {
-                echo("<div class=\"tekst\"><strong>No data found.</strong></div>");
-            }
-			
-			
-	}//end corps loop
-		?>
-		
-		<div class="tekst">
-			<a href="#top">Scroll up</a>
-			<a name="down"></a>
-			
-		    </div><br>
-		
+    </div>
+
+	<table class="lmframework">
+	<tr><th width="64">
+		<b>keyID</b>
+	  </th><th width="128">
+		<b>Feed</b>
+	   </th><th width="128">
+		<b>Date</b>
+	   </th><th width="64">
+		<b>errorCode</b>
+	   </td><th width="64">
+		<b>errorCount</b>
+	   </th><th width="350">
+		<b>errorMessage</b>
+	   </th>
+	   </tr>
+	<?php
+	
+	function hrefedit($nr) {
+				echo('<a href="index.php?id=5&id2=8&nr=');
+				echo($nr);
+				echo('" title="Click to reset this API feed status (it will be polled in the next cycle)">');
+	}
+	
+	$data=db_asocquery("SELECT * FROM apistatus ORDER BY keyID,fileName;");
+	
+	foreach($data as $row) {
+		echo('<tr><td class="tab">');
+				hrefedit($row['errorID']);
+				echo($row['keyID']);
+				echo('</a></td><td>');
+				hrefedit($row['errorID']);
+				echo($row['fileName']);
+				echo('</a></td><td>');
+				hrefedit($row['errorID']);
+				echo($row['date']);
+				if ($row['errorCode'] == 0) $color="#00a000";
+				if ($row['errorCode'] >= 100 && $row['errorCode'] < 200 ) $color="#a04000";
+				if ($row['errorCode'] >= 200 && $row['errorCode'] < 500 ) $color="#a00000";
+				if ($row['errorCode'] >= 500) $color="#a0a000";
+				echo('</a></td><td style="text-align: center; background: '.$color.'">');
+				hrefedit($row['errorID']);
+				echo($row['errorCode']);
+                                echo('</a></td><td style="text-align: center;">');
+				hrefedit($row['errorID']);
+				echo($row['errorCount']);
+				echo('</a></td><td>');
+				hrefedit($row['errorID']);
+				echo($row['errorMessage']);
+				echo('</a></td>');
+			echo('</tr>');
+	}
+	echo("</table>");
+?>

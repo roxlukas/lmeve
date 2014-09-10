@@ -82,7 +82,7 @@ if (strlen($date)==6) {
 		    
 		    <?php
 		    
-		    $ONEPOINT=15000000; //it should be loaded from DB, static for now
+		    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
 		    
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop

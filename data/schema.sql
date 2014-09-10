@@ -1464,9 +1464,26 @@ CREATE TABLE IF NOT EXISTS `crestmarketprices` (
   PRIMARY KEY (`typeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;	
 
+--schema delta for EVE SSO functionality in release 0.1.47
+
 CREATE TABLE IF NOT EXISTS `lmownerhash` (
   `characterID` bigint(11) NOT NULL,
   `ownerHash` varchar(255) NOT NULL,
   PRIMARY KEY (`characterID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--schema delta for db based configuration and keys for LMeve external JSON api
+
+CREATE TABLE IF NOT EXISTS `lmconfig` (
+  `itemLabel` varchar(64) NOT NULL,
+  `itemValue` text NOT NULL,
+  PRIMARY KEY (`itemLabel`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `lmeveapi` (
+  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
+  `apiKey` varchar(64) NOT NULL,
+  `userID` int(11) NOT NULL,
+  PRIMARY KEY (`apiKeyID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

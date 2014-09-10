@@ -17,16 +17,7 @@
         <input type="submit" value="Industry Activity" />
         </form></td>
     <?php } ?>
-    <?php if (checkrights("Administrator,ViewActivity")) { ?>
-        <td><form action="" method="get">
-        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
-        <input type="hidden" name="id2" value="3" />
-        <input type="submit" value="PVE Activity" />
-        </form></td>
-    <?php } ?> 
-        
-        <td id="separator" style="width: 10px;"></td>
-        
+      
     <?php if (checkrights("Administrator,ViewActivity")) { ?>
         <td><form action="" method="get">
         <input type="hidden" name="id" value="<?php echo ($id); ?>" />
@@ -79,6 +70,41 @@
 	</td>
     </tr>
     </table>
+
+<table cellpadding="0" cellspacing="2">
+    <tr>
+    <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="3" />
+        <input type="submit" value="PVE Activity" />
+        </form></td>
+    <?php } ?> 
+        
+        <td id="separator" style="width: 10px;"></td>
+        
+ <?php if (checkrights("Administrator,ViewActivity")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="5" />
+        <input type="submit" value="PVP Activity" title="Coming soon(tm)" disabled />
+        </form></td>
+    <?php } ?>
+    </tr>
+    </table>
+
+<table cellpadding="0" cellspacing="2">
+    <tr>
+    <?php if (checkrights("Administrator,ViewAPIStats")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="4" />
+        <input type="submit" value="EVE API Statistics" />
+        </form></td>
+    <?php } ?>
+    </tr>
+</table>
+
     <?php
 //end submenu
 
@@ -94,9 +120,11 @@
             include("82.php");  //activity - overview
             break;
         case 3:
-            include("83.php");  //activity - overview
+            include("83.php");  //activity - pve
             break;
-        
+        case 4:
+            include("84.php");  //API Statistics
+            break;
     }
 ?>
 

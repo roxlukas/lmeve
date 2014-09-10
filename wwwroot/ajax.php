@@ -12,6 +12,8 @@ include_once('inventory.php'); //inventory and pos related subroutines
 
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 
+include_once('configuration.php'); //configuration settings in db
+
 session_start();
 checksession(); //check if we are called by a valid session
 $act=secureGETstr('act');

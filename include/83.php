@@ -1,7 +1,7 @@
 <?php 
 //standard header for each included file
 checksession(); //check if we are called by a valid session
-if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
+if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
 	global $LANG;
 	echo("<h2>${LANG['NORIGHTS']}</h2>");
 	return;

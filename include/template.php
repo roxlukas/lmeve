@@ -102,11 +102,9 @@ function template_main() {
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr><td class="tab-links" style="width: 20%; vertical-align: top; padding: 5px;">
 	<?php //draw links from db
-	$sql="SELECT * FROM linki LIMIT 1;";
-	$linki=db_asocquery($sql);
-	$linki=$linki[0]['link'];
+        $sidebar=getConfigItem('leftSidebar','Administrators can freely edit this sidebar.');
         
-            echo(stripslashes(htmlspecialchars_decode($linki)));
+            echo(stripslashes(htmlspecialchars_decode($sidebar)));
             
 	if (checkrights("Administrator")) { ?>
 	<div style="text-align: center;"><hr><form method="get" action="">

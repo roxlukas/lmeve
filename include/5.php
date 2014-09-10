@@ -18,7 +18,7 @@
         <input type="button" value="View Logs" onclick="location.href='?id=5&id2=1';">
     </td>
     <td>
-        <input type="button" value="Edit links" onclick="location.href='?id=5&id2=6';">
+        <input type="button" value="Edit Sidebar" onclick="location.href='?id=5&id2=6';">
     </td>
     <?php } ?>
     <?php if (checkrights("Administrator,EditHoursPerPoint")) { ?>
@@ -71,5 +71,8 @@
             case 12:
 		include("5c.php");  //save points per isk
 		break;
+            case 13:
+                include("5d.php"); //save LMeve configuration
+                break;
 	    }
 ?>

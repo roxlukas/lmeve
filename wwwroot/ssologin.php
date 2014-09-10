@@ -10,6 +10,7 @@ include_once("lang.php");  //translations
 include_once("menu.php");  //menu
 include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
+include_once('configuration.php'); //configuration settings in db
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  

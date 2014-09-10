@@ -137,7 +137,7 @@ if (strlen($date)==6) {
 		    
 		    <?php
 		    
-		    $ONEPOINT=15000000; //it should be loaded from DB, static for now
+		    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
                     
                     
 		    
