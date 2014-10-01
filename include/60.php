@@ -246,7 +246,7 @@ WHERE transactionType='sell'
 AND corporationID=${corp['corporationID']}
 AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
 GROUP BY corporationID,accountKey) AS s
-RIGHT JOIN
+LEFT JOIN
 (SELECT SUM(price*quantity) AS buy,accountKey,corporationID FROM `apiwallettransactions`
 WHERE transactionType='buy'
 AND corporationID=${corp['corporationID']}
