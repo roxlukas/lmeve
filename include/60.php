@@ -11,7 +11,7 @@ $PANELNAME='Wallet'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB;
-	
+
 $date=secureGETnum("date");
 
 if (strlen($date)==6) {
@@ -19,20 +19,20 @@ if (strlen($date)==6) {
 	$month=substr($date,4,2);
 } else {
 	$year=date("Y");
-	$month=date("m");	
+	$month=date("m");
 }
 
 		function hrefedit($nr) {
 		    echo("<a href=\"index.php?id=$MENUITEM&id2=1&nr=$nr\">");
 		}
 
-	    
+
 		?>
 		<a name="top"></a>
                 <script type="text/javascript" src="chart.js/Chart.min.js"></script>
                 <script type="text/javascript">
                            options = {
-                                    //Boolean - If we show the scale above the chart data			
+                                    //Boolean - If we show the scale above the chart data
                                     scaleOverlay : false,
                                     //Boolean - If we want to override with a hard coded scale
                                     scaleOverride : false,
@@ -43,31 +43,31 @@ if (strlen($date)==6) {
                                     scaleStepWidth : null,
                                     //Number - The scale starting value
                                     scaleStartValue : null,
-                                    //String - Colour of the scale line	
+                                    //String - Colour of the scale line
                                     scaleLineColor : "rgba(255,255,255,.1)",
-                                    //Number - Pixel width of the scale line	
+                                    //Number - Pixel width of the scale line
                                     scaleLineWidth : 1,
-                                    //Boolean - Whether to show labels on the scale	
+                                    //Boolean - Whether to show labels on the scale
                                     scaleShowLabels : true,
                                     //Interpolated JS string - can access value
                                     scaleLabel : "<%=value%>M",
                                     //String - Scale label font declaration for the scale label
                                     scaleFontFamily : "'Arial'",
-                                    //Number - Scale label font size in pixels	
+                                    //Number - Scale label font size in pixels
                                     scaleFontSize : 12,
-                                    //String - Scale label font weight style	
+                                    //String - Scale label font weight style
                                     scaleFontStyle : "normal",
-                                    //String - Scale label font colour	
-                                    scaleFontColor : "#aaa",	
+                                    //String - Scale label font colour
+                                    scaleFontColor : "#aaa",
                                     ///Boolean - Whether grid lines are shown across the chart
                                     scaleShowGridLines : true,
                                     //String - Colour of the grid lines
                                     scaleGridLineColor : "rgba(255,255,255,.1)",
                                     //Number - Width of the grid lines
-                                    scaleGridLineWidth : 1,	
-                                    //Boolean - If there is a stroke on each bar	
+                                    scaleGridLineWidth : 1,
+                                    //Boolean - If there is a stroke on each bar
                                     barShowStroke : true,
-                                    //Number - Pixel width of the bar stroke	
+                                    //Number - Pixel width of the bar stroke
                                     barStrokeWidth : 2,
                                     //Number - Spacing between each of the X value sets
                                     barValueSpacing : 5,
@@ -86,9 +86,9 @@ if (strlen($date)==6) {
 		    <div class="tytul">
 			Wallet for <?php echo("$year-$month"); ?><br>
 		    </div>
-		
+
 		    <div class="tekst">
-		    
+
 		    <?php //Monthly navigation
 		    switch ($month) {
 				case 1:
@@ -124,23 +124,23 @@ if (strlen($date)==6) {
 		    <input type="hidden" name="id2" value="0">
 		    <input type="hidden" name="date" value="<?php echo(sprintf("%04d", $NEXTYEAR).sprintf("%02d", $NEXTMONTH)); ?>">
 		    <input type="submit" value="next month &raquo;">
-			</form>			
+			</form>
 			</td></tr></table>
 		    <?php /*
 		    <a href="?id=<?php echo($MENUITEM); ?>&date=<?php echo(sprintf("%04d", $PREVYEAR).sprintf("%02d", $PREVMONTH)); ?>">&laquo; previous month</a> |  <a href="?id=<?php echo($MENUITEM); ?>&date=<?php echo(sprintf("%04d", $NEXTYEAR).sprintf("%02d", $NEXTMONTH)); ?>">next month &raquo;</a><br/>
 		    */ ?>
-		    
-		    
-		    
+
+
+
 			<a href="#down">Scroll down</a>
 		    </div>
-		    
+
 		    <?php
-		    
+
 		    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
-                    
-                    
-		    
+
+
+
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
                         echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
@@ -148,8 +148,8 @@ if (strlen($date)==6) {
 			$days="";
                         $incomes="";
                         $outcomes="";
-                        
-//GRAPHING		
+
+//GRAPHING
                     //getting data
                         $dayss=date("t",mktime(0,0,$month,1,$year));
                         for($i=1; $i<=$dayss; $i++) {
@@ -157,7 +157,7 @@ if (strlen($date)==6) {
                             $daystab[$i]['income']=0;
                             $daystab[$i]['outcome']=0;
                         }
-                        
+
                         //refTypeID=37 is "Corporation Account Withdrawal" - previous month wages
 			//refTypeID=42 is "Market Escrow"
 			//refTypeID=2 is "Market Transaction"
@@ -188,7 +188,7 @@ if (strlen($date)==6) {
 
                         $walletGraphIncomes=db_asocquery($sqlinc);
                         $walletGraphOutcomes=db_asocquery($sqloutc);
-                        
+
 if (count($walletGraphIncomes)>0 || count($walletGraphOutcomes)>0) {
                     //reformatting data
                         foreach ($walletGraphIncomes as $row) {
@@ -210,7 +210,7 @@ if (count($walletGraphIncomes)>0 || count($walletGraphOutcomes)>0) {
                     //display
                         ?>
             <h2>Wallet Operations</h2>
-                        
+
                         <canvas id="wallet_<?php echo($corp['corporationID']); ?>" width="<?php echo($width); ?>" height="300"></canvas>
                         <script type="text/javascript">
                             var data_<?php echo($corp['corporationID']); ?> = {
@@ -232,29 +232,34 @@ if (count($walletGraphIncomes)>0 || count($walletGraphOutcomes)>0) {
                                        }
                                 ]
                             }
-                            
+
                             var ctx_<?php echo($corp['corporationID']); ?> = document.getElementById("wallet_<?php echo($corp['corporationID']); ?>").getContext("2d");
                             var walletChart_<?php echo($corp['corporationID']); ?> = new Chart(ctx_<?php echo($corp['corporationID']); ?>).Bar(data_<?php echo($corp['corporationID']); ?>,options);
-                            
+
                         </script>
                         <?php
 }
-//TABLES                    
-			$sql="SELECT coalesce(b.buy,0) as buy,coalesce(s.sell,0) as sell,coalesce(s.sell-b.buy,s.sell,-b.buy) AS total,coalesce(s.corporationID,b.corporationID) as corporationID,coalesce(s.accountKey,b.accountKey) as accountKey FROM 
-(SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
-WHERE transactionType='sell'
-AND corporationID=${corp['corporationID']}
-AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
-GROUP BY corporationID,accountKey) AS s
-LEFT JOIN
-(SELECT SUM(price*quantity) AS buy,accountKey,corporationID FROM `apiwallettransactions`
-WHERE transactionType='buy'
-AND corporationID=${corp['corporationID']}
-AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
-GROUP BY corporationID,accountKey) AS b
-ON s.accountKey=b.accountKey";
+//TABLES
+			$sql="
+SELECT COALESCE(b.buy,0) AS buy, COALESCE(s.sell,0) AS sell, (COALESCE(s.sell,0)-COALESCE(b.buy,0)) AS total, c.corporationID AS corporationID, a.accountKey AS accountKey
+  FROM apiwalletdivisions AS a
+  LEFT JOIN apicorps AS c ON a.corporationID = c.corporationID
+  LEFT JOIN ( SELECT SUM(price*quantity) AS buy,accountKey,corporationID
+                FROM `apiwallettransactions`
+               WHERE transactionType='buy'
+                 AND corporationID=${corp['corporationID']}
+                 AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
+               GROUP BY corporationID,accountKey
+            ) AS b ON (a.accountKey = b.accountKey AND c.corporationID = b.corporationID)
+  LEFT JOIN ( SELECT SUM(price*quantity) AS sell,accountKey,corporationID
+                FROM `apiwallettransactions`
+               WHERE transactionType='sell'
+                 AND corporationID=${corp['corporationID']}
+                 AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
+               GROUP BY corporationID,accountKey
+            ) AS s ON (a.accountKey = s.accountKey AND c.corporationID = s.corporationID)";
 			$wallet_summaries_raw=db_asocquery($sql);
-			
+
 			$sql="SELECT SUM(awj.amount) AS amount,awj.refTypeID,awj.accountKey FROM
 apiwalletjournal awj
 JOIN apireftypes art
@@ -264,15 +269,15 @@ AND awj.corporationID = ${corp['corporationID']}
 AND awj.refTypeID IN (71, 79)
 GROUP BY awj.refTypeID,awj.accountKey;";
 			$contracts_raw=db_asocquery($sql);
-			
+
 			$sql="SELECT accountKey, balance FROM
 apiaccountbalance
 WHERE corporationID=${corp['corporationID']}";
 			$balances=db_asocquery($sql);
-			
-			
+
+
 			$wallet_summaries=array();
-			
+
 			//refactor wallet transactions SQL result into display tables
 		    foreach($wallet_summaries_raw as $row) {
 				//echo("DEBUG: ${row['accountKey']} | ${row['buy']} | ${row['sell']} | ${row['total']} <br>");
@@ -288,7 +293,7 @@ WHERE corporationID=${corp['corporationID']}";
 				}
 				$wallet_summaries[$row['accountKey']]['total']=$wallet_summaries[$row['accountKey']]['sell']-$wallet_summaries[$row['accountKey']]['buy'];
 		    }
-		    
+
 		    //refactor contracts SQL result into display tables
 		    foreach($contracts_raw as $row) {
 				if ($row['refTypeID']==71) {
@@ -300,16 +305,16 @@ WHERE corporationID=${corp['corporationID']}";
 					$wallet_summaries[$row['accountKey']]['total']+=stripslashes($row['amount']);
 				}
 		    }
-		    
+
 		    //and add current balance
 		    foreach($balances as $row) {
 				$wallet_summaries[$row['accountKey']]['balance']=stripslashes($row['balance']);
 		    }
-			
+
 			$sql="SELECT * FROM apiwalletdivisions WHERE corporationID=${corp['corporationID']};";
-			
+
 			$wallet_divisions=db_asocquery($sql);
-			
+
 			//Count current month wages value
 			$sql="SELECT SUM(wage) AS wages FROM (SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
 SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
@@ -325,7 +330,7 @@ AND aij.corporationID=${corp['corporationID']}
 GROUP BY `characterID`,`name`,`activityName`
 ORDER BY `name`,`activityName`) AS w) AS wages;";
 			$wages=db_asocquery($sql);
-			
+
 			//refTypeID=37 is "Corporation Account Withdrawal" - previous month wages
 			//refTypeID=42 is "Market Escrow"
 			//refTypeID=2 is "Market Transaction"
@@ -342,13 +347,13 @@ AND awj.refTypeID NOT IN (2, 37, 42, 71, 79)
 GROUP BY awj.refTypeID,art.refTypeName
 ORDER BY art.refTypeName;";
 			$journal=db_asocquery($sql);
-			
-		
+
+
 			$totals['buy']=0.0;
 			$totals['sell']=0.0;
 			$totals['total']=0.0;
 			$totals['balance']=0.0;
-			
+
 			?>
 <h2>Wallet Breakdown</h2>
 		    <table width="<?php echo($width); ?>" class="lmframework">
@@ -428,7 +433,7 @@ ORDER BY art.refTypeName;";
 				<b><?php echo(number_format(0-$wages[0]['wages'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); $netprofit=$totals['total']-$wages[0]['wages']?></b>
 		    </td>
 		    </tr>
-		    
+
 		    <?php
 		foreach($journal as $row) {
 		    echo('<tr><td style="text-align: left;">');
@@ -445,7 +450,7 @@ ORDER BY art.refTypeName;";
 		    echo('</tr>');
 		}
 		?>
-		    
+
 		    <tr><td class="tab-header" style="text-align: center;">
 			    <b>Net profit</b>
 		    </td><td class="tab-header" style="text-align: center;">
@@ -460,17 +465,17 @@ ORDER BY art.refTypeName;";
 				<b><?php echo(number_format($netprofit, 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 		    </td>
 		    </tr>
-		
-		</table> 
-		    
-		 <?php 
-		  
+
+		</table>
+
+		 <?php
+
 	}//end corps loop
 		?>
-		
+
 		<div class="tekst">
 			<a href="#top">Scroll up</a>
 			<a name="down"></a>
-			
+
 		    </div><br>
-		
+
