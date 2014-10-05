@@ -86,7 +86,7 @@ Settings
                         </td></tr>
                         <tr><td width="150" class="tab">
                             Enable Northbound API:<br></td><td width="200" class="tab">
-                                <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('northboundApi')=='enabled') echo('checked'); ?> />
+                                <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('northboundApi','disabled')=='enabled') echo('checked'); ?> />
                         </td></tr>
                         <tr><td width="150" class="tab">
                             Get market prices from:<br></td><td width="200" class="tab">
