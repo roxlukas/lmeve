@@ -257,7 +257,8 @@ SELECT COALESCE(b.buy,0) AS buy, COALESCE(s.sell,0) AS sell, (COALESCE(s.sell,0)
                  AND corporationID=${corp['corporationID']}
                  AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
                GROUP BY corporationID,accountKey
-            ) AS s ON (a.accountKey = s.accountKey AND c.corporationID = s.corporationID)";
+            ) AS s ON (a.accountKey = s.accountKey AND c.corporationID = s.corporationID)
+ WHERE c.corporationID=${corp['corporationID']}";
 			$wallet_summaries_raw=db_asocquery($sql);
 
 			$sql="SELECT SUM(awj.amount) AS amount,awj.refTypeID,awj.accountKey FROM
