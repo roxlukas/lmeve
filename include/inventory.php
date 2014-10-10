@@ -283,7 +283,70 @@ function getPocos($where='TRUE') {
     return($raw);
 }
 
-function showPocos($pocos) {
+function getPocoIncome($corporationID) {
+    $year=date("Y"); $month=date("m");
+    switch ($month) {
+                case 1:
+                        $NEXTMONTH=2;
+                        $NEXTYEAR=$year;
+                        $PREVMONTH=12;
+                        $PREVYEAR=$year-1;
+                break;
+                case 12:
+                        $NEXTMONTH=1;
+                        $NEXTYEAR=$year+1;
+                        $PREVMONTH=11;
+                        $PREVYEAR=$year;
+                break;
+                default:
+                        $NEXTMONTH=$month+1;
+                        $NEXTYEAR=$year;
+                        $PREVMONTH=$month-1;
+                        $PREVYEAR=$year;
+    }
+    $sql="SELECT SUM(awj.amount) AS amount, 'current' AS month FROM
+    apiwalletjournal awj
+    JOIN apireftypes art
+    ON awj.refTypeID=art.refTypeID
+    WHERE date_format(awj.date, '%Y%m') = '$year$month'
+    AND awj.corporationID = $corporationID
+    AND awj.refTypeID IN (96, 97)
+    UNION
+    SELECT SUM(awj.amount) AS amount, 'previous' AS month FROM
+    apiwalletjournal awj
+    JOIN apireftypes art
+    ON awj.refTypeID=art.refTypeID
+    WHERE date_format(awj.date, '%Y%m') = '".sprintf("%04d", $PREVYEAR).sprintf("%02d", $PREVMONTH)."'
+    AND awj.corporationID = $corporationID
+    AND awj.refTypeID IN (96, 97);";
+    $poco_raw=db_asocquery($sql);
+    return $poco_raw;
+}
+
+function showPocoIncome($raw) {
+    $day=date('j'); $days=date('t');
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    if (count($raw)==2) {
+    ?>
+    <table class="lmframework" style="width: 984px;" id="income">
+        <tr><th>
+                Previous month income
+        </th><th>
+                This month income
+        </th>
+        </tr>		
+        <tr><td style="text-align: center;">
+            <?php echo(number_format($raw[1]['amount'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK
+        </td><td style="text-align: center;">
+            <?php echo(number_format($raw[0]['amount'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK
+            (Estimated: <?php echo(number_format($raw[0]['amount']/($day/$days), 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK)
+        </td>
+    </table>
+    <?php
+    }
+}
+
+function showPocos($pocos, $income=null) {
     
         if (count($pocos)>0) {
 			?>
@@ -360,6 +423,7 @@ function showPocos($pocos) {
             ?>
 			</table>
 			<?php
+            if (!is_null($income)) showPocoIncome($income);
         } else {
 		echo('<table class="lmframework" style="width: 984px;"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
         }

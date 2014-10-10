@@ -22,7 +22,7 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
 		    
 			<a href="#down">Scroll down</a>
 		    </div>
-		    
+	    
 <?php
 include_once("inventory.php");
 
@@ -31,13 +31,14 @@ foreach ($corps as $corp) { //begin corps loop
     echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
     
     $pocos=getPocos("apo.`corporationID`=${corp['corporationID']}");
+    $income=getPocoIncome($corp['corporationID']);
     
     //echo("DEBUG: <pre>"); print_r($pocos); echo('</pre>');
     ?>
     
     <?php
     
-    showPocos($pocos,$corp['corporationID']);
+    showPocos($pocos,$income);
 }//end corps loop
 ?>
 		
