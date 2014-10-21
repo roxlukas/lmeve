@@ -10,6 +10,11 @@ wwwroot/css/aideron.css
 wwwroot/img/aideron-robotics.jpg
 config/config.php
 
+#################
+## NetBeans
+#################
+
+nbproject/
 
 #################
 ## Eclipse
