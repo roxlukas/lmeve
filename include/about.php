@@ -58,6 +58,9 @@ Changelog:
 <li>
         Bug fixes
 </li>
+<li>
+        Performance fixes
+</li>
 </ul>
 </td></tr>
 
