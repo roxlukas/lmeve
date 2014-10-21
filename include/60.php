@@ -167,7 +167,7 @@ if (strlen($date)==6) {
                         apiwalletjournal awj
                         JOIN apireftypes art
                         ON awj.refTypeID=art.refTypeID
-                        WHERE date_format(awj.date, '%Y%m') = '${year}${month}'
+                        WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
                         AND awj.corporationID=${corp['corporationID']}
                         AND awj.refTypeID <> 37
                         AND awj.amount > 0
@@ -177,7 +177,7 @@ if (strlen($date)==6) {
                         apiwalletjournal awj
                         JOIN apireftypes art
                         ON awj.refTypeID=art.refTypeID
-                        WHERE date_format(awj.date, '%Y%m') = '${year}${month}'
+                        WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
                         AND awj.corporationID=${corp['corporationID']}
                         AND awj.refTypeID <> 37
                         AND awj.amount < 0
@@ -248,14 +248,14 @@ SELECT COALESCE(b.buy,0) AS buy, COALESCE(s.sell,0) AS sell, (COALESCE(s.sell,0)
                 FROM `apiwallettransactions`
                WHERE transactionType='buy'
                  AND corporationID=${corp['corporationID']}
-                 AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
+                 AND transactionDateTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
                GROUP BY corporationID,accountKey
             ) AS b ON (a.accountKey = b.accountKey AND c.corporationID = b.corporationID)
   LEFT JOIN ( SELECT SUM(price*quantity) AS sell,accountKey,corporationID
                 FROM `apiwallettransactions`
                WHERE transactionType='sell'
                  AND corporationID=${corp['corporationID']}
-                 AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
+                 AND transactionDateTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
                GROUP BY corporationID,accountKey
             ) AS s ON (a.accountKey = s.accountKey AND c.corporationID = s.corporationID)
  WHERE c.corporationID=${corp['corporationID']}";
@@ -265,7 +265,7 @@ SELECT COALESCE(b.buy,0) AS buy, COALESCE(s.sell,0) AS sell, (COALESCE(s.sell,0)
 apiwalletjournal awj
 JOIN apireftypes art
 ON awj.refTypeID=art.refTypeID
-WHERE date_format(awj.date, '%Y%m') = '${year}${month}'
+WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 AND awj.corporationID = ${corp['corporationID']}
 AND awj.refTypeID IN (71, 79)
 GROUP BY awj.refTypeID,awj.accountKey;";
@@ -326,7 +326,7 @@ JOIN cfgpoints cpt
 ON aij.activityID=cpt.activityID
 JOIN apicorpmembers acm
 ON aij.installerID=acm.characterID
-WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 AND aij.corporationID=${corp['corporationID']}
 GROUP BY `characterID`,`name`,`activityName`
 ORDER BY `name`,`activityName`) AS w) AS wages;";
@@ -342,7 +342,7 @@ ORDER BY `name`,`activityName`) AS w) AS wages;";
 apiwalletjournal awj
 JOIN apireftypes art
 ON awj.refTypeID=art.refTypeID
-WHERE date_format(awj.date, '%Y%m') = '${year}${month}'
+WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 AND awj.corporationID=${corp['corporationID']}
 AND awj.refTypeID NOT IN (2, 37, 42, 71, 79)
 GROUP BY awj.refTypeID,art.refTypeName

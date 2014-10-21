@@ -62,7 +62,7 @@ if (strlen($date)==6) {
 			FROM `apiindustryjobs` aij
 			JOIN $LM_EVEDB.`ramActivities` rac
 			ON aij.activityID=rac.activityID
-			WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+			WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 			AND aij.installerID=${char['characterID']}
 			GROUP BY `activityName`
 			ORDER BY `activityName`;");
@@ -73,7 +73,7 @@ JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
 JOIN $LM_EVEDB.invTypes inv ON aij.`outputTypeID` = inv.`typeID`
 JOIN apicorpmembers acm ON aij.`installerID` = acm.`characterID`
 WHERE rac.`activityID` IS NOT NULL
-AND date_format(`beginProductionTime`, '%Y%m') = '${year}${month}'
+AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 AND `installerID` = $nr
 GROUP BY `typeID` , `typeName` , `name` , `installerID`, rac.activityName
 ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";

@@ -115,12 +115,16 @@ $(function() {
 <div id="accrd_<?php echo($corp['corporationID']); ?>">
     <!--<h2>&raquo; Summary</h2>-->
 <div>
-<?php				
-				$stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs, SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
+<?php	
+        //OLD date condition:
+            //date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+        //NEW (otpimized) date condition:
+            //beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+	$stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs, SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
 	FROM `apiindustryjobs` aij
 	JOIN $LM_EVEDB.`ramActivities` rac
 	ON aij.activityID=rac.activityID
-	WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+        WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 	AND aij.corporationID=${corp['corporationID']}
 	GROUP BY `activityName`
 	ORDER BY `activityName`;");
@@ -210,7 +214,7 @@ $(function() {
 	ON aij.activityID=cpt.activityID
 	JOIN apicorpmembers acm
 	ON aij.installerID=acm.characterID
-	WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 	AND aij.corporationID=${corp['corporationID']}
 	GROUP BY `characterID`,`name`,`activityName`
 	ORDER BY `name`,`activityName`) AS wages;";

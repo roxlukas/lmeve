@@ -135,7 +135,7 @@ $pointsDisplayed=false;
                         
                         $sqlact="SELECT COUNT(*) AS activity,date_format(beginProductionTime, '%e') AS day FROM
                         apiindustryjobs aij
-                        WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+                        WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
                         AND aij.corporationID=${corp['corporationID']}
                         GROUP BY date_format(beginProductionTime, '%e')
                         ORDER BY date_format(beginProductionTime, '%e');";
