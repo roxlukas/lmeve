@@ -308,7 +308,7 @@ function getPocoIncome($corporationID) {
     apiwalletjournal awj
     JOIN apireftypes art
     ON awj.refTypeID=art.refTypeID
-    WHERE date_format(awj.date, '%Y%m') = '$year$month'
+    WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
     AND awj.corporationID = $corporationID
     AND awj.refTypeID IN (96, 97)
     UNION
@@ -316,7 +316,7 @@ function getPocoIncome($corporationID) {
     apiwalletjournal awj
     JOIN apireftypes art
     ON awj.refTypeID=art.refTypeID
-    WHERE date_format(awj.date, '%Y%m') = '".sprintf("%04d", $PREVYEAR).sprintf("%02d", $PREVMONTH)."'
+    WHERE awj.date BETWEEN '".sprintf("%04d", $PREVYEAR)."-".sprintf("%02d", $PREVMONTH)."-01' AND LAST_DAY('".sprintf("%04d", $PREVYEAR)."-".sprintf("%02d", $PREVMONTH)."-01')
     AND awj.corporationID = $corporationID
     AND awj.refTypeID IN (96, 97);";
     $poco_raw=db_asocquery($sql);

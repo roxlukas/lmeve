@@ -31,7 +31,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	JOIN $LM_EVEDB.ramActivities rac
 	ON lmt.activityID=rac.activityID
 	WHERE $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND date_format(lmt.taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0))
 	) AS a
 	LEFT JOIN	
 	(SELECT lmt.taskID, SUM(aij.runs)*itp.portionSize AS runsDone, COUNT(*) AS jobsDone
@@ -40,9 +40,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	ON lmt.typeID=itp.typeID
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-	WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND date_format(lmt.taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS b
 	ON a.taskID=b.taskID
@@ -51,9 +51,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	FROM lmtasks lmt
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-	WHERE aij.completed=1 AND aij.completedStatus=1 AND date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+	WHERE aij.completed=1 AND aij.completedStatus=1 AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND date_format(lmt.taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS c
 	ON a.taskID=c.taskID
@@ -64,9 +64,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
         JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
-	WHERE aij.completed=1 AND date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+	WHERE aij.completed=1 AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND date_format(lmt.taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0))
+	AND ((singleton=1 AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS d
 	ON a.taskID=d.taskID
@@ -77,9 +77,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
         JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
-	WHERE date_format(beginProductionTime, '%Y%m') = '${year}${month}' AND aij.endProductionTime < UTC_TIMESTAMP()
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01') AND aij.endProductionTime < UTC_TIMESTAMP()
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND date_format(lmt.taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS e
 	ON a.taskID=e.taskID
@@ -91,7 +91,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 function getTasksByLab($nr) {
     $year=date("Y"); $month=date("m");
     $tasks=db_asocquery("SELECT * FROM `lmtasks` WHERE `structureID`=$nr
-    AND ((singleton=1 AND date_format(taskCreateTimestamp, '%Y%m') = '${year}${month}') OR (singleton=0));");
+    AND ((singleton=1 AND taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0));");
     return ($tasks);
 }
 

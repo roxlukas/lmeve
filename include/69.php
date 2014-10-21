@@ -88,19 +88,6 @@ if (strlen($date)==6) {
 		    foreach ($corps as $corp) { //begin corps loop
 		    echo("<h1><img src=\"http://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
 			    
-		    /*$sql="SELECT b.buy,s.sell,s.sell-b.buy AS total,s.corporationID,s.accountKey FROM 
-(SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
-WHERE transactionType='sell'
-AND corporationID=${corp['corporationID']}
-AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
-GROUP BY corporationID,accountKey) AS s,
-FULL JOIN
-(SELECT SUM(price*quantity) AS buy,accountKey,corporationID FROM `apiwallettransactions`
-WHERE transactionType='buy'
-AND corporationID=${corp['corporationID']}
-AND date_format(transactionDateTime, '%Y%m') = '${year}${month}'
-GROUP BY corporationID,accountKey) AS b
-ON s.accountKey=b.accountKey";*/
 			$sql="SELECT DISTINCT * FROM (
 SELECT b.buy,s.sell,s.sell-b.buy AS total,s.corporationID,s.accountKey FROM 
 (SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
@@ -163,11 +150,13 @@ WHERE corporationID=${corp['corporationID']}";
 			
 			$wallet_divisions=db_asocquery($sql);
 			
+                        global $LM_EVEDB;
+                        
 			//Count current month wages value
 			$sql="SELECT SUM(wage) AS wages FROM (SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
 SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
 FROM `apiindustryjobs` aij
-JOIN `ramActivities` rac
+JOIN `$LM_EVEDB`.`ramActivities` rac
 ON aij.activityID=rac.activityID
 JOIN cfgpoints cpt
 ON aij.activityID=cpt.activityID
