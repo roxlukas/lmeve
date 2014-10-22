@@ -47,6 +47,18 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.10.22</div></td>
+<td valign="top" class="tab">
+<b>0.1.48 beta:</b><br>
+<b>Poller version 20</b>
+<ul>
+<li>
+	New API Endpoint: Blueprints
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.09.02</div></td>
 <td valign="top" class="tab">
 <b>0.1.47 beta:</b><br>
@@ -163,6 +175,24 @@ Changelog:
 </ul>
 </td></tr>
 
+
+
+
+
+
+
+ 
+    
+<!-- end of changelog -->
+
+<?php
+
+//HISTORIA ZMIAN
+
+$history=$_GET['history'];
+if (isset($history)) {
+?>
+
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.07.28</div></td>
 <td valign="top" class="tab">
@@ -241,22 +271,6 @@ Changelog:
 </li>
 </ul>
 </td></tr>
-
-
-
-
-
- 
-    
-<!-- end of changelog -->
-
-<?php
-
-//HISTORIA ZMIAN
-
-$history=$_GET['history'];
-if (isset($history)) {
-?>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.06.11</div></td>

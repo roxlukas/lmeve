@@ -13,3 +13,19 @@ CREATE TABLE IF NOT EXISTS `lmnbapi` (
   `lastIP` varchar(32) NULL,
   PRIMARY KEY (`apiKeyID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--itemID,locationID,typeID,typeName,flagID,quantity,timeEfficiency,materialEfficiency,runs
+
+CREATE TABLE IF NOT EXISTS `apiblueprints` (
+  `itemID` bigint(11) NOT NULL,
+  `locationID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `typeName` varchar(256) NULL,
+  `flagID` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `timeEfficiency` int(11) NOT NULL,
+  `materialEfficiency` int(11) NOT NULL,
+  `runs` int(11) NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

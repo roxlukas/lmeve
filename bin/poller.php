@@ -1253,6 +1253,43 @@ foreach ($api_keys as $api_key) {
                     warning("Locations.xml",$FEED_BLOCKED);
             }
         }
+        
+        //POLL BLUEPRINTS API
+	if (!apiCheckErrors($keyid,"Blueprints.xml")) {
+		$mtr=get_xml_contents("$API_BASEURL/corp/Blueprints.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Blueprints_$keyid.xml",24*60*60);
+		if (isset($mtr->error)) {
+			apiSaveWarning($keyid,$mtr->error,"Blueprints.xml");
+		} else {
+			db_uquery("DELETE FROM apiblueprints WHERE corporationID=$corporationID;");
+			$rows=$mtr->result->rowset->row;
+			foreach ($rows as $row) {
+				$attrs=$row->attributes();
+				$sql="INSERT IGNORE INTO apiblueprints VALUES (".
+				$attrs->itemID.",".
+				$attrs->locationID.",".
+				$attrs->typeID.",".
+                                ins_string($attrs->typeName).",".
+                                $attrs->flagID.",".
+                                $attrs->quantity.",".
+                                $attrs->timeEfficiency.",".
+                                $attrs->materialEfficiency.",".
+                                $attrs->runs.",".				
+				$corporationID.
+				");";
+				db_uquery($sql);
+			}
+                        //ok now insert maxed me and te into cfgbpo
+                        echo("DEBUG: saving apiblueprints into cfgbpo...");
+                        $sql="INSERT INTO cfgbpo (SELECT typeID, MAX( materialEfficiency ) AS me, MAX( timeEfficiency ) AS pe
+                        FROM `apiblueprints`
+                        WHERE runs = -1
+                        GROUP BY typeID) ON DUPLICATE KEY UPDATE me=VALUES(me), pe=VALUES(pe);";
+                        echo("done! \r\n");
+			apiSaveOK($keyid,"Blueprints.xml");
+		}
+	} else {
+		warning("Blueprints.xml",$FEED_BLOCKED);
+	}
 	
 	//Base URL	$API_BASEURL/corp/Medals.xml.aspx
 	//Parameters	 userID, apiKey, characterID
