@@ -457,6 +457,7 @@ CREATE TABLE IF NOT EXISTS `apiindustryjobs` (
   `installedItemCopy` int(11) NOT NULL,
   `completed` int(11) NOT NULL,
   `completedSuccessfully` int(11) NOT NULL,
+  `successfulRuns` int(11) NULL,
   `installedItemFlag` int(11) NOT NULL,
   `outputFlag` int(11) NOT NULL,
   `activityID` int(11) NOT NULL,
@@ -508,6 +509,7 @@ CREATE TABLE IF NOT EXISTS `apiindustryjobscrius` (
   `pauseDate` datetime NOT NULL,
   `completedDate` datetime NOT NULL,
   `completedCharacterID` bigint(11) NOT NULL,
+  `successfulRuns` int(11) NULL,
   `corporationID` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`jobID`),
   KEY `installerID` (`installerID`),
@@ -1487,4 +1489,20 @@ CREATE TABLE IF NOT EXISTS `lmnbapi` (
   `lastIP` varchar(32) NULL,
   PRIMARY KEY (`apiKeyID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `apiblueprints` (
+  `itemID` bigint(11) NOT NULL,
+  `locationID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `typeName` varchar(256) NULL,
+  `flagID` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `timeEfficiency` int(11) NOT NULL,
+  `materialEfficiency` int(11) NOT NULL,
+  `runs` int(11) NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
 

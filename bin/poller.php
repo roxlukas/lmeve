@@ -1,6 +1,7 @@
 <?php
-$POLLER_VERSION="19";
-set_time_limit(900-20); //poller can work for up to 15 minutes 
+$POLLER_VERSION="21";
+$POLLER_MAX_TIME=900;
+set_time_limit($POLLER_MAX_TIME-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
 $mypath=str_replace('\\','/',dirname(__FILE__));
 $mylog=$mypath."/../var/poller.txt";
@@ -416,11 +417,13 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
                                 ins_string($attrs->pauseDate).",".
                                 ins_string($attrs->completedDate).",".
                                 $attrs->completedCharacterID.",".
+                                $attrs->successfulRuns.",".
 				$corporationID.
 				") ON DUPLICATE KEY UPDATE".
 				" status=".$attrs->status.
 				",completedDate=".ins_string($attrs->completedDate).
 				",completedCharacterID=".$attrs->completedCharacterID.
+                                ",successfulRuns=".$attrs->successfulRuns.
                                 ",productTypeID=".$attrs->productTypeID.
                                 ",productTypeName=".ins_string($attrs->productTypeName);
 				db_uquery($sql);
@@ -439,6 +442,11 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
                                         $completedStatus=1;
                                         break;
                                     case 105: //failed
+                                        $completed=1;
+                                        $completedSuccessfully=0;
+                                        $completedStatus=0;
+                                        break;
+                                    case 101: //phoebe
                                         $completed=1;
                                         $completedSuccessfully=0;
                                         $completedStatus=0;
@@ -476,6 +484,7 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 				"0,".
 				$completed.",".
 				$completedSuccessfully.",".
+                                $attrs->successfulRuns.",".
 				"0,".
 				"0,".
 				$attrs->activityID.",".
@@ -489,6 +498,7 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 				" completed=".$completed.
 				",completedSuccessfully=".$completedSuccessfully.
 				",completedStatus=".$completedStatus.
+                                ",successfulRuns=".$attrs->successfulRuns.
                                 ",outputTypeID=".$productTypeID;
 				db_uquery($sql2);
        }
