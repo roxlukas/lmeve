@@ -173,8 +173,8 @@ function getBaseMaterialsOld($typeID,$runs=1,$melvl_override=null) {
                         }
                         switch ($techLevel) {
                                 case 2:
-                                        if (!isset($melevel)) $melevel=2;
-                                        if (!isset($pelevel)) $pelevel=2;
+                                        if (!isset($melevel)) $melevel=0;
+                                        if (!isset($pelevel)) $pelevel=0;
                                         break;
                                 case 3:
                                         if (!isset($melevel)) $melevel=0;
@@ -232,8 +232,8 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
         }
         switch ($techLevel) {
                 case 2:
-                        if (!isset($melevel)) $melevel=2;
-                        if (!isset($pelevel)) $pelevel=2;
+                        if (!isset($melevel)) $melevel=0;
+                        if (!isset($pelevel)) $pelevel=0;
                         break;
                 case 3:
                         if (!isset($melevel)) $melevel=0;
@@ -526,7 +526,7 @@ function calcManufacturingCost($typeID) {
     }
     switch ($techLevel) {
         case 2:
-            if (!isset($melevel)) $melevel=2;
+            if (!isset($melevel)) $melevel=0;
             break;
 	case 3:
             if (!isset($melevel)) $melevel=0;

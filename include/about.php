@@ -47,6 +47,24 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.11.05</div></td>
+<td valign="top" class="tab">
+<b>0.1.49 beta:</b><br>
+<b>Poller version 21</b>
+<ul>
+<li>
+	YAML Static Data updater made compatible with Phoebe Static Data
+</li>
+<li>
+	Default ME & TE values for Tech II BPCs adjusted to 0/0
+</li>
+<li>
+	Poller made compatible with Phoebe IndustryJobs endpoint changes
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.10.22</div></td>
 <td valign="top" class="tab">
 <b>0.1.48 beta:</b><br>

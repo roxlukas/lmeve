@@ -47,11 +47,11 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	) AS b
 	ON a.taskID=b.taskID
 	LEFT JOIN	
-	(SELECT lmt.taskID, COUNT(*) AS jobsSuccess
+	(SELECT lmt.taskID, SUM(successfulRuns) AS jobsSuccess
 	FROM lmtasks lmt
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-	WHERE aij.completed=1 AND aij.completedStatus=1 AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
 	AND $MYTASKS AND $SELECTEDCHAR
 	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
@@ -234,8 +234,8 @@ function showTasks($tasklist) {
 				if (empty($row['jobsCompleted'])) $row['jobsCompleted']=0;
 				if (empty($row['jobsSuccess'])) $row['jobsSuccess']=0;
 				if (($row['activityID']==7) || ($row['activityID']==8)) {
-				if ($row['jobsCompleted'] > 0) $realperc=round(100*$row['jobsSuccess']/$row['jobsCompleted']); else $realperc=0;
-                                percentbar($realperc,"${row['jobsSuccess']} successful in ${row['jobsCompleted']} attempts");
+				if ($row['runsCompleted'] > 0) $realperc=round(100*$row['jobsSuccess']/$row['runsCompleted']); else $realperc=0;
+                                percentbar($realperc,"${row['jobsSuccess']} successful in ${row['runsCompleted']} attempts");
 				}
 			echo('</td><td style="text-align: center; padding: 0px; width: 48px;">');
                                 //$row['runs'] - total number of runs, $row['runsDone'] - number of completed runs
