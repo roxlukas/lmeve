@@ -61,6 +61,43 @@ if ($act=='') $act=0;
             displayKit2(getBaseMaterials($typeID,$runs,null,$activityID),array(),$melevel,null,$location);
             echo('</div>');
             break;
+        case 'CACHE':
+            $pages = array (
+                "20"  => array( "file" => "20-content.php", "rights" => "Administrator,ViewInventory", "validTime" => 7200 ),
+                "a9"  => array( "file" => "a9-content.php", "rights" => "Administrator,ViewProfitCalc", "validTime" => 86400 )
+            );
+            $page=secureGETstr('page');
+            if (array_key_exists($page, $pages)) {
+                if (!checkrights($pages[$page]['rights'])) {
+                    echo("<h2>${LANG['NORIGHTS']}</h2>");
+                    return;
+                } else {
+                    //everything ok! include the content function and check caches
+                    include($pages[$page]['file']);
+                    if (function_exists('cachedContent')) {
+                        //function exists. check if a cached version exists
+                        $validTime=$pages[$page]['validTime'];
+                        $sql="SELECT * FROM `lmpagecache` WHERE `pageLabel`='$page' AND `timestamp` >= (NOW() - INTERVAL $validTime SECOND);";
+                        $data=db_asocquery($sql);            
+                        if (count($data)>0) {
+                            //if there is a cached version, show it
+                            //echo("DEBUG: found cached version of the page.<br/>");
+                            echo(stripslashes($data[0]['pageContents']));
+                        } else {
+                            //if there is no cached version, refresh cache
+                            //echo("DEBUG: no cached version, refreshing page.<br/>");
+                            $tmpContent=cachedContent();
+                            db_uquery("INSERT INTO `lmpagecache` VALUES ('$page','".addslashes($tmpContent)."', NOW()) ON DUPLICATE KEY UPDATE `pageContents`='".addslashes($tmpContent)."', timestamp=NOW();");
+                            echo($tmpContent);
+                        }
+                    } else {
+                        echo("Cannot load cachedContent() from ".$pages[$page]['file']);
+                    }
+                }
+            } else {
+                echo("Invalid 'page' value.");
+            }
+            break;
 	default:
             echo('Error in AJAX call.');
     }

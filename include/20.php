@@ -17,34 +17,11 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
                 
 <div class="tytul">
 			Inventory<br/>
-		    </div>
 
-		    
-			<a href="#down">Scroll down</a>
-		    </div>
-		    
-<?php
-include_once("inventory.php");
-
-$corps=db_asocquery("SELECT * FROM apicorps;");
-foreach ($corps as $corp) { //begin corps loop
-    echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
-    
-    $stock=getStock("apa.`corporationID`=${corp['corporationID']}");
-    
-    //echo("DEBUG: <pre>"); print_r($inventory); echo('</pre>');
-    ?>
-    <h3>Current Stock</h3>
-    <em>Due to EVE API limitations, Assets can only be updated every 6 hours.</em>
-    <?php
-    
-    showStock($stock,$corp['corporationID']);
-}//end corps loop
-?>
+                    <div id="pageContents"><i>Loading...</i></div>
+                    <script type="text/javascript">
+                        ajax_get('ajax.php?act=CACHE&page=20','pageContents');
+                    </script>
 		
-		<div class="tekst">
-			<a href="#top">Scroll up</a>
-			<a name="down"></a>
-			
-		    </div><br>
+	
 		
