@@ -8,6 +8,8 @@ For the most current version check the "Releases" page. The trunk code is unstab
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
+<h2>ISK donations are welcome - send to "Lukas Rox" in game</h2>
+
 Try LMeve's Database module here: http://pozniak.pl/database/index.php
 
 This app requires EVE Online corporation API keys to function. It doesn't use CREST, which came after I retired from EVE Online.
