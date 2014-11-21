@@ -8,7 +8,7 @@ For the most current version check the "Releases" page. The trunk code is unstab
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
-<h2>ISK donations are welcome - send to "Lukas Rox" in game</h2>
+<h3>ISK donations are welcome - send to "Lukas Rox" in game</h3>
 
 Try LMeve's Database module here: http://pozniak.pl/database/index.php
 
