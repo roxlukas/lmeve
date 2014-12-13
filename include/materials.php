@@ -215,16 +215,24 @@ function getBaseMaterialsOld($typeID,$runs=1,$melvl_override=null) {
 function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
 	global $LM_EVEDB;
 	
-	$bpo=getBlueprintByProduct($typeID);      
+	$bpo=getBlueprintByProduct($typeID);
+        
+        $typeID=$bpo['blueprintTypeID'];
+        
 	$techLevel=$bpo['techLevel'];
         
-        $materials=db_asocquery("SELECT rtr.`requiredTypeID` AS typeID, itp.`typeName`, rtr.`quantity`, rtr.`damagePerJob`, rtr.`recycle`
-        FROM `$LM_EVEDB`.`ramTypeRequirements` rtr
-        JOIN `$LM_EVEDB`.`invTypes` itp
-        ON rtr.`requiredTypeID` = itp.`typeID`
-        WHERE rtr.`typeID` = $typeID
-        AND `activityID` = $activityID
-        ORDER BY rtr.`requiredTypeID`;");
+        $sql="SELECT ybm.`materialTypeID` AS `typeID`, itp.`typeName`, ybm.`quantity`, 0 AS `damagePerJob`, 0 AS `recycle`
+            FROM `$LM_EVEDB`.`yamlBlueprintMaterials` ybm
+            JOIN `$LM_EVEDB`.`invTypes` itp
+            ON ybm.`materialTypeID` = itp.`typeID`
+            WHERE ybm.`blueprintTypeID` = $typeID
+            AND `activityID` = $activityID
+            ORDER BY ybm.`materialTypeID`";
+        
+        $materials=db_asocquery($sql);
+        
+        //echo("<pre>$sql</pre>");
+        //echo("<pre>".print_r($materials,true)."</pre>");
 	
 	if ($set=getMEPE($typeID)) {
                 $melevel=$set['me'];
@@ -635,15 +643,19 @@ function calcInventionCost($typeID) {
         $invchance=0.2;
     } 
     
-    $extraMats=getBaseMaterials($bptypeID, 1, 0, 8);
+    //find TEch I BPO
+    $t1bptypeID=getT1BPOforT2BPO($bptypeID);
+    
+    if ($t1bptypeID === FALSE) return FALSE;
+    
+    //echo("t1bptypeID=".$t1bptypeID['blueprintTypeID']);
+    
+    $extraMats=getBaseMaterials($t1bptypeID['blueprintTypeID'], 1, 0, 8);
     //form a complete material list
     if ($extraMats) {
         foreach ($extraMats as $mat) {
-            //Data Interface workaround
-            if ($mat['damagePerJob'] > 0) {
-                $completeMats[$mat['typeID']]['qty']+=$mat['quantity'];
-                $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
-            }
+            $completeMats[$mat['typeID']]['qty']+=$mat['quantity'];
+            $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
         }
     }
     

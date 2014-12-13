@@ -24,6 +24,68 @@ function ajax_get(URL,hookID) {
 	return;
 }
 
+function get_next(URL,tableRef,loaderRef,callback,offset,rowcount,length) {
+    //console.log('get_next() offset='+offset);
+    loaderRef.style.display = "block";
+    loaderRef.innerHTML = "<em><img src=\"img/loader.png\" /> Loading "+offset+" of "+length+"...</em>";
+    $.ajax({
+        url: URL+'&offset='+offset,
+        success: function(data) {
+            tableRef.innerHTML+=data;
+        },
+        complete: function() {
+            if (offset < length) {
+                get_next(URL,tableRef,loaderRef,callback,parseInt(offset,10)+parseInt(rowcount,10),rowcount,length);
+            } else {
+                callback();
+                loaderRef.style.display = "none";
+            }
+        }
+    });
+}
+
+function ajax_append_table(URL, tableID, loaderID, callback) {
+        if(typeof(tableID)==='undefined') tableID = 'NULL';
+
+        var tableRef = document.getElementById(tableID).getElementsByTagName('tbody')[0];
+        var loaderRef = document.getElementById(loaderID);
+        
+        var length=0; var rowcount=0;
+        
+        $.ajax({
+            url: URL+'&getlength=true',
+            success: function(data) {
+                length=data;
+                console.log('length='+length);
+            },
+            complete: function() {
+                $.ajax({
+                    url: URL+'&getrowcount=true',
+                    success: function(data) {
+                        rowcount=data;
+                        console.log('rowcount='+rowcount);
+                    },
+                    complete: function() {
+                        get_next(URL,tableRef,loaderRef,callback,0,rowcount,length);
+                    }
+                });
+            }
+        });
+	
+	return;
+}
+
+function isScrolledIntoView(elem)
+{
+    var docViewTop = $(window).scrollTop();
+    var docViewBottom = docViewTop + $(window).height();
+
+    var elemTop = $(elem).offset().top;
+    var elemBottom = elemTop + $(elem).height();
+
+    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+}
+
 function ajax_save(URL, itemID, itemlabelID) {
 	var xmlhttp;
 	var item=document.getElementById(itemID);

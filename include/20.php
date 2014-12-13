@@ -18,7 +18,7 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
 <div class="tytul">
 			Inventory<br/>
 
-                    <div id="pageContents"><i>Loading...</i></div>
+                    <div id="pageContents"><em><img src="img/loader.png" /> Loading...</em></div>
                     <script type="text/javascript">
                         ajax_get('ajax.php?act=CACHE&page=20','pageContents');
                     </script>
