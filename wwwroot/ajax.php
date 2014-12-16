@@ -68,7 +68,8 @@ if ($act=='') $act=0;
             break;
         case 'CACHE':
             $pages = array (
-                "20"  => array( "file" => "20-content.php", "rights" => "Administrator,ViewInventory", "validTime" => 7200 )
+                "20"  => array( "file" => "20-content.php", "rights" => "Administrator,ViewInventory", "validTime" => 21600 ), // Inventory 6h cache
+                "26"  => array( "file" => "26-content.php", "rights" => "Administrator,ViewPOS", "validTime" => 43200 ) // PoCo 12h cache
             );
             $page=secureGETstr('page');
             if (array_key_exists($page, $pages)) {

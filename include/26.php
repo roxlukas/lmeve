@@ -15,36 +15,14 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
 ?>
 		<a name="top"></a>             
                 
-<div class="tytul">
+                <div class="tytul">
 			Player-owned Customs Offices<br/>
-		    </div>
+		</div>
 
+                <div id="pageContents"><em><img src="img/loader.png" /> Loading...</em></div>
+                <script type="text/javascript">
+                        ajax_get('ajax.php?act=CACHE&page=26','pageContents');
+                </script>
 		    
-			<a href="#down">Scroll down</a>
-		    </div>
-	    
-<?php
-include_once("inventory.php");
-
-$corps=db_asocquery("SELECT * FROM apicorps;");
-foreach ($corps as $corp) { //begin corps loop
-    echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
-    
-    $pocos=getPocos("apo.`corporationID`=${corp['corporationID']}");
-    $income=getPocoIncome($corp['corporationID']);
-    
-    //echo("DEBUG: <pre>"); print_r($pocos); echo('</pre>');
-    ?>
-    
-    <?php
-    
-    showPocos($pocos,$income);
-}//end corps loop
-?>
-		
-		<div class="tekst">
-			<a href="#top">Scroll up</a>
-			<a name="down"></a>
 			
-		    </div><br>
 		

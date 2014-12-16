@@ -47,6 +47,38 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2014.12.16</div></td>
+<td valign="top" class="tab">
+<b>0.1.50 beta:</b><br>
+<b>Poller version 21</b>
+<ul>
+<li>
+	Page caching. Pages that refresh very long are now cached - starting with Inventory and PoCos
+</li>
+<li>
+	Profit Chart was causing timeouts when too many items have been selected. Added an AJAX lazy-loader.
+</li>
+<li>
+	Big update regarding POCOs
+        <ul>
+            <li>
+                POCOs are now linked to Planet they orbit using magic SQL Query that involves square root ;-)
+            </li>
+            <li>
+                POCOs now display planet type they orbit
+            </li>
+            <li>
+                POCOs now display a bar that shows how much they contributed to overall income
+            </li>
+            <li>
+                When you hover over the planet name it will show exactly how much ISK it made in the last month
+            </li>
+        </ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.11.05</div></td>
 <td valign="top" class="tab">
 <b>0.1.49 beta:</b><br>
