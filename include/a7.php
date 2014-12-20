@@ -46,8 +46,23 @@ foreach($ores_raw as $row) {
   <link rel="stylesheet" type="text/css" href="jquery-tablesorter/blue/style.css">
   <script type="text/javascript">
     $(document).ready(function() { 
+        addTSCustomParsers();
+        
         $("#minerals").tablesorter({ 
-            headers: { 0: { sorter: false } } 
+            headers: { 
+                0: { sorter: false },
+                4: { sorter: 'numsep' },
+                5: { sorter: 'numsep' },
+                6: { sorter: 'numsep' },
+                7: { sorter: 'numsep' },
+                8: { sorter: 'numsep' },
+                9: { sorter: 'numsep' },
+                10: { sorter: 'numsep' },
+                11: { sorter: 'numsep' },
+                12: { sorter: 'numsep' },
+                13: { sorter: 'numsep' },
+                14: { sorter: 'numsep' },
+            } 
         }); 
     });
   </script>

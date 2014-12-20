@@ -619,7 +619,7 @@ if ($model) {
 		if (eregi(".*resistance$", $element[2], $regs)) {
 			$element[0]=sprintf("%6.1f%%",100*(1.0-$element[0]));
 		}
-		if (eregi(".*skill required$", $element[2], $regs)) {
+		if (eregi(".*skill.*", $element[2], $regs)) {
 			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$skill[0][0]);
 		}
@@ -628,13 +628,19 @@ if ($model) {
 			$element[0]=sprintf("%s",$groupid[0][0]);
 		}
 		if (strstr("Can be fitted to",$element[2])) {
-			if (!empty($element[0])) {
-                            $groupid=db_asocquery("SELECT `groupName` FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[0]};");
+                    //echo("DEBUG: 0=".$element[0].' 1='.$element[1].' 2='.$element[2].'<br/>');
+                        if (!empty($element[0])) {
+                            $canbeID=$element[0];
+                        } else if (!empty($element[1])) {
+                            $canbeID=$element[1];
+                        }
+			if (!empty($canbeID)) {
+                            $groupid=db_asocquery("SELECT `groupName` FROM $LM_EVEDB.`invGroups` WHERE groupID = $canbeID;");
                             if (!empty($groupid)) {
                                 $element[0]=$groupid[0]['groupName'];
                             } else {
-                                $groupid=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[0]};");
-                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$element[0],$groupid[0]['typeName']);
+                                $groupid=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE typeID = $canbeID;");
+                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$canbeID,$groupid[0]['typeName']);
                             }
                         }
 		}
@@ -668,6 +674,14 @@ if ($model) {
 		//}
 		if (eregi("Warp Speed Multiplier",$element[2], $regs)) {
 			$element[0]=sprintf("%6.2f AU/s",$element[0]);
+			//$element[2]="Warp Speed";
+		}
+                if (eregi("powergrid usage",$element[2], $regs)) {
+			$element[0]=sprintf("%d MW",$element[1]);
+			//$element[2]="Warp Speed";
+		}
+                if (eregi("CPU usage",$element[2], $regs)) {
+			$element[0]=sprintf("%d tf",$element[1]);
 			//$element[2]="Warp Speed";
 		}
 		if (eregi(".*echarge time$", $element[2], $regs) || strstr("Rate of fire",$element[2])) {

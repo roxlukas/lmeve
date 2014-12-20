@@ -293,3 +293,29 @@ function sub(editbox) {
             var tmp=element.value;
             return tmp;
         }
+        
+        function addTSCustomParsers() {
+            //add ISK parser for sorter
+            $.tablesorter.addParser({ 
+                id: 'isk', 
+                is: function(s) { 
+                    return false; 
+                }, 
+                format: function(s) { 
+                    return $.tablesorter.formatFloat(s.replace(new RegExp(/\sisk/g), "").replace(/,/g,""));
+                }, 
+                type: 'numeric' 
+            }); 
+
+            //numeric with thousand separator
+            $.tablesorter.addParser({ 
+                id: 'numsep', 
+                is: function(s) { 
+                    return false; 
+                }, 
+                format: function(s) { 
+                    return $.tablesorter.formatFloat(s.replace(/,/g,""));
+                }, 
+                type: 'numeric' 
+            }); 
+        }

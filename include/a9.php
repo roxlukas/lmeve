@@ -29,9 +29,37 @@ if (!empty($marketGroupID)) {
   <script type="text/javascript">
     function finished() {
         console.log("finished!!!");
-            $("#items").tablesorter({ 
-                headers: { 0: { sorter: false } } 
-            }); 
+        addTSCustomParsers();
+
+        //enable sorting
+        $("#items").tablesorter({ 
+     headers: {
+            0: {
+                sorter: false
+            },
+            1: {
+                sorter: 'text'
+            },
+            2: {
+                sorter: 'isk'
+            },
+            3: {
+                sorter: 'isk'
+            },
+            4: {
+                sorter: 'numsep'
+            },
+            5: {
+                sorter: 'isk'
+            },
+            6: {
+                sorter: 'procent'
+            },
+            7: {
+                sorter: 'numsep'
+            }
+        }
+    }); 
     }
   </script>
 <?php
