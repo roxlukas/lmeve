@@ -62,6 +62,13 @@ if ($act=='') $act=0;
                 $runs=$runs/$portionSize;
             }
             if (!isset($activityID)) $activityID=1;
+            
+            if ($activityID==8) { //invention materials are now bound to T1 BP, not T2 BP
+                $tmpBPO=getT1BPOforT2BPO($typeID);
+                //echo("<h2>Invention DEBUG</h2><pre>".print_r($tmpBPO,TRUE)."</pre>");
+                $typeID=$tmpBPO['blueprintTypeID'];
+            }
+            
             echo('<div style="width: 400px;">');
             displayKit2(getBaseMaterials($typeID,$runs,null,$activityID),array(),$melevel,null,$location);
             echo('</div>');

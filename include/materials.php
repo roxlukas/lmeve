@@ -214,7 +214,8 @@ function getBaseMaterialsOld($typeID,$runs=1,$melvl_override=null) {
 
 function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
 	global $LM_EVEDB;
-	
+	$DEBUG_MODE=FALSE;
+        
 	$bpo=getBlueprintByProduct($typeID);
         
         $typeID=$bpo['blueprintTypeID'];
@@ -231,8 +232,12 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
         
         $materials=db_asocquery($sql);
         
-        //echo("<pre>$sql</pre>");
-        //echo("<pre>".print_r($materials,true)."</pre>");
+        if ($DEBUG_MODE) {
+            echo("<h2>DEBUG getBaseMaterials()</h2>");
+            echo("<pre>$sql</pre>");
+            echo("<pre>".print_r($materials,true)."</pre>");
+            echo("<h2>END DEBUG</h2>");
+        }
 	
 	if ($set=getMEPE($typeID)) {
                 $melevel=$set['me'];
@@ -443,6 +448,12 @@ function displayFacilityKit($tasks) {
                     $runs=$runs/$portionSize;
                 }
                 if (!isset($activityID)) $activityID=1;
+                
+                if ($activityID==8) { //invention materials are now bound to T1 BP, not T2 BP
+                    $tmpBPO=getT1BPOforT2BPO($typeID);
+                    //echo("<h2>Invention DEBUG</h2><pre>".print_r($tmpBPO,TRUE)."</pre>");
+                    $typeID=$tmpBPO['blueprintTypeID'];
+                }
 
                 $tempmats=getBaseMaterials($typeID,$runs,null,$activityID);
                 foreach ($tempmats as $tempmat) {
