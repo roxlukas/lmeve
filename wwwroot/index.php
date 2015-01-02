@@ -44,6 +44,7 @@ include_once("menu.php");  //menu
 include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
+include_once('mobile.php'); //mobile device related functions
 
 $lmver="0.1.50 beta";
 
@@ -77,16 +78,18 @@ if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
 }
 //echo("PHP_SESS_ID=".session_id()." regenerateID=".$_SESSION['regenerateID']);
 
+if (isMobileUserAgent()) $MOBILE=1; else $MOBILE=0;
+
 //
 //AUTOLOGIN HERE IF YOU WANT
 //set the POST variable to the desired username and password
 //
 if ($LM_LOCKED==1) { //APP IS LOCKED!
-	template_locked();
+	$MOBILE ? mobile_template_locked() : template_locked();
 } else { 			 //APP NOT LOCKED
 	if ($_SESSION['status']==0) { //NOT LOGGED ON
 		if (empty($_POST['login'])&&empty($_SESSION["status"])) { //NO LOGIN DATA? DISPLAY PROMPT
-			template_login();
+                        $MOBILE ? mobile_template_login() : template_login();
 		} else { //FILLED DATA? CHECK CREDENTIALS
 			$granted=auth_user(addslashes($_POST['login']),addslashes($_POST['password']));
 			if ($granted>-1) { //LOGIN SUCCESS?
@@ -94,7 +97,7 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 				$_SESSION["status"]=1;
 				//MAIN WINDOW
 				updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
-				template_main();
+                                $MOBILE ? mobile_template_main() : template_main();
 			} else { //LOGIN FAILURE?
 				//WRITE TO LOG FILE
 				$uzytk=htmlspecialchars($_POST['login']);
@@ -102,16 +105,16 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 				loguj("../var/access.txt",$do_logu);
 				$_SESSION=array();
 				//DISPLAY BAD LOGON
-				template_badlogon();
+                                $MOBILE ? mobile_template_badlogon() : template_badlogon();
 			}
 		}
 	} else if ($_SESSION['status']==1) { //LOGGED ON
 		if ($_GET['logoff']==1) { //TRYING TO LOG OUT?
 			$_SESSION=array();
-			template_logout();
+			$MOBILE ? mobile_template_logout() : template_logout();
 		} else { //MAIN WINDOW
 			updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
-			template_main();
+			$MOBILE ? mobile_template_main() : template_main();
 		}
 	}
 }

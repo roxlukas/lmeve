@@ -60,6 +60,10 @@ $menu[254]['php']='about.php';
 
 function showMenuTab($id, $opcja) {
 	global $menu;
+        global $MOBILE;
+        
+        if ($MOBILE) return mobile_showMenuTab($id, $opcja);
+        
 	if ($id==$opcja) {
 		echo	'<td class="menua">
 			<a href="?id=';
@@ -74,6 +78,15 @@ function showMenuTab($id, $opcja) {
 		echo	'">';
 		echo	$menu[$id]['name'];
 		echo	'</a><br></td>';
+	}
+}
+
+function mobile_showMenuTab($id, $opcja) {
+	global $menu;
+	if ($id==$opcja) {
+                echo("<option value=\"?id=$id\" selected>".$menu[$id]['name']."</option>");
+	} else {
+		echo("<option value=\"?id=$id\">".$menu[$id]['name']."</option>");
 	}
 }
 

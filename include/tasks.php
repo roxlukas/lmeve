@@ -88,10 +88,47 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	return(db_asocquery($sql));
 }
 
+function getOrphanedTasks() {
+    $sql_sel="SELECT * FROM `lmtasks` lmt
+            LEFT JOIN `apicorpmembers` apc ON lmt.`characterID` = apc.`characterID`
+            WHERE apc.`characterID` IS NULL;";
+    $tasks=db_asocquery($sql_sel);
+    $lista="";
+    if (count($tasks)>0) {
+        foreach($tasks as $task) {
+            $lista.=$task['taskID'].',';
+        }
+        //cut trailing comma
+        $lista=rtrim($lista,',');
+        return($lista);
+    } else {
+        return FALSE;
+    }
+}
+
+function getOrphanedTasksCount() {
+    $sql_sel="SELECT * FROM `lmtasks` lmt
+            LEFT JOIN `apicorpmembers` apc ON lmt.`characterID` = apc.`characterID`
+            WHERE apc.`characterID` IS NULL;";
+    $ile=db_count($sql_sel);
+    return($ile);
+}
+
+function clearOrphanedTasks() {
+    $lista=getOrphanedTasks();
+    $sql_del="DELETE FROM `lmtasks` WHERE `taskID` IN ($lista);";
+    $ret=db_uquery($sql_del);
+    if ($ret!==FALSE) {
+        return($ile);
+    } else {
+        return FALSE;
+    }
+}
+
 function getTasksByLab($nr) {
     $year=date("Y"); $month=date("m");
     $tasks=db_asocquery("SELECT * FROM `lmtasks` WHERE `structureID`=$nr
-    AND ((singleton=1 AND taskCreateTimestamp BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (singleton=0));");
+    AND ((`singleton`=1 AND `taskCreateTimestamp` BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (`singleton`=0));");
     return ($tasks);
 }
 

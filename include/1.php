@@ -21,5 +21,8 @@ checksession(); //check if we are called by a valid session
 		case 5:
 		include("15.php");  //Choose Type
 		break;
+                case 6:
+		include("16.php");  //Clear orphaned tasks
+		break;
 	    }
 ?>

@@ -30,11 +30,9 @@
 
 **********************************************************************************/
 
-function haha(){
-    z1=document.getElementById("lista_filtru");
-    z2=document.getElementById("pole_daty");
-    z3=document.getElementById("pole_szukaj");
-    eval("location='"+z1.options[z1.selectedIndex].value+"&date="+z2.value+"&find="+z3.value+"'");
+function haha(id){
+    var myselect = document.getElementById(id);
+    eval("location='"+myselect.options[myselect.selectedIndex].value+"'");
 }
 
 

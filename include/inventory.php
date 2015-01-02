@@ -83,13 +83,15 @@ function getLabDetails($facilityID) {
 }
 
 function getSimpleTasks($where='TRUE') {
+    $year=date("Y"); $month=date("m");
     global $LM_EVEDB;
     $sql="SELECT lmt.*,itp.`typeName`,acm.`name` AS characterName FROM `lmtasks` lmt
     JOIN $LM_EVEDB.`invTypes` itp
     ON lmt.`typeID`=itp.`typeID`
     LEFT JOIN `apicorpmembers` acm
     ON lmt.`characterID`=acm.`characterID`
-    WHERE $where";
+    WHERE ((lmt.`singleton`=1 AND lmt.`taskCreateTimestamp` BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (lmt.`singleton`=0))
+    AND $where";
     $raw=db_asocquery($sql);
     return($raw);
 }

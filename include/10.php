@@ -98,6 +98,13 @@ $nr=secureGETnum("nr");
 		<input type="submit" value="Create Task">
 		</form></td>
 		<?php } ?>
+            <?php if (checkrights("Administrator,EditTasks")) { ?>
+	    <td><form action="" method="get">
+		<input type="hidden" name="id" value="1">
+		<input type="hidden" name="id2" value="6">
+		<input type="submit" value="Clear Orphane Tasks">
+		</form></td>
+		<?php } ?>
 		</tr></table>
 	    
 	<?php

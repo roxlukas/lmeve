@@ -47,6 +47,24 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2015.01.05</div></td>
+<td valign="top" class="tab">
+<b>0.1.51 beta:</b><br>
+<b>Poller version 21</b>
+<ul>
+<li>
+	Admin can now clear Orphane Tasks - tasks assigned to members who left the corporation
+</li>
+<li>
+	One-time (singleton) Task bug fix in Industry Facilities and Facility kits. Both now show singleton tasks only for the current month.
+</li>
+<li>
+        Mobile theme for smartphones
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2014.12.16</div></td>
 <td valign="top" class="tab">
 <b>0.1.50 beta:</b><br>
@@ -148,6 +166,24 @@ Changelog:
 </td></tr>
 
 
+
+
+
+
+
+
+ 
+    
+<!-- end of changelog -->
+
+<?php
+
+//HISTORIA ZMIAN
+
+$history=$_GET['history'];
+if (isset($history)) {
+?>
+
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.08.18</div></td>
 <td valign="top" class="tab">
@@ -224,24 +260,6 @@ Changelog:
 </li>
 </ul>
 </td></tr>
-
-
-
-
-
-
-
- 
-    
-<!-- end of changelog -->
-
-<?php
-
-//HISTORIA ZMIAN
-
-$history=$_GET['history'];
-if (isset($history)) {
-?>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2014.07.28</div></td>
