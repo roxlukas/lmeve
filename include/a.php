@@ -1,4 +1,5 @@
 <?php
+global $MOBILE;
 //begin
     checksession(); //check if we are called by a valid session
 //routing
@@ -26,7 +27,11 @@
     <input type="submit" value="Ore Chart" />
     </form>
     </td>
-    <?php } ?>
+    <?php }
+    
+    //if ($MOBILE) echo('</tr><tr>');
+    
+    ?>
     <?php if (checkrights("Administrator,ViewProfitCalc")) { ?>
     <td>
     <form method="get" action="">

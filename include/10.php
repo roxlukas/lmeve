@@ -12,7 +12,7 @@ $PANELNAME='My Tasks'; //Panel name (optional)
 
 include("tasks.php");
 
-global $USERSTABLE,$LM_EVEDB;
+global $USERSTABLE,$LM_EVEDB,$MOBILE;
 
 $date=secureGETnum("date");
 $nr=secureGETnum("nr");
@@ -82,8 +82,10 @@ $nr=secureGETnum("nr");
 	    <input type="submit" value="next month &raquo;">
 		</form>			
 		</td>
+                <td width="10" id="separator"></td>
+                <?php if ($MOBILE) echo('</tr><tr>');  ?>
 		<?php if (checkrights("Administrator,ViewAllTasks")) { ?>
-	    <td width="10" id="separator"></td><td><form action="" method="get">
+	    <td><form action="" method="get">
 		<input type="hidden" name="id" value="1">
 		<input type="hidden" name="id2" value="3">
 		<input type="hidden" name="date" value="<?php echo($year.$month); ?>">

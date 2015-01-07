@@ -198,6 +198,7 @@ function getMyChars($array=false) {
  * @return type 
  */
 function showTasks($tasklist) {
+    global $MOBILE;
 	if (!sizeof($tasklist)>0) {
 		echo('<h3>There is no tasks assigned!</h3>');
 	} else {
@@ -205,15 +206,15 @@ function showTasks($tasklist) {
 	<table class="lmframework">
 	<tr><th>
 		
-	</th><th>
+	</th><?php if(!$MOBILE) { ?><th>
 		Character
 	</th><th>
 		Task
-	</th><th>
+	</th><?php } ?><th>
 		
-	</th><th>
+	</th><?php if(!$MOBILE) { ?><th>
 		Type
-	</th><th>
+	</th><?php } ?><th>
 		Done
 	</th><th>
 		Quantity
@@ -230,34 +231,44 @@ function showTasks($tasklist) {
 		$rights=checkrights("Administrator,EditTasks");
 		foreach($tasklist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
+                        echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
 			taskhrefedit($row['characterID'],$year.$month);
 				echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</a>');
-			echo('</td><td>');
-                        echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
+			echo('</td>');
+                    if(!$MOBILE) {
+                        echo('<td>');
 			taskhrefedit($row['characterID'],$year.$month);
 				echo($row['name']);
 			echo('</a>');
-			echo('</td><td>');
+			echo('</td>');
+                        
+                        echo('<td>');
 			if ($rights) edittaskhrefedit($row['taskID']);
 				echo($row['activityName']);
                                 echo("&nbsp;<img src=\"ccp_icons/38_16_208.png\" style=\"vertical-align: middle;\" />");
 			if ($rights) echo('</a>');
-                        echo('</td><td style="padding: 0px; width: 32px;">');
+                        echo('</td>');
+                    }
+                        echo('<td style="padding: 0px; width: 32px;">');
 			itemhrefedit($row['typeID']);
 				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
 			echo('</a>');
-			echo('</td><td>');
+			echo('</td>');
+                    if(!$MOBILE) {
+                        echo('<td>');
 			itemhrefedit($row['typeID']);
 				echo($row['typeName']);
                                 echo("&nbsp;<img src=\"ccp_icons/38_16_208.png\" style=\"vertical-align: middle;\" />");
 			echo('</a>');
-			echo('</td><td style="text-align: center;">');
+			echo('</td>');
+                    }
+                        echo('<td style="text-align: center;">');
 				if (empty($row['runsDone'])) $row['runsDone']=0;
 				echo($row['runsDone']);
 			echo('</td><td style="text-align: center;">');
 				echo($row['runs']);
-			echo('</td><td>');
+			echo('</td><td style="text-align: center;">');
                                 //var_dump($row);
 				if ($row['runs'] > 0) {
                                         $percent1=round(100*$row['runsDone']/$row['runs']);
@@ -266,13 +277,21 @@ function showTasks($tasklist) {
                                     $percent1=0;
                                     $percent2=0;
                                 }
-                                percentbar2($percent1,$percent2,"Done ${row['runsDone']} of ${row['runs']}");
-				echo('</td><td>');
+                                if ($MOBILE) {
+                                    echo($percent1+$percent2.'%');
+                                } else {
+                                    percentbar2($percent1,$percent2,"Done ${row['runsDone']} of ${row['runs']}");
+                                }
+				echo('</td><td style="text-align: center;">');
 				if (empty($row['jobsCompleted'])) $row['jobsCompleted']=0;
 				if (empty($row['jobsSuccess'])) $row['jobsSuccess']=0;
 				if (($row['activityID']==7) || ($row['activityID']==8)) {
 				if ($row['runsCompleted'] > 0) $realperc=round(100*$row['jobsSuccess']/$row['runsCompleted']); else $realperc=0;
-                                percentbar($realperc,"${row['jobsSuccess']} successful in ${row['runsCompleted']} attempts");
+                                if ($MOBILE) {
+                                    echo($realperc.'%');
+                                } else {   
+                                    percentbar($realperc,"${row['jobsSuccess']} successful in ${row['runsCompleted']} attempts");
+                                }
 				}
 			echo('</td><td style="text-align: center; padding: 0px; width: 48px;">');
                                 //$row['runs'] - total number of runs, $row['runsDone'] - number of completed runs
@@ -429,6 +448,7 @@ function getCurrentJobs($MYTASKS, $SELECTEDCHAR, $ORDERBY) {
  * @return type 
  */
 function showCurrentJobs($jobslist) {
+    global $MOBILE;
 	if (!sizeof($jobslist)>0) {
 		echo('<h3>There is no jobs in progress!</h3>');
 	} else {
@@ -437,9 +457,9 @@ function showCurrentJobs($jobslist) {
 	<table class="lmframework">
 	<tr><th>
 		
-	</th><th>
+	</th><?php if (!$MOBILE) { ?><th>
 		Character
-	</th><th>
+	</th><?php } ?><th>
 		Activity
 	</th><th>
 		
@@ -455,9 +475,13 @@ function showCurrentJobs($jobslist) {
 		foreach($jobslist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
                             echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
-			echo('</td><td>');
-                            echo($row['name']);
-                        echo('</td><td>');
+			echo('</td>');
+                        if (!$MOBILE) {
+                            echo('<td>');
+                                echo($row['name']);
+                            echo('</td>');
+                        }
+                        echo('<td>');
                             echo($row['activityName']);    
 			echo('</td><td style="padding: 0px; width: 32px;">');
 				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");

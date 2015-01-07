@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Item Database'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY;
+global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE;
 include_once('materials.php');
 include_once('yaml_graphics.php');
 
@@ -41,16 +41,17 @@ function url_replace($input) {
 	    
 	    <td style="width: 20%; min-width: 182px;">
 		<form method="get" action="">
-		<input type="text" name="query" value="" size="20">
+		<input type="text" name="query" value="" size="20" style="width: 120px;">
 		<input type="hidden" name="id" value="10">
 		<input type="hidden" name="id2" value="2">
 	    <input type="submit" value="Search">
 		</form>
 		</td>
 		<?php
+                if ($MOBILE) echo('</tr><tr>');
 //TASKS INTEGRATION
 		if (checkrights("Administrator,EditTasks")) {
-			echo('<td  style="width: 35%;">');
+			echo('<td  style="width: 35%; padding: 5px 0px 5px 0px;">');
 			$tasks=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, ibt.`blueprintTypeID`, iit.`productTypeID`, ibt.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel
 			FROM $LM_EVEDB.`invTypes` itp
 			LEFT JOIN $LM_EVEDB.`invBlueprintTypes` ibt
@@ -78,14 +79,23 @@ function url_replace($input) {
 			}
 			echo('</td>');
 		}
+                if ($MOBILE) echo('</tr><tr>');
                 $hasMarketGroup=db_asocquery("SELECT * FROM $LM_EVEDB.`invTypes` WHERE `typeID`=$nr AND `marketGroupID` IS NOT NULL;");
 		if (count($hasMarketGroup)>0) {
 			$pricesDisabled='';
 		} else {
 			$pricesDisabled='disabled';
 		}
+                
+                echo('<td>');
+                echo('<table style="width: 100%;"><tr>');
+                
 		if (checkrights("Administrator,EditPricesFlag")) {
-			echo('<td style="width: 12%; min-width: 110px;">');
+                        if (!$MOBILE) {
+                            echo('<td style="width: 12%; min-width: 110px;">');
+                        } else {
+                            echo('<td>');
+                        }
 			echo('<strong>Fetch Prices: </strong>');
 			$pricesFlag=db_asocquery("SELECT * FROM `cfgmarket` WHERE `typeID`=$nr;");
 			if (count($pricesFlag)>0) {
@@ -98,7 +108,11 @@ function url_replace($input) {
 			echo('</td>');
 		}
 		if (checkrights("Administrator,EditBuyingFlag")) {
-			echo('<td style="width: 13%; min-width: 130px;">');
+                        if (!$MOBILE) {
+                            echo('<td style="width: 13%; min-width: 130px;">');
+                        } else {
+                            echo('<td>');
+                        }
 			echo('<strong>Show in Buy Calc: </strong>');
 			$buyingFlag=db_asocquery("SELECT * FROM `cfgbuying` WHERE `typeID`=$nr;");
 			if (count($buyingFlag)>0) {
@@ -111,7 +125,11 @@ function url_replace($input) {
 			echo('</td>');
 		}
                 if (checkrights("Administrator,EditStock")) {
-			echo('<td style="width: 20%; min-width: 180px;">');
+                        if (!$MOBILE) {
+                            echo('<td style="width: 20%; min-width: 180px;">');
+                        } else {
+                            echo('<td>');
+                        }
 			$stocks=db_asocquery("SELECT * FROM `cfgstock` WHERE `typeID`=$nr;");
 			if (count($stocks)>0) {
 				$stockChecked='checked';
@@ -122,10 +140,15 @@ function url_replace($input) {
 			}
                         echo('<strong>Track: ');
                         echo('<input type="checkbox" name="cfgstock" title="Check \'Track\' first, then input a number in \'Stock\' and press enter" id="cfgstock" '.$stockChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=6&nr='.$nr.'&amount=\'+getStockAmount(\'stockamount\'),\'cfgstock\',\'cfgstock_label\');">');
-                        echo(' stock: <input '.$pricesDisabled.' type="text" name="stockamount" id="stockamount" size="8" title="Press Enter to save the amount" value="'.$stockAmount.'" onchange="ajax_save(\'index.php?id=10&id2=6&nr='.$nr.'&update=1&amount=\'+getStockAmount(\'stockamount\'),\'cfgstock\',\'cfgstock_label\');" /></strong>');
+                        if ($MOBILE) echo('<br/>');
+                        echo(' Stock: <input '.$pricesDisabled.' type="text" name="stockamount" id="stockamount" size="8" title="Press Enter to save the amount" value="'.$stockAmount.'" onchange="ajax_save(\'index.php?id=10&id2=6&nr='.$nr.'&update=1&amount=\'+getStockAmount(\'stockamount\'),\'cfgstock\',\'cfgstock_label\');" /></strong>');
 			echo('<div id="cfgstock_label" style="position: fixed;"></div>');
 			echo('</td>');
 		}
+                
+                echo('</tr></table>');
+                echo('</td>');
+                
 		?>
 		
 		</tr></table>
@@ -289,7 +312,11 @@ function checkwglsuprt() {
   return true;
 }
 </script>
-<div id="3dpreview" style="width: 70%; min-width: 718px; display: none;">
+<?php if (!$MOBILE) { ?>
+    <div id="3dpreview" style="width: 70%; min-width: 718px; display: none;">
+<?php } else { ?>
+    <div id="3dpreview" style="width: 100%; display: none;">
+<?php } ?>
 <table class="lmframework" style="width: 100%;">
     <tr><th>3D Preview</th><th style="width: 14px;"><img src="img/del.gif" alt="x" onclick="toggler('3dpreview');" value="x"/></th></tr>
     <tr><td colspan="2"><canvas id="wglCanvas" style="width:100%; height:420px;"></canvas><input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td></tr>
@@ -302,10 +329,21 @@ function checkwglsuprt() {
     
 //SHOW INFO AND ATTRIBUTES
 ?>
-                
-<table cellspacing="2" cellpadding="0" style="width: 70%; min-width: 718px;">
-<tr><td style="vertical-align: top; width:55%;">
 
+<?php if (!$MOBILE) { ?>
+    <table cellspacing="2" cellpadding="0" style="width: 70%; min-width: 718px;">
+<?php } else { ?>
+    <table cellspacing="2" cellpadding="0" style="width: 100%;">
+<?php } ?>      
+        
+<tr>
+    
+<?php if (!$MOBILE) { ?> 
+    <td style="vertical-align: top; width:55%;">
+<?php } else { ?>
+    <td style="vertical-align: top; width:100%;">
+<?php } ?>   
+        
 <table class="lmframework" style="width:100%;">
 <tr><th colspan="2">
 <strong>Show info</strong>
@@ -577,10 +615,14 @@ if ($model) {
         ?> </table> <?php
 	}
         
-	
-	echo('</td><td style="width: 45%; vertical-align: top;">');
-	
-	
+        
+if (!$MOBILE) {
+    echo('</td><td style="width: 45%; vertical-align: top;">');
+} else {
+    echo('</td></tr><tr><td style="width: 100%; vertical-align: top;">');
+}
+
+		
 	/****************************************************************************/
 	/* CODE BELOW IS COPIED FROM ANOTHER APP. IT NEEDS TO BE DESPAGHETTIFIED!!  */
 	/****************************************************************************/
