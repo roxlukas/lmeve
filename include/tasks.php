@@ -278,7 +278,7 @@ function showTasks($tasklist) {
                                     $percent2=0;
                                 }
                                 if ($MOBILE) {
-                                    echo($percent1+$percent2.'%');
+                                    echo($percent1.'%');
                                 } else {
                                     percentbar2($percent1,$percent2,"Done ${row['runsDone']} of ${row['runs']}");
                                 }

@@ -52,12 +52,12 @@ global $LM_EVEDB;
 		} else {
 			$singleton=0;
 		}
-		$autoadd=secureGETstr('autoadd',3);
-		if ($autoadd=='on') {
-			$autoadd=1;
-		} else {
-			$autoadd=0;
-		}
+		$autoadd_copy=secureGETstr('autoadd_copy',3);
+                $autoadd_invention=secureGETstr('autoadd_invention',3);
+                $autoadd_tech1=secureGETstr('autoadd_tech1',3);
+		if ($autoadd_copy=='on') $autoadd_copy=TRUE; else $autoadd_copy=FALSE;
+                if ($autoadd_invention=='on') $autoadd_invention=TRUE; else $autoadd_invention=FALSE;
+                if ($autoadd_tech1=='on') $autoadd_tech1=TRUE; else $autoadd_tech1=FALSE;
 		
 		//walidacja
 		if(empty($typeID)) {
@@ -93,7 +93,7 @@ if ($new) {
                         //echo("DEBUG: $sql");
 			db_uquery($sql);
 			
-			if ($autoadd==1) {
+			if ($autoadd_invention || $autoadd_copy || $autoadd_tech1) {
 			    $sql="SELECT itp.`typeID`, itp.`typeName`, iit.`blueprintTypeID`, iit.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel, itp.`groupID`, ing.`categoryID`, imt.`parentTypeID`, iit1.`blueprintTypeID` AS bpoT1TypeID, itp.`portionSize`
 				FROM $LM_EVEDB.`invTypes` itp
 				JOIN $LM_EVEDB.`invGroups` ing
@@ -131,30 +131,49 @@ if ($new) {
 				if ($multipliedRuns < 1) $multipliedRuns=1;
 				
 				//insert invention task
-				$sql="INSERT INTO `lmtasks` VALUES (
-				DEFAULT,
-				$characterID,
-				${typeName['blueprintTypeID']},
-				8,
-				$multipliedRuns,
-				NOW(),
-				$singleton,
-                                NULL
-				);";
-				db_uquery($sql);
+                                if ($autoadd_invention) {
+                                    $sql="INSERT INTO `lmtasks` VALUES (
+                                    DEFAULT,
+                                    $characterID,
+                                    ${typeName['blueprintTypeID']},
+                                    8,
+                                    $multipliedRuns,
+                                    NOW(),
+                                    $singleton,
+                                    NULL
+                                    );";
+                                    db_uquery($sql);
+                                }
 				
 				//insert copy task
-				$sql="INSERT INTO `lmtasks` VALUES (
-				DEFAULT,
-				$characterID,
-				${typeName['bpoT1TypeID']},
-				5,
-				$multipliedRuns,
-				NOW(),
-				$singleton,
-                                NULL
-				);";
-				db_uquery($sql);
+                                if ($autoadd_copy) {
+                                    $sql="INSERT INTO `lmtasks` VALUES (
+                                    DEFAULT,
+                                    $characterID,
+                                    ${typeName['bpoT1TypeID']},
+                                    5,
+                                    $multipliedRuns,
+                                    NOW(),
+                                    $singleton,
+                                    NULL
+                                    );";
+                                    db_uquery($sql);
+                                }
+                                
+                                //insert tech 1 manufacturing task
+                                if ($autoadd_tech1) {
+                                    $sql="INSERT INTO `lmtasks` VALUES (
+                                    DEFAULT,
+                                    $characterID,
+                                    ${typeName['parentTypeID']},
+                                    1,
+                                    $runs,
+                                    NOW(),
+                                    $singleton,
+                                    NULL
+                                    );";
+                                    db_uquery($sql);
+                                }
 			}
 						
 			echo('Task added successfully.<br><br>');

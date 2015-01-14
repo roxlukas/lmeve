@@ -127,6 +127,7 @@ $PANELNAME='PVE Statistics'; //Panel name (optional)
                             }
                             
                             var ctx= document.getElementById("statsCanvas").getContext("2d");
+                            <?php if ($MOBILE) echo('ctx.canvas.width  = window.innerWidth;'); ?>
                             var apiChart = new Chart(ctx).Line(data,bar_options);
                             
                         </script>

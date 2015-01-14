@@ -1,6 +1,7 @@
 <?php
 //begin
     checksession(); //check if we are called by a valid session
+    global $MOBILE;
 //routing
     $id=8;
     $id2=$_GET['id2'];
@@ -32,8 +33,8 @@
         <input type="submit" value="Industry: characters" />
         </form></td>
     <?php } ?> 
-    
-        <td id="separator" style="width: 10px;"></td>
+    <?php if ($MOBILE) echo('</tr></table><table><tr>'); else echo('<td id="separator" style="width: 10px;"></td>');?>
+        
     <?php
 //show proper year-month buttons
     $date=secureGETnum("date");

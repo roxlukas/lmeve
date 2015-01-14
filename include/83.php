@@ -218,6 +218,7 @@ $pointsDisplayed=false;
                             }
                             
                             var ctx_<?php echo($corp['corporationID']); ?> = document.getElementById("pve_<?php echo($corp['corporationID']); ?>").getContext("2d");
+                            <?php if ($MOBILE) echo('ctx_'.$corp['corporationID'].'.canvas.width  = window.innerWidth;'); ?>
                             var activityChart_<?php echo($corp['corporationID']); ?> = new Chart(ctx_<?php echo($corp['corporationID']); ?>).Bar(data_<?php echo($corp['corporationID']); ?>,bar_options);
                             
                         </script>

@@ -29,7 +29,7 @@ global $MOBILE;
     </td>
     <?php }
     
-    //if ($MOBILE) echo('</tr><tr>');
+    if ($MOBILE) echo('</tr><tr>');
     
     ?>
     <?php if (checkrights("Administrator,ViewProfitCalc")) { ?>

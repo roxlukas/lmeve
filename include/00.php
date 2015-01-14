@@ -12,6 +12,7 @@ $PANELNAME='Timesheet'; //Panel name (optional)
 
 global $LM_EVEDB;
 include_once('tasks.php');
+include_once('stats.php');
 
 $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
 $rights_edithours=checkrights("Administrator,EditHoursPerPoint");
@@ -116,18 +117,7 @@ $(function() {
     <!--<h2>&raquo; Summary</h2>-->
 <div>
 <?php	
-        //OLD date condition:
-            //date_format(beginProductionTime, '%Y%m') = '${year}${month}'
-        //NEW (otpimized) date condition:
-            //beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
-	$stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs, SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
-	FROM `apiindustryjobs` aij
-	JOIN $LM_EVEDB.`ramActivities` rac
-	ON aij.activityID=rac.activityID
-        WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
-	AND aij.corporationID=${corp['corporationID']}
-	GROUP BY `activityName`
-	ORDER BY `activityName`;");
+        
 				
 				echo('<table cellspacing="2" cellpadding="0" width="100%">');
 				echo('<tr><td width="40%" style="vertical-align: top;">');
@@ -164,38 +154,8 @@ $(function() {
                     }
 					echo('</td><td width="60%" style="vertical-align: top;">');
 					
-					$sumstat=0.0;
-					$sumjobs=0;
-            if (count($stats)>0) {                                        
-					echo("<h2>Statistics</h2>");
-					echo('<table class="lmframework">');
-					echo('<tr><th>');
-					echo('Activity');
-					echo('</th><th>');		
-					echo('Jobs');
-					echo('</td><th>');		
-					echo('Hours');
-					echo('</th></tr>');
-					foreach($stats as $stat) {
-						echo('<tr><td>');
-						echo($stat['activityName']);
-						echo('</td><td style="text-align: right;">');
-						echo(number_format($stat['jobs'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
-						$sumjobs+=$stat['jobs'];
-						echo('</td><td style="text-align: right;">');
-						echo(number_format($stat['hours'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
-						$sumstat+=$stat['hours'];
-						echo('</td></tr>');
-					}
-					echo('<tr><th>');
-					echo('TOTAL:');
-					echo('</th><th style="text-align: right;">');
-					echo(number_format($sumjobs, 0, $DECIMAL_SEP, $THOUSAND_SEP));
-                                        echo('</th><th style="text-align: right;">');		
-					echo(number_format($sumstat, 0, $DECIMAL_SEP, $THOUSAND_SEP));
-					echo('</td></tr>');
-					echo('</table>');
-            }				
+	//display stats here	
+        showIndustryStats(getIndustryStats($corp['corporationID'], $year, $month));
 				echo('</td></tr></table>');
 ?>
 </div>                        

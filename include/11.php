@@ -71,10 +71,10 @@ $runs=secureGETnum('runs');
 		    echo('<input type="hidden" name="nr" value="');
 		    echo($nr);
 		    echo('">');
-		    echo('<table border="0" cellspacing="2" cellpadding="">');
+		    echo('<table class="lmframework">');
 		    
-		    echo('<tr><td width="150" class="tab">');
-		    echo('Item:<br></td><td width="200" class="tab">');
+		    echo('<tr><td width="150">');
+		    echo('Item:<br></td><td width="200">');
 		    if ((!$new)||(isset($task['activityID']))) {
 				//variables are set, so we can dig DB for a typeName
 				/*$typeName=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE `typeID`=${task['typeID']}");
@@ -100,8 +100,8 @@ $runs=secureGETnum('runs');
 		    echo('"><a href="?id=1&id2=5&nr='.$nr.'"><strong>Search items &raquo;</strong></a>');
 		    echo('</td></tr>');
 		    
-		    echo('<tr><td width="150" class="tab">');
-		    echo('Activity:<br></td><td width="200" class="tab">');
+		    echo('<tr><td width="150">');
+		    echo('Activity:<br></td><td width="200">');
 		    echo('<select name="activityID">');
 		    foreach($activities as $row) {
 				if ($row['activityID']==$task['activityID']) $select='selected'; else $select='';
@@ -110,7 +110,7 @@ $runs=secureGETnum('runs');
 		    echo('</select>');
 		    echo('</td></tr>');
 		    
-		    echo('<tr><td width="150" class="tab">Character:<br></td><td width="200" class="tab">');
+		    echo('<tr><td width="150">Character:<br></td><td width="200">');
 		    echo('<select name="characterID">');
 		    foreach($chars as $row) {
 				if ($row['characterID']==$task['characterID']) $select='selected'; else $select='';
@@ -119,7 +119,7 @@ $runs=secureGETnum('runs');
 		    echo('</select>');
 		    echo('</td></tr>');
                     
-                    echo('<tr><td width="150" class="tab">Lab/array:<br></td><td width="200" class="tab">');
+                    echo('<tr><td width="150">Lab/array:<br></td><td width="200">');
 		    echo('<select name="structureID">');
                     if (is_null($row['structureID'])) $select='selected'; else $select='';
 		    echo("<option value=\"null\" $select>- none -</option>");
@@ -130,14 +130,14 @@ $runs=secureGETnum('runs');
 		    echo('</select>');
 		    echo('</td></tr>');
 		    
-		    echo('<tr><td width="150" class="tab">');
-		    echo('Quantity:<br></td><td width="200" class="tab">');
+		    echo('<tr><td width="150">');
+		    echo('Quantity:<br></td><td width="200">');
 		    echo('<input type="text" name="runs" size="25" value="');
 		    echo(stripslashes($task['runs']));
 		    echo('">');
 		    echo('</td></tr>');
 		    
-		    echo('<tr><td width="150" class="tab">One time task:<br></td><td width="200" class="tab">');
+		    echo('<tr><td width="150">One time task:<br></td><td width="200">');
 		    echo('<input type="checkbox" name="singleton" ');
 		    if (($task['singleton']==1)) {
 		    	echo('checked>');
@@ -149,9 +149,17 @@ $runs=secureGETnum('runs');
 		    
 		    if (($new) && (!empty($typeName['productTypeID']))) {
 				if ($typeName['itemTechLevel']==2) {
-					echo('<tr><td width="150" class="tab">Auto-add invention and copying<!--and Tech 1 manufacturing:--><br></td><td width="200" class="tab">');
-					echo('<input type="checkbox" name="autoadd" checked>');
-					echo('</td></tr>');
+                                    ?>
+                                        <tr><td width="150">Auto-add copying<br></td><td width="200">
+					<input type="checkbox" name="autoadd_copy" >
+					</td></tr>
+                                        <tr><td width="150">Auto-add invention<br></td><td width="200">
+					<input type="checkbox" name="autoadd_invention" checked>
+					</td></tr>
+                                        <tr><td width="150">Auto-add Tech I Manufacturing<br></td><td width="200">
+					<input type="checkbox" name="autoadd_tech1" checked>
+					</td></tr>
+                                    <?php
 				}
 			}
 
