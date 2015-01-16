@@ -504,4 +504,245 @@ function showCurrentJobs($jobslist) {
 	return;
 }
 
+function getPoints() {
+    global $LM_EVEDB;
+    $points=db_asocquery("SELECT rac.`activityName`,cpt.* FROM $LM_EVEDB.`ramActivities` rac JOIN `cfgpoints` cpt ON rac.`activityID`=cpt.`activityID` ORDER BY `activityName`;");
+    return $points;
+}
+
+function showPoints($points) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    $rights_edithours=FALSE;
+    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
+    
+    echo("<h2>Points");
+    if (checkrights("Administrator,EditHoursPerPoint")) { ?>
+        <input type="button" value="Edit hours-per-point" onclick="location.href='?id=5&id2=10';">
+    <?php 
+        $rights_edithours=TRUE;
+    }
+    echo('</h2><table class="lmframework">');
+    echo('<tr><th>');
+    echo('Activity');
+    echo('</td><th>');		
+    echo('Hours');
+    echo('</td></tr>');
+    foreach($points as $point) {
+            echo('<tr><td>');
+            if ($rights_edithours) pointshrefedit($point['activityID']);
+            echo($point['activityName']);
+            if ($rights_edithours) echo("</a>");
+            echo('</td><td>');
+            if ($rights_edithours) pointshrefedit($point['activityID']);
+            echo($point['hrsPerPoint']);
+            if ($rights_edithours) echo("</a>");
+            echo('</td></tr>');
+    }
+    echo('</table>');
+
+    echo("<strong>1 point = ".number_format($ONEPOINT, 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</strong>");
+    if (checkrights("Administrator")) { ?>
+        <input type="button" value="Edit" onclick="location.href='?id=5&id2=0';">
+    <?php }
+    echo('<br/>');
+}
+
+function getTimesheet($corporationID, $year, $month) {
+    global $LM_EVEDB;
+    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
+    
+    $sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
+	SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
+	FROM `apiindustryjobs` aij
+	JOIN $LM_EVEDB.`ramActivities` rac
+	ON aij.activityID=rac.activityID
+	JOIN cfgpoints cpt
+	ON aij.activityID=cpt.activityID
+	JOIN apicorpmembers acm
+	ON aij.installerID=acm.characterID
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+	AND aij.corporationID=$corporationID
+	GROUP BY `characterID`,`name`,`activityName`
+	ORDER BY `name`,`activityName`) AS wages;";
+	
+    $data=db_asocquery($sql_all);
+
+    //echo("<pre>DB=\n");
+    //var_dump($data);
+    //echo("</pre>");
+
+    $rearrange=array();
+
+    foreach($data as $row) {
+            $rearrange[$row['characterID']]['activities'][stripslashes($row['activityName'])]['points']=stripslashes($row['points']);
+            $rearrange[$row['characterID']]['activities'][stripslashes($row['activityName'])]['activityName']=stripslashes($row['activityName']);
+            $rearrange[$row['characterID']]['totalpoints']+=stripslashes($row['points']);
+            $rearrange[$row['characterID']]['wage']+=stripslashes($row['wage']);
+            $rearrange[$row['characterID']]['name']=stripslashes($row['name']);
+            $rearrange[$row['characterID']]['characterID']=$row['characterID'];
+    }
+    return $rearrange;
+}
+
+function timesheetHeader() {
+    global $MOBILE;
+    
+    ?>			
+    <table class="lmframework">
+    <tr><th width="32" style="padding: 0px; text-align: center;">
+            <b></b>
+    </th><th style="text-align: center;">
+            <b>Name</b>
+    </th><?php if (!$MOBILE) { ?><th width="64" style="text-align: center;">
+            <b>Copying</b>
+    </td><th width="64" style="text-align: center;">
+            <b>Invention</b>
+    </th><th width="64" style="text-align: center;">
+            <b>Manufacturing</b>
+    </th><th width="64" style="text-align: center;">
+            <b>ME</b>
+    </th><th width="64" style="text-align: center;">
+            <b>PE</b>
+    </th><?php 
+    /* <th width="64" style="text-align: center;">
+            <b>Reverse engineering</b>
+    </th> */
+    }  ?><th width="48" style="text-align: center;">
+            <b>Points</b>
+    </th><th width="96" style="text-align: center;">
+            <b>ISK</b>
+    </td>
+    </tr>
+    <?php
+}
+
+function timesheetFooter() {
+    ?>
+    </table>
+    <?php  
+}
+
+function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE) {
+    global $DECIMAL_SEP, $THOUSAND_SEP, $MOBILE;
+    
+    echo('<tr><td style="padding: 0px;">');
+            if ($rights_viewallchars) charhrefedit($row['characterID']);
+                    echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+            if ($rights_viewallchars) echo('</a>');
+    echo('</td><td>');
+            if ($rights_viewallchars) charhrefedit($row['characterID']);
+                    echo(stripslashes($row['name']));
+            if ($rights_viewallchars) echo('</a>');
+    echo('</td><td style="text-align: center;">');
+    if (!$MOBILE) {
+        echo(number_format($row['activities']['Copying']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+        $totals['Copying']+=$row['activities']['Copying']['points'];
+        echo('</td><td style="text-align: center;">');
+
+        echo(number_format($row['activities']['Invention']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+        $totals['Invention']+=$row['activities']['Invention']['points'];
+        echo('</td><td style="text-align: center;">');
+
+        echo(number_format($row['activities']['Manufacturing']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+        $totals['Manufacturing']+=$row['activities']['Manufacturing']['points'];
+        echo('</td><td style="text-align: center;">');
+
+        echo(number_format($row['activities']['Researching Material Efficiency']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+        $totals['Researching Material Efficiency']+=$row['activities']['Researching Material Efficiency']['points'];
+        echo('</td><td style="text-align: center;">');
+
+        echo(number_format($row['activities']['Researching Time Efficiency']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+        $totals['Researching Time Efficiency']+=$row['activities']['Researching Time Efficiency']['points'];
+        echo('</td><td style="text-align: center;">');
+        /*
+        echo(number_format($row['activities']['Reverse Engineering']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
+        $totals['Reverse Engineering']+=$row['activities']['Reverse Engineering']['points'];
+        echo('</td><td style="text-align: center;">');
+         */
+    }
+    echo(number_format(stripslashes($row['totalpoints']), 2, $DECIMAL_SEP, $THOUSAND_SEP));
+    $totals['totalpoints']+=$row['totalpoints'];
+    echo('</td><td style="text-align: right;">');
+
+    echo(number_format(stripslashes($row['wage']), 2, $DECIMAL_SEP, $THOUSAND_SEP));
+    echo('</td>');
+    echo('</tr>');
+    $totals['ISK']+=stripslashes($row['wage']);
+}
+
+function timesheetTotals($totals,$label='Total') {
+    global $DECIMAL_SEP, $THOUSAND_SEP, $MOBILE;
+    
+    ?>
+    <tr><th width="32" style="padding: 0px; text-align: center;">
+            <b></b>
+    </th><th style="text-align: left;">
+            <b><?php echo($label); ?></b>
+    </th><?php if (!$MOBILE) { ?><th width="64" style="text-align: center;">
+            <b><?php echo(number_format($totals['Copying'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th><th width="64" style="text-align: center;">
+            <b><?php echo(number_format($totals['Invention'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th><th width="64" style="text-align: center;">
+            <b><?php echo(number_format($totals['Manufacturing'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th><th width="64" style="text-align: center;">
+            <b><?php echo(number_format($totals['Researching Material Efficiency'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th><th width="64" style="text-align: center;">
+            <b><?php echo(number_format($totals['Researching Time Efficiency'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th><?php /* <th width="64" style="text-align: center;">
+            <b><?php echo(number_format($totals['Reverse Engineering'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th> */ } ?><th width="48" style="text-align: center;">
+            <b><?php echo(number_format($totals['totalpoints'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th><th width="96" style="text-align: right;">
+            <b><?php echo(number_format($totals['ISK'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
+    </th>
+    </tr>
+    <?php
+}
+    
+function showTimesheet($timesheet) {
+    $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
+    
+    $mychars=getMyChars(true);   
+
+    $totals['ISK']=0.0;
+    $totals['Copying']=0.0;
+    $totals['Invention']=0.0;
+    $totals['Manufacturing']=0.0;
+    $totals['Researching Material Efficiency']=0.0;
+    $totals['Researching Time Efficiency']=0.0;
+    //$totals['Reverse Engineering']=0.0;
+    $totals['totalpoints']=0.0;
+    
+    //draw table header
+    timesheetHeader();
+    //draw "My characters" header
+    if ($mychars) {
+        echo('<tr><th colspan="'. ($MOBILE ? 4 : 9) .'" style="text-align: center; font-weight: bold;">My characters</th></tr>');
+    }
+    //display data for "My characters"
+    foreach($timesheet as $row) {
+        if ($mychars!=false && in_array($row['characterID'], $mychars)) {
+            timesheetRow($row,$totals,$rights_viewallchars);
+        }
+    }
+    //display subtotal for "My Characters"
+    if ($mychars) {
+        timesheetTotals($totals,"My Total");
+    }
+    //display data for everyone else
+    foreach($timesheet as $row) {
+        if ($mychars==false || !in_array($row['characterID'], $mychars)) {
+            timesheetRow($row,$totals,$rights_viewallchars);
+        }
+    }
+    //display total for everyone
+    timesheetTotals($totals);
+    //close table
+    timesheetFooter();  
+}
+
+function charhrefedit($nr) {
+    echo("<a href=\"index.php?id=9&id2=6&nr=$nr\" title=\"Click to open character information\">");
+}
+
 ?>

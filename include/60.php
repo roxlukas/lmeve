@@ -10,7 +10,7 @@ $MENUITEM=6; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Wallet'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB;
+global $LM_EVEDB,$MOBILE;
 
 $date=secureGETnum("date");
 
@@ -234,6 +234,7 @@ if (count($walletGraphIncomes)>0 || count($walletGraphOutcomes)>0) {
                             }
 
                             var ctx_<?php echo($corp['corporationID']); ?> = document.getElementById("wallet_<?php echo($corp['corporationID']); ?>").getContext("2d");
+                            <?php if ($MOBILE) echo('ctx_'.$corp['corporationID'].'.canvas.width  = window.innerWidth;'); ?>
                             var walletChart_<?php echo($corp['corporationID']); ?> = new Chart(ctx_<?php echo($corp['corporationID']); ?>).Bar(data_<?php echo($corp['corporationID']); ?>,options);
 
                         </script>
