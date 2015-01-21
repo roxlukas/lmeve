@@ -28,7 +28,7 @@ function outsiderhrefedit($characterName) {
 }
 
 function pocohrefedit($nr) {
-    echo("<a href=\"index.php?id=2&id2=7&nr=$nr\"  title=\"Click to show client list and other details\">");
+    echo("<a href=\"index.php?id=2&id2=7&nr=$nr\" >");
 }
 
 function getControlTowers($where='TRUE') {
@@ -325,20 +325,14 @@ function getPocoIncome($corporationID) {
     $year=date("Y"); $month=date("m");
     switch ($month) {
                 case 1:
-                        $NEXTMONTH=2;
-                        $NEXTYEAR=$year;
                         $PREVMONTH=12;
                         $PREVYEAR=$year-1;
                 break;
                 case 12:
-                        $NEXTMONTH=1;
-                        $NEXTYEAR=$year+1;
                         $PREVMONTH=11;
                         $PREVYEAR=$year;
                 break;
                 default:
-                        $NEXTMONTH=$month+1;
-                        $NEXTYEAR=$year;
                         $PREVMONTH=$month-1;
                         $PREVYEAR=$year;
     }
@@ -356,6 +350,40 @@ function getPocoIncome($corporationID) {
     ON awj.refTypeID=art.refTypeID
     WHERE awj.date BETWEEN '".sprintf("%04d", $PREVYEAR)."-".sprintf("%02d", $PREVMONTH)."-01' AND LAST_DAY('".sprintf("%04d", $PREVYEAR)."-".sprintf("%02d", $PREVMONTH)."-01')
     AND awj.corporationID = $corporationID
+    AND awj.refTypeID IN (96, 97);";
+    $poco_raw=db_asocquery($sql);
+    return $poco_raw;
+}
+
+function getSinglePocoIncome($planetItemID) {
+    $year=date("Y"); $month=date("m");
+    switch ($month) {
+                case 1:
+                        $PREVMONTH=12;
+                        $PREVYEAR=$year-1;
+                break;
+                case 12:
+                        $PREVMONTH=11;
+                        $PREVYEAR=$year;
+                break;
+                default:
+                        $PREVMONTH=$month-1;
+                        $PREVYEAR=$year;
+    }
+    $sql="SELECT SUM(awj.amount) AS amount, 'current' AS month FROM
+    apiwalletjournal awj
+    JOIN apireftypes art
+    ON awj.refTypeID=art.refTypeID
+    WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+    AND awj.`argID1`=$planetItemID
+    AND awj.refTypeID IN (96, 97)
+    UNION
+    SELECT SUM(awj.amount) AS amount, 'previous' AS month FROM
+    apiwalletjournal awj
+    JOIN apireftypes art
+    ON awj.refTypeID=art.refTypeID
+    WHERE awj.date BETWEEN '".sprintf("%04d", $PREVYEAR)."-".sprintf("%02d", $PREVMONTH)."-01' AND LAST_DAY('".sprintf("%04d", $PREVYEAR)."-".sprintf("%02d", $PREVMONTH)."-01')
+    AND awj.`argID1`=$planetItemID
     AND awj.refTypeID IN (96, 97);";
     $poco_raw=db_asocquery($sql);
     return $poco_raw;
@@ -440,7 +468,7 @@ function showPocoClients($clients) {
     }
 }
 
-function showPocos($pocos, $income=null, $single=FALSE) {
+function showPocos($pocos, $income=null) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
     $TABWIDTH='1016px';
         if (count($pocos)>0) {
@@ -451,7 +479,7 @@ function showPocos($pocos, $income=null, $single=FALSE) {
             }
             //display header
 			?>
-			<table class="lmframework" style="width: $TABWIDTH;" id="pocos">
+			<table class="lmframework" style="width: <?php echo($TABWIDTH); ?>" id="pocos">
 			<tr><th style="width: 64px; padding: 0px; text-align: center;" rowspan="2">
 				Icon
 			</th><th style="width: 100px; text-align: center;" rowspan="2">
@@ -491,38 +519,32 @@ function showPocos($pocos, $income=null, $single=FALSE) {
             ?>
                 <tr><td style="padding: 0px; text-align: center;">
                     <?php 
-                    if(!$single) {
-                        echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>");
-                        echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_32.png\" title=\"".$row['planetTypeName']."\" /></a>");
-                    } else {
-                        echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_64.png\" title=\"".$row['planetTypeName']."\" /></a>");
-                    }
+                    echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>");
+                    echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_32.png\" title=\"".$row['planetTypeName']."\" /></a>");
                     ?>
                     
                 </td>
                     <?php
-                          if(!$single) {
-                              $perc=round(100*$row['planetIncome']/$maxIncome);
-                              $good=array(0,192,0,0.5);
-                              $bad=array(192,0,0,0.5);
-                              for ($i=0; $i<4; $i++) {
-                                  $color[$i] = round ($bad[$i] + ($good[$i]-$bad[$i])*$perc/100);
-                                  //echo("good[$i]=".$good[$i]." bad[$i]=".$bad[$i]." color[$i]=".$color[$i]."<br/>");
-                              }
-                              $bar_color='rgba('.$color[0].','.$color[1].','.$color[2].','.$color[3].')';
-                              $empty_color='rgba(0,0,0,0.0)';
-                              $perc.='%';
-                              echo("<td style=\"background: -webkit-gradient(linear, left top, right top, color-stop($perc,$bar_color), color-stop($perc,$empty_color));
-                                    background: -moz-linear-gradient(left center, $bar_color $perc, $empty_color $perc);
-                                    background: -o-linear-gradient(left, $bar_color $perc, $empty_color $perc);
-                                    background: linear-gradient(to right, $bar_color $perc, $empty_color $perc);\">");                  
-                              echo('<span title="Income in last 30 days: '.number_format($row['planetIncome'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK">');
-                              pocohrefedit($row['planetItemID']);
-                          } else {
-                              echo('<td>');
-                          }
+
+                      $perc=round(100*$row['planetIncome']/$maxIncome);
+                      $good=array(0,192,0,0.5);
+                      $bad=array(192,0,0,0.5);
+                      for ($i=0; $i<4; $i++) {
+                          $color[$i] = round ($bad[$i] + ($good[$i]-$bad[$i])*$perc/100);
+                          //echo("good[$i]=".$good[$i]." bad[$i]=".$bad[$i]." color[$i]=".$color[$i]."<br/>");
+                      }
+                      $bar_color='rgba('.$color[0].','.$color[1].','.$color[2].','.$color[3].')';
+                      $empty_color='rgba(0,0,0,0.0)';
+                      $perc.='%';
+                      echo("<td style=\"background: -webkit-gradient(linear, left top, right top, color-stop($perc,$bar_color), color-stop($perc,$empty_color));
+                            background: -moz-linear-gradient(left center, $bar_color $perc, $empty_color $perc);
+                            background: -o-linear-gradient(left, $bar_color $perc, $empty_color $perc);
+                            background: linear-gradient(to right, $bar_color $perc, $empty_color $perc);\">");                  
+                      echo('<span title="Income in last 30 days: '.number_format($row['planetIncome'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK">');
+                      pocohrefedit($row['planetItemID']);
+
                           echo($row['planetName']);
-                          if(!$single) echo('</a></span>');
+                          echo('</a></span>');
                     ?>
                 </td><td style="text-align: center;">
                     <?php echo( ($row['reinforceHour']-1) .'-'. ($row['reinforceHour']+1 )); ?> 
@@ -554,6 +576,139 @@ function showPocos($pocos, $income=null, $single=FALSE) {
 			</table>
 			<?php
             if (!is_null($income)) showPocoIncome($income);
+        } else {
+		echo('<table class="lmframework" style="width: '.$TABWIDTH.';"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
+        }
+        
+    
+}
+
+function getCorp($corporationID) {
+    $ret=db_asocquery("SELECT * FROM apicorps WHERE `corporationID`=$corporationID;");
+    if (count($ret)>0) {
+        $ret=$ret[0];
+        return $ret;
+    } else {
+        return FALSE;
+    }
+}
+
+function showPocoDetail($pocos,$income=null) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    $TABWIDTH='1016px';
+        if (count($pocos)>0) {
+            //find max monthly income for percentage scaling
+            $maxIncome=0.0;
+            foreach ($pocos as $row) {
+                if ($row['planetIncome']>$maxIncome) $maxIncome=$row['planetIncome'];
+            }
+            //display header
+			?>
+                        <table class="lmframework" style="width: <?php echo($TABWIDTH); ?>" id="pocos">
+			<tr><th style="width: 64px; padding: 0px; text-align: center;">
+				Icon
+			</th><th style="text-align: center;">
+				Location
+			</th>
+                        <th style="text-align: center;">
+				Owner corporation
+			</th></tr>
+                        <tr><td style="padding: 0px; text-align: center;">
+                            <?php 
+                            echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_64.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                            ?>
+			</td><td style="text-align: center;">
+                            <h2><?=$row['planetName']?></h2>
+                            <?=$row['planetTypeName']?>
+                        </td><td style="text-align: center;">
+                            <h2><img src="https://image.eveonline.com/Corporation/<?=$row['corporationID']?>_32.png" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
+				
+			</td></tr>
+                        </table>
+            
+			<table class="lmframework" style="width: <?php echo($TABWIDTH); ?>" id="pocos">
+			<tr><th style="width: 64px; text-align: center;" rowspan="2">
+				Reinforced Hours
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Allow Alliance
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Allow Standings
+			</th><th style="width: 64px; text-align: center;" rowspan="2">
+				Min Standings
+			</th><th colspan="7" style="text-align: center;">
+				Tax rates
+			</th>
+			</tr>
+			<tr>
+			<th style="width: 64px;">
+				Alliance
+			</th><th style="width: 64px; text-align: center;">
+				Corp
+			</th><th style="width: 64px; text-align: center;">
+				Excellent Standing
+			</th><th style="width: 64px; text-align: center;">
+				Good Standing
+			</th><th style="width: 64px; text-align: center;">
+				Neutral Standing
+			</th><th style="width: 64px; text-align: center;">
+				Bad Standing
+			</th><th style="width: 64px; text-align: center;">
+				Horrible Standing
+			</th>
+			</tr>
+            <?php
+            //walk each PoCo
+            foreach ($pocos as $row) {
+            ?>
+                <tr><td style="text-align: center;">
+                    <?php echo( ($row['reinforceHour']-1) .'-'. ($row['reinforceHour']+1 )); ?> 
+                </td><td style="text-align: center;">
+                    <?php if ($row['allowAlliance']==0) echo('No'); else echo('Yes'); ?>
+                </td><td style="text-align: center;">
+                    <?php if ($row['allowStandings']==0) echo('No'); else echo('Yes'); ?> 
+                </td><td style="text-align: center;">
+                    <?php echo($row['standingLevel']);  ?>
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateAlliance']);  ?>%
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateCorp']);  ?>%
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateStandingHigh']);  ?>%
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateStandingGood']);  ?>%
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateStandingNeutral']);  ?>%
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateStandingBad']);  ?>%
+                </td><td style="text-align: center;">
+                    <?php echo(100 * $row['taxRateStandingHorrible']);  ?>%
+                </td>
+                </tr>
+                <tr>
+                    <th colspan="3" style="text-align: center;">Income in the last 30 days</th>
+                    <th colspan="3" style="text-align: center;">Previous month income</th>
+                    <th colspan="5" style="text-align: center;">Current month income</th>
+                </tr><tr>
+                    <td colspan="3" style="text-align: center;"><?php echo(number_format($row['planetIncome'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</td>
+                    <td colspan="3" style="text-align: center;">
+                        <?php
+                            if (!is_null($income)) echo(number_format($income[1]['amount'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                        ?>
+                    </td>
+                    <td colspan="5" style="text-align: center;">
+                        <?php
+                            $day=date('j'); $days=date('t');
+                            if (!is_null($income)) echo(number_format($income[0]['amount'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+                            if (!is_null($income)) echo(' (Estimated: '.number_format($income[0]['amount']/($day/$days), 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK)');
+                        ?>
+                    </td>
+                </tr>
+            <?php
+            }
+            ?>
+	    </table>
+	    <?php
+            //if (!is_null($income)) showPocoIncome($income);
         } else {
 		echo('<table class="lmframework" style="width: '.$TABWIDTH.';"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
         }

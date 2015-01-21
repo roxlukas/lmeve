@@ -20,11 +20,11 @@ $nr=secureGETnum('nr');
 		<a name="top"></a>             
                 
                 <div class="tytul">
-			Player-owned Customs Offices<br/>
+			Planet details<br/>
 		</div>
 <?php
-                showPocos(getPocos("apo.planetItemID=$nr"),null,TRUE);
-                echo('<h2>Clients List</h2>');
+                showPocoDetail(getPocos("apo.planetItemID=$nr"),getSinglePocoIncome($nr));
+                echo('<h2>Clients List</h2><i>All paying clients who accessed this POCO in the current month.</i>');
                 showPocoClients(getPocoClients($nr));
 ?>
 		    
