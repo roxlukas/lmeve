@@ -44,7 +44,7 @@ function nbapihrefedit($nr) {
     <?php
     if (!checkrights("Administrator")) {
         //if user is not admin, he can only delete their own keys
-        $owner="`userID`=${_SESSION['granted']}";
+        $owner="lma.`userID`=${_SESSION['granted']}";
     } else {
         //if user is admin, he can delete any key
         $owner="TRUE";
