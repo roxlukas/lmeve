@@ -22,6 +22,15 @@ function toonhrefedit($nr) {
     echo("<a href=\"index.php?id=9&id2=6&nr=$nr\" title=\"Click to open character information\">");
 }
 
+function outsiderhrefedit($characterName) {
+    $cn=rawurlencode($characterName);
+    echo("<a href=\"https://gate.eveonline.com/Profile/${cn}\" target=\"_blank\" title=\"Click to open character information\">");
+}
+
+function pocohrefedit($nr) {
+    echo("<a href=\"index.php?id=2&id2=7&nr=$nr\"  title=\"Click to show client list and other details\">");
+}
+
 function getControlTowers($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT asl.*,apl.itemName,apl.x,apl.y,apl.z,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
@@ -376,7 +385,62 @@ function showPocoIncome($raw) {
     }
 }
 
-function showPocos($pocos, $income=null) {
+function getPocoClients($planetItemID) {
+    $year=date("Y"); $month=date("m");
+    $sql="SELECT MAX( date ) AS lastAccess, COUNT( * ) AS timesAccessed, SUM(amount) AS taxPaid, ownerID1 As characterID, ownerName1 AS characterName
+FROM `apiwalletjournal`
+WHERE `argID1`=$planetItemID
+AND `date` BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+GROUP BY `ownerID1`
+ORDER BY `taxPaid` DESC;";
+    return db_asocquery($sql);
+}
+
+function showPocoClients($clients) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    
+    if (count($clients)>0) {
+        ?>
+        <table class="lmframework" id="pococlients">
+        <tr><th style="width: 32px; padding: 0px; text-align: center;">
+
+        </th><th style="text-align: center;">
+                Character Name
+        </th><th style="text-align: center;">
+                Tax paid
+        </th><th style="text-align: center;">
+                Times accessed
+        </th><th style="text-align: center;">
+                Last access
+        </th>
+        </tr>
+        <?php
+        foreach ($clients as $row) {
+            echo('<tr><td style="width: 32px; padding: 0px; text-align: center;">');
+                outsiderhrefedit($row['characterName']);
+                    echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['characterName']}\" />");
+                echo('</a>');
+            echo('</td><td style="text-align: left;">');
+                outsiderhrefedit($row['characterName']);
+                    echo($row['characterName']);
+                echo('</a>');
+            echo('</td><td style="text-align: right;">');
+                    echo(number_format($row['taxPaid'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK');
+            echo('</td><td style="text-align: center;">');
+                    echo($row['timesAccessed']);
+            echo('</td><td style="text-align: left;">');
+                    echo($row['lastAccess']);
+            echo('</td></tr>');
+        }
+        ?>
+        </table>
+        <?php
+    } else {
+        echo('No clients');
+    }
+}
+
+function showPocos($pocos, $income=null, $single=FALSE) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
     $TABWIDTH='1016px';
         if (count($pocos)>0) {
@@ -426,27 +490,39 @@ function showPocos($pocos, $income=null) {
             foreach ($pocos as $row) {
             ?>
                 <tr><td style="padding: 0px; text-align: center;">
-                    <?php echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>");
-                    echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_32.png\" title=\"".$row['planetTypeName']."\" /></a>");?>
+                    <?php 
+                    if(!$single) {
+                        echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>");
+                        echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_32.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                    } else {
+                        echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_64.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                    }
+                    ?>
+                    
                 </td>
                     <?php
-                          $perc=round(100*$row['planetIncome']/$maxIncome);
-                          $good=array(0,192,0,0.5);
-                          $bad=array(192,0,0,0.5);
-                          for ($i=0; $i<4; $i++) {
-                              $color[$i] = round ($bad[$i] + ($good[$i]-$bad[$i])*$perc/100);
-                              //echo("good[$i]=".$good[$i]." bad[$i]=".$bad[$i]." color[$i]=".$color[$i]."<br/>");
+                          if(!$single) {
+                              $perc=round(100*$row['planetIncome']/$maxIncome);
+                              $good=array(0,192,0,0.5);
+                              $bad=array(192,0,0,0.5);
+                              for ($i=0; $i<4; $i++) {
+                                  $color[$i] = round ($bad[$i] + ($good[$i]-$bad[$i])*$perc/100);
+                                  //echo("good[$i]=".$good[$i]." bad[$i]=".$bad[$i]." color[$i]=".$color[$i]."<br/>");
+                              }
+                              $bar_color='rgba('.$color[0].','.$color[1].','.$color[2].','.$color[3].')';
+                              $empty_color='rgba(0,0,0,0.0)';
+                              $perc.='%';
+                              echo("<td style=\"background: -webkit-gradient(linear, left top, right top, color-stop($perc,$bar_color), color-stop($perc,$empty_color));
+                                    background: -moz-linear-gradient(left center, $bar_color $perc, $empty_color $perc);
+                                    background: -o-linear-gradient(left, $bar_color $perc, $empty_color $perc);
+                                    background: linear-gradient(to right, $bar_color $perc, $empty_color $perc);\">");                  
+                              echo('<span title="Income in last 30 days: '.number_format($row['planetIncome'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK">');
+                              pocohrefedit($row['planetItemID']);
+                          } else {
+                              echo('<td>');
                           }
-                          $bar_color='rgba('.$color[0].','.$color[1].','.$color[2].','.$color[3].')';
-                          $empty_color='rgba(0,0,0,0.0)';
-                          $perc.='%';
-                          echo("<td style=\"background: -webkit-gradient(linear, left top, right top, color-stop($perc,$bar_color), color-stop($perc,$empty_color));
-                                background: -moz-linear-gradient(left center, $bar_color $perc, $empty_color $perc);
-                                background: -o-linear-gradient(left, $bar_color $perc, $empty_color $perc);
-                                background: linear-gradient(to right, $bar_color $perc, $empty_color $perc);\">");                  
-                          echo('<span title="Income in last 30 days: '.number_format($row['planetIncome'], 2, $DECIMAL_SEP, $THOUSAND_SEP).' ISK">');
                           echo($row['planetName']);
-                          echo('</span>');
+                          if(!$single) echo('</a></span>');
                     ?>
                 </td><td style="text-align: center;">
                     <?php echo( ($row['reinforceHour']-1) .'-'. ($row['reinforceHour']+1 )); ?> 

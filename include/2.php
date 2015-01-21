@@ -59,6 +59,9 @@
         case 6:
             include("26.php");  //POCO list
             break;
+        case 7:
+            include("27.php");  //POCO details
+            break;
     }
 ?>
 
