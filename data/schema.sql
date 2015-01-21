@@ -1484,6 +1484,7 @@ CREATE TABLE IF NOT EXISTS `lmconfig` (
 
 CREATE TABLE IF NOT EXISTS `lmnbapi` (
   `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
+  `userID` int(11) NOT NULL,
   `apiKey` varchar(64) NOT NULL,
   `lastAccess` datetime NULL,
   `lastIP` varchar(32) NULL,

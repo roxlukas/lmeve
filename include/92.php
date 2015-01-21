@@ -59,9 +59,5 @@ global $USERSTABLE;
 		}
 		?>
 		<br>
-		<form method="get" action="">
-		<input type="hidden" name="id" value="9">
-		<input type="hidden" name="id2" value="0">
-		<input type="submit" value="OK">
-		</form>
+		<input type="button" value="OK" onclick="location.href='?id=9&id2=0';"/>
 		<script type="text/javascript">location.href="index.php?id=9&id2=0";</script>

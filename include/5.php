@@ -27,7 +27,10 @@
     </td>
     <?php } ?>
     </tr></table>
+    <?php if (checkrights("Administrator,UseNorthboundApi")) { ?>
+    <input type="button" value="LMeve Northbound API" onclick="location.href='?id=5&id2=14';"/>
     <?php
+    }
 //end submenu
 
 //controller
@@ -73,6 +76,15 @@
 		break;
             case 13:
                 include("5d.php"); //save LMeve configuration
+                break;
+            case 14:
+                include("5e.php"); //list Northbound API keys
+                break;
+            case 15:
+                include("5f.php"); //add/save Northbound API keys
+                break;
+            case 16:
+                include("5g.php"); //delete Northbound API keys
                 break;
 	    }
 ?>
