@@ -20,6 +20,12 @@ include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 
 include_once('configuration.php'); //configuration settings in db
 
+if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 $endpoint=secureGETstr('endpoint');
 $key=secureGETstr('key');
 
