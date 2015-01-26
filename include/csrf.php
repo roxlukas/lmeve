@@ -1,12 +1,33 @@
 <?php
 
+function random_pseudo_bytes_wrapper($numBytes) {
+    if (function_exists('openssl_random_pseudo_bytes') ) {
+        //use openssl random pseudo bytes
+        return openssl_random_pseudo_bytes($numBytes);
+    } else if (function_exists('mt_rand')) {
+        //fall back to less secure Mersenne-Twister mt_rand()
+        $tmp='';
+        for ($i=0; $i < $numBytes; $i++) {
+            $tmp.=chr(mt_rand(0, 255));
+        }
+        return $tmp;
+    } else {
+        //fall back to least secure php rand()
+        $tmp='';
+        for ($i=0; $i < $numBytes; $i++) {
+            $tmp.=chr(rand(0, 255));
+        }
+        return $tmp;
+    }
+}
+
 function token_generate($returnString=FALSE) {
     global $LM_SECUREFORMS,$LM_SECUREFORMSEXPIRY;
     if (!isset($LM_SECUREFORMSEXPIRY)) $LM_SECUREFORMSEXPIRY=300;
     if (!$LM_SECUREFORMS) {
         return TRUE;
     } else {
-        $rnd = base64_encode(openssl_random_pseudo_bytes(64));
+        $rnd = base64_encode(random_pseudo_bytes_wrapper(64));
         if (!is_array($_SESSION['form-tokens'])) $_SESSION['form-tokens']=array();
         array_push($_SESSION['form-tokens'], array('value'=>$rnd,'valid-until'=>time()+$LM_SECUREFORMSEXPIRY));
         if ($returnString) {
