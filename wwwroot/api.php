@@ -51,6 +51,8 @@ if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",4
 
 if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
 
+header("Content-type: application/json");
+
     switch ($endpoint) {
         case 'MATERIALS':
             $typeID=secureGETnum('typeID');
@@ -65,6 +67,34 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (empty($characterID)) $sql="TRUE";
             echo(json_encode(getTasks($sql, "TRUE", "",date("Y"),date("m"))));
             break;
+        case 'INVTYPES':
+            $typeID=secureGETnum('typeID');
+            $sql="lmt.`characterID`=".$characterID;
+            if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
+            $items=db_asocquery("SELECT itp.*,cre.`averagePrice` FROM $LM_EVEDB.`invTypes` itp LEFT JOIN `crestmarketprices` cre ON itp.`typeID`=cre.`typeID` WHERE itp.`typeID`=$typeID;");
+            if (count($items)==0) RESTfulError('typeID not found.',404);
+            $item=$items[0];
+            $traitData=db_asocquery("SELECT yit.*, eun.displayName
+                FROM `$LM_EVEDB`.`yamlInvTraits` yit
+                LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+                ON yit.`unitID`=eun.`unitID`
+                WHERE `typeID`=$typeID AND `skillID`=-1;");
+            $bonusData=db_asocquery("SELECT yit.*, eun.displayName
+                FROM `$LM_EVEDB`.`yamlInvTraits` yit
+                LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+                ON yit.`unitID`=eun.`unitID`
+                WHERE `typeID`=$typeID AND `skillID`!=-1;");
+            $dogmaData=db_asocquery("SELECT valueFloat,valueInt,displayName,description
+                FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
+                JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
+                ON dta.attributeID=da.attributeID
+                WHERE dta.typeID=$typeID
+                AND displayName != '';");
+            if (count($traitData) > 0) $item['traits']=$traitData;
+            if (count($bonusData) > 0) $item['bonuses']=$bonusData;
+            if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
+            echo(json_encode($item));
+            break;    
 	default:		
             RESTfulError('Invalid endpoint.',404);
     }
