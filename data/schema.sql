@@ -1549,3 +1549,27 @@ awj.`argID1`=`planetID`
 AND awj.`refTypeID` IN (96, 97)
 AND awj.`date` BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()
 );
+
+--apipocolist - table for pocos
+
+CREATE TABLE IF NOT EXISTS `apipocolist` (
+  `itemID` bigint(20) NOT NULL,
+  `solarSystemID` int(11) NOT NULL,
+  `solarSystemName` varchar(256) NOT NULL,
+  `reinforceHour` int(11) NOT NULL,
+  `allowAlliance` int(11) NOT NULL,
+  `allowStandings` int(11) NOT NULL,
+  `standingLevel` int(11) NOT NULL,
+  `taxRateAlliance` float NOT NULL,
+  `taxRateCorp` float NOT NULL,
+  `taxRateStandingHigh` float NOT NULL,
+  `taxRateStandingGood` float NOT NULL,
+  `taxRateStandingNeutral` float NOT NULL,
+  `taxRateStandingBad` float NOT NULL,
+  `taxRateStandingHorrible` float NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`itemID`),
+  KEY `itemID` (`itemID`),
+  KEY `solarSystemID` (`solarSystemID`),
+  KEY `corporationID` (`corporationID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
