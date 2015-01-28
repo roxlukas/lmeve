@@ -57,7 +57,10 @@ if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",4
 
 if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
 
+//Add proper JSON MIME type in header
 header("Content-type: application/json");
+//Add CORS header in header so API can be used with web apps on other servers
+header("Access-Control-Allow-Origin: *");
 
     switch ($endpoint) {
         case 'MATERIALS':
