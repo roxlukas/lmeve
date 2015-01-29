@@ -31,8 +31,8 @@
 
 **********************************************************************************/
 
-include_once("log.php");
-include_once('../config/config.php');
+include_once(dirname(__FILE__).'/log.php');
+include_once(dirname(__FILE__).'/../config/config.php');
 
 function printerr($text) {
 	echo("<br><table class=\"error\"><tr><td>$text</td></tr></table>");
@@ -68,14 +68,14 @@ Funkcje dost�pu do bazy danych
 
 //db_connect zwraca identyfikator po��czenia z MySQL
 function db_connect() {
-	global $LM_DEBUG,$LM_DBENGINE;
-    include('../config/config.php');
+	global $LM_DEBUG,$LM_DBENGINE,$LM_dbname,$LM_dbuser,$LM_dbpass;
+    
     
     if ($LM_DBENGINE=="MYSQL") {
 		$ret=mysql_pconnect($LM_dbhost, $LM_dbuser, $LM_dbpass);
 		if (!$ret) {
 			$blad=mysql_error();
-			loguj('../var/error.txt',"No connection to the database. MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"No connection to the database. MySQL reply: $blad");
 			
 			if ($LM_DEBUG==1) {
 				printerr("No connection to the database.<br />MySQL reply: $blad");
@@ -87,7 +87,7 @@ function db_connect() {
 		$odp=@mysql_select_db($LM_dbname);
 		if (!$odp) {
 			$blad=mysql_error();
-			loguj('../var/error.txt',"Database selection error. MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Database selection error. MySQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Database selection error.<br />MySQL reply: $blad");
 			} else {
@@ -98,7 +98,7 @@ function db_connect() {
 		$odp=mysql_query("SET CHARACTER SET 'utf8'", $ret);
 		if (!$odp) {
 			$blad=mysql_error();
-			loguj('../var/error.txt',"Character set select error. MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Character set select error. MySQL reply: $blad");
 			
 			if ($LM_DEBUG==1) {
 				printerr("Character set select error.<br />MySQL reply: $blad");
@@ -112,7 +112,7 @@ function db_connect() {
 		$ret=pg_pconnect("host=$LM_dbhost port=5432 dbname=$LM_dbname user=$LM_dbuser password=$LM_dbpass");
 		if (!$ret) {
 			$blad=pg_last_error();
-			loguj('../var/error.txt',"No connection to the database. PostgreSQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"No connection to the database. PostgreSQL reply: $blad");
 			
 			if ($LM_DEBUG==1) {
 				printerr("No connection to the database.<br />PostgreSQL reply: $blad");
@@ -125,7 +125,7 @@ function db_connect() {
 		$odp=pg_set_client_encoding ($ret, 'utf8');
 		if ($odp!=0) {
 			$blad=pg_last_error();
-			loguj('../var/error.txt',"Character set select error. PostgreSQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Character set select error. PostgreSQL reply: $blad");
 			
 			if ($LM_DEBUG==1) {
 				printerr("Character set select error.<br />PostgreSQL reply: $blad");
@@ -149,7 +149,7 @@ function db_query($sql) {
 		$my_result = mysql_query ($sql);
 		if (!$my_result) {
 			$blad=mysql_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />MySQL reply: $blad");
 			} else {
@@ -174,7 +174,7 @@ function db_query($sql) {
 		$my_result = pg_query($sql);
 		if (!$my_result) {
 			$blad=pg_last_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
 			} else {
@@ -209,7 +209,7 @@ function db_asocquery($sql) {
 		$my_result = mysql_query ($sql);
 		if (!$my_result) {
 			$blad=mysql_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />MySQL reply: $blad");
 			} else {
@@ -231,7 +231,7 @@ function db_asocquery($sql) {
 		$my_result = pg_query ($sql);
 		if (!$my_result) {
 			$blad=pg_last_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
 			} else {
@@ -260,7 +260,7 @@ function db_count($sql) {
 		$my_result = mysql_query ($sql);
 		if (!$my_result) {
 			$blad=mysql_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />MySQL reply: $blad");
 			} else {
@@ -275,7 +275,7 @@ function db_count($sql) {
 		$my_result = pg_query ($sql);
 		if (!$my_result) {
 			$blad=pg_last_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
 			} else {
@@ -303,7 +303,7 @@ function db_uquery($sql) {
 		$my_result = mysql_unbuffered_query ($sql);
 		if (!$my_result) {
 			$blad=mysql_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql MySQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />MySQL reply: $blad");
 			} else {
@@ -317,7 +317,7 @@ function db_uquery($sql) {
 		$my_result = pg_query ($sql);
 		if (!$my_result) {
 			$blad=pg_last_error($my_link);
-			loguj('../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
+			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
 			if ($LM_DEBUG==1) {
 				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
 			} else {

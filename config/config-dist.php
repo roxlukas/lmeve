@@ -54,6 +54,12 @@ $USERSTABLE='lmusers';
 $LM_LEARNING_MODE=0;
 //use proxy for CCP WebGL assets
 $LM_CCPWGL_USEPROXY=FALSE;
+//cache files proxied by WebGL proxy
+$LM_CCPWGL_PROXYCACHE=FALSE;
+//log every and all attempts to use proxy
+$LM_CCPWGL_PROXYAUDIT=FALSE;
+//database schema for WebGL proxy cache
+$LM_CCPWGL_CACHESCHEMA='lmeve-cache';
 //CCP CDN URL - normally it should never be changed
 $LM_CCPWGL_URL='https://web.ccpgamescdn.com/ccpwgl/res/';
 //TODO: Make the below 2 variables values in a database table or something maybe?
