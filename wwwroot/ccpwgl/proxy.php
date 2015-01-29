@@ -9,7 +9,7 @@
 include_once('../../config/config.php');
 
 if (!$LM_CCPWGL_USEPROXY) die('Error: proxy is disabled.');
-
+/*
 function cache_file($url, $cache, $interval) { //unused for now
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
    		$data = file_get_contents($cache);
@@ -23,6 +23,7 @@ function cache_file($url, $cache, $interval) { //unused for now
 	}
         return $data;
 }
+ */
 
 $addr=$_GET['fetch'];
 
@@ -38,13 +39,40 @@ $url = $LM_CCPWGL_URL.$addr;
 
   $data = curl_exec($ch);
   $info = curl_getinfo($ch,CURLINFO_CONTENT_TYPE);
+  $http_code = curl_getinfo($ch,CURLINFO_HTTP_CODE);
   
   if ($info=='text/plain; charset=UTF-8') $info='text/xml; charset=UTF-8';
   
   curl_close($ch);
+  
+  //Add CORS header in header so API can be used with web apps on other servers
+  header("Access-Control-Allow-Origin: *");
+  if ($data===FALSE) {
+      //error occured
+      $errno=curl_errno($ch);
+      switch ($errno) {
+          case 78:
+              http_response_code(404);
+              break;
+          case 9:
+              http_response_code(403);
+              break;
+          default:
+              http_response_code(404);
+              break;
+      }
+      
+  } else {
+      //no error
+      //output!
+      //Add proper content-type header
+      header("Content-type: $info");
+      //proxy the http code as well
+      //http_response_code($http_code);
 
-//output!
-header("Content-type: $info");
-echo $data;
+      echo $data;
+  }
+
+
 
 ?>
