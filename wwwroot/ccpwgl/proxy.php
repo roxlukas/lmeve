@@ -40,6 +40,33 @@ function file_header($mime) {
     header("Content-type: $mime");
 }
 
+function insert_log($ip,$fetch,$ok,$ref,$cacheInUse,$url,$http_code,$size) {
+    global $LM_CCPWGL_PROXYAUDIT, $LM_CCPWGL_CACHESCHEMA;
+    
+    if ($LM_CCPWGL_PROXYAUDIT) {
+        if (is_null($url)) $url='NULL'; else $url="'".mysql_escape_string($url)."'";
+        if (is_null($http_code)) $http_code='NULL';
+        switch($cacheInUse) {
+            case 0: 
+                break;
+            case 1: 
+                break;
+            default:
+                $cacheInUse=0;
+        }
+        db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),
+            '".mysql_escape_string($ip)."',
+            '".mysql_escape_string($fetch)."',
+            '".mysql_escape_string($ok)."',
+            '".mysql_escape_string($ref)."',
+            $cacheInUse,
+            ".$url.",
+            $http_code,
+            $size
+        );");
+    }
+}
+
 //get fetch var
 $addr=$_GET['fetch'];
 
@@ -67,18 +94,20 @@ if ($LM_CCPWGL_PROXYAUDIT) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 }
 //validate input using regexp
-if ( !preg_match('/^[\w\d\.\/]+$/',$addr) || preg_match('/\.\./',$addr) ) {
-    if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','INVALID_FETCH','$ref',0,NULL,NULL,0);");
+if ( !preg_match('/^[\w\d\.\/\-\_]+$/',$addr) || preg_match('/\.\./',$addr) ) {
+    if ($LM_CCPWGL_PROXYAUDIT) {
+        insert_log($ip,$fetch,"INVALID_FETCH",$ref,0,null,null,0);
+    }
     die('Error: Filter error.');
 }
 
 $url = $LM_CCPWGL_URL.$addr;
 
-
-
 if (!$LM_CCPWGL_USEPROXY) {
     header("Location: $url");
-    if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','PROXY_DISABLED','$ref',0,NULL,NULL,0);");
+    if ($LM_CCPWGL_PROXYAUDIT) {
+        insert_log($ip,$fetch,"PROXY_DISABLED",$ref,0,null,null,0);
+    }
     die('Error: WebGL Proxy is disabled.');
 }
 
@@ -100,7 +129,7 @@ if ($LM_CCPWGL_PROXYCACHE) {
         $info=$cache[0]['mime'];
         if ($LM_CCPWGL_PROXYAUDIT) {
           $size=strlen($data);
-          db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','OK','$ref',1,'$url',200,$size);");
+          insert_log($ip,$fetch,"OK",$ref,1,$url,200,$size);
         }
         file_header($info);
         echo($data);
@@ -141,7 +170,9 @@ if ($LM_CCPWGL_PROXYCACHE) {
               http_response_code(404);
               break;
       }
-      if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','CURL_ERROR_$errno','$ref',0,'$url',$http_code,0);");
+      if ($LM_CCPWGL_PROXYAUDIT) {
+          insert_log($ip,$fetch,"CURL_ERROR_$errno",$ref,0,$url,$http_code,0);
+      }
   } else {
       //no error
       //if we use cache, we should save the retrieved file to the database
@@ -154,7 +185,7 @@ if ($LM_CCPWGL_PROXYCACHE) {
       if ($LM_CCPWGL_PROXYAUDIT) {
           $size=strlen($data);
           $http_code == '200' ? $ok='OK' : $ok='HTTP_ERROR';
-          db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','$ok','$ref',0,'$url',$http_code,$size);");
+          insert_log($ip,$fetch,$ok,$ref,0,$url,$http_code,$size);
       }
       echo $data;
   }
