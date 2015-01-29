@@ -244,18 +244,20 @@ function itemhrefedit($nr) {
 
 function getMarketOrders($where) {
     global $LM_EVEDB;
-    return db_asocquery("SELECT amo.*,acm.`name`,itp.`typeName`,sta.`stationName`,mss.`solarSystemName`
+    return db_asocquery("SELECT amo.*,acm.`name`,itp.`typeName`,COALESCE(sta2.`stationName`,sta.`stationName`) AS `stationName`,mss.`solarSystemName`
         FROM apimarketorders amo
         JOIN apicorpmembers acm
-        ON amo.`charID`=acm.`characterID`
+            ON amo.`charID`=acm.`characterID`
         JOIN $LM_EVEDB.invTypes itp
-        ON amo.`typeID`=itp.`typeID`
-        JOIN $LM_EVEDB.staStations sta
-        ON amo.`stationID`=sta.`stationID`
+            ON amo.`typeID`=itp.`typeID`
+        LEFT JOIN $LM_EVEDB.staStations sta
+            ON amo.`stationID`=sta.`stationID`
+        LEFT JOIN apiconquerablestationslist sta2
+            ON amo.`stationID`=sta2.`stationID`
         JOIN $LM_EVEDB.mapSolarSystems mss
-        ON sta.solarSystemID=mss.solarSystemID
+            ON COALESCE(sta2.`solarSystemID`,sta.`solarSystemID`)=mss.`solarSystemID`
         $where
-        ORDER BY itp.`typeName`;");
+        ORDER BY `typeName`;");
 }
 
 function showMarketOrders($orderlist,$label=null) {
