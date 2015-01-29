@@ -24,8 +24,7 @@ function file_header($mime) {
     } else {
       $if_modified_since = '';
     }
-    $mtime = filemtime($_SERVER['SCRIPT_FILENAME']);
-    $gmdate_mod = gmdate('D, d M Y H:i:s', $mtime) . ' GMT';
+    $gmdate_mod = gmdate('D, d M Y H:i:s') . ' GMT';
 
     if ($if_modified_since == $gmdate_mod) {
       header("HTTP/1.0 304 Not Modified");
@@ -47,6 +46,7 @@ $addr=$_GET['fetch'];
 //prepare logging vars
 if ($LM_CCPWGL_PROXYAUDIT) {
     $ip=$_SERVER['REMOTE_ADDR'];
+    $ref = $_SERVER['HTTP_REFERER'];
     $fetch=secureGETstr('fetch',256);
     db_uquery("CREATE TABLE IF NOT EXISTS `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` (
       `logID` bigint(11) NOT NULL AUTO_INCREMENT,
@@ -54,26 +54,31 @@ if ($LM_CCPWGL_PROXYAUDIT) {
       `ip` varchar(23) NOT NULL,
       `fetch` varchar(256) NOT NULL,
       `status` varchar(24) NOT NULL,
+      `referer` varchar(256) NOT NULL,
       `cacheUsed` int(11) NOT NULL,
       `url` varchar(256) NULL,
       `http_code` int(11) NULL,
       `bytes` bigint(11) NOT NULL,
       PRIMARY KEY (`logID`),
-      KEY `status_key` (`status`)
+      KEY `status_key` (`status`),
+      KEY `referer_key` (`referer`),
+      KEY `url_key` (`url`),
+      KEY `fetch_key` (`fetch`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 }
 //validate input using regexp
 if ( !preg_match('/^[\w\d\.\/]+$/',$addr) || preg_match('/\.\./',$addr) ) {
-    if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','INVALID_FETCH',0,NULL,NULL,0);");
+    if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','INVALID_FETCH','$ref',0,NULL,NULL,0);");
     die('Error: Filter error.');
 }
+
 $url = $LM_CCPWGL_URL.$addr;
 
 
 
 if (!$LM_CCPWGL_USEPROXY) {
     header("Location: $url");
-    if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','PROXY_DISABLED',0,NULL,NULL,0);");
+    if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','PROXY_DISABLED','$ref',0,NULL,NULL,0);");
     die('Error: WebGL Proxy is disabled.');
 }
 
@@ -95,7 +100,7 @@ if ($LM_CCPWGL_PROXYCACHE) {
         $info=$cache[0]['mime'];
         if ($LM_CCPWGL_PROXYAUDIT) {
           $size=strlen($data);
-          db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','OK',1,'$url',200,$size);");
+          db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','OK','$ref',1,'$url',200,$size);");
         }
         file_header($info);
         echo($data);
@@ -111,6 +116,7 @@ if ($LM_CCPWGL_PROXYCACHE) {
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+  curl_setopt($ch, CURLOPT_USERAGENT, "LMeve/1.0 API Poller/WebGL-Proxy");
 
   $data = curl_exec($ch);
   $info = curl_getinfo($ch,CURLINFO_CONTENT_TYPE);
@@ -135,7 +141,7 @@ if ($LM_CCPWGL_PROXYCACHE) {
               http_response_code(404);
               break;
       }
-      if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','CURL_ERROR_$errno',0,'$url',$http_code,0);");
+      if ($LM_CCPWGL_PROXYAUDIT) db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','CURL_ERROR_$errno','$ref',0,'$url',$http_code,0);");
   } else {
       //no error
       //if we use cache, we should save the retrieved file to the database
@@ -148,7 +154,7 @@ if ($LM_CCPWGL_PROXYCACHE) {
       if ($LM_CCPWGL_PROXYAUDIT) {
           $size=strlen($data);
           $http_code == '200' ? $ok='OK' : $ok='HTTP_ERROR';
-          db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','$ok',0,'$url',$http_code,$size);");
+          db_uquery("INSERT INTO `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` VALUES(DEFAULT,NOW(),'$ip','$fetch','$ok','$ref',0,'$url',$http_code,$size);");
       }
       echo $data;
   }
