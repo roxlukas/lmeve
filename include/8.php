@@ -9,6 +9,7 @@
     if ($id2=='') $id2=2;
 //submenu
     ?>
+    <strong>Industry</strong>
     <table cellpadding="0" cellspacing="2">
     <tr>
     <?php if (checkrights("Administrator,ViewActivity")) { ?>
@@ -71,7 +72,7 @@
 	</td>
     </tr>
     </table>
-
+<strong>Combat</strong>
 <table cellpadding="0" cellspacing="2">
     <tr>
     <?php if (checkrights("Administrator,ViewActivity")) { ?>
@@ -93,7 +94,7 @@
     <?php } ?>
     </tr>
     </table>
-
+<strong>Technical</strong>
 <table cellpadding="0" cellspacing="2">
     <tr>
     <?php if (checkrights("Administrator,ViewAPIStats")) { ?>
@@ -101,6 +102,13 @@
         <input type="hidden" name="id" value="<?php echo ($id); ?>" />
         <input type="hidden" name="id2" value="4" />
         <input type="submit" value="EVE API Statistics" />
+        </form></td>
+    <?php } ?>
+        <?php if (checkrights("Administrator,ViewCDNStats")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="5" />
+        <input type="submit" value="WebGL Proxy Statistics" />
         </form></td>
     <?php } ?>
     </tr>
@@ -125,6 +133,9 @@
             break;
         case 4:
             include("84.php");  //API Statistics
+            break;
+        case 5:
+            include("85.php");  //WebGL Proxy Statistics
             break;
     }
 ?>

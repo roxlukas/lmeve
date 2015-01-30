@@ -1,5 +1,228 @@
 <?php
 
+function getCdnCacheDbSize() {
+    global $LM_CCPWGL_USEPROXY, $LM_CCPWGL_CACHESCHEMA;
+    
+    $sql="SELECT table_name AS 'table', 
+    round(((data_length + index_length) / 1024 / 1024), 2) 'size' 
+    FROM information_schema.TABLES 
+    WHERE table_schema = '$LM_CCPWGL_CACHESCHEMA'
+    AND table_name = 'lmproxyfiles';";
+    
+    if (!$LM_CCPWGL_USEPROXY) {
+        return FALSE;
+    } else {
+        $data=db_asocquery($sql);
+        if (count($data)>0) return $data[0]['size']; else return FALSE;
+    }
+}
+
+function showTopByBytes($stats) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    $count=count($stats);
+    if ($count>0) {
+        ?>
+        <table class="lmframework" style="width: 100%;">
+        <tr><th>
+            Key
+        </th><th>		
+            Bytes
+        </th>
+        </tr>
+        <?php
+        foreach($stats as $stat) {
+            $isUrl=preg_match('/^http.*$/', $stat['key']);
+            ?>
+            <tr><td>
+                <?=strip_tags(shorten($stat['key'],40,$isUrl))?>
+            </td><td>		
+                <?=strip_tags(number_format($stat['value'], 0, $DECIMAL_SEP, ' '))?>
+            </td>
+            </tr>
+            <?php
+        }
+        ?>
+        </table>
+        <?php
+    }
+}
+
+function showTopByRequests($stats) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    $count=count($stats);
+    if ($count>0) {
+        ?>
+        <table class="lmframework" style="width: 100%;">
+        <tr><th>
+            Key
+        </th><th>		
+            Requests
+        </th>
+        </tr>
+        <?php
+        foreach($stats as $stat) {
+            $isUrl=preg_match('/^http.*$/', $stat['key']);
+            ?>
+            <tr><td>
+                <?=strip_tags(shorten($stat['key'],40,$isUrl))?>
+            </td><td>		
+                <?=strip_tags($stat['value'])?>
+            </td>
+            </tr>
+            <?php
+        }
+        ?>
+        </table>
+        <?php
+    }
+}
+
+function getTopClientsByRequests($n=5,$hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT COUNT(*) AS `value`,`ip` AS `key` FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where GROUP BY `ip` ORDER BY `value` DESC LIMIT 0,$n;";
+   $stats=db_asocquery($sql);
+   return $stats; 
+}
+
+function getTopClientsByBytes($n=5,$hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT SUM(`bytes`) AS `value`,`ip` AS `key` FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where GROUP BY `ip` ORDER BY `value` DESC LIMIT 0,$n;";
+   $stats=db_asocquery($sql);
+   return $stats; 
+}
+
+function getTopFilesByRequests($n=5,$hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT COUNT(*) AS `value`,`url` AS `key` FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where GROUP BY `url` ORDER BY `value` DESC LIMIT 0,$n;";
+   $stats=db_asocquery($sql);
+   return $stats; 
+}
+
+function getTopFilesByBytes($n=5,$hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT SUM(`bytes`) AS `value`,`url` AS `key` FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where GROUP BY `url` ORDER BY `value` DESC LIMIT 0,$n;";
+   $stats=db_asocquery($sql);
+   return $stats; 
+}
+
+function getRequestsInLast($hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT COUNT(*) AS `count` FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where;";
+   $stats=db_asocquery($sql);
+   if (count($stats)>0) $stats=$stats[0];
+   return $stats; 
+}
+
+function getBytesInLast($hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $stats=db_asocquery("SELECT SUM(`bytes`) as bytes FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where;");
+   if (count($stats)>0) $stats=$stats[0];
+   return $stats; 
+}
+
+function getRequestsInLast24h($where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   return getRequestsInLast('1 day',$where);
+}
+
+function getBytesInLast24h($where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   return getBytesInLast('1 day',$where);
+}
+
+function getLastProxyErrors($n) {
+   $stats=getLastProxyRequests($n,"`status` != 'OK'");
+   return $stats; 
+}
+
+function getLastProxyRequests($n,$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   if (!is_numeric($n)) return FALSE;
+   $stats=db_asocquery("SELECT * FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE $where ORDER BY `timestamp` DESC LIMIT 0,$n;");
+   return $stats; 
+}
+
+function shorten($string,$length,$isURL=FALSE) {
+    if (strlen($string)<$length) {
+        if ($isURL) {
+            echo('<a href="'.$string.'">'.$string.'</a>');
+        } else {
+            echo($string);
+        }
+    } else {
+        if ($isURL) {
+            ?><a href="<?=$string?>" title="<?=$string?>"><?=substr($string,0,$length)?>...</a><?php
+        } else {
+            ?><span title="<?=$string?>"><?=substr($string,0,$length)?>...</span><?php
+        }
+    }
+}
+
+function showLastProxyRequests($stats) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+
+    $count=count($stats);
+    if ($count>0) {
+        ?>
+        <table class="lmframework">
+        <tr><th>
+            Timestamp
+        </th><th>		
+            IP Address
+        </th><th>		
+            Request
+        </th><th>		
+            Status
+        </th><th>		
+            Referer
+        </th><th>		
+            Used cache?
+        </th><th>		
+            Original URL
+        </th><th>		
+            HTTP code
+        </th><th>		
+            Bytes
+        </th>
+        </tr>
+        <?php
+        foreach($stats as $stat) {
+            ?>
+            <tr><td>
+                <?=strip_tags($stat['timestamp'])?>
+            </td><td>		
+                <?=strip_tags($stat['ip'])?>
+            </td><td>		
+                <?=shorten(strip_tags($stat['fetch']),40)?>
+            </td><td>		
+                <?=strip_tags($stat['status'])?>
+            </td><td>		
+                <?=shorten(strip_tags($stat['referer']),40,TRUE)?>
+            </td><td style="text-align: center;">		
+                <?php if ($stat['cacheUsed']==1) echo('YES'); else echo('NO'); ?>
+            </td><td>		
+                <?=shorten(strip_tags($stat['url']),40,TRUE)?>
+            </td><td style="text-align: right;">		
+                <?=$stat['http_code']?>
+            </td><td style="text-align: right;">		
+                <?php echo(number_format($stat['bytes'], 0, $DECIMAL_SEP, ' ')); ?>
+            </td>
+            </tr>
+            <?php
+        }
+        ?>
+        </table>
+        <?php
+    }
+}
+
 function getIndustryStats($corporationID,$year,$month) {
     global $LM_EVEDB;
     //OLD date condition:

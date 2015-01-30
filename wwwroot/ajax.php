@@ -9,6 +9,7 @@ include_once('auth.php'); //authentication and authorization
 include_once('materials.php'); //material related subroutines
 include_once('tasks.php'); //task related subroutines
 include_once('inventory.php'); //inventory and pos related subroutines
+include_once('stats.php'); //real time stats
 
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 
@@ -18,7 +19,8 @@ function hrefedit_item($nr) {
 		echo("<a href=\"index.php?id=10&id2=1&nr=$nr\">");
 	}
 	
-
+global $THOUSAND_SEP,$DECIMAL_SEP,$LM_CCPWGL_CACHESCHEMA;
+        
 session_start();
 checksession(); //check if we are called by a valid session
 $act=secureGETstr('act');
@@ -33,6 +35,66 @@ if ($act=='') $act=0;
             $melevel=secureGETnum('melevel');
             //displayExtraMats(getExtraMats($typeID,1));
             displayBaseMaterials(getBaseMaterials($typeID, 1, $melevel));
+            break;
+        case 'GET_PROXY_STATS':
+            if (!checkrights("Administrator,ViewCDNStats")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            ?>
+            <div id="top">
+                <h3>Top clients and files</h3>
+                <table style="width: 100%; padding: 0px;">
+                    <tr>
+                        <td>
+                            <?php showTopByRequests(getTopClientsByRequests()); ?>
+                        </td>
+                        <td>
+                            <?php showTopByBytes(getTopClientsByBytes()); ?>
+                        </td>
+                        <td>
+                            <?php showTopByRequests(getTopFilesByRequests()); ?>
+                        </td>
+                        <td>
+                            <?php showTopByBytes(getTopFilesByBytes()); ?>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="latest">
+                <h3>Latest requests</h3>
+                <?php showLastProxyRequests(getLastProxyRequests(10)); ?>
+            </div>
+            <div id="errors">
+                <h3>Errors</h3>
+                <?php showLastProxyRequests(getLastProxyErrors(5)); ?>
+            </div>
+            <?php
+            break;
+        case 'GET_CACHE_SIZE':
+            if (!checkrights("Administrator,ViewCDNStats")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            ?>
+            <h3>CDN Cache schema: <a href="#"><?=$LM_CCPWGL_CACHESCHEMA?></a><br/>CDN Cache size: <a href="#"><?php echo(getCdnCacheDbSize()); ?> MB</a></h3>
+            <?php
+            break;
+        case 'GET_CACHE_STATS':
+            if (!checkrights("Administrator,ViewCDNStats")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            $cache_total=getRequestsInLast24h(); $cache_total=$cache_total['count'];
+            $cache_hits=getRequestsInLast24h("`cacheUsed`=1"); $cache_hits=$cache_hits['count'];
+            $bytes=getBytesInLast24h(); $bytes=number_format($bytes['bytes'],0, $DECIMAL_SEP, ' ');
+            $cdnbytes=getBytesInLast24h("`cacheUsed`=0"); $cdnbytes=number_format($cdnbytes['bytes'],0, $DECIMAL_SEP, ' ');
+            $ratio=number_format(100 * $cache_hits / $cache_total, 1, $DECIMAL_SEP, $THOUSAND_SEP);
+            ?> <table class="lmframework" style="width: 100%;"><tr>
+                    <th>Cache hit ratio:</th><td><?=$ratio?>% (<?=$cache_hits?>/<?=$cache_total?>)</td>
+                    <th>Bytes received from origin:</th><td><?=$cdnbytes?></td>
+                    <th>Bytes sent to clients:</th><td><?=$bytes?></td>
+                </tr></table> <?php
             break;
         case 'GET_QUOTE':
             if (!checkrights("Administrator,ViewDatabase")) {
