@@ -99,7 +99,7 @@ function getSimpleTasks($where='TRUE') {
     ON lmt.`typeID`=itp.`typeID`
     LEFT JOIN `apicorpmembers` acm
     ON lmt.`characterID`=acm.`characterID`
-    WHERE ((lmt.`singleton`=1 AND lmt.`taskCreateTimestamp` BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')) OR (lmt.`singleton`=0))
+    WHERE ((lmt.`singleton`=1 AND lmt.`taskCreateTimestamp` BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (lmt.`singleton`=0))
     AND $where";
     $raw=db_asocquery($sql);
     return($raw);
@@ -340,7 +340,7 @@ function getPocoIncome($corporationID) {
     apiwalletjournal awj
     JOIN apireftypes art
     ON awj.refTypeID=art.refTypeID
-    WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+    WHERE awj.date BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
     AND awj.corporationID = $corporationID
     AND awj.refTypeID IN (96, 97)
     UNION
@@ -374,7 +374,7 @@ function getSinglePocoIncome($planetItemID) {
     apiwalletjournal awj
     JOIN apireftypes art
     ON awj.refTypeID=art.refTypeID
-    WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+    WHERE awj.date BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
     AND awj.`argID1`=$planetItemID
     AND awj.refTypeID IN (96, 97)
     UNION
@@ -418,7 +418,7 @@ function getPocoClients($planetItemID) {
     $sql="SELECT MAX( date ) AS lastAccess, COUNT( * ) AS timesAccessed, SUM(amount) AS taxPaid, ownerID1 As characterID, ownerName1 AS characterName
 FROM `apiwalletjournal`
 WHERE `argID1`=$planetItemID
-AND `date` BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND `date` BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 GROUP BY `ownerID1`
 ORDER BY `taxPaid` DESC;";
     return db_asocquery($sql);

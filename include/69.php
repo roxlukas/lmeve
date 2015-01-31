@@ -93,13 +93,13 @@ SELECT b.buy,s.sell,s.sell-b.buy AS total,s.corporationID,s.accountKey FROM
 (SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
 WHERE transactionType='sell'
 AND corporationID=${corp['corporationID']}
-AND transactionDateTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND transactionDateTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 GROUP BY corporationID,accountKey) AS s
 LEFT JOIN
 (SELECT SUM(price*quantity) AS buy,accountKey,corporationID FROM `apiwallettransactions`
 WHERE transactionType='buy'
 AND corporationID=${corp['corporationID']}
-AND transactionDateTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND transactionDateTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 GROUP BY corporationID,accountKey) AS b
 ON s.accountKey=b.accountKey
 UNION ALL
@@ -107,13 +107,13 @@ SELECT b.buy,s.sell,s.sell-b.buy AS total,s.corporationID,s.accountKey FROM
 (SELECT SUM(price*quantity) AS sell,accountKey,corporationID FROM `apiwallettransactions`
 WHERE transactionType='sell'
 AND corporationID=${corp['corporationID']}
-AND transactionDateTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND transactionDateTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 GROUP BY corporationID,accountKey) AS s
 RIGHT JOIN
 (SELECT SUM(price*quantity) AS buy,accountKey,corporationID FROM `apiwallettransactions`
 WHERE transactionType='buy'
 AND corporationID=${corp['corporationID']}
-AND transactionDateTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND transactionDateTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 GROUP BY corporationID,accountKey) AS b
 ON s.accountKey=b.accountKey) AS raw_summary";
 			$wallet_summaries_raw=db_asocquery($sql);
@@ -162,7 +162,7 @@ JOIN cfgpoints cpt
 ON aij.activityID=cpt.activityID
 JOIN apicorpmembers acm
 ON aij.installerID=acm.characterID
-WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 AND aij.corporationID=${corp['corporationID']}
 GROUP BY `characterID`,`name`,`activityName`
 ORDER BY `name`,`activityName`) AS w) AS wages;";
@@ -175,7 +175,7 @@ ORDER BY `name`,`activityName`) AS w) AS wages;";
 apiwalletjournal awj
 JOIN apireftypes art
 ON awj.refTypeID=art.refTypeID
-WHERE awj.date BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+WHERE awj.date BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 AND awj.corporationID=${corp['corporationID']}
 AND awj.refTypeID NOT IN (2, 37, 42)
 GROUP BY awj.refTypeID,art.refTypeName

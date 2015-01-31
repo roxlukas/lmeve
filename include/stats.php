@@ -228,12 +228,12 @@ function getIndustryStats($corporationID,$year,$month) {
     //OLD date condition:
         //date_format(beginProductionTime, '%Y%m') = '${year}${month}'
     //NEW (otpimized) date condition:
-        //beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+        //beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
     $stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs, SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
 	FROM `apiindustryjobs` aij
 	JOIN $LM_EVEDB.`ramActivities` rac
 	ON aij.activityID=rac.activityID
-        WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+        WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 	AND aij.corporationID=${corporationID}
 	GROUP BY `activityName`
 	ORDER BY `activityName`;");
@@ -278,7 +278,7 @@ function showIndustryStats($stats) {
 function getIndustryActivity($corporationID,$year,$month) {
     $sqlact="SELECT COUNT(*) AS activity,date_format(beginProductionTime, '%e') AS day FROM
             apiindustryjobs aij
-            WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+            WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
             AND aij.corporationID=${corporationID}
             GROUP BY date_format(beginProductionTime, '%e')
             ORDER BY date_format(beginProductionTime, '%e');";

@@ -130,7 +130,7 @@ JOIN $LM_EVEDB.invTypes inv ON aij.outputTypeID = inv.typeID
 JOIN apicorpmembers acm ON aij.installerID = acm.characterID
 WHERE rac.activityID IS NOT NULL
 AND aij.corporationID = ${corp['corporationID']}
-AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
 AND $mycharssql
 GROUP BY `typeID` , `typeName` , `name` , `installerID`, rac.activityName
 ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
