@@ -92,7 +92,7 @@ if ($act=='') $act=0;
             $ratio=number_format(100 * $cache_hits / $cache_total, 1, $DECIMAL_SEP, $THOUSAND_SEP);
             
             ?> 
-            <div id="visits" style="overflow: hidden; margin: 0px auto 0px auto; width: 140px; height: 80px;">
+            <div id="visits" style="overflow: hidden; margin: 0px auto 0px auto; width: 200px; height: 80px;">
                 <center>
                     <div id="users" style="text-align: center; float: left;">
                         <h1><?php echo(getVisitors()); ?></h1>
