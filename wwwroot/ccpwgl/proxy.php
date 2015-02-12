@@ -119,7 +119,8 @@ if ($LM_CCPWGL_PROXYCACHE) {
       `url` varchar(256) NOT NULL,
       `mime` varchar(256) NOT NULL,
       `data` MEDIUMBLOB NOT NULL,
-      PRIMARY KEY (`fileID`)
+      PRIMARY KEY (`fileID`),
+      KEY `url_key` (`url`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
     // Check if we have that file already in DB
     $cache=db_asocquery("SELECT * FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxyfiles` WHERE `url`='$url'");

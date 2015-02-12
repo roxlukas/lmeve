@@ -1,5 +1,23 @@
 <?php
 
+function getVisitors($hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT COUNT(DISTINCT(`ip`)) AS visitors FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where;";
+   $stats=db_asocquery($sql);
+   if (count($stats)>0) return $stats[0]['visitors']; else return 0;
+   return $stats; 
+}
+
+function getRequests($hours='1 day',$where='TRUE') {
+   global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
+   if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
+   $sql="SELECT COUNT(*) AS requests FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` WHERE `timestamp` > DATE_SUB(CURDATE(), INTERVAL $hours) AND $where;";
+   $stats=db_asocquery($sql);
+   if (count($stats)>0) return $stats[0]['requests']; else return 0;
+   return $stats; 
+}
+
 function getCdnCacheDbSize() {
     global $LM_CCPWGL_USEPROXY, $LM_CCPWGL_CACHESCHEMA;
     

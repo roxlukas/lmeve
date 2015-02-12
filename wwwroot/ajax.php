@@ -42,7 +42,7 @@ if ($act=='') $act=0;
                 return;
             }
             ?>
-            <div id="top">
+            <div id="top" style="width: 100%;">
                 <h3>Top clients and files</h3>
                 <table style="width: 100%; padding: 0px;">
                     <tr>
@@ -90,11 +90,25 @@ if ($act=='') $act=0;
             $bytes=getBytesInLast24h(); $bytes=number_format($bytes['bytes'],0, $DECIMAL_SEP, ' ');
             $cdnbytes=getBytesInLast24h("`cacheUsed`=0"); $cdnbytes=number_format($cdnbytes['bytes'],0, $DECIMAL_SEP, ' ');
             $ratio=number_format(100 * $cache_hits / $cache_total, 1, $DECIMAL_SEP, $THOUSAND_SEP);
-            ?> <table class="lmframework" style="width: 100%;"><tr>
-                    <th>Cache hit ratio:</th><td><?=$ratio?>% (<?=$cache_hits?>/<?=$cache_total?>)</td>
-                    <th>Bytes received from origin:</th><td><?=$cdnbytes?></td>
-                    <th>Bytes sent to clients:</th><td><?=$bytes?></td>
-                </tr></table> <?php
+            
+            ?> 
+            <div id="visits" style="overflow: hidden; margin: 0px auto 0px auto; width: 140px; height: 80px;">
+                <center>
+                    <div id="users" style="text-align: center; float: left;">
+                        <h1><?php echo(getVisitors()); ?></h1>
+                        unique visitors
+                    </div>
+                    <div id="hits" style="margin-left: 20px; margin-top: 8px; text-align: center; float: left;">
+                        <h2><?php echo(getRequests()); ?></h2>
+                        requests
+                    </div>
+                </center>
+            </div>
+            <table class="lmframework" style="width: 100%;"><tr>
+                <th>Cache hit ratio:</th><td><?=$ratio?>% (<?=$cache_hits?>/<?=$cache_total?>)</td>
+                <th>Bytes received from origin:</th><td><?=$cdnbytes?></td>
+                <th>Bytes sent to clients:</th><td><?=$bytes?></td>
+            </tr></table> <?php
             break;
         case 'GET_QUOTE':
             if (!checkrights("Administrator,ViewDatabase")) {
