@@ -160,7 +160,7 @@ if (!$SSOENABLED) { //if sso is not enabled, exit immediately
         $userID=get_userID($verify->CharacterID);
         if ($userID===false) {
             //unkown character, bail!
-            template_locked("This EVE Online character is not autohorized.<br/><br/><i>If the character should be authorized, check whether it's linked to your LMeve account.</i>");
+            template_locked("This EVE Online character is not authorized.<br/><br/><i>If the character should be authorized, check whether it's linked to your LMeve account.</i>");
             die();
         }
         //now check the characterOwnerHash
