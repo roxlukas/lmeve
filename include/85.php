@@ -30,12 +30,12 @@ if (strlen($date)==6) {
             <div class="tytul">
                 CDN Proxy Statistics for <?php echo("$year-$month"); ?><br>
             </div>
-
+            <a href="#down">Scroll down</a>
             <div class="tekst">
             <?php
-                
+                showVisitorsMonthly($year,$month,getVisitorsMonthly($year, $month));
             ?>
-            <a href="#down">Scroll down</a>
+            
             </div>
                 <div id="global-cdn-info" style="overflow: hidden;">
                     <div id="settings" style="float: left;">
@@ -55,7 +55,9 @@ if (strlen($date)==6) {
                             </div>
                         </div>
                 </div>
-                <h1>Last 24 hours</h1>
+                <div class="tytul">
+                    Last 24 hours
+                </div>
                 <div id="cache_stats">
                         Checking cache hit ratio...
                 </div>

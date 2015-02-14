@@ -1,5 +1,152 @@
 <?php
 
+function getVisitorsMonthly($year,$month) {
+    global $LM_CCPWGL_CACHESCHEMA;
+    //last 30 days
+    /*$sql="SELECT DATE_FORMAT(timestamp,'%Y-%m-%d') AS date,
+        COUNT(DISTINCT ip) AS visits
+        FROM `lmproxylog`
+        WHERE timestamp > SUBDATE(NOW(), 30)
+        GROUP BY DATE_FORMAT(timestamp,'%Y-%m-%d');";*/
+    $sql="SELECT DATE_FORMAT(timestamp,'%e') AS date,
+        COUNT(DISTINCT ip) AS visits
+        FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog`
+        WHERE timestamp BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+        GROUP BY DATE_FORMAT(timestamp,'%e');";
+    return(db_asocquery($sql));
+}
+
+function showVisitorsMonthly($year,$month,$visitors) {
+    global $MOBILE;
+    ?>
+    <h2>Visitors [unique IP address]</h2>
+    <script type="text/javascript" src="chart.js/Chart.min.js"></script>
+    <script type="text/javascript">
+            pie_options = {
+                    //Boolean - Whether we should show a stroke on each segment
+                    segmentShowStroke : true,
+                    //String - The colour of each segment stroke
+                    segmentStrokeColor : "#fff",
+                    //Number - The width of each segment stroke
+                    segmentStrokeWidth : 2,
+                    //Boolean - Whether we should animate the chart	
+                    animation : true,
+                    //Number - Amount of animation steps
+                    animationSteps : 100,
+                    //String - Animation easing effect
+                    animationEasing : "easeOutBounce",
+                    //Boolean - Whether we animate the rotation of the Pie
+                    animateRotate : true,
+                    //Boolean - Whether we animate scaling the Pie from the centre
+                    animateScale : false,
+                    //Function - Will fire on animation completion.
+                    onAnimationComplete : null
+            }
+           bar_options = {
+                    //Boolean - If we show the scale above the chart data			
+                    scaleOverlay : false,
+                    //Boolean - If we want to override with a hard coded scale
+                    scaleOverride : false,
+                    //** Required if scaleOverride is true **
+                    //Number - The number of steps in a hard coded scale
+                    scaleSteps : null,
+                    //Number - The value jump in the hard coded scale
+                    scaleStepWidth : null,
+                    //Number - The scale starting value
+                    scaleStartValue : null,
+                    //String - Colour of the scale line	
+                    scaleLineColor : "rgba(255,255,255,.1)",
+                    //Number - Pixel width of the scale line	
+                    scaleLineWidth : 1,
+                    //Boolean - Whether to show labels on the scale	
+                    scaleShowLabels : true,
+                    //Interpolated JS string - can access value
+                    scaleLabel : "<%=value%>",
+                    //String - Scale label font declaration for the scale label
+                    scaleFontFamily : "'Arial'",
+                    //Number - Scale label font size in pixels	
+                    scaleFontSize : 12,
+                    //String - Scale label font weight style	
+                    scaleFontStyle : "normal",
+                    //String - Scale label font colour	
+                    scaleFontColor : "#aaa",	
+                    ///Boolean - Whether grid lines are shown across the chart
+                    scaleShowGridLines : true,
+                    //String - Colour of the grid lines
+                    scaleGridLineColor : "rgba(255,255,255,.1)",
+                    //Number - Width of the grid lines
+                    scaleGridLineWidth : 1,	
+                    //Boolean - If there is a stroke on each bar	
+                    barShowStroke : true,
+                    //Number - Pixel width of the bar stroke	
+                    barStrokeWidth : 2,
+                    //Number - Spacing between each of the X value sets
+                    barValueSpacing : 5,
+                    //Number - Spacing between data sets within X values
+                    barDatasetSpacing : 1,
+                    //Boolean - Whether to animate the chart
+                    animation : true,
+                    //Number - Number of animation steps
+                    animationSteps : 60,
+                    //String - Animation easing effect
+                    animationEasing : "easeOutQuart",
+                    //Function - Fires when the animation is complete
+                    onAnimationComplete : null
+            }
+    </script>
+    <?php
+              //getting data
+                        $days="";
+                        $visits="";
+                        $dayss = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+                        for($i=1; $i<=$dayss; $i++) {
+                            $daystab[$i]['day']="$i";
+                            $daystab[$i]['visits']=0;
+                        }
+   
+            if (count($visitors)>0) {
+                    //reformatting data
+                        foreach ($visitors as $row) {
+                            $daystab[$row['date']]['visits']=$row['visits'];
+                        }
+                        
+                    //ready to display
+                        foreach($daystab as $row) {
+                            $days.='"'.$row['day'].'",';
+                            if (!empty($row['visits'])) $visits.=$row['visits'].','; else $visits.='0,';
+                        }
+                    //cut trailing commas
+                        $days=rtrim($days,',');
+                        $visits=rtrim($visits,',');
+                    //display
+                        ?>
+                    <!--<h2>&raquo; Activity</h2>-->
+                        
+                        <canvas id="visitors_graph" width="600" height="200"></canvas>
+                        <script type="text/javascript">
+                            var data_visitors = {
+                                labels : [ <?php echo($days); ?> ],
+                                datasets : [
+                                       {
+                                           fillColor : "rgba(151,187,205,0.5)",
+                                           strokeColor : "rgba(151,187,205,1.0)",
+                                           data : [ <?=$visits?> ]
+                                       }
+                                ]
+                            }
+                            
+                            var ctx_visitors = document.getElementById("visitors_graph").getContext("2d");
+                            <?php if ($MOBILE) echo('ctx_visitors.canvas.width  = window.innerWidth;'); ?>
+                            var visitorChart = new Chart(ctx_visitors).Bar(data_visitors,bar_options);
+                            
+                        </script>
+                        
+                <?php  
+            } else {
+                echo("<div class=\"tekst\"><strong>No data found.</strong></div>");
+            }
+}
+
 function getVisitors($hours='1 day',$where='TRUE') {
    global $LM_CCPWGL_CACHESCHEMA, $LM_CCPWGL_PROXYAUDIT;
    if (!$LM_CCPWGL_PROXYAUDIT) return FALSE;
@@ -413,14 +560,12 @@ function showIndustryActivity($corporationID,$year,$month,$activityGraph) {
                         <canvas id="activity_<?php echo($corporationID); ?>" width="600" height="200"></canvas>
                         <script type="text/javascript">
                             var data_<?php echo($corporationID); ?> = {
-                                labels : [ <?php echo($days); ?> ],
+                                labels : [ <?=$days?> ],
                                 datasets : [
                                        {
                                            fillColor : "rgba(151,187,205,0.5)",
                                            strokeColor : "rgba(151,187,205,1.0)",
-                                           <?php //pointColor : "rgba(205,107,101,1.0)",
-                                           //pointStrokeColor : "#fff", ?>
-                                           data : [ <?php echo($activities); ?> ]
+                                           data : [ <?=$activities?> ]
                                        }
                                 ]
                             }
