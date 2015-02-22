@@ -89,6 +89,10 @@ Settings
                                 <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('northboundApi','disabled')=='enabled') echo('checked'); ?> />
                         </td></tr>
                         <tr><td width="150" class="tab">
+                            Non-recurring tasks expiration:<br></td><td width="200" class="tab">
+                                <input type="text" size="6" name="singletonTaskExpiration" value="<?=getConfigItem('singletonTaskExpiration','90');?>" /> days
+                        </td></tr>
+                        <tr><td width="150" class="tab">
                             Get market prices from:<br></td><td width="200" class="tab">
                                 <select name="marketRegion"> <?php
                                 $regions=db_asocquery("SELECT `regionID`,`regionName` FROM `$LM_EVEDB`.`mapRegions` ORDER BY `regionName`;");

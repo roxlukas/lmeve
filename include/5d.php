@@ -20,6 +20,7 @@ global $LM_EVEDB;
                 if (!token_verify()) die("Invalid or expired token.");
        
                 setConfigItem('iskPerPoint', secureGETnum('iskPerPoint'));
+                setConfigItem('singletonTaskExpiration', secureGETnum('singletonTaskExpiration'));
                 setConfigItem('marketRegion', secureGETnum('marketRegion'));
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
 		

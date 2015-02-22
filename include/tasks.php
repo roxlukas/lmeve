@@ -20,8 +20,8 @@ include_once("percentage.php");
  */
 function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	global $LM_EVEDB, $USERSTABLE;
-
-	$sql="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
+        /**** ORIGINAL TASKS SQL, works fast ****/
+        $sql_original="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
 	FROM (SELECT acm.name, lmt.characterID, itp.typeName, lmt.typeID, rac.activityName, lmt.activityID, lmt.taskID, lmt.runs
 	FROM lmtasks lmt
 	JOIN apicorpmembers acm
@@ -84,7 +84,81 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	) AS e
 	ON a.taskID=e.taskID
 	$ORDERBY";
-	//echo("DEBUG:<hr/> $sql<hr/>");
+
+        /**** NEW TASKS SQL - way slower ****/
+        /* runs - number of individual items to build/invent in a task
+         * runsDone - how many individual items started (ammo, ships, mods)
+         * jobsDone - how many industry jobs started
+         * jobsSuccess - successful invention jobs
+         * jobsCompleted - how many industry jobs actually completed 
+         * runsCompleted - how many individual items actually completed */
+        $howOldSingletons=getConfigItem('singletonTaskExpiration','90');
+        $thisMonth="BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)";
+        $singletonOrNot="((singleton=0 AND beginProductionTime $thisMonth) OR (singleton=1 AND taskCreateTimestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL $howOldSingletons day) AND beginProductionTime > taskCreateTimestamp))";
+        //$singletonOrNot="beginProductionTime $thisMonth";
+        
+	$sql="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
+	FROM (SELECT acm.name, lmt.characterID, itp.typeName, lmt.typeID, rac.activityName, lmt.activityID, lmt.taskID, lmt.runs, lmt.taskCreateTimestamp, lmt.singleton
+	FROM lmtasks lmt
+	JOIN apicorpmembers acm
+	ON acm.characterID=lmt.characterID
+	JOIN $LM_EVEDB.invTypes itp
+	ON lmt.typeID=itp.typeID
+	JOIN $LM_EVEDB.ramActivities rac
+	ON lmt.activityID=rac.activityID
+	WHERE $MYTASKS AND $SELECTEDCHAR
+	) AS a
+	LEFT JOIN	
+	(SELECT lmt.taskID, SUM(aij.runs)*itp.portionSize AS runsDone, COUNT(*) AS jobsDone
+	FROM lmtasks lmt
+	JOIN $LM_EVEDB.invTypes itp
+	ON lmt.typeID=itp.typeID
+	JOIN apiindustryjobs aij
+	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
+	WHERE $singletonOrNot
+	AND $MYTASKS AND $SELECTEDCHAR
+	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
+	) AS b
+	ON a.taskID=b.taskID
+	LEFT JOIN	
+	(SELECT lmt.taskID, SUM(successfulRuns) AS jobsSuccess
+	FROM lmtasks lmt
+	JOIN apiindustryjobs aij
+	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
+	WHERE $singletonOrNot
+	AND $MYTASKS AND $SELECTEDCHAR
+	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
+	) AS c
+	ON a.taskID=c.taskID
+	LEFT JOIN	
+	(SELECT lmt.taskID, COUNT(*) AS jobsCompleted, SUM(aij.runs) * itp.portionSize AS runsCompleted
+	FROM lmtasks lmt
+	JOIN apiindustryjobs aij
+	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
+        JOIN $LM_EVEDB.invTypes itp
+	ON lmt.typeID=itp.typeID
+	WHERE aij.completed=1 AND $singletonOrNot
+	AND $MYTASKS AND $SELECTEDCHAR
+	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
+	) AS d
+	ON a.taskID=d.taskID
+        LEFT JOIN	
+	(SELECT lmt.taskID, SUM(aij.runs) * itp.portionSize AS runsCompleted
+	FROM lmtasks lmt
+	JOIN apiindustryjobs aij
+	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
+        JOIN $LM_EVEDB.invTypes itp
+	ON lmt.typeID=itp.typeID
+	WHERE $singletonOrNot AND aij.endProductionTime < UTC_TIMESTAMP()
+	AND $MYTASKS AND $SELECTEDCHAR
+	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
+	) AS e
+	ON a.taskID=e.taskID
+        WHERE ((a.singleton=1 AND b.runsDone < a.runs) OR (a.singleton=0))
+	$ORDERBY";
+        //        WHERE ((a.singleton=1 AND a.taskCreateTimestamp $thisMonth) OR (a.singleton=0))
+	//echo("NEW QUERY DEBUG:<hr/> $sql<hr/>");
+        //echo("OLD QUERY DEBUG:<hr/> $sql_original<hr/>");
 	return(db_asocquery($sql));
 }
 
@@ -119,7 +193,25 @@ function clearOrphanedTasks() {
     $sql_del="DELETE FROM `lmtasks` WHERE `taskID` IN ($lista);";
     $ret=db_uquery($sql_del);
     if ($ret!==FALSE) {
-        return($ile);
+        return(TRUE);
+    } else {
+        return FALSE;
+    }
+}
+
+function getExpiredSingletonTasksCount() {
+    $singletonTaskExpiration=getConfigItem('singletonTaskExpiration','90');
+    $sql_sel="SELECT * FROM `lmtasks` WHERE singleton=1 AND taskCreateTimestamp < DATE_SUB(UTC_TIMESTAMP(), INTERVAL $singletonTaskExpiration day);";
+    $ile=db_count($sql_sel);
+    return($ile);
+}
+
+function clearExpiredSingletonTasks() {
+    $singletonTaskExpiration=getConfigItem('singletonTaskExpiration','90');
+    $sql_del="DELETE FROM `lmtasks` WHERE singleton=1 AND taskCreateTimestamp < DATE_SUB(UTC_TIMESTAMP(), INTERVAL $singletonTaskExpiration day);";
+    $ret=db_uquery($sql_del);
+    if ($ret!==FALSE) {
+        return(TRUE);
     } else {
         return FALSE;
     }
@@ -202,6 +294,7 @@ function showTasks($tasklist) {
 	if (!sizeof($tasklist)>0) {
 		echo('<h3>There is no tasks assigned!</h3>');
 	} else {
+            echo("Found ".count($tasklist)." tasks.");
 	?>
 	<table class="lmframework">
 	<tr><th>
@@ -248,6 +341,7 @@ function showTasks($tasklist) {
 				echo($row['activityName']);
                                 echo("&nbsp;<img src=\"ccp_icons/38_16_208.png\" style=\"vertical-align: middle;\" />");
 			if ($rights) echo('</a>');
+                        if ($row['singleton']==1) echo("&nbsp;<img src=\"ccp_icons/38_16_238.png\" style=\"vertical-align: middle;\" alt=\"Non-recurring task\" title=\"Non-recurring task\" />");
                         echo('</td>');
                     }
                         echo('<td style="padding: 0px; width: 32px;">');

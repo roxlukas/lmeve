@@ -24,5 +24,8 @@ checksession(); //check if we are called by a valid session
                 case 6:
 		include("16.php");  //Clear orphaned tasks
 		break;
+                case 7:
+		include("17.php");  //Clear Expired non-recurring tasks
+		break;
 	    }
 ?>
