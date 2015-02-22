@@ -197,7 +197,7 @@ function url_replace($input) {
 //CCP WebGL -- 3D Preview!
         
     if ($model=getResourceFromYaml($nr)) {
-    
+    //var_dump($model);
 ?>
 <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
@@ -207,11 +207,11 @@ function url_replace($input) {
 function loadPreview()
             {
                 <?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
-                ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
+                //ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
                 var canvas = document.getElementById('wglCanvas');
                 ccpwgl.initialize(canvas);
                 var scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
-                sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
+                //sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
        		var camera = new TestCamera(canvas);
                 camera.minDistance = 10;
                 camera.maxDistance = 10000;
@@ -236,10 +236,12 @@ function loadPreview()
                 <?php
                     if ($item['categoryID']==6 || $item['categoryID']==18) {
                         //if ship, NPC or drone - use loadShip
-                        echo("var ship = scene.loadShip('${model['shipModel']}', undefined);\r\n");
-                        echo("ship.loadBoosters('${model['thrusters']}');");
+                        //use new SOF data
+                        echo("var ship = scene.loadShip('${model['sofHullName']}:${model['sofFactionName']}:${model['sofRaceName']}', undefined);\r\n");
+                        
+                        //echo("ship.loadBoosters('${model['thrusters']}');");
                     } else if ($item['categoryID']==3 || $item['categoryID']==11 || $item['categoryID']==2) {
-                        echo("var ship = scene.loadObject('${model['shipModel']}', undefined);\r\n");
+                        echo("var ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
                     } else {
                         //echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
                         $model = false;

@@ -96,37 +96,34 @@ function updateYamlGraphicIDs($silent=true) {
         return FALSE;
     }
     
-    $create="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`yamlGraphicIDs` (
+    $drop="DROP TABLE `$LM_EVEDB`.`yamlGraphicIDs`;";
+    
+    $create="CREATE TABLE `$LM_EVEDB`.`yamlGraphicIDs` (
       `graphicID` int(11) NULL,
-      `colorScheme` varchar(256) NULL,
       `description` varchar(256) NULL,
       `graphicFile` varchar(512) NULL,
-      `graphicName` varchar(256) NULL,
-      `graphicType` varchar(256) NULL,
-      `gfxRaceID` varchar(64) NULL,
-      `collidable` boolean NULL,
-      `directoryID` int(11) NULL,
+      `sofFactionName` varchar(128) NULL,
+      `sofHullName` varchar(128) NULL,
+      `sofRaceName` varchar(128) NULL,
       PRIMARY KEY (`graphicID`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    db_uquery($create);
     
     if (!$silent) echo('loading YAML...');
     $graphicIDs = Spyc::YAMLLoad($file);
     
     if (!empty($graphicIDs)) {
-        db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlGraphicIDs`;");
+        //db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlGraphicIDs`;");
+        db_uquery($drop);
+        db_uquery($create);
     } else return false;
     $biginsert="INSERT INTO `$LM_EVEDB`.`yamlGraphicIDs` VALUES ";
     foreach($graphicIDs as $graphicID => $row) {
-        if (!isset($row['colorScheme'])) $colorScheme='NULL'; else $colorScheme="'".addslashes($row['colorScheme'])."'";
         if (!isset($row['description'])) $description='NULL'; else $description="'".addslashes($row['description'])."'";
         if (!isset($row['graphicFile'])) $graphicFile='NULL'; else $graphicFile="'".addslashes($row['graphicFile'])."'";
-        if (!isset($row['graphicName'])) $graphicName='NULL'; else $graphicName="'".addslashes($row['graphicName'])."'";
-        if (!isset($row['graphicType'])) $graphicType='NULL'; else $graphicType="'".addslashes($row['graphicType'])."'";
-        if (!isset($row['gfxRaceID'])) $gfxRaceID='NULL'; else $gfxRaceID="'".addslashes($row['gfxRaceID'])."'";
-        if (!isset($row['collidable'])) $collidable='NULL'; else $collidable=$row['collidable'];
-        if (!isset($row['directoryID'])) $directoryID='NULL'; else $directoryID=$row['directoryID'];
-        $biginsert.="($graphicID, $colorScheme, $description, $graphicFile, $graphicName, $graphicType, $gfxRaceID, $collidable, $directoryID),";
+        if (!isset($row['sofFactionName'])) $sofFactionName='NULL'; else $sofFactionName="'".addslashes($row['sofFactionName'])."'";
+        if (!isset($row['sofHullName'])) $sofHullName='NULL'; else $sofHullName="'".addslashes($row['sofHullName'])."'";
+        if (!isset($row['sofRaceName'])) $sofRaceName='NULL'; else $sofRaceName="'".addslashes($row['sofRaceName'])."'";
+        $biginsert.="($graphicID, $description, $graphicFile, $sofFactionName, $sofHullName, $sofRaceName),";
     }
     $biginsert=rtrim($biginsert,',').";";
     if (!$silent) echo('insert to DB...');
@@ -156,58 +153,44 @@ function getResourceFromMapping($typeID) {
  */
 function getResourceFromYaml($typeID) {
     global $LM_EVEDB;
-    $modelinfo=db_asocquery("SELECT * FROM `$LM_EVEDB`.`yamlTypeIDs` yti JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi ON yti.`graphicID`=ygi.`graphicID` WHERE yti.`typeID`=$typeID;");
+    $sql="SELECT * FROM `$LM_EVEDB`.`yamlTypeIDs` yti JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi ON yti.`graphicID`=ygi.`graphicID` WHERE yti.`typeID`=$typeID";
+    //echo("DEBUG: $sql");
+    $modelinfo=db_asocquery($sql);
     if (count($modelinfo)==1) {
         $model=$modelinfo[0];
         $returns['typeID']=$typeID;
         $returns['shipModel']=$model['graphicFile'];
-        /*
-        NULL
-        Caldari
-        Minmatar
-        Amarr
-        Gallente
-        Jove
-        Angel
-        Sansha
-        ORE
-        Concord
-        RogueDrone
-        SOCT
-        Generic
-        Sleeper
-        Talocan
-         * (28661, 'res:/dx9/model/ship/gallente/battleship/gb2/duvolle/gb2_t2_duvolle.red', 'res:/dx9/scene/universe/g04_cube.red', 'res:/dx9/model/ship/booster/booster_gallente.red'),
-(28659, 'res:/dx9/model/ship/amarr/battleship/ab1/sarum/ab1_t2_sarum.red', 'res:/dx9/scene/universe/a04_cube.red', 'res:/dx9/model/ship/booster/booster_amarr.red'),
-(28710, 'res:/dx9/model/ship/caldari/battleship/cb1/laidai/cb1_t2_laidai.red', 'res:/dx9/scene/universe/c03_cube.red', 'res:/dx9/model/ship/booster/booster_caldari.red'),
-(28665, 'res:/dx9/model/ship/minmatar/battleship/mb2/brutor/mb2_t2_brutor.red', 'res:/dx9/scene/universe/m01_cube.red', 'res:/dx9/model/ship/booster/booster_minmatar.red');
-        */
-        switch($model['gfxRaceID']) {
-            case 'Caldari':
+        $returns['graphicFile']=$model['graphicFile'];
+        $returns['sofFactionName']=$model['sofFactionName'];
+        $returns['sofHullName']=$model['sofHullName'];
+        $returns['sofRaceName']=$model['sofRaceName'];
+
+        switch($model['sofRaceName']) {
+            case 'caldari':
                 $returns['background']='res:/dx9/scene/universe/c03_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_caldari.red';
                 break;
-            case 'Minmatar':
+            case 'minmatar':
                 $returns['background']='res:/dx9/scene/universe/m01_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_minmatar.red';
                 break;
-            case 'Amarr':
+            case 'amarr':
                 $returns['background']='res:/dx9/scene/universe/a04_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_amarr.red';
                 break;
-            case 'Gallente':
+            case 'gallente':
                 $returns['background']='res:/dx9/scene/universe/g04_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_gallente.red';
                 break;
-            case 'Angel':
+            case 'angel':
                 $returns['background']='res:/dx9/scene/universe/m01_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_minmatar.red';
                 break;
-            case 'Sansha':
+            case 'sansha':
                 $returns['background']='res:/dx9/scene/universe/a04_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_amarr.red';
                 break;
-            case 'ORE':
+            case 'ore':
                 $returns['background']='res:/dx9/scene/universe/g04_cube.red';
                 $returns['thrusters']='res:/dx9/model/ship/booster/booster_gallente.red';
                 break;
