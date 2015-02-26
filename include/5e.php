@@ -23,9 +23,9 @@ function nbapihrefedit($nr) {
     <?php token_generate(); ?>
     <input type="submit" value="Create key" /><br/>
 </form>
-<br/>
-<img src="ccp_icons/38_16_208.png" alt="(!) "/> LMeve can provide information to other third party apps that support it, such as <a href="http://evernus.com/" target="_blank">Evernus</a>.<br/>
-<br/>
+<div><br/>
+<img src="ccp_icons/38_16_208.png" alt="(!) "/> LMeve can provide information to other third party apps that support it, such as <a href="http://evernus.com/" target="_blank">Evernus</a> or <a href="http://caldariprimeponyclub.com/" target="_blank">Jeremy</a>.<br/>
+<br/></div>
 <table class="lmframework">
     <tr><th>
         API Key

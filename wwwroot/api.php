@@ -67,6 +67,7 @@ header("Access-Control-Allow-Origin: *");
             $typeID=secureGETnum('typeID');
             $meLevel=secureGETnum('meLevel');
             if (empty($meLevel)) $meLevel=0;
+            if ($melevel>10) $melevel=10;
             if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
             echo(json_encode(formatMaterials(getBaseMaterials($typeID, 1, $meLevel))));
             break;
@@ -78,7 +79,6 @@ header("Access-Control-Allow-Origin: *");
             break;
         case 'INVTYPES':
             $typeID=secureGETnum('typeID');
-            $sql="lmt.`characterID`=".$characterID;
             if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
             $items=db_asocquery("SELECT itp.*,cre.`averagePrice` FROM $LM_EVEDB.`invTypes` itp LEFT JOIN `crestmarketprices` cre ON itp.`typeID`=cre.`typeID` WHERE itp.`typeID`=$typeID;");
             if (count($items)==0) RESTfulError('typeID not found.',404);
@@ -103,8 +103,54 @@ header("Access-Control-Allow-Origin: *");
             if (count($bonusData) > 0) $item['bonuses']=$bonusData;
             if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
             echo(json_encode($item));
-            break;    
-	default:		
+            break;
+        case 'INVGROUPS':
+            $groupID=secureGETnum('groupID');
+            if (empty($groupID)) $where_gid="TRUE"; else $where_gid="`groupID`=$groupID";
+            $categoryID=secureGETnum('categoryID');
+            if (empty($categoryID)) $where_cid="TRUE"; else $where_cid="`categoryID`=$categoryID";
+            $groups=db_asocquery("SELECT * FROM `$LM_EVEDB`.`invGroups`
+                WHERE $where_gid AND $where_cid;");
+            if (count($groups)==0) RESTfulError('No data found.',404);
+            echo(json_encode($groups));
+            break;  
+        case 'INVCATEGORIES':
+            $categoryID=secureGETnum('categoryID');
+            if (empty($categoryID)) $where_cid="TRUE"; else $where_cid="`categoryID`=$categoryID";
+            $categories=db_asocquery("SELECT * FROM `$LM_EVEDB`.`invCategories`
+                WHERE $where_cid;");
+            if (count($categories)==0) RESTfulError('No data found.',404);
+            echo(json_encode($categories));
+            break; 
+        case 'GRAPHICID':
+            $typeID=secureGETnum('typeID');
+            if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
+            $items=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
+                JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
+                ON yti.`graphicID`=ygi.`graphicID`
+                JOIN `$LM_EVEDB`.`invTypes` itp
+                ON yti.`typeID`=itp.`typeID`
+                WHERE yti.`typeID`=$typeID;");
+            if (count($items)==0) RESTfulError('typeID not found.',404);
+            $item=$items[0];
+            echo(json_encode($item));
+            break;
+        case 'ALLGRAPHICIDS':
+            RESTfulError('ALLGRAPHICIDS endpoint is now obsolete. Use GRAPHICIDS instead.',404);
+            break;
+        case 'GRAPHICIDS':
+            $groupID=secureGETnum('groupID');
+            if (empty($groupID)) $where_gid="TRUE"; else $where_gid="itp.`groupID`=$groupID";
+            $items=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
+                JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
+                ON yti.`graphicID`=ygi.`graphicID`
+                JOIN `$LM_EVEDB`.`invTypes` itp
+                ON yti.`typeID`=itp.`typeID`
+                WHERE $where_gid;");
+            if (count($items)==0) RESTfulError('No data found.',404);
+            echo(json_encode($items));
+            break;
+	default:	
             RESTfulError('Invalid endpoint.',404);
     }
 ?>
