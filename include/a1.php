@@ -234,13 +234,12 @@ function loadPreview()
                 camera.maxPitch = 0.65;
                 ccpwgl.setCamera(camera);
                 <?php
-                    if ($item['categoryID']==6 || $item['categoryID']==18) {
+                    if ($item['categoryID']==6 || $item['categoryID']==18 || $item['categoryID']==11) {
                         //if ship, NPC or drone - use loadShip
                         //use new SOF data
                         echo("var ship = scene.loadShip('${model['sofHullName']}:${model['sofFactionName']}:${model['sofRaceName']}', undefined);\r\n");
                         
-                        //echo("ship.loadBoosters('${model['thrusters']}');");
-                    } else if ($item['categoryID']==3 || $item['categoryID']==11 || $item['categoryID']==2) {
+                    } else if ($item['categoryID']==3 || $item['categoryID']==2) {
                         echo("var ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
                     } else {
                         //echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
