@@ -141,12 +141,16 @@ header("Access-Control-Allow-Origin: *");
         case 'GRAPHICIDS':
             $groupID=secureGETnum('groupID');
             if (empty($groupID)) $where_gid="TRUE"; else $where_gid="itp.`groupID`=$groupID";
+            $categoryID=secureGETnum('categoryID');
+            if (empty($categoryID)) $where_cid="TRUE"; else $where_cid="`categoryID`=$categoryID";
             $items=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
                 JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
                 ON yti.`graphicID`=ygi.`graphicID`
                 JOIN `$LM_EVEDB`.`invTypes` itp
                 ON yti.`typeID`=itp.`typeID`
-                WHERE $where_gid;");
+                JOIN `$LM_EVEDB`.`invGroups` igp
+                ON itp.`groupID`=igp.`groupID`    
+                WHERE $where_gid AND $where_cid;");
             if (count($items)==0) RESTfulError('No data found.',404);
             echo(json_encode($items));
             break;
