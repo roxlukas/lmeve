@@ -33,4 +33,5 @@
 
 //put custom notifications here
 	include("checkpoller.php");
+        include("checkinstall.php");
 ?>

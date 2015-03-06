@@ -41,7 +41,8 @@ function getUserCount() {
 function resetAdminPassword() {
     global $USERSTABLE,$LM_DEFAULT_CSS;
     $pwd=hashpass("admin");
-    
+    $lockfile=__DIR__.'/../INSTALL';
+    if (!file_exists($lockfile)) return FALSE;
     if (getUserCount()===0) {
         //echo("User 'admin' does not exist. Adding user 'admin' and setting password 'admin'".PHP_EOL);
             $userid=db_query("SELECT MAX(`userID`) FROM `$USERSTABLE`;");
@@ -55,6 +56,7 @@ function resetAdminPassword() {
         //echo("User 'admin' already exists. New password is 'admin'".PHP_EOL);
         db_uquery("UPDATE `$USERSTABLE` SET `pass`='$pwd',`act`=1 WHERE login='admin';");
     }
+    return TRUE;
 }
 
 function check_changed_session_path() {
