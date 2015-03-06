@@ -56,10 +56,24 @@ Changelog:
 	Admin can now clear Orphane Tasks - tasks assigned to members who left the corporation
 </li>
 <li>
-	One-time (singleton) Task bug fix in Industry Facilities and Facility kits. Both now show singleton tasks only for the current month.
+	Non-recurring Tasks (singleton) bug fix in Industry Facilities and Facility kits. Both now show singleton tasks only for the current month.
 </li>
 <li>
+	Non-recurring Tasks will now only expire if:
+        <ul>
+            <li>Task is completed (100% complete)</li>
+            <li>Task is older than x days (90 by default)</li>
+        </ul>
+</li>
+
+<li>
         Mobile theme for smartphones
+</li>
+<li>
+        Easier installation (no need to use CLI commands to reset admin password)
+</li>
+<li>
+        PHP error_reporting is now set up according to $LM_DEBUG config variable
 </li>
 </ul>
 </td></tr>
@@ -1168,7 +1182,7 @@ Map of LMeve:
 <table width="90%" border="0" cellspacing="2" cellpadding="0">
 <tr>
 <td class="tab-header"><b>Timesheet</b></td>
-<td class="tab-header"><b>Overview</b></td>
+<td class="tab-header"><b>Statistics</b></td>
 <td class="tab-header"><b>Tasks</b></td>
 <td class="tab-header"><b>Characters</b></td>
 <td class="tab-header"><b>Database</b></td>
@@ -1181,7 +1195,7 @@ Map of LMeve:
 </tr>
 <tr>
 <td class="tab">timesheet, wages</td>
-<td class="tab">production overview</td>
+<td class="tab">various corp stats</td>
 <td class="tab">task list</td>
 <td class="tab">character-to-user mapping</td>
 <td class="tab">EVE static DB</td>

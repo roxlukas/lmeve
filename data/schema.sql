@@ -1375,9 +1375,6 @@ CREATE TABLE IF NOT EXISTS `lmusers` (
 -- Zrzut danych tabeli `lmusers`
 --
 
-INSERT INTO `lmusers` (`userID`, `login`, `pass`, `lastip`, `last`, `defaultPage`, `css`, `act`) VALUES
-(1, 'admin', 'f37a30e245cd301dfc935a15e791f232', '127.0.0.1', '01.01.2013 00:00', 0, 'css/rixxjavix.css', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -1466,7 +1463,7 @@ CREATE TABLE IF NOT EXISTS `crestmarketprices` (
   PRIMARY KEY (`typeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;	
 
---schema delta for EVE SSO functionality in release 0.1.47
+-- schema delta for EVE SSO functionality in release 0.1.47
 
 CREATE TABLE IF NOT EXISTS `lmownerhash` (
   `characterID` bigint(11) NOT NULL,
@@ -1474,7 +1471,7 @@ CREATE TABLE IF NOT EXISTS `lmownerhash` (
   PRIMARY KEY (`characterID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---schema delta for db based configuration and keys for LMeve external JSON api
+-- schema delta for db based configuration and keys for LMeve external JSON api
 
 CREATE TABLE IF NOT EXISTS `lmconfig` (
   `itemLabel` varchar(64) NOT NULL,
@@ -1505,7 +1502,7 @@ CREATE TABLE IF NOT EXISTS `apiblueprints` (
   PRIMARY KEY (`itemID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
---schema delta for page cache
+-- schema delta for page cache
 
 CREATE TABLE IF NOT EXISTS `lmpagecache` (
   `pageLabel` varchar(32) NOT NULL,
@@ -1514,7 +1511,7 @@ CREATE TABLE IF NOT EXISTS `lmpagecache` (
   PRIMARY KEY (`pageLabel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---function for PoCo planet finding
+-- function for PoCo planet finding
 
 DROP FUNCTION IF EXISTS `findNearest`;
 
@@ -1532,7 +1529,7 @@ SELECT a.itemID FROM
     LIMIT 1) a
 );
 
---function for PoCo last 30 days income
+-- function for PoCo last 30 days income
 
 DROP FUNCTION IF EXISTS `thirtyDayIncome`;
 
@@ -1550,7 +1547,7 @@ AND awj.`refTypeID` IN (96, 97)
 AND awj.`date` BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()
 );
 
---apipocolist - table for pocos
+-- apipocolist - table for pocos
 
 CREATE TABLE IF NOT EXISTS `apipocolist` (
   `itemID` bigint(20) NOT NULL,

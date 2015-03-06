@@ -35,6 +35,7 @@ set_include_path("../include");
 date_default_timezone_set("Europe/Paris");
 if (!is_file('../config/config.php')) die ($LANG['CONFIGERROR']);
 include_once('../config/config.php'); //load config file
+if ($LM_DEBUG==TRUE) error_reporting(E_ALL ^ E_NOTICE); else error_reporting(0);
 include_once("db.php");  //db access functions
 //include_once("ping.php");  //ping function - not used
 include_once("log.php");  //logging facility
@@ -46,7 +47,7 @@ include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
 
-$lmver="0.1.50 beta";
+$lmver="0.1.51 beta";
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  
@@ -91,6 +92,9 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 		if (empty($_POST['login'])&&empty($_SESSION["status"])) { //NO LOGIN DATA? DISPLAY PROMPT
                         $MOBILE ? mobile_template_login() : template_login();
 		} else { //FILLED DATA? CHECK CREDENTIALS
+                        //if user table is empty, reset admin password
+                        resetAdminPassword();
+                        //check authorization
 			$granted=auth_user(addslashes($_POST['login']),addslashes($_POST['password']));
 			if ($granted>-1) { //LOGIN SUCCESS?
 				$_SESSION["granted"]=$granted;

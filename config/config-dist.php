@@ -11,14 +11,18 @@ $LM_IPCONTROL=1;
 $LM_SESSION=3600;
 //cookie path. must have a trailing slash, for example: /lmeve/
 $LM_COOKIEPATH='/';
-//debug database queries? (include additional information in error messages)
-$LM_DEBUG=1;
+//debug database queries and PHP errors? (include additional information in error messages)
+$LM_DEBUG=FALSE;
+//which DB engine to use? - MySQL be default, can work with PostgreSQL if needed.
 $LM_DBENGINE='MYSQL'; //MYSQL || PGSQL
 //database settings
 $LM_dbhost='localhost';
 $LM_dbname='lmeve';
 $LM_dbuser='lmeve';
 $LM_dbpass='password';
+//LMeve will use static data from this database schema. Can be the same as LMeve $LM_dbname,
+//but for the sake of easy SDE updates a different db schema is recommended
+$LM_EVEDB='eve_tia100_dbo';
 //salt used for passwords. Should be a random string CHANGE IT!
 $LM_SALT='abcde12345';
 //thousand and decimal separators
@@ -39,8 +43,6 @@ $SSO_CLIENT_SECRET='sso_client_secret';
 $SSO_AUTH_SERVER='sisilogin.testeveonline.com';
 //CSRF token expiry time (in seconds)
 $LM_SECUREFORMSEXPIRY=300;
-//LMeve will use static data from this database.
-$LM_EVEDB='eve_rub130_dbo';
 //Buy calculator can show colored hints green - we buy, yellow - we have enough, red - we have way more than enough - we dont buy
 $LM_BUYCALC_SHOWHINTS=TRUE;
 //for LDAP authentication use the following settings

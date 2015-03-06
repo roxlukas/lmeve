@@ -2,6 +2,8 @@
 //$granted=-1;
 include_once("ldap.php");
 include_once("db.php");
+include_once("log.php");
+include_once("auth.php");
 
 function check_includes_for_auth_php() {
 	return TRUE;
@@ -28,6 +30,31 @@ function check_changed_session_ip() {
 	} else {
 		unset($_SESSION['ip']);
 	}
+}
+
+function getUserCount() {
+    global $USERSTABLE;
+    $c=db_asocquery("SELECT `userID` FROM `$USERSTABLE`;");
+    if ($c !== FALSE ) return count($c); else return FALSE;
+}
+
+function resetAdminPassword() {
+    global $USERSTABLE,$LM_DEFAULT_CSS;
+    $pwd=hashpass("admin");
+    
+    if (getUserCount()===0) {
+        //echo("User 'admin' does not exist. Adding user 'admin' and setting password 'admin'".PHP_EOL);
+            $userid=db_query("SELECT MAX(`userID`) FROM `$USERSTABLE`;");
+            $userid=$userid[0][0]; $userid++;
+        db_uquery("INSERT INTO `$USERSTABLE` VALUES ($userid, 'admin', '$pwd', '127.0.0.1', '01.01.2007 12:00',0,'$LM_DEFAULT_CSS',1);");
+        //echo("Adding 'Administrator' role to user 'admin'".PHP_EOL);
+            $roleid=db_query("SELECT `roleID` FROM `lmroles` WHERE `roleName`='Administrator';");
+            $roleid=$roleid[0][0];
+        db_uquery("INSERT IGNORE INTO `lmuserroles` VALUES ($userid,$roleid);");
+    } else {
+        //echo("User 'admin' already exists. New password is 'admin'".PHP_EOL);
+        db_uquery("UPDATE `$USERSTABLE` SET `pass`='$pwd',`act`=1 WHERE login='admin';");
+    }
 }
 
 function check_changed_session_path() {
