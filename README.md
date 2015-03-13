@@ -20,51 +20,14 @@ All Eve Related Materials are Property Of CCP Games
 
 There is no installer currently, so there is some setup work to get LMeve to run
 
-<h3>1. Initial setup</h3>
+<h3>1. Pre-built VMware VM</h3>
 
-`index.php` and the website itself is in `./wwwroot/` directory. If you can set up your webserver root to this directory, please do so.
+This is the easiest way to try out LMeve. Download the VM image from https://pozniak.pl/lmeve-vm/
+You will need free VMware Player to run this VM. You can download it here: https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/7_0
 
-*Example:*
+<h3>2. Manual Installation</h3>
 
-```
-Alias /lmeve /opt/lmeve/wwwroot
-<Directory /opt/lmeve/wwwroot>
-    Order allow,deny
-    Allow from all
-    Require all granted
-    Options FollowSymLinks
-</Directory>
-```
-
-* Go to `./config/ directory`, copy `config-dist.php` to `config.php`
-* Set up database credentials and db schemas
-* Set up a random new `$LM_SALT` value, save config.php
-* For multi-site deployment, make sure correct cookie path is set in $LM_COOKIEPATH, for single LMeve deployment you can leave the default
-* generate admin password by using `php ./bin/passwd.php`
-* Download current `Types` and `Icons` from EVE Online Toolkit page: http://community.eveonline.com/community/fansites/toolkit/
-* unpack all PNG files from `Types` to `./wwwroot/ccp_img/`
-  * symlinks should work, too: `ln -s /opt/Types/ ccp_img`
-* unpack all PNG files from `Icons` to `./wwwroot/ccp_icons/`
-  * symlinks should work, too: `ln -s /opt/Icons/items/ ccp_icons`
-
-<h3>2. Database setup</h3>
-
-* Import `./data/schema.sql` file to MySQL database before using LMeve. Remember to set the db config options in `./config/config.php`
-* Import latest static data dump (can be put in different db schema for clarity, for example you can import lmeve db to `lmeve` schema and static data in `sde_crius`. LMeve will always use SDE schema set in `$LM_EVEDB` variable in `config.php` file)
-You can download latest static data from Steve Ronuken's website: https://www.fuzzwork.co.uk/dump/
-* Copy all YAML files (the yare included in Steve Ronuken's mysql package, or from official Static Data Export) to `./data/<static_data_schema_name>/`
-* Run `php ./bin/update_yaml.php --all`
-* Add corp API key (or keys) to `cfgapikeys` table. keyID goes to `keyID`, vCode goes to `vCode`
-* Full corp API key works best, but the app will adjust the amount of visible information according to the rights it has been given.
-
-Afterwards you will be able to login as admin/admin
-password should be be changed in `Settings` as soon as possible.
-
-<h3>3. API Poller setup</h3>
-
-* Set up API poller in cron to run every 15 minutes
-
-  `*/15 * * * * 	[path-to-php]/php [path-to-lmeve]/bin/poller.php`
+Please refer to LMeve Wiki: https://github.com/roxlukas/lmeve/wiki/Installation-manual
   
 <h1>Credits and copyrights</h1>
 
