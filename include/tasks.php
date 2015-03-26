@@ -326,6 +326,10 @@ function showTasks($tasklist) {
 		//var_dump($tasklist);
 		$rights=checkrights("Administrator,EditTasks");
 		foreach($tasklist as $row) {
+                    //dirty hack to hide completed one time tasks
+                    if ($row['singleton']==1 && $row['runsDone'] >= $row['runs']) continue;
+                    //end dirty hack
+                    
 			echo('<tr><td style="padding: 0px; width: 32px;">');
                         echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
 			taskhrefedit($row['characterID'],$year.$month);
