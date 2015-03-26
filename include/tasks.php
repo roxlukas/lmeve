@@ -97,7 +97,11 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
         $singletonOrNot="((singleton=0 AND beginProductionTime $thisMonth) OR (singleton=1 AND taskCreateTimestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL $howOldSingletons day) AND beginProductionTime > taskCreateTimestamp))";
         //$singletonOrNot="beginProductionTime $thisMonth";
         
-	$sql="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
+	$sql="SELECT a.*,COALESCE(b.runsDone,0) AS runsDone,
+	COALESCE(b.jobsDone,0) AS jobsDone,
+	COALESCE(c.jobsSuccess,0) AS jobsSuccess,
+	COALESCE(d.jobsCompleted,0) AS jobsCompleted,
+	COALESCE(e.runsCompleted,0) AS runsCompleted
 	FROM (SELECT acm.name, lmt.characterID, itp.typeName, lmt.typeID, rac.activityName, lmt.activityID, lmt.taskID, lmt.runs, lmt.taskCreateTimestamp, lmt.singleton
 	FROM lmtasks lmt
 	JOIN apicorpmembers acm
@@ -154,11 +158,10 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS e
 	ON a.taskID=e.taskID
-        WHERE ((a.singleton=1 AND b.runsDone < a.runs) OR (a.singleton=0))
-	$ORDERBY";
-        //        WHERE ((a.singleton=1 AND a.taskCreateTimestamp $thisMonth) OR (a.singleton=0))
+        WHERE ((a.singleton=1 AND a.taskCreateTimestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL $howOldSingletons day)) OR (a.singleton=0))
+	$ORDERBY"; 
 	//echo("NEW QUERY DEBUG:<hr/> $sql<hr/>");
-        //echo("OLD QUERY DEBUG:<hr/> $sql_original<hr/>");
+    //echo("OLD QUERY DEBUG:<hr/> $sql_original<hr/>");
 	return(db_asocquery($sql));
 }
 

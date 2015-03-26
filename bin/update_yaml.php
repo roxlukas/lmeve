@@ -43,11 +43,11 @@
         } else if ($argc==1 || ($argc==2 && ($argv[1]=='--usage' || $argv[1]='--help' || $argv[1]='/?')) ) {
             echo('--usage, --help, /? - display this help'.PHP_EOL);
             echo('--all - update all tables'.PHP_EOL);
-            echo('--typeIDs - update all tables'.PHP_EOL);
-            echo('--graphicIDs - update all tables'.PHP_EOL);
-            echo('--certificates - update all tables'.PHP_EOL);
-            echo('--blueprints - update all tables'.PHP_EOL);
-            echo('--legacy - update all tables'.PHP_EOL);
+            echo('--typeIDs - update yamltypeids'.PHP_EOL);
+            echo('--graphicIDs - update yamlgraphicids'.PHP_EOL);
+            echo('--certificates - update certificates'.PHP_EOL);
+            echo('--blueprints - update yasmlblueprints'.PHP_EOL);
+            echo('--legacy - convert yamlblueprints into invBlueprintTypes and ramTypeRequirements'.PHP_EOL);
             return;
         } 
         

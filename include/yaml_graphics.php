@@ -96,7 +96,7 @@ function updateYamlGraphicIDs($silent=true) {
         return FALSE;
     }
     
-    $drop="DROP TABLE `$LM_EVEDB`.`yamlGraphicIDs`;";
+    $drop="DROP TABLE IF EXISTS `$LM_EVEDB`.`yamlGraphicIDs`;";
     
     $create="CREATE TABLE `$LM_EVEDB`.`yamlGraphicIDs` (
       `graphicID` int(11) NULL,

@@ -33,6 +33,75 @@ function pocohrefedit($nr) {
 
 function getControlTowers($where='TRUE') {
     global $LM_EVEDB;
+    $sql="SELECT asl.*,asd.*,asf.`typeID` AS `fuelTypeID`, asf.`quantity` AS `fuelQuantity`,
+          iftp.`typeName` AS `fuelTypeName`,ictr.`purpose`,ictr.`quantity` AS `requiredQuantity`,
+          apl.itemName,apl.x,apl.y,apl.z,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
+    FROM `apistarbaselist` asl
+    JOIN `apistarbasedetail` asd
+    ON asl.`itemID`=asd.`itemID`
+    JOIN `apistarbasefuel` asf
+    ON asl.`itemID`=asf.`itemID`
+    JOIN $LM_EVEDB.`invControlTowerResources` ictr
+    ON asf.`typeID`=ictr.`resourceTypeID` AND asl.`typeID`=ictr.`controlTowerTypeID`
+    JOIN $LM_EVEDB.`invTypes` iftp
+    ON asf.`typeID`=iftp.`typeID`
+    JOIN $LM_EVEDB.`invNames` ssn
+    ON asl.`locationID`=ssn.`itemID`
+    JOIN $LM_EVEDB.`invNames` ssm
+    ON asl.`moonID`=ssm.`itemID`
+    JOIN $LM_EVEDB.`invTypes` itp
+    ON asl.`typeID`=itp.`typeID`
+    LEFT JOIN `apilocations` apl
+    ON asl.`itemID`=apl.`itemID`
+    WHERE $where
+    ORDER BY ssm.`itemName`,ictr.`purpose`,iftp.`typeName`;";
+    //echo("DEBUG: $sql");
+    $rawdata=db_asocquery($sql);
+    $ret=array();
+    foreach($rawdata as $row) { //zmiana struktury danych
+        $itemID=$row['itemID'];
+        $fuelTypeID=$row['fuelTypeID'];
+        $ret[$itemID]['itemID']=$itemID;
+        $ret[$itemID]['state']=$row['state'];
+        $ret[$itemID]['towerTypeID']=$row['typeID'];
+        $ret[$itemID]['towerTypeName']=$row['typeName'];
+        $ret[$itemID]['towerName']=$row['itemName'];
+        $ret[$itemID]['locationID']=$row['locationID'];
+        $ret[$itemID]['moonID']=$row['moonID'];
+        $ret[$itemID]['stateTimestamp']=$row['stateTimestamp'];
+        $ret[$itemID]['onlineTimestamp']=$row['onlineTimestamp'];
+        $ret[$itemID]['standingOwnerID']=$row['standingOwnerID'];
+        $ret[$itemID]['usageFlags']=$row['usageFlags'];
+        $ret[$itemID]['deployFlags']=$row['deployFlags'];
+        $ret[$itemID]['allowCorporationMembers']=$row['allowCorporationMembers'];
+        $ret[$itemID]['allowAllianceMembers']=$row['allowAllianceMembers'];
+        $ret[$itemID]['onStandingDrop']=$row['onStandingDrop'];
+        $ret[$itemID]['onStatusDrop']=$row['onStatusDrop'];
+        $ret[$itemID]['onStatusDropStanding']=$row['onStatusDropStanding'];
+        $ret[$itemID]['onAggression']=$row['onAggression'];
+        $ret[$itemID]['onCorporationWar']=$row['onCorporationWar'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['fuelTypeID']=$fuelTypeID;
+        $ret[$itemID]['fuel'][$fuelTypeID]['fuelTypeName']=$row['fuelTypeName'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['fuelQuantity']=$row['fuelQuantity'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['requiredQuantity']=$row['requiredQuantity'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['purpose']=$row['purpose'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['timeLeft']=floor($row['fuelQuantity']/$row['requiredQuantity']);
+        $ret[$itemID]['location']['x']=$row['x'];
+        $ret[$itemID]['location']['y']=$row['y'];
+        $ret[$itemID]['location']['z']=$row['z'];
+        $ret[$itemID]['location']['solarSystemName']=$row['solarSystemName'];
+        $ret[$itemID]['location']['moonName']=$row['moonName'];
+        
+    }
+    if ($rawdata !== FALSE) {
+        return $ret;
+    } else {
+        return FALSE;
+    }
+}
+
+function getControlTowersOld($where='TRUE') {
+    global $LM_EVEDB;
     $sql="SELECT asl.*,apl.itemName,apl.x,apl.y,apl.z,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
     FROM `apistarbaselist` asl
     JOIN $LM_EVEDB.`invNames` ssn
@@ -214,8 +283,146 @@ function showLabsAndTasks($towers) {
     }
 }
 
-function showControlTowers($controltowers) {
-    
+function showControlTowers($controltowers) {   
+        if (count($controltowers)>0) {
+            ?>
+            <table class="lmframework" style="min-width: 800px; width: 90%;" id="">
+			
+	    <?php
+			foreach ($controltowers as $row) {
+            ?>
+            <tr>
+                <td width="30%" style="text-align: center;">
+                    <?php towershrefedit($row['itemID']); ?>
+                    <h1 style="text-align: center;"><?=$row['towerName']?></h1>
+                    <img src="ccp_img/<?=$row['towerTypeID']?>_64.png" title="<?=$row['towerTypeName']?>" />
+                    <h3 style="text-align: center;"><?=$row['location']['moonName']?></h3>
+                    <i><?=$row['towerTypeName']?></i>
+                    </a>
+                </td>
+                <td width="40%" style="vertical-align: top;">
+                    <table class="lmframework" style="width: 100%;">
+                        <tr>
+                            <th colspan="2" style="text-align: center;">
+                                State
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                State
+                            </td>
+                            <td>
+                                <?php
+                                switch($row['state']) {
+                                case 1:
+                                    echo('anchored');
+                                    break;
+                                case 4:
+                                    echo('online');
+                                    break;
+                                default:
+                                    echo('unknown');
+                                }?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Online since
+                            </td>
+                            <td>
+                                <?=$row['onlineTimestamp']?>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="lmframework" style="width: 100%;">
+                        <tr>
+                            <th colspan="4" style="text-align: center;">
+                                Fuel
+                            </th>
+                        </tr>
+                        <?php
+                            foreach ($row['fuel'] as $fuel) {
+                                $timeleft=$fuel['timeLeft'];
+                                if ($timeleft < 48 && $fuel['purpose']==1) $style=" color: red; font-weight: bold;"; else $style="";
+                                if ($timeleft > 24) {
+                                    $days=floor($timeleft/24);
+                                    $hours=$timeleft%24;
+                                    $timeleft="$days d $hours h";
+                                } else {
+                                    $timeleft="$timeleft h";
+                                }
+                                echo('<tr><td style="padding: 0px; width: 32px;"><img src="ccp_img/'.$fuel['fuelTypeID'].'_32.png" title="" /></td><td>'.$fuel['fuelTypeName'].'</td><td style="text-align: right;">'.$fuel['fuelQuantity'].'</td><td style="text-align: right;'.$style.'">'.$timeleft.'</td></tr>');
+                            }
+                        ?>
+                    </table>
+
+                </td>
+                <td width="30%" style="vertical-align: top;">
+                    <table class="lmframework" style="width: 100%;">
+                        <tr>
+                            <th colspan="2" style="text-align: center;">
+                                Usage settings
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                Allow corp
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['allowCorporationMembers']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Allow alliance
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['allowAllianceMembers']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="text-align: center">
+                                Defense settings
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                Attack on standings
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['onStandingDrop']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Attack on aggression
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['onAggression']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Attack when at war
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['onCorporationWar']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                    </table>
+                </td>    
+            </tr>
+            <?php
+            }
+            ?>
+	    </table>
+	    <?php
+        } else {
+		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t have any POSes</th</tr></table>');
+        }
+}
+
+function showControlTowersOld($controltowers) {   
         if (count($controltowers)>0) {
 			?>
 		    <table class="lmframework" style="" id="">
@@ -273,10 +480,8 @@ function showControlTowers($controltowers) {
         } else {
 		echo('<table class="lmframework" style="width: 564px;"><tr><th style="text-align: center;">Corporation doesn\'t have any POSes</th</tr></table>');
         }
-        
-    
-    
 }
+
 /*
  * Laurvier II = 40316877 (mapping: invNames)
  * Laurvier II planet typeID=2016 (mapping: invItems)
@@ -470,7 +675,7 @@ function showPocoClients($clients) {
 
 function showPocos($pocos, $income=null) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
-    $TABWIDTH='1016px';
+    $TABWIDTH='1024px';
         if (count($pocos)>0) {
             //find max monthly income for percentage scaling
             $maxIncome=0.0;
@@ -479,7 +684,7 @@ function showPocos($pocos, $income=null) {
             }
             //display header
 			?>
-			<table class="lmframework" style="width: <?php echo($TABWIDTH); ?>" id="pocos">
+			<table class="lmframework" style="width: 90%; min-width: <?php echo($TABWIDTH); ?>" id="pocos">
 			<tr><th style="width: 64px; padding: 0px; text-align: center;" rowspan="2">
 				Icon
 			</th><th style="width: 100px; text-align: center;" rowspan="2">

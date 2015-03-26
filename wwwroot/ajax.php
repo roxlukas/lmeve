@@ -1,18 +1,17 @@
 <?php
 set_include_path("../include");
 date_default_timezone_set("Europe/Paris");
+if (!is_file('../config/config.php')) die('Config file not found.');
 include_once('../config/config.php'); //load config file
+if ($LM_DEBUG==TRUE) error_reporting(E_ALL ^ E_NOTICE); else error_reporting(0);
 include_once("db.php");  //db access functions
 include_once("log.php");  //logging facility
 include_once('auth.php'); //authentication and authorization
-
 include_once('materials.php'); //material related subroutines
 include_once('tasks.php'); //task related subroutines
 include_once('inventory.php'); //inventory and pos related subroutines
 include_once('stats.php'); //real time stats
-
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
-
 include_once('configuration.php'); //configuration settings in db
 
 function hrefedit_item($nr) {
@@ -128,6 +127,7 @@ if ($act=='') $act=0;
             $typeID=$data['typeID'];
             $activityID=$data['activityID'];
             $structureID=$data['structureID'];
+            $techLevel=getTechLevel($typeID);
             if (!is_null($structureID)) {
                 $location=getLabDetails($structureID);
             } else {
@@ -140,7 +140,11 @@ if ($act=='') $act=0;
             if (!isset($activityID)) $activityID=1;
             
             if ($activityID==8) { //invention materials are now bound to T1 BP, not T2 BP
-                $tmpBPO=getT1BPOforT2BPO($typeID);
+                if ($techLevel==2) {
+                    $tmpBPO=getT1BPOforT2BPO($typeID);
+                } else if ($techLevel==3) {
+                    $tmpBPO=getRelicForT3BPC($typeID);
+                }
                 //echo("<h2>Invention DEBUG</h2><pre>".print_r($tmpBPO,TRUE)."</pre>");
                 $typeID=$tmpBPO['blueprintTypeID'];
             }

@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="21";
+$POLLER_VERSION="22";
 $POLLER_MAX_TIME=900;
 set_time_limit($POLLER_MAX_TIME-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
@@ -919,6 +919,127 @@ foreach ($api_keys as $api_key) {
 	} else {
 		warning("StarbaseList.xml",$FEED_BLOCKED);
 	}
+        
+        //StarbaseDetails.
+	//First: max_value = SELECT MAX(`contractID`) FROM `apicontractitems`;
+	//If null, then = 0
+	//Then: SELECT `contractID` FROM apicontracts WHERE `contractID` > max_value;
+	//for each contract - fetch items, inert to DB
+	//maybe it will work without php checking? i.e. max_value as sub query?
+	//it works!! if there is a not-null value. A record with all zeros will do just fine.
+	//ContractItems: $API_BASEURL/corp/ContractItems.xml.aspx
+	//Parameters	 userID, apiKey, contractID 
+	//Cache Time (minutes)	 15
+	$starbases=db_asocquery("SELECT `itemID` FROM apistarbaselist WHERE `corporationID`=$corporationID;");
+	if (sizeof($starbases) > 0) {
+		foreach($starbases as $starbase) {
+			$itemID=$starbase['itemID'];
+			if (!apiCheckErrors($keyid,"StarbaseDetail.xml")) {
+				$stb=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID=${keyid}&vCode=${vcode}&itemID=$itemID","${mycache}/StarbaseDetail_${keyid}_${itemID}.xml",0);
+				if (isset($stb->error)) {
+					apiSaveWarning($keyid,"Error for starbase itemID=${itemID}: ".$stb->error,"StarbaseDetail.xml");
+				} else {
+                                        $state=$stb->result->state;
+                                        $stateTimestamp=$stb->result->stateTimestamp;
+                                        $onlineTimestamp=$stb->result->onlineTimestamp;
+                                        $usageFlags=$stb->result->generalSettings->usageFlags;
+                                        $deployFlags=$stb->result->generalSettings->deployFlags;
+                                        $allowCorporationMembers=$stb->result->generalSettings->allowCorporationMembers;
+                                        $allowAllianceMembers=$stb->result->generalSettings->allowAllianceMembers;
+                                        $attrs=$stb->result->combatSettings->useStandingsFrom->attributes();
+                                            $useStandingsFrom=$attrs->ownerID;
+                                        $attrs=$stb->result->combatSettings->onStandingDrop->attributes();
+                                            $onStandingDrop=$attrs->standing;
+                                        $attrs=$stb->result->combatSettings->onStatusDrop->attributes();
+                                            $onStatusDrop=$attrs->enabled;
+                                            $onStatusDropStanding=$attrs->standing;
+                                        $attrs=$stb->result->combatSettings->onAggression->attributes();
+                                            $onAggression=$attrs->enabled;
+                                        $attrs=$stb->result->combatSettings->onCorporationWar->attributes();
+                                            $onCorporationWar=$attrs->enabled;
+                                        //BIG SQL INSERT
+                                        $sql="INSERT INTO apistarbasedetail VALUES (".
+                                        $itemID.",".
+                                        $state.",".
+                                        ins_string($stateTimestamp).",".
+                                        ins_string($onlineTimestamp).",".
+                                        $usageFlags.",".
+                                        $deployFlags.",".
+                                        $allowCorporationMembers.",".
+                                        $allowAllianceMembers.",".
+                                        $useStandingsFrom.",".
+                                        $onStandingDrop.",".
+                                        $onStatusDrop.",".
+                                        $onStatusDropStanding.",".
+                                        $onAggression.",".
+                                        $onCorporationWar.",".
+                                        $corporationID.
+                                        ") ON DUPLICATE KEY UPDATE".
+                                            " `state`=".$state.
+                                            ",`stateTimestamp`=".ins_string($stateTimestamp).
+                                            ",`onlineTimestamp`=".ins_string($onlineTimestamp).
+                                            ",`usageFlags`=".$usageFlags.
+                                            ",`deployFlags`=".$deployFlags.
+                                            ",`allowCorporationMembers`=".$allowCorporationMembers.
+                                            ",`allowAllianceMembers`=".$allowAllianceMembers.
+                                            ",`useStandingsFrom`=".$useStandingsFrom.
+                                            ",`onStandingDrop`=".$onStandingDrop.
+                                            ",`onStatusDrop`=".$onStatusDrop.
+                                            ",`onStatusDropStanding`=".$onStatusDropStanding.
+                                            ",`onAggression`=".$onAggression.
+                                            ",`onCorporationWar`=".$onCorporationWar.';';
+                                        db_uquery($sql);
+                                        //FUEL
+					$rows=$stb->result->rowset->row; //fuel
+					foreach ($rows as $row) {
+						$attrs=$row->attributes();
+						$sql="INSERT INTO apistarbasefuel VALUES (".
+						$itemID.",".
+						$attrs->typeID.",".
+						$attrs->quantity.",".
+						$corporationID.
+						") ON DUPLICATE KEY UPDATE".
+                                                    " quantity=".$attrs->quantity;
+						db_uquery($sql);
+					}
+					apiSaveOK($keyid,"StarbaseDetail.xml");
+				}
+			} else {
+				warning("StarbaseDetail.xml",$FEED_BLOCKED);
+			}	
+		}
+	}
+        
+        
+       /*
+<eveapi version="2">
+<currentTime>2015-03-23 15:25:14</currentTime>
+<result>
+<state>4</state>
+<stateTimestamp>2015-03-23 15:54:03</stateTimestamp>
+<onlineTimestamp>2014-03-03 16:47:13</onlineTimestamp>
+<generalSettings>
+<usageFlags>15</usageFlags>
+<deployFlags>0</deployFlags>
+<allowCorporationMembers>1</allowCorporationMembers>
+<allowAllianceMembers>0</allowAllianceMembers>
+</generalSettings>
+<combatSettings>
+<useStandingsFrom ownerID="xxxxxxxx"/>
+<onStandingDrop standing="0"/>
+<onStatusDrop enabled="0" standing="0"/>
+<onAggression enabled="0"/>
+<onCorporationWar enabled="1"/>
+</combatSettings>
+<rowset name="fuel" key="typeID" columns="typeID,quantity">
+<row typeID="4051" quantity="2899"/>
+<row typeID="16275" quantity="16666"/>
+<row typeID="24594" quantity="12663"/>
+</rowset>
+</result>
+<cachedUntil>2015-03-23 16:12:14</cachedUntil>
+</eveapi>
+        */
 	
 	//POCOS LIST: $API_BASEURL/corp/CustomsOffices.xml.aspx
 	//Parameters	 userID, apiKey, characterID
@@ -1092,10 +1213,15 @@ foreach ($api_keys as $api_key) {
 	//for each contract - fetch items, inert to DB
 	//maybe it will work without php checking? i.e. max_value as sub query?
 	//it works!! if there is a not-null value. A record with all zeros will do just fine.
+        //BUGFIX the loop below would fail if there were two corporation in LMeve with contract items to refresh
+        //       because there was no corporationID filter in the "SELECT" query
+        //       as a result, poller cycle for corp A would ask for corp A and corp B contracts
+        //       but API would fail for corp B contracts.
+        //       In the corp B cycle, API would fail for corp A contracts instead
 	//ContractItems: $API_BASEURL/corp/ContractItems.xml.aspx
 	//Parameters	 userID, apiKey, contractID 
 	//Cache Time (minutes)	 15
-	$contracts=db_asocquery("SELECT `contractID` FROM apicontracts WHERE `contractID` > (SELECT MAX(`contractID`) FROM `apicontractitems`) AND `type`!='Courier';");
+	$contracts=db_asocquery("SELECT `contractID` FROM apicontracts WHERE `corporationID`=$corporationID AND `contractID` > (SELECT MAX(`contractID`) FROM `apicontractitems`) AND `type`!='Courier';");
 	if (sizeof($contracts) > 0) {
 		foreach($contracts as $con) {
 			$contractID=$con['contractID'];
@@ -1526,7 +1652,7 @@ if (!apiCheckErrors(0,"CREST /market/prices/")) {
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat,"CREST /market/prices/");
 	} else {
-		db_uquery("DELETE FROM crestmarketprices WHERE true;");
+		db_uquery("TRUNCATE TABLE crestmarketprices;");
 		$rows=$dat->items;
 		foreach ($rows as $row) {
                     if (!isset($row->adjustedPrice)) $row->adjustedPrice=0.0;
@@ -1544,6 +1670,34 @@ if (!apiCheckErrors(0,"CREST /market/prices/")) {
 	}
 } else {
 	warning("CREST /market/prices/",$FEED_BLOCKED);
+}
+
+if (!apiCheckErrors(0,"CREST /industry/systems/")) {
+	$dat=get_crest_contents("$CREST_BASEURL/industry/systems/","${mycache}/crest_industry_systems.xml",1*60*60);
+	if (isset($dat->error)) {
+		apiSaveWarning(0,$dat,"CREST /industry/systems/");
+	} else {
+		db_uquery("TRUNCATE TABLE crestindustrysystems;");
+		$rows=$dat->items;
+		foreach ($rows as $row) {
+                    $solarsystemID=$row->solarSystem->id;
+                    foreach ($row->systemCostIndices as $sci) {
+                        $costIndex=$sci->costIndex;
+                        $activityID=$sci->activityID_str;
+                        //echo("$solarsystemID,$costIndex,$activityID\r\n");
+			$sql="INSERT INTO crestindustrysystems VALUES(".
+			$solarsystemID.",".
+			$costIndex.",".
+                        $activityID.
+			");";
+			db_uquery($sql);
+                    }
+		}
+                //var_dump($dat);
+		apiSaveOK(0,"CREST /industry/systems/");
+	}
+} else {
+	warning("CREST /industry/systems/",$FEED_BLOCKED);
 }
 
 /******************** EVE-CENTRAL PUBLIC FEEDS **************************/

@@ -68,7 +68,7 @@ Funkcje dost�pu do bazy danych
 
 //db_connect zwraca identyfikator po��czenia z MySQL
 function db_connect() {
-	global $LM_DEBUG,$LM_DBENGINE,$LM_dbname,$LM_dbuser,$LM_dbpass;
+	global $LM_DEBUG,$LM_DBENGINE,$LM_dbhost,$LM_dbname,$LM_dbuser,$LM_dbpass;
     
     
     if ($LM_DBENGINE=="MYSQL") {

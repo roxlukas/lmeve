@@ -69,8 +69,7 @@ function url_replace($input) {
 					$isBlueprint=FALSE;
 				}
 				if (!empty($tasks['blueprintTypeID'])) {
-					if ($tasks['bpoTechLevel']==2) echo('<input type="button" value="Invention" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=8\';">');
-					if ($tasks['bpoTechLevel']==3) echo('<input type="button" value="Reverse Eng." onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=7\';">');
+					if ($tasks['bpoTechLevel']==2 || $tasks['bpoTechLevel']==3) echo('<input type="button" value="Invention" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=8\';">');
 					echo('<input type="button" value="Copying" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=5\';">');
 					echo('<input type="button" value="ME" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=4\';">');
 					echo('<input type="button" value="PE" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=3\';">');
@@ -651,7 +650,7 @@ if (!$MOBILE) {
 		if ($produceditem[4]==2) echo("<tr><td class=\"tab\"><b>Base Invention chance:</b></td><td class=\"tab\">${produceditem[12]}</td></tr>");
 	}
 
-	$sql="SELECT valueFloat,valueInt,displayName,description
+	$sql="SELECT COALESCE(valueFloat,valueInt),COALESCE(valueFloat,valueInt),displayName,description
 	FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
 	JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
 	ON dta.attributeID=da.attributeID
@@ -659,10 +658,10 @@ if (!$MOBILE) {
 	AND displayName != '';";
 	$attr=db_query($sql); //dogma! [0]=valueFloat [1]=valueInt [2]=displayName [3]=description
 	foreach ($attr as $element) {
-		if (eregi(".*resistance$", $element[2], $regs)) {
+		if (preg_match("/.*resistance$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%6.1f%%",100*(1.0-$element[0]));
 		}
-		if (eregi(".*skill.*", $element[2], $regs)) {
+		if (preg_match("/.*skill.*/i", $element[2], $regs)) {
 			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$skill[0][0]);
 		}
@@ -692,42 +691,36 @@ if (!$MOBILE) {
 			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_img/${element[1]}_32.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$fuel[0][0]);
 		}
-		if (eregi(".*duration$", $element[2], $regs)) {
+		if (preg_match("/.*duration$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
-		if (eregi("Drone Capacity|.*Bay Capacity|.*Hangar Capacity|.*Hold Capacity", $element[2], $regs)) {
+		if (preg_match("/Drone Capacity|.*Bay Capacity|.*Hangar Capacity|.*Hold Capacity/i", $element[2], $regs)) {
 			$element[0]=number_format($element[0], 0, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup>";
 		}
-		if (eregi(".*Velocity$", $element[2], $regs)) {
+		if (preg_match("/.*Velocity$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d m/s",$element[0]);
 		}
-		if (eregi("Bandwidth", $element[2], $regs)) {
+		if (preg_match("/Bandwidth/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d MB/s",$element[0]);
 		}
 		if (strstr("Planet Type Restriction",$element[2])) {
 			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$planettype[0][0]);
 		}
-		/*if (strstr("Can be fitted to",$element[2])) {
-			if (!empty($element[1])) $fittedto=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"> %s</a>",$element[1],$fittedto[0][0]);
-		}*/
-		//if (eregi(".*Damage Resistance$", $element[2], $regs)) {
-		//	$element[0]=sprintf("%d %%",100*(1.0-$element[0]));
-		//}
-		if (eregi("Warp Speed Multiplier",$element[2], $regs)) {
+
+		if (preg_match("/Warp Speed Multiplier/i",$element[2], $regs)) {
 			$element[0]=sprintf("%6.2f AU/s",$element[0]);
 			//$element[2]="Warp Speed";
 		}
-                if (eregi("powergrid usage",$element[2], $regs)) {
+                if (preg_match("/powergrid usage/i",$element[2], $regs)) {
 			$element[0]=sprintf("%d MW",$element[1]);
 			//$element[2]="Warp Speed";
 		}
-                if (eregi("CPU usage",$element[2], $regs)) {
+                if (preg_match("/CPU usage/i",$element[2], $regs)) {
 			$element[0]=sprintf("%d tf",$element[1]);
 			//$element[2]="Warp Speed";
 		}
-		if (eregi(".*echarge time$", $element[2], $regs) || strstr("Rate of fire",$element[2])) {
+		if (preg_match("/.*echarge time$/i", $element[2], $regs) || strstr("Rate of fire",$element[2])) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
 		if (strstr("Consumption Type",$element[2])) {

@@ -153,7 +153,7 @@ function recreateLegacyTables() {
     NULL AS `parentBlueprintTypeID`,
     manu.`productTypeID`,
     manu.`time` AS `productionTime`,
-    imt.`metaGroupID` AS `techLevel`,
+    COALESCE(dgm.`valueInt`,dgm.`valueFloat`) AS `techLevel`,
     te.`time` AS `researchProductivityTime`,
     me.`time` AS `researchMaterialTime`,
     copy.`time` AS `researchCopyTime`,
@@ -175,6 +175,8 @@ function recreateLegacyTables() {
       ON ybt.`blueprintTypeID`=inv.`blueprintTypeID` AND inv.`activityID`=8
     LEFT JOIN `$LM_EVEDB`.`invMetaTypes` imt
       ON manu.`productTypeID`=imt.`typeID`
+    LEFT JOIN `$LM_EVEDB`.`dgmTypeAttributes` dgm
+      ON manu.`productTypeID`=dgm.`typeID` AND dgm.`attributeID`=422
     WHERE TRUE;";
     
     db_uquery($insertinvBlueprintTypes);

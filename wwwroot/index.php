@@ -33,11 +33,10 @@
 
 set_include_path("../include");
 date_default_timezone_set("Europe/Paris");
-if (!is_file('../config/config.php')) die ($LANG['CONFIGERROR']);
+if (!is_file('../config/config.php')) die('Config file not found.');
 include_once('../config/config.php'); //load config file
 if ($LM_DEBUG==TRUE) error_reporting(E_ALL ^ E_NOTICE); else error_reporting(0);
 include_once("db.php");  //db access functions
-//include_once("ping.php");  //ping function - not used
 include_once("log.php");  //logging facility
 include_once('auth.php'); //authentication and authorization
 include_once("lang.php");  //translations
@@ -47,16 +46,12 @@ include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
 
-$lmver="0.1.51 beta";
-
-if (!is_file('../config/config.php')) die('Config file not found.');
+$lmver="0.1.52 beta";
  
 //Ustawienie sesji i parametrów ciastka sesyjnego
 $param=session_get_cookie_params();
 session_set_cookie_params($LM_SESSION,$LM_COOKIEPATH,$param['domain'],$LM_COOKIESECUREONLY,true);
 session_start();
-
-
 
 //POPRAWKI BEZPIECZEŃSTWA - regenrowanie ID sesji po przekirowaniu HTTP->HTTPS
 if ($_SESSION['regenerateID']===true) {

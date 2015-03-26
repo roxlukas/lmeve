@@ -1,13 +1,65 @@
 <?php
 //Blueprint and material related functions
 
+function getBlueprintByProduct($typeID) {
+        $DEBUG=FALSE;
+        if (empty($typeID)) return FALSE;
+	global $LM_EVEDB;
+	$blueprint=db_asocquery("SELECT ybp.*,itp.`typeName`,COALESCE(dgm.`valueInt`,dgm.`valueFloat`) AS techLevel 
+            FROM $LM_EVEDB.`yamlBlueprintProducts` ybp 
+            JOIN $LM_EVEDB.`invTypes` itp
+            ON ybp.`blueprintTypeID`=itp.`typeID`
+            JOIN $LM_EVEDB.`dgmTypeAttributes` dgm
+            ON ybp.`productTypeID`=dgm.`typeID`
+            WHERE ybp.`productTypeID`=$typeID
+            AND dgm.`attributeID`=422;");
+	if (count($blueprint)>0) {
+            if ($DEBUG) echo("Found blueprint(s) in yamlBlueprintProducts<br/>");
+            if ($blueprint[0]['techLevel']==3 && count($blueprint)>1) {
+                if ($DEBUG) echo("This is Tech III and has multiple blueprints (relics)<br/>");
+                if ($DEBUG) echo('<pre>');
+                if ($DEBUG) var_dump($blueprint);
+                if ($DEBUG) echo('</pre>');
+                foreach($blueprint as $relic) {
+                    if (strstr($relic['typeName'], getConfigItem('T3relicType','Wrecked')) !== FALSE) {
+                        if ($DEBUG) echo("Returning single relic<br/>");
+                        return $relic;
+                    }
+                }
+                if ($DEBUG) echo("Didn't found relic for typeID=$typeID , sorry<br/>");
+            } else {
+                if ($DEBUG) echo("Returning single blueprint<br/>");
+                return $blueprint[0];
+            }
+	} else { //blueprint not found... maybe given typeID is a blueprint itself??
+            $blueprint=db_asocquery("SELECT ybp.*,itp.`typeName`,COALESCE(dgm.`valueInt`,dgm.`valueFloat`) AS techLevel 
+            FROM $LM_EVEDB.`yamlBlueprintProducts` ybp 
+            JOIN $LM_EVEDB.`invTypes` itp
+            ON ybp.`blueprintTypeID`=itp.`typeID`
+            JOIN $LM_EVEDB.`dgmTypeAttributes` dgm
+            ON ybp.`productTypeID`=dgm.`typeID`
+            WHERE ybp.`blueprintTypeID`=$typeID
+            AND dgm.`attributeID`=422;");
+            if (count($blueprint)>0) {
+                if ($DEBUG) echo("Provided typeID is itself a blueprint<br/>");
+                //ha! it's blueprint all right! told you!!
+                return $blueprint[0];
+            } else {
+                if ($DEBUG) echo("Didn't found blueprint for typeID=$typeID , sorry<br/>");
+                //not found either... mkay, return false
+                return FALSE;
+            }
+	}
+}
+
 /**
  * Finds blueprint typeID for product typeID
  * 
  * @global type $LM_EVEDB - static data dump schema
  * @param $typeID - blueprint typeID
  */
-function getBlueprintByProduct($typeID) {
+function getBlueprintByProductOld($typeID) {
+        if (empty($typeID)) return FALSE;
 	global $LM_EVEDB;
 	$blueprint=db_asocquery("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `productTypeID` = $typeID;");
 	//$techLevel=$blueprint[0][4];
@@ -35,14 +87,28 @@ function getBlueprintByProduct($typeID) {
  */
 function getT1BPOforT2BPO($typeID) {
         global $LM_EVEDB;
-        $blueprint=db_asocquery("SELECT t1.* FROM $LM_EVEDB.`invBlueprintTypes` t1 
-                JOIN $LM_EVEDB.`invMetaTypes` imt
-                ON t1.`productTypeID`=imt.`parentTypeID`
-                JOIN $LM_EVEDB.`invBlueprintTypes` t2
-                ON imt.`typeID`=t2.`productTypeID`
-                WHERE t2.`blueprintTypeID` = $typeID
-                AND t2.`techLevel`=2;");
+        $blueprint=db_asocquery("SELECT ybp.* 
+                FROM $LM_EVEDB.`yamlBlueprintProducts` ybp
+                JOIN $LM_EVEDB.`invTypes` itp
+                ON ybp.`blueprintTypeID`=itp.`typeID`
+                WHERE `productTypeID`=$typeID;");
         if (count($blueprint)==1) {
+            return $blueprint[0];
+	} else { //blueprint not found... maybe given typeID is a blueprint itself??
+            return FALSE;
+	}
+}
+
+function getRelicForT3BPC($typeID) {
+        global $LM_EVEDB;
+        $relicType=getConfigItem('T3relicType','Wrecked');
+        $blueprint=db_asocquery("SELECT ybp.* 
+                FROM $LM_EVEDB.`yamlBlueprintProducts` ybp
+                JOIN $LM_EVEDB.`invTypes` itp
+                ON ybp.`blueprintTypeID`=itp.`typeID`
+                WHERE `productTypeID`=$typeID
+                AND itp.`typeName` LIKE '%$relicType%';");
+        if (count($blueprint)>=1) {
             return $blueprint[0];
 	} else { //blueprint not found... maybe given typeID is a blueprint itself??
             return FALSE;
@@ -220,6 +286,11 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
         
         $typeID=$bpo['blueprintTypeID'];
         
+        if (empty($typeID)) {
+            echo("Error: getBlueprintByProduct() returned empty typeID");
+            return FALSE;
+        }
+        
 	$techLevel=$bpo['techLevel'];
         
         $sql="SELECT ybm.`materialTypeID` AS `typeID`, itp.`typeName`, ybm.`quantity`, 0 AS `damagePerJob`, 0 AS `recycle`
@@ -243,6 +314,7 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
                 $melevel=$set['me'];
                 $pelevel=$set['pe'];
         }
+        
         switch ($techLevel) {
                 case 2:
                         if (!isset($melevel)) $melevel=0;
@@ -256,6 +328,8 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
                         if (!isset($melevel)) $melevel=0;
                         if (!isset($pelevel)) $pelevel=0;
         }
+        
+       
         if (!is_null($melvl_override)) {
             $melevel=$melvl_override;
         }
@@ -270,6 +344,19 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
             $materials[$i]['notperfect']=$runs*round($row['quantity']*$multiplier);
             $materials[$i]['waste']=$waste;
         }
+        
+        //inject relics for tech III jobs :D
+        if ($techLevel==3 && $activityID==8) {
+            if ($DEBUG_MODE) echo("This is Tech III job<br/>");
+            $relic=db_asocquery("SELECT `typeID`,`typeName`,$runs AS `quantity`, 0 AS `damagePerJob`, 0 AS `recycle`, $runs AS `notperfect`, 0 AS `waste`
+                    FROM $LM_EVEDB.`invTypes`
+                    WHERE typeID=$typeID;");
+            if(count($relic)!=0) {
+                if ($DEBUG_MODE) echo("Injecting relic as material<br/>");
+                array_push($materials, $relic[0]);
+            }
+        }
+        
         //end ME modification
         return $materials;
 
@@ -602,6 +689,7 @@ function calcManufacturingCost($typeID) {
  */
 function calcInventionCost($typeID) {
     global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_MAN;
+    $DEBUG=FALSE;
     $returns=array();
     $returns['price']=0;
     $returns['accurate']=true;
@@ -610,13 +698,17 @@ function calcInventionCost($typeID) {
     } else {
         return false;
     }
-    //now check if we are dealing with Tech II at all
-    if ($t2bpo['techLevel']!=2) return false;
+    //now check if we are dealing with Tech II or Tech III at all
+    if ($t2bpo['techLevel']<2) {
+        if ($DEBUG) echo("Invention requires the item to be at least Tech II or higher (this job is tech ".$t2bpo['techLevel'].")<br/>");
+        return false;
+    }
     
     //Number of invented runs:
     //CategoryID = 6 - ships - have 1 run
     //GroupID = 330 - cloaks - have 1 run
     //GroupID = 773 - 782 - rigs - have 1 run
+    if ($DEBUG) echo("Getting item stats<br/>");
     $stats=db_asocquery("SELECT it.`portionSize`,it.`groupID`,ig.`categoryID`,it.`typeID` FROM $LM_EVEDB.`invTypes` it JOIN $LM_EVEDB.`invGroups` ig ON it.`groupID`=ig.`groupID` WHERE `typeID`=$typeID;");
     $stats=$stats[0];
     
@@ -628,40 +720,31 @@ function calcInventionCost($typeID) {
     } else {
         $bpcruns=10; //static 10 runs BPC for everything else
     }
-    //Invention chances
-    if ($stats['categoryID']==7 || $stats['categoryID']==8 || $stats['categoryID']==18) {
-        $invchance=0.4;
-    } else if ($stats['groupID']==324 || $stats['groupID']==831 || $stats['groupID']==834 || $stats['groupID']==830 || $stats['groupID']==541 || $stats['groupID']==902 || $stats['groupID']==893 || $stats['typeID']==22546) {
-        //frigates, destroyers, freighters, skiff
-        //AF - 324, Cep - 831, SB - 834, Cov - 830
-        //Dic - 541
-        //JF - 902
-        //EAF - 893
-        $invchance=0.3;
-    } else if ($stats['groupID']==1202 || $stats['groupID']==380 || $stats['groupID']==906 || $stats['groupID']==358 || $stats['groupID']==833 || $stats['groupID']==894 || $stats['typeID']==22548) {
-        //crusier, industrials, mackinaw
-        //Blockade runner - 1202
-        //DST - 380
-        //Combat Recon - 906
-        //HAC - 358
-        //Force Recon - 833
-        //HIC - 894
-        $invchance=0.25;
-    } else if ($stats['groupID']==540 || $stats['groupID']==898 || $stats['groupID']==900 || $stats['typeID']==22544) {
-        //battlecruisers, battlships, hulk
-        //CS - 540
-        //BO - 898, Marauder - 900
-        $invchance=0.2;
-    } 
     
-    //find TEch I BPO
-    $t1bptypeID=getT1BPOforT2BPO($bptypeID);
+    if ($DEBUG) echo("Using $bpcruns BPC runs<br/>");
     
-    if ($t1bptypeID === FALSE) return FALSE;
+    if ($t2bpo['techLevel']==2) {
+        if ($DEBUG) echo("This is tech II invention job, getting Tech I BPO stats<br/>");
+        //for Tech II, find Tech I BPO
+        $t1bptypeID=getT1BPOforT2BPO($bptypeID);
+    } else if ($t2bpo['techLevel']==3) {
+        if ($DEBUG) echo("This is tech III invention job, getting Relic stats<br/>");
+        //for Tech III, must find a Relic
+        $t1bptypeID=getRelicForT3BPC($bptypeID);
+    }
+
+    if ($t1bptypeID === FALSE) {
+        if ($DEBUG) echo("Didn't find suitable Blueprint or Relic<br/>");
+        return FALSE;
+    }
+    
+    $invchance=$t1bptypeID['probability'];
+    $t1bptypeID=$t1bptypeID['blueprintTypeID'];
     
     //echo("t1bptypeID=".$t1bptypeID['blueprintTypeID']);
-    
-    $extraMats=getBaseMaterials($t1bptypeID['blueprintTypeID'], 1, 0, 8);
+    if ($DEBUG) echo("Getting materials...<br/>");
+    $extraMats=getBaseMaterials($t1bptypeID, 1, 0, 8);
+
     //form a complete material list
     if ($extraMats) {
         foreach ($extraMats as $mat) {
@@ -669,8 +752,7 @@ function calcInventionCost($typeID) {
             $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
         }
     }
-    
-   
+
     if (count($completeMats)>0) {
         foreach ($completeMats as $id => $mat) {
             if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {             
@@ -680,9 +762,12 @@ function calcInventionCost($typeID) {
                 //echo("Missing price: ${mat['typeName']}<br/>");
             }
         }
+        //echo("DEBUG invchance=$invchance bpcruns=$bpcruns portionSize=$portionSize<br/>");
         $returns['price']=(($returns['price']/$invchance)/$bpcruns)/$portionSize;
+        if ($DEBUG) echo("Returning materials (OK)<br/>");
         return $returns;
     } else {
+        if ($DEBUG) echo("Didn't find any materials, returning FALSE (NOK)<br/>");
         return false;
     }
 }
@@ -696,8 +781,11 @@ function calcInventionCost($typeID) {
  */
 function displayCosts($typeID) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
+    $DEBUG=FALSE;
     //Manufacturing costs
+    if ($DEBUG) echo('Getting Manufacturing Costs...<br/>');
     $mancost=calcManufacturingCost($typeID);
+    if ($DEBUG) echo('Getting Invention Costs...<br/>');
     $invcost=calcInventionCost($typeID);
     if ($mancost || $invcost) {
         ?>		

@@ -93,6 +93,18 @@ Settings
                                 <input type="text" size="6" name="singletonTaskExpiration" value="<?=getConfigItem('singletonTaskExpiration','90');?>" /> days
                         </td></tr>
                         <tr><td width="150" class="tab">
+                            Relic to use for Tech III:<br></td><td width="200" class="tab">
+                                
+                                <select name="T3relicType"> <?php
+                                $relics=array("Intact","Malfunctioning","Wrecked");
+                                $currentRelic=getConfigItem('T3relicType','Wrecked');
+                                foreach($relics as $row) {
+                                            if ($row==$currentRelic) $select='selected'; else $select='';
+                                            echo("<option value=\"$row\" $select>$row</option>");
+                                }
+                                ?></select>
+                        </td></tr>
+                        <tr><td width="150" class="tab">
                             Get market prices from:<br></td><td width="200" class="tab">
                                 <select name="marketRegion"> <?php
                                 $regions=db_asocquery("SELECT `regionID`,`regionName` FROM `$LM_EVEDB`.`mapRegions` ORDER BY `regionName`;");

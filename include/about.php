@@ -47,6 +47,45 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2015.03.26</div></td>
+<td valign="top" class="tab">
+<b>0.1.52 beta:</b><br>
+<b>Poller version 22</b>
+<ul>
+<li>
+	Poller now fetches StarbaseDetails.xml and CREST industry cost indexes
+</li>
+<li>
+        New POS management screen - displays fuel amounts and how long it will last
+</li>
+<li>
+        There is now a notification when any tower has less than 48 hours of fuel left
+</li>
+<li>
+        Tech III invention added. You can now add Tech III invention tasks and get price estimates for Tech III
+</li>
+<li>
+        New global setting for the default Relic type for use with Tech III Invention (Intact, Malfunctioning or Wrecked)
+</li>
+<li>Bug fixes:<ul>
+    <li>
+        Non-recurring Tasks (singleton) bug fix - they did not display correctly
+    </li>
+    <li>
+        Bug fix in db.php "Notice: LM_dbhost is not defined" - added $LM_dbhost to global declaration
+    </li>
+    <li>
+        Bug fix in Database - "function eregi() is deprecated" - replaced with preg_match()
+    </li>
+    <li>
+        Bug fix in YAML updater - DROP TABLE <strong>IF EXISTS</strong>
+    </li>
+    </ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2015.01.05</div></td>
 <td valign="top" class="tab">
 <b>0.1.51 beta:</b><br>
