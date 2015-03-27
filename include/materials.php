@@ -5,14 +5,15 @@ function getBlueprintByProduct($typeID) {
         $DEBUG=FALSE;
         if (empty($typeID)) return FALSE;
 	global $LM_EVEDB;
-	$blueprint=db_asocquery("SELECT ybp.*,itp.`typeName`,COALESCE(dgm.`valueInt`,dgm.`valueFloat`) AS techLevel 
+        $sql="SELECT ybp.*,itp.`typeName`,COALESCE(dgm.`valueInt`,dgm.`valueFloat`,0) AS techLevel 
             FROM $LM_EVEDB.`yamlBlueprintProducts` ybp 
             JOIN $LM_EVEDB.`invTypes` itp
             ON ybp.`blueprintTypeID`=itp.`typeID`
-            JOIN $LM_EVEDB.`dgmTypeAttributes` dgm
-            ON ybp.`productTypeID`=dgm.`typeID`
-            WHERE ybp.`productTypeID`=$typeID
-            AND dgm.`attributeID`=422;");
+            LEFT JOIN $LM_EVEDB.`dgmTypeAttributes` dgm
+            ON ybp.`productTypeID`=dgm.`typeID` AND dgm.`attributeID`=422
+            WHERE ybp.`productTypeID`=$typeID;";
+	$blueprint=db_asocquery($sql);
+        if ($DEBUG) echo("<pre>$sql</pre>");
 	if (count($blueprint)>0) {
             if ($DEBUG) echo("Found blueprint(s) in yamlBlueprintProducts<br/>");
             if ($blueprint[0]['techLevel']==3 && count($blueprint)>1) {
@@ -393,8 +394,18 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 //$typeID - ITEM typeID
 //$activityID - ID of activity: 1-Manufacturing 5-Copying 8-Invention, etc.
 function getSkills($typeID,$activityID) {
+    $DEBUG=FALSE;
+    if (empty($typeID)) {
+        if ($DEBUG) echo("getSkills called with null typeID, exiting<br/>");
+        return FALSE;
+    }
     $bpo=getBlueprintByProduct($typeID);
     $bpoID=$bpo['blueprintTypeID'];
+    if (empty($bpoID)) {
+        if ($DEBUG) echo("getSkills got null blueprintID from getBlueprintByProduct<br/>");
+        return FALSE;
+    }
+    if ($DEBUG) echo("getSkills got blueprintID=$bpoID<br/>");
 	global $LM_EVEDB;
 	$sql="SELECT ybs.`skillTypeID`, ybs.`level`, itp.`typeName`
         FROM `$LM_EVEDB`.`yamlBlueprintSkills` ybs
@@ -404,9 +415,11 @@ function getSkills($typeID,$activityID) {
         AND `activityID` = $activityID";
 	$skills=db_asocquery($sql); //Skills
 	if (count($skills)>0) {
-		return $skills;
+            if ($DEBUG) echo("Returning skills for typeID=$typeID<br/>");
+            return $skills;
 	} else {
-		return FALSE;
+            if ($DEBUG) echo("Didn't find any skills for typeID=$typeID<br/>");
+            return FALSE;
 	}
 }
 
