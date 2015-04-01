@@ -176,19 +176,27 @@ function getSimpleTasks($where='TRUE') {
 
 function getLabsAndTasks($corporationID) {
     global $LM_EVEDB;
+    $DEBUG=FALSE;
     $raw_towers=getControlTowers("asl.`corporationID`=$corporationID");
+    if ($DEBUG) {
+        echo('DEBUG:<br/>$raw_towers=<pre>'); var_dump($raw_towers); echo('</pre>');
+    }
     
     $towers=array();
     $labs=array();
     if (count($raw_towers)>0) {
         $raw_tasks=getSimpleTasks();
         foreach($raw_towers as $tower) {
-            //var_dump($tower);
-            $x=$tower[x];
-            $y=$tower[y];
-            $z=$tower[z];
+            if ($DEBUG) {
+                echo('$tower=<pre>'); var_dump($tower); echo('</pre>');
+            }
+            $x=$tower['location'][x];
+            $y=$tower['location'][y];
+            $z=$tower['location'][z];
             $raw_labs=getLabs("SQRT(POW($x-apl.x,2)+POW($y-apl.y,2)+POW($z-apl.z,2)) < 30000");
-            //var_dump($raw_labs);
+            if ($DEBUG) {
+                echo('$raw_labs=<pre>'); var_dump($raw_labs); echo('</pre>');
+            }
             $towers[$tower['itemID']]=$tower;
             foreach($raw_labs as $lab) {
                 $towers[$tower['itemID']]['labs'][$lab['facilityID']]=$lab;
@@ -219,7 +227,7 @@ function showLabsAndTasks($towers) {
         ?>
         <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
             <tr><th colspan="6" style="text-align: center;">
-                <?php echo($tower['moonName'].' ("'.$tower['itemName'].'")'); ?>
+                <?php echo($tower['location']['moonName'].' ("'.$tower['towerName'].'")'); ?>
             </th>
             </tr>
             <tr><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
