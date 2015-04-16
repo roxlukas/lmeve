@@ -1369,6 +1369,7 @@ foreach ($api_keys as $api_key) {
                     if (isset($dat->error)) {
                             apiSaveWarning($keyid,$dat->error,"Locations.xml");
                     } else {
+                        //itemID itemName x y z corporationID
                             db_uquery("DELETE FROM `apilocations` WHERE corporationID=$corporationID;");
                             $rows=$dat->result->rowset->row;
                             foreach ($rows as $row) {
@@ -1380,7 +1381,12 @@ foreach ($api_keys as $api_key) {
                                     $attrs->y.",".
                                     $attrs->z.",".
                                     $corporationID.
-                                    ");";
+                                    ") ON DUPLICATE KEY UPDATE ".
+                                    "itemName=".ins_string($attrs->itemName).",".
+                                    "x=".$attrs->x.",".
+                                    "y=".$attrs->y.",".
+                                    "z=".$attrs->z.",".
+                                    "corporationID=".$corporationID.";";
                                     db_uquery($sql);
                             }
                             apiSaveOK($keyid,"Locations.xml");

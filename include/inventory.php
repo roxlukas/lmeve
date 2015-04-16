@@ -516,12 +516,15 @@ function getPocos($where='TRUE') {
     //refresh mapDenormalize VIEW for Stored Procedure
     db_uquery("CREATE OR REPLACE VIEW `mapDenormalize` AS SELECT * FROM `$LM_EVEDB`.`mapDenormalize`");
     //do the real select
+    //`solarsystemID` BETWEEN 30000001 AND 31002604 is a fix for XML API bug that keeps returning destroyed POCOs
+    //in solar systems like: solarSystemID=1915	solarSystemName='EVE Singleton Parent Junkyard - Week 15'
     $sql="SELECT apo.*, thirtyDayIncome(`planetItemID`) AS `planetIncome`, ina.`itemName` AS `planetName`, ite.`typeID` AS `planetTypeID`, itp.`typeName` AS `planetTypeName`
     FROM 
         (SELECT apo1.*,apl.itemName, findNearest(apl.x, apl.y, apl.z, apo1.solarSystemID) AS `planetItemID`
         FROM `apipocolist` apo1
         LEFT JOIN `apilocations` apl
-        ON apo1.`itemID`=apl.`itemID`) AS apo
+        ON apo1.`itemID`=apl.`itemID`
+        WHERE `solarsystemID` BETWEEN 30000001 AND 31002604) AS apo
     LEFT JOIN `$LM_EVEDB`.`invItems` AS ite
     ON apo.`planetItemID`=ite.itemID
     LEFT JOIN `$LM_EVEDB`.`invNames` AS ina
