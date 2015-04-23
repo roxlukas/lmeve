@@ -293,15 +293,6 @@ function get_crest_contents($url, $cache, $interval) {
 	$json_data = json_decode($data);
         return $json_data;
 }
-/*
-PHP Warning:  file_get_contents($API_BASEURL/account/APIKeyInfo.xml.aspx?keyID=1141058&vCode=zd6cxEv98sMKyxOTwRiqkh3fYRGlYiDPBBEGVNM5vcwGTWSn6jPLb5KVuTEkWpPL): 
- * failed to open stream: php_network_getaddresses: getaddrinfo failed: No address associated with hostname in /home/lukas/lmeve/bin/poller.php on line 157
-PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 160
-PHP Notice:  Undefined offset: 1 in /home/lukas/lmeve/bin/poller.php on line 161
-PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 164
-PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 166
-<br><table class="error"><tr><td>Error in query: UPDATE `apistatus` SET date=NOW(), errorCode=, errorCount=0, errorMessage='HTTP ERROR! Return code: ' WHERE keyID='1141058' AND fileName='APIKeyInfo.xml';<br />MySQL reply: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' errorCount=0, errorMessage='HTTP ERROR! Return code: ' WHERE keyID='1141058' AN' at line 1</td></tr></table><input type="button" value="&lt; Back" onclick="history.back();">
- */
 
 function load_apikeys_from_file() { //DEPRECATED
 	$handle=fopen($myconfig,"r");
