@@ -192,8 +192,8 @@ function sub(editbox) {
 		createCookie(name,"",-1);
 	}
         
-        //toggler can be used to toggle a group in <div> on and off
-        function toggler(what) {
+    //toggler can be used to toggle a group in <div> on and off
+    function toggler(what) {
 		var element=document.getElementById(what);
 		if ((element.style.display=="") || (element.style.display=="none")) {
 			element.style.display="block";
@@ -203,8 +203,18 @@ function sub(editbox) {
                         eraseCookie(what);
 		}
 	}
-        //table_toggler can be used to toggle a group in <table> on and off
-        function table_toggler(what) {
+	
+	//toggler_on can be used to toggle a group in <div> on if it is off, and does nothing if it's already on
+    function toggler_on(what) {
+		var element=document.getElementById(what);
+		if ((element.style.display=="") || (element.style.display=="none")) {
+			element.style.display="block";
+                        createCookie(what,"1");
+		}
+	}
+	
+    //table_toggler can be used to toggle a group in <table> on and off
+    function table_toggler(what) {
 		var element=document.getElementById(what);
 		if ((element.style.display=="") || (element.style.display=="none")) {
 			element.style.display="table";

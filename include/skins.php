@@ -1,4 +1,6 @@
 <?php
+include_once('csrf.php');
+
 function getShipSkins($shipTypeID) {
 	global $LM_EVEDB;
 	$sql="SELECT shp.*,skn.*,mat.*,lic.* FROM $LM_EVEDB.`skinShip` shp
@@ -61,16 +63,17 @@ function skinhrefedit($nr) {
 }
 
 function displaySkinIcon($skin,$size=64) {
+	$rnd=md5(random_pseudo_bytes_wrapper(24));
 	?>
-	<canvas id="skin_<?=$skin['skinID']?>" width="<?=$size?>" height="<?=$size?>" />
+	<canvas id="skin_<?=$rnd?>" width="<?=$size?>" height="<?=$size?>" />
 	<script type="text/javascript">
-		var colors_<?=$skin['skinID']?> = {
+		var colors_<?=$rnd?> = {
 			"window": "#<?=$skin['colorWindow']?>",
 			"primary": "#<?=$skin['colorPrimary']?>",
 			"secondary": "#<?=$skin['colorSecondary']?>",
 			"hull": "#<?=$skin['colorHull']?>"
 		}
-		drawSkinIcon('skin_<?=$skin['skinID']?>',colors_<?=$skin['skinID']?>);
+		drawSkinIcon('skin_<?=$rnd?>',colors_<?=$rnd?>);
 	</script>
 	<?php
 }
@@ -80,13 +83,22 @@ function showSkins($skins) {
 	var_dump($skins);
 	echo('</pre>');*/
 	if (count($skins)>0) {
-		?><table class="lmframework" width="100%"><tr><th colspan="2">Ship SKINs</th></tr><?php
+		?><table class="lmframework" width="100%"><tr><th colspan="3">Ship SKINs</th></tr><?php
 		foreach ($skins as $skin) {
+			$rnd=md5(random_pseudo_bytes_wrapper(24));
 			?><tr>
 				<td style="width: 32px; padding: 0px;">
 					<?php displaySkinIcon($skin,32); ?>
 				</td>
 				<td><?php skinhrefedit($skin['licenseTypeID']); echo($skin['internalName']); ?></a></td>
+				<td style="width: 36px; text-align: center;"><input type="button" id="3dbutton_<?=$rnd?>" onclick="toggler_on('3dpreview'); loadPreview('<?=$skin['material']?>');" value="3D" disabled/>
+					<script type="text/javascript">
+						if (WGLSUPPORT) {
+							document.getElementById('3dbutton_<?=$rnd?>').disabled=false;
+							document.getElementById('3dbutton_<?=$rnd?>').title="Click to preview this SKIN";
+						}
+					</script>
+				</td>
 			</tr><?php
 		}
 		?></table><?php

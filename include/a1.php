@@ -204,137 +204,150 @@ function url_replace($input) {
         //echo("DEBUG: categoryID=".$item['categoryID']."<br/>");
 
 //CCP WebGL -- 3D Preview!
-        
+    $skins = getShipSkins($nr);
+    
     if ($model=getResourceFromYaml($nr)) {
     //var_dump($model);
 ?>
-<script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
-<script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
-<script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
-<script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
-<script type="text/javascript">
-var scene = null,
-    ship = null;
-
-function loadPreview()
-            {
-                <?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
-                //ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
-                var canvas = document.getElementById('wglCanvas');
-                ccpwgl.initialize(canvas);
-                scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
-                //sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
-       		var camera = new TestCamera(canvas);
-                camera.minDistance = 10;
-                camera.maxDistance = 10000;
-                camera.fov = 30;
-                camera.distance = <?php
-                    if ($item['volume']==0 && ($item['categoryID']==3 || $item['categoryID']==2) ) echo('100000'); else
-                    if ($item['volume']<100) echo('30'); else 
-                    if (($item['volume']>=100) && ($item['volume']<6000)) echo('50'); else
-                    if (($item['volume']>=6000) && ($item['volume']<29000)) echo('150'); else
-                    if (($item['volume']>=29000) && ($item['volume']<50000)) echo('250'); else
-                    if (($item['volume']>=50000) && ($item['volume']<120000)) echo('500'); else
-                    if (($item['volume']>=120000) && ($item['volume']<600000)) echo('1600'); else
-                    if (($item['volume']>=600000)) echo('2500');
-                ?>;
-                camera.rotationX = 0.5;
-                camera.rotationY = 0.1;
-                camera.nearPlane = 1;
-                camera.farPlane = 10000000;
-                camera.minPitch = -0.5;
-                camera.maxPitch = 0.65;
-                ccpwgl.setCamera(camera);
-                <?php
-                    if ($item['categoryID']==6 || $item['categoryID']==18 || $item['categoryID']==11) {
-                        //if ship, NPC or drone - use loadShip
-                        //use new SOF data
-                        echo("ship = scene.loadShip('${model['sofHullName']}:${model['sofFactionName']}:${model['sofRaceName']}', undefined);\r\n");
-                        
-                    } else if ($item['categoryID']==3 || $item['categoryID']==2) {
-                        echo("ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
-                    } else {
-                        //echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
-                        $model = false;
-                    }
-                ?>
-                
-
-                
-                
-                <?php //ccpwgl.enablePostprocessing(true); ?>
-
-        	ccpwgl.onPreRender = function () 
-        	{ 
-                    /*var shipTransform = ship.getTransform();
-                    shipTransform[5] = shipTransform[15] = 1.0;
-                    X = Y * (Math.PI / 180.0);
-                    Y=Y+.1;
-                    shipTransform[0]=Math.cos(X);
-                    shipTransform[2]=Math.sin(X);
-                    shipTransform[8]=-1 * Math.sin(X);
-                    shipTransform[10]=Math.cos(X);
-                    ship.setTransform(shipTransform);*/
-        	};
-        		
-            }
-            
-function togglefull() {
-    var canvas=document.getElementById('wglCanvas');
-    var button=document.getElementById('buttonFull');
-    if (canvas.style.position=="absolute") {
-        //minimize!
-        canvas.style.position="static";
-        canvas.style.width="100%";
-        canvas.style.height="420px";
-        button.style.position="relative";
-        button.style.left="2px";
-        button.style.top="-418px";
-        button.value="Fullscreen";
-    } else {
-        //maximize!
-        canvas.style.position="absolute";
-        canvas.style.top="0px";
-        canvas.style.left="0px";
-        canvas.style.width="100%";
-        canvas.style.height="100%";
-        button.style.position="absolute";
-        button.style.left="2px";
-        button.style.top="2px";
-        button.value="Minimize";
-    }
-}
-
-function checkwglsuprt() {
-  if (!window.WebGLRenderingContext) {
-      //window.alert("Cannot create WebGLRenderingContext. WebGL disabled.");
-      return false;   
-  }
-  var canvas = document.getElementById('wglCanvas');
-  var experimental = false;
-  try { gl = canvas.getContext("webgl"); }
-  catch (x) { gl = null; }
-  
-  if (gl == null) {
-        try { gl = canvas.getContext("experimental-webgl"); experimental = true; }
-        catch (x) { return false; }
-        if (!gl) {
-            return false;
-        }
-  }
-  return true;
-}
-</script>
 <?php if (!$MOBILE) { ?>
-    <div id="3dpreview" style="width: 70%; min-width: 718px; display: none;">
+    <div id="3dpreview" style="width: 100%; min-width: 720px; display: none;">
 <?php } else { ?>
     <div id="3dpreview" style="width: 100%; display: none;">
 <?php } ?>
 <table class="lmframework" style="width: 100%;">
-    <tr><th>3D Preview</th><th style="width: 14px;"><img src="img/del.gif" alt="x" onclick="toggler('3dpreview');" value="x"/></th></tr>
-    <tr><td colspan="2"><canvas id="wglCanvas" style="width:100%; height:420px;"></canvas><input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td></tr>
+    <tr><th colspan="2">3D Preview <img src="img/del.gif" alt="x" onclick="toggler('3dpreview'); scene=null; ship=null;" value="x" style="float: right;"/></th></tr>
+    <tr><td width="725"><canvas id="wglCanvas" width="720" height="420" style="width: 720px; height: 420px;"></canvas>
+    <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td>
+    <td style="vertical-align: top;">
+    <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+	<script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
+	<script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
+	<script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
+	<script type="text/javascript">
+	function checkwglsuprt() {
+	  if (!window.WebGLRenderingContext) {
+		  //window.alert("Cannot create WebGLRenderingContext. WebGL disabled.");
+		  return false;   
+	  }
+	  var canvas = document.getElementById('wglCanvas');
+	  var experimental = false;
+	  try { gl = canvas.getContext("webgl"); }
+	  catch (x) { gl = null; }
+	  
+	  if (gl == null) {
+			try { gl = canvas.getContext("experimental-webgl"); experimental = true; }
+			catch (x) { return false; }
+			if (!gl) {
+				return false;
+			}
+	  }
+	  return true;
+	}
+	
+	var scene = null,
+		ship = null,
+		WGLSUPPORT = checkwglsuprt();
+	
+	function loadPreview(skin) {
+					<?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
+					//ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
+					if (skin=='default' || !skin ) skin='<?=$model['sofFactionName']?>';
+					if (scene != null) {
+						if (ship != null) scene.removeObject(ship);
+						ship = scene.loadShip('<?=$model['sofHullName']?>:'+skin+':<?=$model['sofRaceName']?>', undefined);
+						return;
+					}
+					var canvas = document.getElementById('wglCanvas');
+					ccpwgl.initialize(canvas);
+					scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
+					//sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
+				var camera = new TestCamera(canvas);
+					camera.minDistance = 10;
+					camera.maxDistance = 10000;
+					camera.fov = 30;
+					camera.distance = <?php
+						if ($item['volume']==0 && ($item['categoryID']==3 || $item['categoryID']==2) ) echo('100000'); else
+						if ($item['volume']<100) echo('30'); else 
+						if (($item['volume']>=100) && ($item['volume']<6000)) echo('50'); else
+						if (($item['volume']>=6000) && ($item['volume']<29000)) echo('150'); else
+						if (($item['volume']>=29000) && ($item['volume']<50000)) echo('250'); else
+						if (($item['volume']>=50000) && ($item['volume']<120000)) echo('500'); else
+						if (($item['volume']>=120000) && ($item['volume']<600000)) echo('1600'); else
+						if (($item['volume']>=600000)) echo('2500');
+					?>;
+					camera.rotationX = 0.5;
+					camera.rotationY = 0.1;
+					camera.nearPlane = 1;
+					camera.farPlane = 10000000;
+					camera.minPitch = -0.5;
+					camera.maxPitch = 0.65;
+					ccpwgl.setCamera(camera);
+					<?php
+						if ($item['categoryID']==6 || $item['categoryID']==18 || $item['categoryID']==11) {
+							//if ship, NPC or drone - use loadShip
+							//use new SOF data
+							?>ship = scene.loadShip('<?=$model['sofHullName']?>:'+skin+':<?=$model['sofRaceName']?>', undefined);<?php
+							
+						} else if ($item['categoryID']==3 || $item['categoryID']==2) {
+							echo("ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
+						} else {
+							//echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
+							$model = false;
+						}
+					?>
+					
+					<?php //ccpwgl.enablePostprocessing(true); ?>
+	
+				ccpwgl.onPreRender = function () 
+				{ 
+						/*var shipTransform = ship.getTransform();
+						shipTransform[5] = shipTransform[15] = 1.0;
+						X = Y * (Math.PI / 180.0);
+						Y=Y+.1;
+						shipTransform[0]=Math.cos(X);
+						shipTransform[2]=Math.sin(X);
+						shipTransform[8]=-1 * Math.sin(X);
+						shipTransform[10]=Math.cos(X);
+						ship.setTransform(shipTransform);*/
+				};
+					
+	}
+				
+	function togglefull() {
+		var canvas=document.getElementById('wglCanvas');
+		var button=document.getElementById('buttonFull');
+		if (canvas.style.position=="absolute") {
+			//minimize!
+			canvas.style.position="static";
+			canvas.style.width="720px";
+			canvas.style.height="420px";
+			button.style.position="relative";
+			button.style.left="2px";
+			button.style.top="-418px";
+			button.value="Fullscreen";
+		} else {
+			//maximize!
+			canvas.style.position="absolute";
+			canvas.style.top="0px";
+			canvas.style.left="0px";
+			canvas.style.width="100%";
+			canvas.style.height="100%";
+			button.style.position="absolute";
+			button.style.left="2px";
+			button.style.top="2px";
+			button.value="Minimize";
+		}
+	}
+	
+	</script> 
+	   
+    <?php if (count($skins)>0) showSkins($skins); else echo('<center><h3>This ship has no SKINs</h3></center>'); ?></td>
+    
+    </tr>
 </table>
-</div>                  
+</div> 
+
+             
                 
 <?php
     } //end if
@@ -344,7 +357,7 @@ function checkwglsuprt() {
 ?>
 
 <?php if (!$MOBILE) { ?>
-    <table cellspacing="2" cellpadding="0" style="width: 70%; min-width: 718px;">
+    <table cellspacing="2" cellpadding="0" style="width: 100%; min-width: 718px;">
 <?php } else { ?>
     <table cellspacing="2" cellpadding="0" style="width: 100%;">
 <?php } ?>      
@@ -352,7 +365,7 @@ function checkwglsuprt() {
 <tr>
     
 <?php if (!$MOBILE) { ?> 
-    <td style="vertical-align: top; width:55%;">
+    <td style="vertical-align: top; width:50%;">
 <?php } else { ?>
     <td style="vertical-align: top; width:100%;">
 <?php } ?>   
@@ -373,13 +386,13 @@ function checkwglsuprt() {
 <?php echo($item['typeName']);
 if ($model) {
     ?>
-    <input type="button" id="3dbutton" onclick="toggler('3dpreview'); loadPreview();" value="3D" disabled/>
+    <input type="button" id="3dbutton_main" onclick="toggler('3dpreview'); loadPreview('default');" value="3D" disabled/>
     <script type="text/javascript">
-        if (checkwglsuprt()) {
-            document.getElementById('3dbutton').disabled=false;
-            document.getElementById('3dbutton').title="Click to view the 3D model";
+        if (WGLSUPPORT) {
+            document.getElementById('3dbutton_main').disabled=false;
+            document.getElementById('3dbutton_main').title="Click to preview the 3D model";
         } else {
-            document.getElementById('3dbutton').title="Your browser does not support WebGL";
+            document.getElementById('3dbutton_main').title="Your browser does not support WebGL";
         }
     </script>    
     <?php
@@ -429,7 +442,6 @@ if ($model) {
 
 <?php
 //SKINS
-	$skins = getShipSkins($nr);
 	showSkins($skins);
 
 //PRICE DATA
@@ -639,7 +651,7 @@ if ($model) {
         
         
 if (!$MOBILE) {
-    echo('</td><td style="width: 45%; vertical-align: top;">');
+    echo('</td><td style="width: 50%; vertical-align: top;">');
 } else {
     echo('</td></tr><tr><td style="width: 100%; vertical-align: top;">');
 }
