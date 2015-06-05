@@ -25,7 +25,16 @@ function Tw2MotherLode()
     {
         this._loadedObjects = {};
     };
-    
+
+    this.UnloadAndClear = function ()
+    {
+        for (var path in this._loadedObjects)
+        {
+            this._loadedObjects[path].Unload();
+        }
+        this._loadedObjects = {};
+    };
+
     this.PurgeInactive = function (curFrame, frameLimit, frameDistance)
     {
         for (var path in this._loadedObjects)
@@ -117,7 +126,15 @@ Inherit(Tw2LoadingObject, Tw2Resource);
 function Tw2ResMan()
 {
     this.resourcePaths = {};
-    this.resourcePaths['res'] = 'http://developers.eveonline.com/ccpwgl/assetpath/860161/';
+    
+    this.resourcePaths['res'] = '//developers.eveonline.com/ccpwgl/assetpath/893551/';
+    if(window.location.protocol == "https:") {
+        this.resourcePaths['res'] = 'https:' + this.resourcePaths['res'];
+    } else {
+        this.resourcePaths['res'] = 'http:' + this.resourcePaths['res'];
+    }
+    
+    
     
     this._extensions = {};
     this.motherLode = new Tw2MotherLode();
@@ -469,6 +486,10 @@ function Tw2ResMan()
     {
         this.motherLode.Clear();
     };
+
+    this.UnloadAndClear = function () {
+        this.motherLode.UnloadAndClear();
+    }
 }
 
 var resMan = new Tw2ResMan();
