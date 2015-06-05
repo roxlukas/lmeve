@@ -13,6 +13,7 @@ $PANELNAME='Item Database'; //Panel name (optional)
 global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE;
 include_once('materials.php');
 include_once('yaml_graphics.php');
+include_once('skins.php');
 
 $nr=secureGETnum('nr');
 
@@ -26,6 +27,7 @@ function url_replace($input) {
 
 ?>	    
 		<script type="text/javascript" src="ajax.js"></script>
+		<script type="text/javascript" src="skin-icon.js"></script>
 		<div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
@@ -34,6 +36,19 @@ function url_replace($input) {
 			echo('Wrong parameter nr.');
 			return;
 		}
+		$item=db_asocquery("SELECT itp.*,igp.`categoryID`
+		FROM $LM_EVEDB.`invTypes` itp
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+		WHERE `typeID` = $nr ;");
+		
+		if (count($item)==0) {
+			echo('There is no such record in the database.');
+			return;
+		}
+		
+		$item=$item[0];
+		
 		?>
 
 		<table cellpadding="0" cellspacing="2" width="95%">
@@ -78,9 +93,9 @@ function url_replace($input) {
 			}
 			echo('</td>');
 		}
-                if ($MOBILE) echo('</tr><tr>');
-                $hasMarketGroup=db_asocquery("SELECT * FROM $LM_EVEDB.`invTypes` WHERE `typeID`=$nr AND `marketGroupID` IS NOT NULL;");
-		if (count($hasMarketGroup)>0) {
+        if ($MOBILE) echo('</tr><tr>');
+                
+		if (!is_null($item['marketGroupID'])) {
 			$pricesDisabled='';
 		} else {
 			$pricesDisabled='disabled';
@@ -154,12 +169,7 @@ function url_replace($input) {
 
 		<?php
 	
-		$item=db_asocquery("SELECT itp.*,igp.`categoryID`
-		FROM $LM_EVEDB.`invTypes` itp
-                JOIN $LM_EVEDB.`invGroups` igp
-                ON itp.`groupID`=igp.`groupID`
-		WHERE `typeID` = $nr ;");
-		$item=$item[0];
+
 //BREADCRUMB NAVIGATION
 	function getMarketNode($marketGroupID) {
 		global $LM_EVEDB;
@@ -203,13 +213,16 @@ function url_replace($input) {
 <script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
 <script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
 <script type="text/javascript">
+var scene = null,
+    ship = null;
+
 function loadPreview()
             {
                 <?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
                 //ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
                 var canvas = document.getElementById('wglCanvas');
                 ccpwgl.initialize(canvas);
-                var scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
+                scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
                 //sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
        		var camera = new TestCamera(canvas);
                 camera.minDistance = 10;
@@ -236,10 +249,10 @@ function loadPreview()
                     if ($item['categoryID']==6 || $item['categoryID']==18 || $item['categoryID']==11) {
                         //if ship, NPC or drone - use loadShip
                         //use new SOF data
-                        echo("var ship = scene.loadShip('${model['sofHullName']}:${model['sofFactionName']}:${model['sofRaceName']}', undefined);\r\n");
+                        echo("ship = scene.loadShip('${model['sofHullName']}:${model['sofFactionName']}:${model['sofRaceName']}', undefined);\r\n");
                         
                     } else if ($item['categoryID']==3 || $item['categoryID']==2) {
-                        echo("var ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
+                        echo("ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
                     } else {
                         //echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
                         $model = false;
@@ -350,7 +363,12 @@ function checkwglsuprt() {
 </th>
 </tr>
 <tr><td class="tab" style="padding: 0px; width: 32px;">
-<img src="ccp_img/<?php echo($item[typeID]); ?>_64.png" title="<?php echo($item['typeName']); ?>" id="miniature" />
+<?php if ($item['groupID']!=1311) { ?>
+	<img src="ccp_img/<?php echo($item[typeID]); ?>_64.png" title="<?php echo($item['typeName']); ?>" id="miniature" />
+<?php } else {
+	$skin = getSkin($nr);
+	if (count($skin)>0) displaySkinIcon($skin[0],64);
+} ?>
 </td><td class="tab" style="text-align: center;"><h2>
 <?php echo($item['typeName']);
 if ($model) {
@@ -410,6 +428,10 @@ if ($model) {
 </table>
 
 <?php
+//SKINS
+	$skins = getShipSkins($nr);
+	showSkins($skins);
+
 //PRICE DATA
 	$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=$nr;");
         $crestPriceData=db_asocquery("SELECT * FROM `crestmarketprices` WHERE `typeID`=$nr;");
