@@ -12,9 +12,9 @@ $PANELNAME='Ore values table'; //Panel name (optional)
 
 global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP;
 
-function dbhrefedit($nr) {
+/*function dbhrefedit($nr) {
     echo("<a href=\"index.php?id=10&id2=1&nr=$nr\">");
-}
+}*/
 
 $sql="SELECT itp.`typeID`, itp.`typeName`, itp.`volume`, itp.`portionSize`, itm.`materialTypeID` AS mineralID, itm.`quantity`, apr.`max` AS price
 FROM $LM_EVEDB.`invTypes` itp
