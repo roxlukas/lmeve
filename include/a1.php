@@ -677,21 +677,28 @@ if (!$MOBILE) {
 	echo("<table border=\"0\" cellspacing=\"3\" cellpadding=\"0\" style=\"width: 100%;\">");
 	echo('<tr><td colspan="2" class="tab-header"><strong>Attributes</strong></td></tr>');
 	//echo("<tr><td width=\"50%\"><b>Size/Radius:</b></td><td width=\"50%\">${item[5]} m</td></tr>");
+        //if item is a SKIN
+        if ($item['groupID']=1311) {
+            $ship=getShipBySkin($nr);
+            if ($ship) echo("<tr><td class=\"tab\"><b>SKIN applies to:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${ship['typeID']}\"><img src=\"ccp_img/${ship['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px; margin-right: 3px;\" /> ${ship['typeName']}</a></td></tr>"); 
+        }
+        //continue
 	echo("<tr><td class=\"tab\"><b>Mass:</b></td><td class=\"tab\">".number_format($item['mass'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." kg</td></tr>");
 	echo("<tr><td class=\"tab\"><b>Volume (unpacked):</b></td><td class=\"tab\">".number_format($item['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup></td></tr>");
 	echo("<tr><td class=\"tab\"><b>Cargohold:</b></td><td class=\"tab\">".number_format($item['capacity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup></td></tr>");
 	echo("<tr><td class=\"tab\"><b>Baseprice:</b></td><td class=\"tab\">".number_format($item['basePrice'], 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</td></tr>");
+        
         if ($item['portionSize']>1) $items='items'; else $items='item';
         echo("<tr><td class=\"tab\"><b>Portion size:</b></td><td class=\"tab\">".$item['portionSize']." $items</td></tr>");
         
 	if (count($blueprint) > 0 ) {
 		$blueprint=$blueprint[0];
-		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> look up</a></td></tr>");
+		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
 	}
 	
 	if (count($produceditem) > 0 ) {
 		$produceditem=$produceditem[0];
-		echo("<tr><td class=\"tab\"><b>Produced item:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${produceditem[2]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> look up</a></td></tr>");
+		echo("<tr><td class=\"tab\"><b>Produced item:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${produceditem[2]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
 		if ($produceditem[4]==2) echo("<tr><td class=\"tab\"><b>Base Invention chance:</b></td><td class=\"tab\">${produceditem[12]}</td></tr>");
 	}
 
@@ -708,7 +715,7 @@ if (!$MOBILE) {
 		}
 		if (preg_match("/.*skill.*/i", $element[2], $regs)) {
 			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$skill[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$skill[0][0]);
 		}
 		if ($element[2]=="Used with (chargegroup)") {
 			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
@@ -727,14 +734,14 @@ if (!$MOBILE) {
                                 $element[0]=$groupid[0]['groupName'];
                             } else {
                                 $groupid=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE typeID = $canbeID;");
-                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$canbeID,$groupid[0]['typeName']);
+                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> %s</a>",$canbeID,$groupid[0]['typeName']);
                             }
                         }
 		}
 		//Jump Drive Fuel Need
 		if (strstr("Jump Drive Fuel Need",$element[2])) {
 			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_img/${element[1]}_32.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$fuel[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_img/${element[1]}_32.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$fuel[0][0]);
 		}
 		if (preg_match("/.*duration$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
@@ -750,7 +757,7 @@ if (!$MOBILE) {
 		}
 		if (strstr("Planet Type Restriction",$element[2])) {
 			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$planettype[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$planettype[0][0]);
 		}
 
 		if (preg_match("/Warp Speed Multiplier/i",$element[2], $regs)) {
@@ -770,7 +777,7 @@ if (!$MOBILE) {
 		}
 		if (strstr("Consumption Type",$element[2])) {
 			$type=db_query("SELECT typeName FROM $LM_EVEDB.invTypes WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/51_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$element[1],$type[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/51_64_11.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> %s</a>",$element[1],$type[0][0]);
 		}
 		//echo("<tr><td><b>${element[2]}</b><br /><i>${element[1]}</i></td><td>${element[0]}</td></tr>");
 		if (isset($element[0])) $value=$element[0]; else $value=$element[1];

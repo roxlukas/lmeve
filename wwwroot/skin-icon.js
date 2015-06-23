@@ -110,7 +110,7 @@ function drawSkinIcon(canvasID,colors) {
  drawPolygon(ctx,primary2,colors.primary);
  //secondary
  drawPolygon(ctx,secondary,colors.secondary);
- ctx.scale(1,1);
+ ctx.scale(1/scalex,1/scaley);
 }
 
 /*sample colors:

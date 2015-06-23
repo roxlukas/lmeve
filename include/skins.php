@@ -17,6 +17,23 @@ function getShipSkins($shipTypeID) {
 	return($skins);
 }
 
+function getShipBySkin($skinTypeID) {
+	global $LM_EVEDB;
+        $DEBUG=FALSE;
+        if ($DEBUG) echo("<pre>DEBUG getShipBySkin($skinTypeID)\r\n");
+	$sql="SELECT shp.*,lic.*,itp.* FROM $LM_EVEDB.`skinShip` shp
+	JOIN $LM_EVEDB.`skinLicense` lic
+	ON lic.`skinID` = shp.`skinID`
+        JOIN $LM_EVEDB.`invTypes` itp
+	ON shp.`typeID`=itp.`typeID`
+	WHERE lic.`licenseTypeID` = $skinTypeID";
+        if ($DEBUG) echo("SQL = $sql\r\n");
+	$skins=db_asocquery($sql);
+        if ($DEBUG) print_r($skins[0]);
+        if ($DEBUG) echo("</pre>");
+        if (count($skins)>0) return $skins[0]; else return FALSE;
+}
+
 function getSkin($skinLicenseID) {
 	global $LM_EVEDB;
 	$sql="SELECT * FROM $LM_EVEDB.`skinLicense` lic
