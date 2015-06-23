@@ -49,18 +49,18 @@ function checkApiKey($key) {
 
 function RESTfulError($msg,$http_error_code=400) {
     header("HTTP/1.0 $http_error_code");
-    echo(json_encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
+     echo(json_encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
     die();
 }
-
-if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",400);
-
-if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
 
 //Add proper JSON MIME type in header
 header("Content-type: application/json");
 //Add CORS header in header so API can be used with web apps on other servers
 header("Access-Control-Allow-Origin: *");
+
+if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",400);
+
+if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
 
     switch ($endpoint) {
         case 'MATERIALS':
@@ -153,6 +153,61 @@ header("Access-Control-Allow-Origin: *");
                 WHERE $where_gid AND $where_cid;");
             if (count($items)==0) RESTfulError('No data found.',404);
             echo(json_encode($items));
+            break;
+        case 'JEREMY':
+            RESTfulError('JEREMY endpoint is now obsolete. Use JEREMYBULK instead.',404);
+            break;
+        case 'JEREMYBULK':
+            //using cache
+            $sql="SELECT * FROM `lmpagecache` WHERE `pageLabel`='JEREMYBULK' AND `timestamp` >= (NOW() - INTERVAL 86400 SECOND);";
+            $data=db_asocquery($sql);            
+            if (count($data)>0) {
+                //if there is a cached version, show it
+                echo(stripslashes($data[0]['pageContents']));
+            } else {
+                //if there is no cached version, refresh cache
+                $retdata=array();
+                $items=db_asocquery("SELECT itp.*,igp.`groupName`,ica.`categoryID`,ica.`categoryName`,cre.`averagePrice`,ygi.*
+                        FROM `$LM_EVEDB`.`yamlTypeIDs` yti
+                        JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
+                        ON yti.`graphicID`=ygi.`graphicID`
+                        JOIN `$LM_EVEDB`.`invTypes` itp
+                        ON yti.`typeID`=itp.`typeID`
+                        JOIN `$LM_EVEDB`.`invGroups` igp
+                        ON itp.`groupID`=igp.`groupID`  
+                        JOIN `$LM_EVEDB`.`invCategories` ica
+                        ON igp.`categoryID`=ica.`categoryID`
+                        LEFT JOIN `crestmarketprices` cre
+                        ON itp.`typeID`=cre.`typeID`;");
+                if (count($items)==0) RESTfulError('No items found.',404);
+                foreach ($items as $item) {
+                    $typeID=$item['typeID'];
+                    $retdata[$typeID]=$item;
+                    $traitData=db_asocquery("SELECT yit.*, eun.displayName
+                        FROM `$LM_EVEDB`.`yamlInvTraits` yit
+                        LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+                        ON yit.`unitID`=eun.`unitID`
+                        WHERE `typeID`=$typeID AND `skillID`=-1;");
+                    $bonusData=db_asocquery("SELECT yit.*, eun.displayName
+                        FROM `$LM_EVEDB`.`yamlInvTraits` yit
+                        LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+                        ON yit.`unitID`=eun.`unitID`
+                        WHERE `typeID`=$typeID AND `skillID`!=-1;");
+                    $dogmaData=db_asocquery("SELECT valueFloat,valueInt,displayName
+                        FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
+                        JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
+                        ON dta.attributeID=da.attributeID
+                        WHERE dta.typeID=$typeID
+                        AND displayName != '';");
+                    if (count($traitData) > 0) $retdata[$typeID]['traits']=$traitData;
+                    if (count($bonusData) > 0) $retdata[$typeID]['bonuses']=$bonusData;
+                    if (count($dogmaData) > 0) $retdata[$typeID]['attributes']=$dogmaData;
+                }
+                $tmpContent=json_encode($retdata);
+                db_uquery("INSERT INTO `lmpagecache` VALUES ('JEREMYBULK','".addslashes($tmpContent)."', NOW()) ON DUPLICATE KEY UPDATE `pageContents`='".addslashes($tmpContent)."', timestamp=NOW();");
+                echo($tmpContent);
+            }
+            
             break;
 	default:	
             RESTfulError('Invalid endpoint.',404);
