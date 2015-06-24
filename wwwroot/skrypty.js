@@ -255,15 +255,17 @@ function sub(editbox) {
 			element.style.display="block";
 		}
 	}
-//sample usage in HTML
-/*
-<div class="rozwijane">
-<a href="javascript:toggler('boks1');">O nas</a>
-</div>
+        
+        //sample usage in HTML
+        /*
+        <div class="rozwijane">
+        <a href="javascript:toggler('boks1');">O nas</a>
+        </div>
 
-<div class="rozwiniete" id="boks1">
-<script type="text/javascript">rememberToggle('boks1');</script>
-*/     
+        <div class="rozwiniete" id="boks1">
+        <script type="text/javascript">rememberToggle('boks1');</script>
+        */    
+       
         function getKit(rowID,spanID,typeID,activityID,runs) {
             //toggle the kit row
             var element=document.getElementById(rowID);
@@ -292,9 +294,9 @@ function sub(editbox) {
         }
         
         // Hide all paragraphs using a slide up animation over 0.8 seconds
-//$( "p" ).slideUp( 800 );
-// Show all hidden divs using a slide down animation over 0.6 seconds
-//$( "div.hidden" ).slideDown( 600 );
+        //$( "p" ).slideUp( 800 );
+        // Show all hidden divs using a slide down animation over 0.6 seconds
+        //$( "div.hidden" ).slideDown( 600 );
 
         function getStockAmount(id) {
             var element=document.getElementById(id);
@@ -326,4 +328,17 @@ function sub(editbox) {
                 }, 
                 type: 'numeric' 
             }); 
+        }
+        
+        function showEvetime(id) {
+            //console.log("id="+id);
+            var evetimeDiv = document.getElementById(id);
+            var now = new Date(); 
+            var hh = now.getUTCHours();
+            var mm = now.getUTCMinutes();
+            if (hh<10) hh="0"+hh;
+            if (mm<10) mm="0"+mm;
+            var evetime = hh + ":" + mm;
+            //console.log("evetime="+evetime);
+            evetimeDiv.innerHTML=evetime;
         }
