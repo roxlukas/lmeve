@@ -50,7 +50,7 @@ if (strlen($date)==6) {
                         <h1><img src="https://image.eveonline.com/Corporation/<?=$corp['corporationID']?>_64.png" style="vertical-align: middle;"> <?=$corp['corporationName']?></h1>
                         <div id="wrapper" style="overflow: hidden;">
                             <div id="col1" style="float: left;">
-                                <?php showIndustryActivity($corp['corporationID'],$year, $month, getIndustryActivity($corp['corporationID'], $year, $month)) ?>
+                                <?php showIndustryActivities($corp['corporationID'],$year, $month, getIndustryActivities($corp['corporationID'], $year, $month)) ?>
                             </div>
                             <div id="col2" style="float: left;">
                                 <?php showIndustryStats(getIndustryStats($corp['corporationID'], $year, $month)) ?>
