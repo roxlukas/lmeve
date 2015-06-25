@@ -47,6 +47,30 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2015.06.25</div></td>
+<td valign="top" class="tab">
+<b>0.1.53 beta:</b><br>
+<b>Poller version 22</b>
+<ul>
+<li>
+	EVE Time has been added on the top bar
+</li>
+<li>
+	Industry Statistics have been divided by activity type (stacked bar chart breaking down into Manufacturing, Invention and so on)
+</li>
+<li>Bug fixes:<ul>
+    <li>
+        Ore Chart now properly displays it's contents again
+    </li>
+    <li>
+        Session now correctly times out since last action in LMeve, instead of since logging in
+    </li>
+</ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2015.03.26</div></td>
 <td valign="top" class="tab">
 <b>0.1.52 beta:</b><br>
@@ -1371,6 +1395,31 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
 THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+
+<h3>StackedBar chart plugin for chart.js</h3>
+<strong>https://github.com/Regaddi/Chart.StackedBar.js</strong>
+
+<pre>The MIT License (MIT)
+
+Copyright (c) 2015 @Regaddi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre>
 
 </td></tr>
 </table>
