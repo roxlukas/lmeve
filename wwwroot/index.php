@@ -46,14 +46,17 @@ include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
 
-$lmver="0.1.52 beta";
+$lmver="0.1.53 beta";
  
-//Ustawienie sesji i parametrów ciastka sesyjnego
+//setting session cookie params
 $param=session_get_cookie_params();
 session_set_cookie_params($LM_SESSION,$LM_COOKIEPATH,$param['domain'],$LM_COOKIESECUREONLY,true);
 session_start();
+//this prevents a forced logout after $LM_SESSION seconds
+//so the user session always lasts $LM_SESSION seconds after the last action in LMeve
+setcookie(session_name(),session_id(),time()+$LM_SESSION);
 
-//POPRAWKI BEZPIECZEŃSTWA - regenrowanie ID sesji po przekirowaniu HTTP->HTTPS
+//Security addon - regenerate session ID after HTTP->HTTPS redirect
 if ($_SESSION['regenerateID']===true) {
     session_regenerate_id(true);
     $_SESSION=array();
@@ -68,7 +71,7 @@ check_changed_session_path(); //CHECK IF COOKIEPATH HAS CHANGED DURING SESSION
 if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
 {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
-    //POPRAWKI BEZPIECZEŃSTWA - regenrowanie ID sesji po przekirowaniu HTTP->HTTPS
+    //Security addon - regenerate session ID after HTTP->HTTPS redirect
     $_SESSION['regenerateID']=true;
     exit();
 }
