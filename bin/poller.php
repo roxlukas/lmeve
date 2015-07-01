@@ -28,7 +28,7 @@ $MAX_ERRORS=10; //ignore first x errors
  * $CREST_BASEURL="http://public-crest-sisi.testeveonline.com";
  */
 $API_BASEURL="https://api.eveonline.com"; 
-$CREST_BASEURL="http://public-crest.eveonline.com";
+$CREST_BASEURL="https://public-crest.eveonline.com";
 $USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
