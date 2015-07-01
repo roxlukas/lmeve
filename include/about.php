@@ -58,12 +58,18 @@ Changelog:
 <li>
 	Industry Statistics have been divided by activity type (stacked bar chart breaking down into Manufacturing, Invention and so on)
 </li>
+<li>
+	Timesheet can be now aggregated by LMeve user rather than by in game character. It means that work and ISK made by all characters belonging to a user will be summed up for a less cluttered Timesheet view.
+</li>
 <li>Bug fixes:<ul>
     <li>
         Ore Chart now properly displays it's contents again
     </li>
     <li>
         Session now correctly times out since last action in LMeve, instead of since logging in
+    </li>
+    <li>
+        CREST now properly uses HTTPS instead of HTTP
     </li>
 </ul>
 </li>
