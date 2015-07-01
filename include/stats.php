@@ -589,7 +589,7 @@ function showIndustryActivities($corporationID,$year,$month,$industryActivitySta
 
               //build object
               $graphObject['labels']=$days;
-              $graphObject['datasets']=array_values($activities);
+              if(is_array($activities)) $graphObject['datasets']=array_values($activities);
               
               if ($display) {
                   //display
