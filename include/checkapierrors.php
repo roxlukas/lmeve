@@ -12,7 +12,9 @@
         $sql="SELECT *
             FROM `apistatus`
             WHERE date >= DATE_SUB( NOW( ) , INTERVAL 1 HOUR )
-            AND errorCode >0";
+            AND errorCode >0
+            ORDER BY date DESC
+            LIMIT 0,3;";
 	$errors = db_asocquery($sql);
         foreach ($errors as $error) {
             ?>
