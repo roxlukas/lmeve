@@ -648,10 +648,11 @@ function showPoints($points) {
     echo('<br/>');
 }
 
-function getTimesheet($corporationID, $year, $month) {
+function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
     global $LM_EVEDB;
     $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
     
+    if (!$aggregate) {
     $sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
 	SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
 	FROM `apiindustryjobs` aij
@@ -665,7 +666,26 @@ function getTimesheet($corporationID, $year, $month) {
 	AND aij.corporationID=$corporationID
 	GROUP BY `characterID`,`name`,`activityName`
 	ORDER BY `name`,`activityName`) AS wages;";
-	
+    } else {
+        $sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
+	SELECT lmc.`userID` AS `characterID`,lmu.`login` AS `name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
+	FROM `apiindustryjobs` aij
+	JOIN $LM_EVEDB.`ramActivities` rac
+	ON aij.`activityID`=rac.`activityID`
+	JOIN cfgpoints cpt
+	ON aij.`activityID`=cpt.`activityID`
+	JOIN apicorpmembers acm
+	ON aij.`installerID`=acm.`characterID`
+        JOIN lmchars lmc
+        ON aij.`installerID`=lmc.`charID`
+        JOIN lmusers lmu
+        ON lmc.`userID`=lmu.`userID`
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	AND aij.corporationID=$corporationID
+	GROUP BY lmu.`userID`,lmu.`login`,`activityName`
+	ORDER BY lmu.`login`,`activityName`) AS wages;";
+    }
+    //echo("<h3>DEBUG</h3><pre>$sql_all</pre>");	
     $data=db_asocquery($sql_all);
 
     //echo("<pre>DB=\n");
@@ -681,7 +701,7 @@ function getTimesheet($corporationID, $year, $month) {
             $rearrange[$row['characterID']]['wage']+=stripslashes($row['wage']);
             $rearrange[$row['characterID']]['name']=stripslashes($row['name']);
             $rearrange[$row['characterID']]['characterID']=$row['characterID'];
-    }
+    }  
     return $rearrange;
 }
 
@@ -723,17 +743,21 @@ function timesheetFooter() {
     <?php  
 }
 
-function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE) {
+function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE,$aggregate=FALSE) {
     global $DECIMAL_SEP, $THOUSAND_SEP, $MOBILE;
     
     echo('<tr><td style="padding: 0px;">');
+        if (!$aggregate) {
             if ($rights_viewallchars) charhrefedit($row['characterID']);
                     echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
             if ($rights_viewallchars) echo('</a>');
+        } else {
+                    echo("<img src=\"https://image.eveonline.com/character/0_32.jpg\" title=\"${row['name']}\" />");
+        }
     echo('</td><td>');
-            if ($rights_viewallchars) charhrefedit($row['characterID']);
+            if ($rights_viewallchars && !$aggregate) charhrefedit($row['characterID']);
                     echo(stripslashes($row['name']));
-            if ($rights_viewallchars) echo('</a>');
+            if ($rights_viewallchars && !$aggregate) echo('</a>');
     echo('</td><td style="text-align: center;">');
     if (!$MOBILE) {
         echo(number_format($row['activities']['Copying']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
@@ -800,7 +824,7 @@ function timesheetTotals($totals,$label='Total') {
     <?php
 }
     
-function showTimesheet($timesheet) {
+function showTimesheet($timesheet,$aggregate=FALSE) {
     $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
     
     $mychars=getMyChars(true);   
@@ -822,8 +846,14 @@ function showTimesheet($timesheet) {
     }
     //display data for "My characters"
     foreach($timesheet as $row) {
-        if ($mychars!=false && in_array($row['characterID'], $mychars)) {
-            timesheetRow($row,$totals,$rights_viewallchars);
+        if (!$aggregate) {
+            if ($mychars!=false && in_array($row['characterID'], $mychars)) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
+        } else {
+            if ($row['characterID']==$_SESSION['granted']) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
         }
     }
     //display subtotal for "My Characters"
@@ -832,8 +862,14 @@ function showTimesheet($timesheet) {
     }
     //display data for everyone else
     foreach($timesheet as $row) {
-        if ($mychars==false || !in_array($row['characterID'], $mychars)) {
-            timesheetRow($row,$totals,$rights_viewallchars);
+        if (!$aggregate) {
+            if ($mychars==false || !in_array($row['characterID'], $mychars)) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
+        } else {
+            if ($row['characterID']!=$_SESSION['granted']) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
         }
     }
     //display total for everyone

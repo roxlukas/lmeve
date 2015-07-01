@@ -17,6 +17,9 @@ include_once('stats.php');
 //$rights_edithours=checkrights("Administrator,EditHoursPerPoint");
 
 $date=secureGETnum("date");
+$aggregate=secureGETstr("aggregate",3);
+if ($aggregate=='yes') $aggregate=TRUE; else $aggregate=FALSE;
+
 $width=600;
 
 if (strlen($date)==6) {
@@ -128,9 +131,13 @@ $(function() {
 </div>
     <h2>Timesheet</h2>
     <?php                                
-                                            
+        if(!$aggregate) {
+            echo('<a href="?id=0&date='.sprintf("%04d", $year).sprintf("%02d", $month).'&aggregate=yes"><img src="img/minus.gif" alt="[-]"> Aggregate by user</a>');
+        } else {
+            echo('<a href="?id=0&date='.sprintf("%04d", $year).sprintf("%02d", $month).'&aggregate=no"><img src="img/plus.gif" alt="[+]"> Break down by character</a>');
+        }
     //Timesheet				
-        showTimesheet(getTimesheet($corp['corporationID'],$year,$month));
+        showTimesheet(getTimesheet($corp['corporationID'],$year,$month, $aggregate),$aggregate);
 		
 }//end corps loop
 ?>
