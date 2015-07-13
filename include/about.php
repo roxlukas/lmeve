@@ -53,6 +53,14 @@ Changelog:
 <b>Poller version 22</b>
 <ul>
 <li>
+    SPYC library removed and code rewritten to use YAML PECL extension in PHP<ul>
+        <li><strong>Please note:</strong> LMeve now requires YAML PECL extenstion installed on your host</li>
+        <li>as a side effect, YAML import now takes several seconds instead of several minutes</li>
+        <li>this was necessary to make LMeve compatible with SDE changes in Aegis release</li>
+    </ul>
+        
+</li>
+<li>
 	EVE Time has been added on the top bar
 </li>
 <li>
@@ -1328,35 +1336,6 @@ on or functioning of this website, nor can it be liable for any damage arising f
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED<br/>
 	OF THE POSSIBILITY OF SUCH DAMAGE.<br/>
 </div>
-
-<h3>Spyc -- A Simple PHP YAML Class</h3>
-<pre>version 0.5.1
-author Vlad Andersen <vlad.andersen@gmail.com>
-author Chris Wanstrath <chris@ozmm.org>
-link http://code.google.com/p/spyc/
-copyright Copyright 2005-2006 Chris Wanstrath, 2006-2011 Vlad Andersen
-
-The MIT License
-
-Copyright (c) 2011 Vladimir Andersen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</pre>
 
 <h3>jQuery, jQuery UI</h3>
 <pre>Copyright 2013 jQuery Foundation and other contributors

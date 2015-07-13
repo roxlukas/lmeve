@@ -1,6 +1,7 @@
 <?php
 //YAML - graphics related functions
-include_once('spyc/Spyc.php');
+//include_once('spyc/Spyc.php');
+include_once('yaml_common.php');
 
 function updateYamlCertificates($silent=true) {
     global $LM_EVEDB;
@@ -59,15 +60,8 @@ function updateYamlCertificates($silent=true) {
     $yamlCrtMasteryLevels['advanced']=4;
     $yamlCrtMasteryLevels['elite']=5;
     
-    //there is a bug in SPYC that incorrectly loads descriptions. Workaround:
-    // instead of: $certificates = Spyc::YAMLLoad("../data/$LM_EVEDB/certificates.yaml");
-    $certificatesraw=file_get_contents($file);
-    $certificatesraw=str_replace('description: ', "description: ingore\r\n        ", $certificatesraw);
-    //another bug in "reccommended for" parsing. workaround:
-    $certificatesraw=str_replace('    - ', "        - ", $certificatesraw); 
-    
-    if (!$silent) echo('loading YAML...');
-    $certificates = Spyc::YAMLLoadString($certificatesraw);
+    //switching from Spyc to YAML PECL module
+    $certificates = yaml_parse_wrapper($file);
     
     //if data loaded correctly, prepare tables by clearing them
     if (!empty($certificates)) {

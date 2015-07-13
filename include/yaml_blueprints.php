@@ -1,7 +1,6 @@
 <?php
-
-//YAML - blueprint related functions
-include_once('spyc/Spyc.php');
+//YAML - graphics related functions
+//include_once('spyc/Spyc.php');
 include_once('yaml_common.php');
 
 function updateYamlBlueprints($silent=true) {
@@ -55,7 +54,12 @@ function updateYamlBlueprints($silent=true) {
     db_uquery($createyamlBlueprintSkills);
     
     if (!$silent) echo('loading YAML...');
-    $blueprints = Spyc::YAMLLoad($file);
+    //switching from Spyc to YAML PECL module
+    $blueprints = yaml_parse_wrapper($file);
+    if ($blueprints===FALSE) die("yaml_parse_file failed for $file");
+    
+    //var_dump($blueprints);
+    
     if (!empty($blueprints)) {
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlBlueprintTypes`;");
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlBlueprintProducts`;");
@@ -75,13 +79,13 @@ function updateYamlBlueprints($silent=true) {
         //var_dump($blueprint);
         //second, walk activities
         foreach ($blueprint['activities'] as $activityName => $activity) {
+            //var_dump($activity);
             $activityID=yaml_activity2ID($activityName);
             $time=yaml_prepare($activity['time'],0);
             
             //walk new (post-Phoebe) flat YAML output
             foreach($activity as $key => $entry) {
-                if (!is_numeric($key)) $currentList=$key; else {
-                    switch($currentList) {
+                    switch($key) {
                         case 'materials':
                             $materialTypeID=yaml_prepare($entry['typeID']);
                             $quantity=yaml_prepare($entry['quantity'],0);
@@ -100,7 +104,6 @@ function updateYamlBlueprints($silent=true) {
                             $bigyamlBlueprintSkills.="($blueprintTypeID, $activityID, $skillTypeID, $level),";
                             break;
                     }
-                }
             }
             
             /*******************************************************/
@@ -273,7 +276,10 @@ function updateYamlBlueprints_pre_Phoebe($silent=true) {
     db_uquery($createyamlBlueprintSkills);
     
     if (!$silent) echo('loading YAML...');
-    $blueprints = Spyc::YAMLLoad($file);
+    //switching from Spyc to YAML PECL module
+    $blueprints = yaml_parse_wrapper($file);
+    if ($blueprints===FALSE) die("yaml_parse_file failed for $file");
+    
     if (!empty($blueprints)) {
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlBlueprintTypes`;");
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlBlueprintProducts`;");
