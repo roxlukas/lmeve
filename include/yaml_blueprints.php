@@ -84,7 +84,8 @@ function updateYamlBlueprints($silent=true) {
             $time=yaml_prepare($activity['time'],0);
             
             //walk new (post-Phoebe) flat YAML output
-            foreach($activity as $key => $entry) {
+            foreach($activity as $key => $entries) {
+                if (is_array($entries)) foreach($entries as $entry) {
                     switch($key) {
                         case 'materials':
                             $materialTypeID=yaml_prepare($entry['typeID']);
@@ -104,6 +105,7 @@ function updateYamlBlueprints($silent=true) {
                             $bigyamlBlueprintSkills.="($blueprintTypeID, $activityID, $skillTypeID, $level),";
                             break;
                     }
+                }
             }
             
             /*******************************************************/

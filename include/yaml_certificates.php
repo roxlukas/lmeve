@@ -91,7 +91,7 @@ function updateYamlCertificates($silent=true) {
     
     //certificates loop
     foreach($certificates as $certificateID => $row) {
-        $description=addslashes(implode(' ',$row['description']));
+        $description=addslashes($row['description']);
         $name=addslashes($row['name']);
         $yamlCrtCertificatesinsert.="($certificateID, '$description', ${row['groupID']}, '$name'),";
         //recommendations loop
