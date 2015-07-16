@@ -39,6 +39,37 @@ function formatMaterials($materials) {
     return $ret;
 }
 
+function json_beautify($json_string) {
+    $ret='';
+    $pos=0;
+    $tabulator='    ';
+    $eol=PHP_EOL;
+    $prev='';
+    $ignore=FALSE;
+    for ($i=0; $i<=strlen($json_string); $i++) {
+        $c=substr($json_string, $i, 1);
+        if ($c=='"' && $prev != '\\') {
+            $ignore=!$ignore;
+        } else if(strpos('}]',$c)!==FALSE && !$ignore) {
+            $ret.=$eol;
+            $pos--;
+            for ($j=0; $j<$pos; $j++) {
+                $ret.=$tabulator;
+            }
+        }
+        $ret.=$c;
+        if (strpos(',{[',$c)!==FALSE && !$ignore) {
+            $ret.=$eol;
+            if ($c=='{' || $c=='[') $pos++;
+            for ($j=0; $j<$pos; $j++) {
+                $ret.=$tabulator;
+            }
+        }
+        $prev=$c;
+    }
+    return $ret;
+}
+
 function checkApiKey($key) {
     $ret=db_asocquery("SELECT * FROM `lmnbapi` WHERE `apiKey`='$key';");
     if (count($ret)==1) {
@@ -51,6 +82,10 @@ function RESTfulError($msg,$http_error_code=400) {
     header("HTTP/1.0 $http_error_code");
      echo(json_encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
     die();
+}
+
+function output($json) {
+    echo(json_beautify($json));
 }
 
 //Add proper JSON MIME type in header
@@ -69,13 +104,13 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (empty($meLevel)) $meLevel=0;
             if ($melevel>10) $melevel=10;
             if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
-            echo(json_encode(formatMaterials(getBaseMaterials($typeID, 1, $meLevel))));
+            output(json_encode(formatMaterials(getBaseMaterials($typeID, 1, $meLevel))));
             break;
         case 'TASKS':
             $characterID=secureGETnum('characterID');
             $sql="lmt.`characterID`=".$characterID;
             if (empty($characterID)) $sql="TRUE";
-            echo(json_encode(getTasks($sql, "TRUE", "",date("Y"),date("m"))));
+            output(json_encode(getTasks($sql, "TRUE", "",date("Y"),date("m"))));
             break;
         case 'INVTYPES':
             $typeID=secureGETnum('typeID');
@@ -102,7 +137,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (count($traitData) > 0) $item['traits']=$traitData;
             if (count($bonusData) > 0) $item['bonuses']=$bonusData;
             if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
-            echo(json_encode($item));
+            output(json_encode($item));
             break;
         case 'INVGROUPS':
             $groupID=secureGETnum('groupID');
@@ -112,7 +147,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             $groups=db_asocquery("SELECT * FROM `$LM_EVEDB`.`invGroups`
                 WHERE $where_gid AND $where_cid;");
             if (count($groups)==0) RESTfulError('No data found.',404);
-            echo(json_encode($groups));
+            output(json_encode($groups));
             break;  
         case 'INVCATEGORIES':
             $categoryID=secureGETnum('categoryID');
@@ -120,7 +155,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             $categories=db_asocquery("SELECT * FROM `$LM_EVEDB`.`invCategories`
                 WHERE $where_cid;");
             if (count($categories)==0) RESTfulError('No data found.',404);
-            echo(json_encode($categories));
+            output(json_encode($categories));
             break; 
         case 'GRAPHICID':
             $typeID=secureGETnum('typeID');
@@ -133,7 +168,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
                 WHERE yti.`typeID`=$typeID;");
             if (count($items)==0) RESTfulError('typeID not found.',404);
             $item=$items[0];
-            echo(json_encode($item));
+            output(json_encode($item));
             break;
         case 'ALLGRAPHICIDS':
             RESTfulError('ALLGRAPHICIDS endpoint is now obsolete. Use GRAPHICIDS instead.',404);
@@ -152,7 +187,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
                 ON itp.`groupID`=igp.`groupID`    
                 WHERE $where_gid AND $where_cid;");
             if (count($items)==0) RESTfulError('No data found.',404);
-            echo(json_encode($items));
+            output(json_encode($items));
             break;
         case 'JEREMY':
             RESTfulError('JEREMY endpoint is now obsolete. Use JEREMYBULK instead.',404);
@@ -214,7 +249,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (isset($regionID)) $regionWhere="`regionID`=$regionID"; else $regionWhere="TRUE";
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapRegions` WHERE $regionWhere;");
             if (count($items)==0) RESTfulError('region not found.',404);
-            echo(json_encode($items));
+            output(json_encode($items));
             break;
         case "MAPCONSTELLATIONS":
             //either regionID or contellationID is mandatory
@@ -232,7 +267,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (!$either) RESTfulError('Missing either regionID or constellationID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapConstellations` WHERE $regionWhere AND $constWhere;");
             if (count($items)==0) RESTfulError('constellation not found.',404);
-            echo(json_encode($items));
+            output(json_encode($items));
             break;
         case "MAPSOLARSYSTEMS":
             //either regionID or contellationID is mandatory
@@ -250,7 +285,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (!$either) RESTfulError('Missing either regionID or constellationID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapSolarSystems` WHERE $regionWhere AND $constWhere;");
             if (count($items)==0) RESTfulError('solar systems not found.',404);
-            echo(json_encode($items));
+            output(json_encode($items));
             break;
         case "MAPSOLARSYSTEM":
             //solarSystemID - mandatory
@@ -258,7 +293,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (empty($solarSystemID)) RESTfulError('Missing solarSystemID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `solarSystemID`=$solarSystemID;");
             if (count($items)==0) RESTfulError('solarSystemID not found.',404);
-            echo(json_encode($items));
+            output(json_encode($items));
             break;
 	default:	
             RESTfulError('Invalid endpoint.',404);
