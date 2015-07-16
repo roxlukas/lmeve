@@ -602,7 +602,9 @@ CREATE TABLE IF NOT EXISTS `apiprices` (
   `stddev` decimal(20,2) NOT NULL,
   `median` decimal(20,2) NOT NULL,
   `percentile` decimal(20,2) DEFAULT NULL,
-  `type` varchar(5) NOT NULL
+  `type` varchar(5) NOT NULL,
+  KEY `typeID` (`typeID`),
+  KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 

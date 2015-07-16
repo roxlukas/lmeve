@@ -1,4 +1,4 @@
---function for PoCo planet finding - fix in 0.1.53 - sometimes returned asteroid belt or moon instead of planet - groupID=7 limits query to planets only
+-- function for PoCo planet finding - fix in 0.1.53 - sometimes returned asteroid belt or moon instead of planet - groupID=7 limits query to planets only
 
 DROP FUNCTION IF EXISTS `findNearest`;
 
