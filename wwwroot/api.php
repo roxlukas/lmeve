@@ -213,15 +213,25 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             $regionID=secureGETnum('regionID');
             if (isset($regionID)) $regionWhere="`regionID`=$regionID"; else $regionWhere="TRUE";
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapRegions` WHERE $regionWhere;");
-            if (count($items)==0) RESTfulError('no regions found.',404);
+            if (count($items)==0) RESTfulError('region not found.',404);
             echo(json_encode($items));
             break;
         case "MAPCONSTELLATIONS":
-            //regionID - mandatory
+            //either regionID or contellationID is mandatory
+            $either=FALSE;
             $regionID=secureGETnum('regionID');
-            if (empty($regionID)) RESTfulError('Missing regionID parameter.',400);
-            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapConstellations` WHERE `regionID`=$regionID;");
-            if (count($items)==0) RESTfulError('regionID not found.',404);
+            if (isset($regionID)) {
+                $regionWhere="`regionID`=$regionID";
+                $either=TRUE;
+            } else $regionWhere="TRUE";
+            $constellationID=secureGETnum('constellationID');
+            if (isset($constellationID)) {
+                $constWhere="`constellationID`=$constellationID";
+                $either=TRUE;
+            } else $constWhere="TRUE";
+            if (!$either) RESTfulError('Missing either regionID or constellationID parameter.',400);
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapConstellations` WHERE $regionWhere AND $constWhere;");
+            if (count($items)==0) RESTfulError('constellation not found.',404);
             echo(json_encode($items));
             break;
         case "MAPSOLARSYSTEMS":
