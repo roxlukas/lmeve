@@ -219,7 +219,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
         case "MAPCONSTELLATIONS":
             //regionID - mandatory
             $regionID=secureGETnum('regionID');
-            if (empty($typeID)) RESTfulError('Missing regionID parameter.',400);
+            if (empty($regionID)) RESTfulError('Missing regionID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapConstellations` WHERE `regionID`=$regionID;");
             if (count($items)==0) RESTfulError('regionID not found.',404);
             echo(json_encode($items));
@@ -245,7 +245,7 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
         case "MAPSOLARSYSTEM":
             //solarSystemID - mandatory
             $solarSystemID=secureGETnum('solarSystemID');
-            if (empty($typeID)) RESTfulError('Missing solarSystemID parameter.',400);
+            if (empty($solarSystemID)) RESTfulError('Missing solarSystemID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `solarSystemID`=$solarSystemID;");
             if (count($items)==0) RESTfulError('solarSystemID not found.',404);
             echo(json_encode($items));
