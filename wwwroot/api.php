@@ -207,7 +207,48 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
                 db_uquery("INSERT INTO `lmpagecache` VALUES ('JEREMYBULK','".addslashes($tmpContent)."', NOW()) ON DUPLICATE KEY UPDATE `pageContents`='".addslashes($tmpContent)."', timestamp=NOW();");
                 echo($tmpContent);
             }
-            
+            break;
+        case "MAPREGIONS":
+            //regionID - optional
+            $regionID=secureGETnum('regionID');
+            if (isset($regionID)) $regionWhere="`regionID`=$regionID"; else $regionWhere="TRUE";
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapRegions` WHERE $regionWhere;");
+            if (count($items)==0) RESTfulError('no regions found.',404);
+            echo(json_encode($items));
+            break;
+        case "MAPCONSTELLATIONS":
+            //regionID - mandatory
+            $regionID=secureGETnum('regionID');
+            if (empty($typeID)) RESTfulError('Missing regionID parameter.',400);
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapConstellations` WHERE `regionID`=$regionID;");
+            if (count($items)==0) RESTfulError('regionID not found.',404);
+            echo(json_encode($items));
+            break;
+        case "MAPSOLARSYSTEMS":
+            //either regionID or contellationID is mandatory
+            $either=FALSE;
+            $regionID=secureGETnum('regionID');
+            if (isset($regionID)) {
+                $regionWhere="`regionID`=$regionID";
+                $either=TRUE;
+            } else $regionWhere="TRUE";
+            $constellationID=secureGETnum('constellationID');
+            if (isset($constellationID)) {
+                $constWhere="`constellationID`=$constellationID";
+                $either=TRUE;
+            } else $constWhere="TRUE";
+            if (!$either) RESTfulError('Missing either regionID or constellationID parameter.',400);
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapSolarSystems` WHERE $regionWhere AND $constWhere;");
+            if (count($items)==0) RESTfulError('solar systems not found.',404);
+            echo(json_encode($items));
+            break;
+        case "MAPSOLARSYSTEM":
+            //solarSystemID - mandatory
+            $solarSystemID=secureGETnum('solarSystemID');
+            if (empty($typeID)) RESTfulError('Missing solarSystemID parameter.',400);
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `solarSystemID`=$solarSystemID;");
+            if (count($items)==0) RESTfulError('solarSystemID not found.',404);
+            echo(json_encode($items));
             break;
 	default:	
             RESTfulError('Invalid endpoint.',404);
