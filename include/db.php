@@ -68,74 +68,30 @@ Funkcje dost�pu do bazy danych
 
 //db_connect zwraca identyfikator po��czenia z MySQL
 function db_connect() {
-	global $LM_DEBUG,$LM_DBENGINE,$LM_dbhost,$LM_dbname,$LM_dbuser,$LM_dbpass;
-    
+    global $LM_DEBUG,$LM_DBENGINE,$LM_dbhost,$LM_dbname,$LM_dbuser,$LM_dbpass;
     
     if ($LM_DBENGINE=="MYSQL") {
-		$ret=mysql_pconnect($LM_dbhost, $LM_dbuser, $LM_dbpass);
-		if (!$ret) {
-			$blad=mysql_error();
-			loguj(dirname(__FILE__).'/../var/error.txt',"No connection to the database. MySQL reply: $blad");
-			
-			if ($LM_DEBUG==1) {
-				printerr("No connection to the database.<br />MySQL reply: $blad");
-			} else {
-				printerr("No connection to the database. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		$odp=@mysql_select_db($LM_dbname);
-		if (!$odp) {
-			$blad=mysql_error();
-			loguj(dirname(__FILE__).'/../var/error.txt',"Database selection error. MySQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Database selection error.<br />MySQL reply: $blad");
-			} else {
-				printerr("Database selection error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}	    
-		$odp=mysql_query("SET CHARACTER SET 'utf8'", $ret);
-		if (!$odp) {
-			$blad=mysql_error();
-			loguj(dirname(__FILE__).'/../var/error.txt',"Character set select error. MySQL reply: $blad");
-			
-			if ($LM_DEBUG==1) {
-				printerr("Character set select error.<br />MySQL reply: $blad");
-			} else {
-				printerr("Character set select error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}	      
-		return($ret);
+        $dsn='mysql';
     } else if ($LM_DBENGINE=="PGSQL") {
-		$ret=pg_pconnect("host=$LM_dbhost port=5432 dbname=$LM_dbname user=$LM_dbuser password=$LM_dbpass");
-		if (!$ret) {
-			$blad=pg_last_error();
-			loguj(dirname(__FILE__).'/../var/error.txt',"No connection to the database. PostgreSQL reply: $blad");
-			
-			if ($LM_DEBUG==1) {
-				printerr("No connection to the database.<br />PostgreSQL reply: $blad");
-			} else {
-				printerr("No connection to the database. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-			    
-		$odp=pg_set_client_encoding ($ret, 'utf8');
-		if ($odp!=0) {
-			$blad=pg_last_error();
-			loguj(dirname(__FILE__).'/../var/error.txt',"Character set select error. PostgreSQL reply: $blad");
-			
-			if ($LM_DEBUG==1) {
-				printerr("Character set select error.<br />PostgreSQL reply: $blad");
-			} else {
-				printerr("Character set select error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}	      
-		return($ret);
+        $dsn='pgsql';
+    } else {
+        die('Error: $LM_DBENGINE setting is missing in config.php');
     }
+		
+    try {
+        $ret = new PDO("mysql:host=$LM_dbhost;dbname=$LM_dbname;charset=utf8", $LM_dbuser, $LM_dbpass, array(PDO::ATTR_EMULATE_PREPARES => false, 
+                                                                                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+    } catch(PDOException $ex) {
+        if ($LM_DEBUG==1) {
+                    printerr("No connection to the database.<br />MySQL reply: ".$ex->getMessage());
+            } else {
+                    printerr("No connection to the database. Contact your administrator and report the problem.<br/>");
+        }
+        loguj(dirname(__FILE__).'/../var/error.txt',"Error connecting to the database. MySQL reply: ".$ex->getMessage());
+        die();
+    }
+    return($ret);
+    
 }
 
 //db_query zwraca dwuwymiarow� tablic� z rekordami
@@ -145,56 +101,19 @@ function db_query($sql) {
 	$i=0;
 	$result=array();
 	
-	if ($LM_DBENGINE=="MYSQL") {
-		$my_result = mysql_query ($sql);
-		if (!$my_result) {
-			$blad=mysql_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />MySQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		
-			while ($line = mysql_fetch_row($my_result)) {
-				$j=0;
-					foreach ($line as $col_value) {
-						$result[$i][$j]=$col_value;
-						$j++;
-					}
-				$i++;
-			}
-			mysql_free_result($my_result);
-	
-		mysql_close($my_link);
-	} else if ($LM_DBENGINE=="PGSQL") {
-		$sql=str_replace ('`','"',$sql);
-		$my_result = pg_query($sql);
-		if (!$my_result) {
-			$blad=pg_last_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		
-			while ($line = pg_fetch_row($my_result)) {
-				$j=0;
-					foreach ($line as $col_value) {
-						$result[$i][$j]=$col_value;
-						$j++;
-					}
-				$i++;
-			}
-			pg_free_result($my_result);
-	
-		pg_close($my_link);
-	}
+	    try {
+                $stmt = $my_link->query($sql); 
+                $result = $stmt->fetchAll(PDO::FETCH_NUM);
+            } catch(PDOException $ex) {
+                loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: ".$ex->getMessage());
+                if ($LM_DEBUG==1) {
+                        printerr("Error in query: $sql<br />MySQL reply: ".$ex->getMessage());
+                } else {
+                        printerr("Database error. Contact your administrator and report the problem.<br/>");
+                }
+                die();
+            }
+        //echo("<pre>db_query($sql): "); var_dump($result); echo('</pre>');
 	return($result);
 }
 
@@ -205,48 +124,20 @@ function db_asocquery($sql) {
 	$i=0;
 	$result=array();
 	
-	if ($LM_DBENGINE=="MYSQL") {
-		$my_result = mysql_query ($sql);
-		if (!$my_result) {
-			$blad=mysql_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />MySQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		echo(mysql_error($my_link));
-		
-			while ($row = mysql_fetch_array($my_result, MYSQL_ASSOC)) {
-				$result[$i]=$row; 
-				$i++;
-			}
-			mysql_free_result($my_result);
+        try {
+            $stmt = $my_link->query($sql); 
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $ex) {
+            loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: ".$ex->getMessage());
+            if ($LM_DEBUG==1) {
+                    printerr("Error in query: $sql<br />MySQL reply: ".$ex->getMessage());
+            } else {
+                    printerr("Database error. Contact your administrator and report the problem.<br/>");
+            }
+            die();
+        }
 	
-		mysql_close($my_link);
-	} else if ($LM_DBENGINE=="PGSQL") {
-		$sql=str_replace ('`','"',$sql);
-		$my_result = pg_query ($sql);
-		if (!$my_result) {
-			$blad=pg_last_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		echo(pg_last_error($my_link));
-			while ($row = pg_fetch_array($my_result)) {
-				$result[$i]=$row; 
-				$i++;
-			}
-			pg_free_result($my_result);
-		pg_close($my_link);
-	}
+        //echo("<pre>db_asocquery($sql): "); var_dump($result); echo('</pre>');
 	return($result);
 }
 
@@ -256,36 +147,19 @@ function db_count($sql) {
 	$my_link=db_connect();
 	$i=0;
 	$result=array();
-	if ($LM_DBENGINE=="MYSQL") {
-		$my_result = mysql_query ($sql);
-		if (!$my_result) {
-			$blad=mysql_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />MySQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		$rows = mysql_num_rows($my_result);
-		mysql_close($my_link);
-	} else if ($LM_DBENGINE=="PGSQL") {
-		$sql=str_replace ('`','"',$sql);
-		$my_result = pg_query ($sql);
-		if (!$my_result) {
-			$blad=pg_last_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		$rows = pg_num_rows($my_result);
-		pg_close($my_link);
-	}
+        try {
+            $stmt = $my_link->query($sql); 
+            $rows = count($stmt->fetchAll(PDO::FETCH_NUM));
+        } catch(PDOException $ex) {
+            loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: ".$ex->getMessage());
+            if ($LM_DEBUG==1) {
+                    printerr("Error in query: $sql<br />MySQL reply: ".$ex->getMessage());
+            } else {
+                    printerr("Database error. Contact your administrator and report the problem.<br/>");
+            }
+            die();
+        }
+        //echo("<pre>db_count($sql): "); var_dump($rows); echo('</pre>');
 	return($rows);
 }
 
@@ -299,34 +173,19 @@ function db_uquery($sql) {
 	$my_link=db_connect();
 	$i=0;
 	$result=array();
-	if ($LM_DBENGINE=="MYSQL") {
-		$my_result = mysql_unbuffered_query ($sql);
-		if (!$my_result) {
-			$blad=mysql_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />MySQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		mysql_close($my_link);
-	} else if ($LM_DBENGINE=="PGSQL") {
-		$sql=str_replace ('`','"',$sql);
-		$my_result = pg_query ($sql);
-		if (!$my_result) {
-			$blad=pg_last_error($my_link);
-			loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql PostgreSQL reply: $blad");
-			if ($LM_DEBUG==1) {
-				printerr("Error in query: $sql<br />PostgreSQL reply: $blad");
-			} else {
-				printerr("Database error. Contact your administrator and report the problem.<br/>");
-			}
-			die('');
-		}
-		pg_close($my_link);
-	}
+	
+        try {
+            $stmt = $my_link->query($sql); 
+        } catch(PDOException $ex) {
+            loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: ".$ex->getMessage());
+            if ($LM_DEBUG==1) {
+                    printerr("Error in query: $sql<br />MySQL reply: ".$ex->getMessage());
+            } else {
+                    printerr("Database error. Contact your administrator and report the problem.<br/>");
+            }
+            die();
+        }
+	
 	return($my_result);
 }
 
