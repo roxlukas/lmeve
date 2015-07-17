@@ -34,6 +34,8 @@
 include_once(dirname(__FILE__).'/log.php');
 include_once(dirname(__FILE__).'/../config/config.php');
 
+$PDO_CONNECTION=null;
+
 function printerr($text) {
 	echo("<br><table class=\"error\"><tr><td>$text</td></tr></table>");
 	echo('<input type="button" value="&lt; Back" onclick="history.back();">');
@@ -68,7 +70,9 @@ Funkcje dost�pu do bazy danych
 
 //db_connect zwraca identyfikator po��czenia z MySQL
 function db_connect() {
-    global $LM_DEBUG,$LM_DBENGINE,$LM_dbhost,$LM_dbname,$LM_dbuser,$LM_dbpass;
+    global $LM_DEBUG,$LM_DBENGINE,$LM_dbhost,$LM_dbname,$LM_dbuser,$LM_dbpass,$PDO_CONNECTION;
+    
+    if (!is_null($PDO_CONNECTION)) return($PDO_CONNECTION);
     
     if ($LM_DBENGINE=="MYSQL") {
         $dsn='mysql';
@@ -90,6 +94,7 @@ function db_connect() {
         loguj(dirname(__FILE__).'/../var/error.txt',"Error connecting to the database. MySQL reply: ".$ex->getMessage());
         die();
     }
+    $PDO_CONNECTION=$ret;
     return($ret);
     
 }
