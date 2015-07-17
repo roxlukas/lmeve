@@ -295,6 +295,14 @@ if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
             if (count($items)==0) RESTfulError('solarSystemID not found.',404);
             output(json_encode($items));
             break;
+        case "MAPLOCATION":
+            //solarSystemID - mandatory
+            $itemID=secureGETnum('itemID');
+            if (empty($itemID)) RESTfulError('Missing itemID parameter.',400);
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `itemID`=$itemID;");
+            if (count($items)==0) RESTfulError('itemID not found.',404);
+            output(json_encode($items));
+            break;
 	default:	
             RESTfulError('Invalid endpoint.',404);
     }
