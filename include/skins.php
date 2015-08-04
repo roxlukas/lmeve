@@ -17,6 +17,30 @@ function getShipSkins($shipTypeID) {
 	return($skins);
 }
 
+function getAllRacialSkins($race) {
+    global $LM_EVEDB;
+    $sql="SELECT DISTINCT `sofFactionName` FROM $LM_EVEDB.`yamlGraphicIDs` WHERE `sofRaceName`='$race' AND `sofFactionName` IS NOT NULL";
+    $skins=db_asocquery($sql);
+    return($skins);
+}
+
+function showAllRacialSkins($skins) {
+    //var_dump($skins);
+	if (count($skins)>0) {
+		?>
+                <table class="lmframework" width="100%"><tr><th>Custom SKINs</th></tr>
+                    <tr><td>Select custom skin: <select id="customskins" onchange="loadPreview(this.value);">
+                            <?php
+                                foreach ($skins as $race) {
+                                    $skin=$race['sofFactionName'];
+                                    echo("<option value=\"$skin\">$skin</option>");
+                                }
+                            ?>
+                        </select></td></tr>
+                </table><?php
+	}
+}
+
 function getShipBySkin($skinTypeID) {
 	global $LM_EVEDB;
         $DEBUG=FALSE;
