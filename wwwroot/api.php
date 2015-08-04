@@ -95,7 +95,10 @@ header("Access-Control-Allow-Origin: *");
 
 if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",400);
 
-if (!checkApiKey($key)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
+//check if LMeve API key is valid -OR- if user is logged on to LMeve GUI - SESSION status = 1
+//this will allow LMeve itself to use the api calls if needed
+session_start();
+if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve Northbound API KEY.",401);
 
     switch ($endpoint) {
         case 'MATERIALS':
