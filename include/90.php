@@ -116,7 +116,7 @@ global $USERSTABLE;
 					foreach($row['chars'] as $contrib) {
 						echo('<tr><td class="tab" width="32" style="padding: 0px;">');
 						althrefedit($contrib['charID']);
-							echo("<img src=\"https://image.eveonline.com/character/${contrib['charID']}_32.jpg\" title=\"${contrib['name']}\" />");
+							echo("<img src=\"https://imageserver.eveonline.com/character/${contrib['charID']}_32.jpg\" title=\"${contrib['name']}\" />");
 						echo('</a>');
 						echo('</td><td class="tab" width="240" style="text-align: left;">');
 						althrefedit($contrib['charID']);

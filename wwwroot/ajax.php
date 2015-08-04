@@ -248,7 +248,7 @@ if ($act=='') $act=0;
 
                         echo('<tr><td style="padding: 0px; width: 32px;">');
                                 hrefedit_item($row['typeID']);
-                                echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />");
+                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
                                 echo('</a>');
                         echo('</td><td>');
                                 hrefedit_item($row['typeID']);

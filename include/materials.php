@@ -383,7 +383,7 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 		foreach ($recycle as $row) {
 			//$notperfect=round($row['quantity']*$multiplier);
                         $notperfect=$row['notperfect'];
-			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td><strong>${notperfect}</strong> (base: ${row['quantity']})</td></tr>");
+			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td><strong>${notperfect}</strong> (base: ${row['quantity']})</td></tr>");
 		}
 		echo("</table>");
 	}
@@ -428,7 +428,7 @@ function displaySkills($skills) {
 			echo("<table class=\"lmframework\" width=\"100%\">");
 			echo("<tr colspan=\"2\"><th>Skill</th><th>Required level</th></tr>");
 			foreach ($skills as $row) {
-				if ($row['level']>0)	echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['skillTypeID']}\"><img src=\"ccp_img/${row['skillTypeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['level']}</td></tr>");
+				if ($row['level']>0)	echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['skillTypeID']}\"><img src=\"".getTypeIDicon($row['skillTypeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['level']}</td></tr>");
 			}
 			echo("</table>");
 		}
@@ -489,7 +489,7 @@ function displayExtraMats($materials) {
 			echo("<tr colspan=\"3\"><th>Extra Material</th><th>Quantity</th><th>dmg per job</th></tr>");
 			foreach ($materials as $row) {
 				$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
-				if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['quantity']}</td><td>${row['damagePerJob']}</td></tr>");
+				if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['quantity']}</td><td>${row['damagePerJob']}</td></tr>");
 			}
 			echo("</table>");
 		}
@@ -508,7 +508,7 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
     if ($location) {
         echo("<table class=\"lmframework\" width=\"100%\">");
         echo("<tr><th colspan=\"2\" style=\"width: 100%\">Location</th></tr>");
-        echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"ccp_img/${location['typeID']}_32.png\" title=\"${location['typeName']}\"></td><td style=\"width: 95%;\"><strong>${location['itemName']}</strong><br/>${location['moonName']}</td></tr>");
+        echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"".getTypeIDicon($location['typeID'])."\" title=\"${location['typeName']}\"></td><td style=\"width: 95%;\"><strong>${location['itemName']}</strong><br/>${location['moonName']}</td></tr>");
 	echo("</table>");		
     }
     if ($materials!=false) {
@@ -517,7 +517,7 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
 			foreach ($materials as $row) {
                             //data interface workaround
                             if (strpos($row['typeName'],'Data Interface')!==false) $row['quantity']=1;
-			    if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
+			    if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
 			}
 			echo("</table>");
     }
@@ -529,7 +529,7 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
 			//$notperfect=round($row['quantity']*$multiplier);
                         if (strpos($row['typeName'],'Data Interface')!==false) $row['notperfect']=1;
                         $notperfect=$row['notperfect'];
-			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"ccp_img/${row['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect}</td></tr>");
+			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect}</td></tr>");
 		}
 		echo("</table>");
     }

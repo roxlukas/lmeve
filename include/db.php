@@ -36,6 +36,25 @@ include_once(dirname(__FILE__).'/../config/config.php');
 
 $PDO_CONNECTION=null;
 
+function getTypeIDicon($typeID,$size=32) {
+    if (!is_numeric($typeID)) $typeID=0;
+    if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=512)) $size=32;
+    if ($size != 512) {
+        if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
+            $icon="ccp_img/${typeID}_${size}.png";
+        } else {
+            $icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
+        }
+    } else {
+        if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
+            $icon="ccp_renders/${typeID}.png";
+        } else {
+            $icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
+        }
+    }
+    return($icon);
+}
+
 function printerr($text) {
 	echo("<br><table class=\"error\"><tr><td>$text</td></tr></table>");
 	echo('<input type="button" value="&lt; Back" onclick="history.back();">');

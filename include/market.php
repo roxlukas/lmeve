@@ -230,7 +230,7 @@ function showBuybackOrder($row) {
 		foreach($items as $item) {
 			$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`=${item['typeID']};");
 			$typeName=$typeName[0][0];
-			echo('<tr><td class="tab"><a href="?id=10&id2=1&nr='.$item['typeID'].'"><img src="ccp_img/'.$item['typeID'].'_32.png" style="width: 16px; height: 16px; vertical-align: text-bottom;" /> '.$typeName.'</td><td class="tab" style="text-align: right;"> '.number_format($item['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP).'</td></tr>');
+			echo('<tr><td class="tab"><a href="?id=10&id2=1&nr='.$item['typeID'].'"><img src="'.getTypeIDicon($item['typeID']).'" style="width: 16px; height: 16px; vertical-align: text-bottom;" /> '.$typeName.'</td><td class="tab" style="text-align: right;"> '.number_format($item['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP).'</td></tr>');
 		}
 		echo('</table>');
 	echo("</td></tr>");
@@ -302,7 +302,7 @@ function showMarketOrders($orderlist,$label=null) {
 			echo('</td>');
 			echo('<td style="padding: 0px; width: 32px;">');
                             if ($rights_viewallchars) charhrefedit($row['charID']);
-                                echo("<img src=\"https://image.eveonline.com/character/${row['charID']}_32.jpg\" title=\"${row['name']}\" />");
+                                echo("<img src=\"https://imageserver.eveonline.com/character/${row['charID']}_32.jpg\" title=\"${row['name']}\" />");
                             if ($rights_viewallchars) echo("</a>");
 			echo('</td>');
                         echo('<td>');
@@ -312,7 +312,7 @@ function showMarketOrders($orderlist,$label=null) {
 			echo('</td>');
                         echo('<td style="padding: 0px; width: 32px;">');
                             itemhrefedit($row['typeID']);
-                                echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />");
+                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
                             echo("</a>");
 			echo('</td>');
                         echo('<td>');
@@ -439,7 +439,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
 			foreach($group['types'] as $typeID => $row) {
 				echo('<tr><td style="padding: 0px; width: 32px;">');
 				if ($rights_viewdatabase) buchrefedit($row['typeID']);
-					echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+					echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 				if ($rights_viewdatabase) echo('</a>');
 				echo('</td>');
 				echo('<td>');

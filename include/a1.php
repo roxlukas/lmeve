@@ -203,10 +203,14 @@ function url_replace($input) {
         
         //echo("DEBUG: categoryID=".$item['categoryID']."<br/>");
 
-//CCP WebGL -- 3D Preview!
-    $skins = getShipSkins($nr);
+
+
     
-    if ($model=getResourceFromYaml($nr)) {
+if ($model=getResourceFromYaml($nr)) {
+    //CCP WebGL -- 3D Preview!
+    $skins = getShipSkins($nr);
+    $racial = getAllRacialSkins($model['sofRaceName']);
+    
     //var_dump($model);
 ?>
 <?php if (!$MOBILE) { ?>
@@ -216,7 +220,10 @@ function url_replace($input) {
 <?php } ?>
 <table class="lmframework" style="width: 100%;">
     <tr><th colspan="2">3D Preview <img src="img/del.gif" alt="x" onclick="toggler('3dpreview'); scene=null; ship=null;" value="x" style="float: right;"/></th></tr>
-    <tr><td width="725"><canvas id="wglCanvas" width="720" height="420" style="width: 720px; height: 420px;"></canvas>
+    <tr><td width="725">
+            <div style="width: 720px; height: 420px; background: url(<?php echo(getTypeIDicon($item['typeID'],512)); ?>) no-repeat center center; background-size: cover;">
+                <canvas id="wglCanvas" width="720" height="420" style="width: 720px; height: 420px;"></canvas>
+            </div>
     <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td>
     <td style="vertical-align: top;">
 		<script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
@@ -350,7 +357,8 @@ function url_replace($input) {
 		
 		</script> 
 		<div id="skinpanel">
-		<?php if (count($skins)>0) showSkins($skins); else echo('<center><h3>This ship has no SKINs</h3></center>'); ?>
+		<?php if (count($skins)>0) showSkins($skins); else echo('<table><tr><th>Ship has no in-game SKINs</th></tr></table>'); ?>
+                <?php if (count($racial)>0) showAllRacialSkins($racial); ?>
 		</div>
     </td>
     
@@ -387,9 +395,13 @@ function url_replace($input) {
 </th>
 </tr>
 <tr><td class="tab" style="padding: 0px; width: 32px;">
-<?php if ($item['groupID']!=1311) { ?>
-	<img src="ccp_img/<?php echo($item[typeID]); ?>_64.png" title="<?php echo($item['typeName']); ?>" id="miniature" />
-<?php } else {
+<?php if ($item['groupID']!=1311) { 
+        if ($model) echo("<a href=\"".getTypeIDicon($item['typeID'],512)."\" target=\"_blank\">");
+        ?>
+	<img src="<?php echo(getTypeIDicon($item['typeID'],64));?>" title="<?php echo($item['typeName']); ?>" id="miniature" />
+<?php 
+        if ($model) echo("</a>");
+} else {
 	$skin = getSkin($nr);
 	if (count($skin)>0) displaySkinIcon($skin[0],64);
 } ?>
@@ -649,7 +661,7 @@ if ($model) {
 		foreach($metaTypes as $row) {
 			echo('<tr><td width="32" style="padding: 0px; text-align: center;">');
 				hrefedit_item($row['typeID']);
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 				echo('</a>');
 			echo('</td><td>');
 				hrefedit_item($row['typeID']);
@@ -680,7 +692,7 @@ if (!$MOBILE) {
         //if item is a SKIN
         if ($item['groupID']=1311) {
             $ship=getShipBySkin($nr);
-            if ($ship) echo("<tr><td class=\"tab\"><b>SKIN applies to:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${ship['typeID']}\"><img src=\"ccp_img/${ship['typeID']}_32.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px; margin-right: 3px;\" /> ${ship['typeName']}</a></td></tr>"); 
+            if ($ship) echo("<tr><td class=\"tab\"><b>SKIN applies to:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${ship['typeID']}\"><img src=\"".getTypeIDicon($ship['typeID'])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px; margin-right: 3px;\" /> ${ship['typeName']}</a></td></tr>"); 
         }
         //continue
 	echo("<tr><td class=\"tab\"><b>Mass:</b></td><td class=\"tab\">".number_format($item['mass'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." kg</td></tr>");
@@ -741,7 +753,7 @@ if (!$MOBILE) {
 		//Jump Drive Fuel Need
 		if (strstr("Jump Drive Fuel Need",$element[2])) {
 			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_img/${element[1]}_32.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$fuel[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"".getTypeIDicon($element[1])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$fuel[0][0]);
 		}
 		if (preg_match("/.*duration$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);

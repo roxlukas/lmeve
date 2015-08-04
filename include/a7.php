@@ -94,7 +94,7 @@ foreach($ores_raw as $row) {
                     ?>
                     <tr>
                         <td style="width: 32px; padding: 0px; text-align: center;">
-                    <?php dbhrefedit($row['typeID']); ?><img src="ccp_img/<?php echo($row['typeID']); ?>_32.png" title="<?php echo($row['typeName']); ?>" /></a>
+                    <?php dbhrefedit($row['typeID']); ?><img src="<?php echo(getTypeIDicon($row['typeID'])); ?>" title="<?php echo($row['typeName']); ?>" /></a>
                         </td>
                         <td><?php dbhrefedit($row['typeID']); echo($row['typeName']); ?></a></td>
                         <td style="text-align: right;"><?php echo($row['volume']); ?></td>

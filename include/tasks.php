@@ -333,7 +333,7 @@ function showTasks($tasklist) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
                         echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+				echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -353,7 +353,7 @@ function showTasks($tasklist) {
                     }
                         echo('<td style="padding: 0px; width: 32px;">');
 			itemhrefedit($row['typeID']);
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -471,7 +471,7 @@ function showTasks_old($tasklist) {
 		foreach($tasklist as $row) {
 			echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+				echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</a>');
 			echo('</td><td class="tab">');
 			taskhrefedit($row['characterID'],$year.$month);
@@ -479,7 +479,7 @@ function showTasks_old($tasklist) {
 			echo('</a>');
 			echo('</td><td class="tab" style="padding: 0px; width: 32px;">');
 			if ($rights) edittaskhrefedit($row['taskID']);
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 			if ($rights) echo('</a>');
 			echo('</td><td class="tab">');
 			if ($rights) edittaskhrefedit($row['taskID']);
@@ -575,7 +575,7 @@ function showCurrentJobs($jobslist) {
 	<?php
 		foreach($jobslist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
-                            echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+                            echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</td>');
                         if (!$MOBILE) {
                             echo('<td>');
@@ -585,7 +585,7 @@ function showCurrentJobs($jobslist) {
                         echo('<td>');
                             echo($row['activityName']);    
 			echo('</td><td style="padding: 0px; width: 32px;">');
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 			echo('</td><td>');
                                 itemhrefedit($row['typeID']);
 				echo($row['typeName']);
@@ -749,10 +749,10 @@ function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE,$aggregate=FALS
     echo('<tr><td style="padding: 0px;">');
         if (!$aggregate) {
             if ($rights_viewallchars) charhrefedit($row['characterID']);
-                    echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+                    echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
             if ($rights_viewallchars) echo('</a>');
         } else {
-                    echo("<img src=\"https://image.eveonline.com/character/0_32.jpg\" title=\"${row['name']}\" />");
+                    echo("<img src=\"https://imageserver.eveonline.com/character/0_32.jpg\" title=\"${row['name']}\" />");
         }
     echo('</td><td>');
             if ($rights_viewallchars && !$aggregate) charhrefedit($row['characterID']);

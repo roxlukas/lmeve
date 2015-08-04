@@ -248,7 +248,7 @@ function showLabsAndTasks($towers) {
             if (count($tower['labs'])>0) foreach ($tower['labs'] as $facilityID => $row) {
                 ?>
                 <tr><td width="32" style="padding: 0px; text-align: center;">
-                    <?php dbhrefedit($row['typeID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                    <?php dbhrefedit($row['typeID']); echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
                 </td><td>
                     <?php 
                     labshrefedit($facilityID); echo(stripslashes($row['itemName'])); echo('</a>');
@@ -261,7 +261,7 @@ function showLabsAndTasks($towers) {
                     <?php 
                     if (count($row['users'])>0) foreach ($row['users'] as $user => $name) {
                         if ($rights_viewallchars) toonhrefedit($user);
-                        echo("<img src=\"https://image.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
+                        echo("<img src=\"https://imageserver.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
 			if ($rights_viewallchars) echo('</a>');
                     }
                     ?>
@@ -269,7 +269,7 @@ function showLabsAndTasks($towers) {
                     <?php 
                     if (count($row['products'])>0) foreach ($row['products'] as $product => $name) {
                         dbhrefedit($product);
-                        echo("<img src=\"ccp_img/${product}_32.png\" title=\"$name\">");
+                        echo("<img src=\"".getTypeIDicon($product)."\" title=\"$name\">");
                         echo('</a>');
                     }
                     ?> 
@@ -303,7 +303,7 @@ function showControlTowers($controltowers) {
                 <td width="30%" style="text-align: center;">
                     <?php towershrefedit($row['itemID']); ?>
                     <h1 style="text-align: center;"><?=$row['towerName']?></h1>
-                    <img src="ccp_img/<?=$row['towerTypeID']?>_64.png" title="<?=$row['towerTypeName']?>" />
+                    <img src="<?php echo(getTypeIDicon($row['towerTypeID'],64)); ?>" title="<?=$row['towerTypeName']?>" />
                     <h3 style="text-align: center;"><?=$row['location']['moonName']?></h3>
                     <i><?=$row['towerTypeName']?></i>
                     </a>
@@ -359,7 +359,7 @@ function showControlTowers($controltowers) {
                                 } else {
                                     $timeleft="$timeleft h";
                                 }
-                                echo('<tr><td style="padding: 0px; width: 32px;"><img src="ccp_img/'.$fuel['fuelTypeID'].'_32.png" title="" /></td><td>'.$fuel['fuelTypeName'].'</td><td style="text-align: right;">'.$fuel['fuelQuantity'].'</td><td style="text-align: right;'.$style.'">'.$timeleft.'</td></tr>');
+                                echo('<tr><td style="padding: 0px; width: 32px;"><img src="'.getTypeIDicon($fuel['fuelTypeID']).' title="" /></td><td>'.$fuel['fuelTypeName'].'</td><td style="text-align: right;">'.$fuel['fuelQuantity'].'</td><td style="text-align: right;'.$style.'">'.$timeleft.'</td></tr>');
                             }
                         ?>
                     </table>
@@ -452,7 +452,7 @@ function showControlTowersOld($controltowers) {
 			foreach ($controltowers as $row) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
-                <?php towershrefedit($row['itemID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                <?php towershrefedit($row['itemID']); echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
             </td><td>
                 <?php towershrefedit($row['itemID']);
                 echo($row['itemName']); echo('</a>'); ?>
@@ -662,7 +662,7 @@ function showPocoClients($clients) {
         foreach ($clients as $row) {
             echo('<tr><td style="width: 32px; padding: 0px; text-align: center;">');
                 outsiderhrefedit($row['characterName']);
-                    echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['characterName']}\" />");
+                    echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['characterName']}\" />");
                 echo('</a>');
             echo('</td><td style="text-align: left;">');
                 outsiderhrefedit($row['characterName']);
@@ -735,8 +735,8 @@ function showPocos($pocos, $income=null) {
             ?>
                 <tr><td style="padding: 0px; text-align: center;">
                     <?php 
-                    echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>");
-                    echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_32.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                    echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"".getTypeIDicon(2233)."\" title=\"Customs Office\" /></a>");
+                    echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"".getTypeIDicon($row['planetTypeID'])."\" title=\"".$row['planetTypeName']."\" /></a>");
                     ?>
                     
                 </td>
@@ -831,13 +831,13 @@ function showPocoDetail($pocos,$income=null) {
 			</th></tr>
                         <tr><td style="padding: 0px; text-align: center;">
                             <?php 
-                            echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_64.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                            echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"".getTypeIDicon($row['planetTypeID'],64)."\" title=\"".$row['planetTypeName']."\" /></a>");
                             ?>
 			</td><td style="text-align: center;">
                             <h2><?=$row['planetName']?></h2>
                             <?=$row['planetTypeName']?>
                         </td><td style="text-align: center;">
-                            <h2><img src="https://image.eveonline.com/Corporation/<?=$row['corporationID']?>_32.png" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
+                            <h2><img src="https://imageserver.eveonline.com/Corporation/<?=$row['corporationID']?>_32.png" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
 				
 			</td></tr>
                         </table>
@@ -1014,7 +1014,7 @@ function showStock($inventory, $corpID) {
         foreach ($group['types'] as $typeID => $row) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
-                <?php dbhrefedit($row['typeID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                <?php dbhrefedit($row['typeID']); echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
             </td><td>
                 <?php dbhrefedit($row['typeID']);
                 if (($LM_BUYCALC_SHOWHINTS) && (isset($inventory[$groupID]['types'][$typeID]['amount'])) && (isset($inventory[$groupID]['types'][$typeID]['quantity']))) {
