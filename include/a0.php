@@ -23,7 +23,7 @@ if (!empty($marketGroupID)) {
 	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
-	    <?php echo("<em>Static Data schema: $LM_EVEDB</em><br />"); ?>
+	    <?php echo("<em><img src=\"ccp_icons/38_16_208.png\" alt=\"(i)\"/> Static Data schema: $LM_EVEDB</em><br />"); ?>
 	<?php
 		if (!empty($marketGroupID)) {
 				$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`

@@ -18,7 +18,7 @@ function cachedContent() {
         //echo("DEBUG: <pre>"); print_r($inventory); echo('</pre>');
         ?>
         <h3>Current Stock</h3>
-        <em>Due to EVE API limitations, Assets can only be updated every 6 hours.</em>
+        <em><img src="ccp_icons/38_16_208.png" alt="(i)"/> Due to EVE API limitations, Assets can only be updated every 6 hours.</em>
         <?php
 
         showStock($stock,$corp['corporationID']);

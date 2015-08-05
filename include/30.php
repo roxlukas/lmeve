@@ -22,7 +22,7 @@ global $LM_EVEDB;
 <?php
 if (checkrights("Administrator,ViewBuyOrders")) { 
 	echo('<h3>Buyback Orders</h3>');
-	echo('<em>Buyback orders are buyback contracts from corp members to the corporation.</em><br />');
+	echo('<em><img src="ccp_icons/38_16_208.png" alt="(i)"/> Buyback orders are buyback contracts from corp members to the corporation.</em><br />');
 	
 	$buybacklist=getBuybackOrders("WHERE TRUE ORDER BY timestmp DESC LIMIT 10");
 	showBuyback($buybacklist);
@@ -30,7 +30,7 @@ if (checkrights("Administrator,ViewBuyOrders")) {
 
 if (checkrights("Administrator,ViewMarket")) { 
 	echo('<h3>Market Orders</h3>');
-	echo('<em>Market Orders show current in game market order status.</em><br />');
+	echo('<em><img src="ccp_icons/38_16_208.png" alt="(i)"/> Market Orders show current in game market order status.</em><br />');
         $corps=db_asocquery("SELECT * FROM apicorps;");
 	foreach ($corps as $corp) { //begin corps loop
             echo("<h3><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_32.png\" style=\"vertical-align: middle;\" /> ${corp['corporationName']}</h3>");

@@ -115,7 +115,8 @@ $nr=secureGETnum("nr");
 		</form></td>
 		<?php } ?>
 		</tr></table>
-	    
+	    <em><img src="ccp_icons/38_16_208.png" alt="(i)"/> Tasks are only contributed to by the characters they have been assigned to. If you'd like to use an alt for production, ask administrator to assign that task to your alt.<br/></em>
+            <br/>
 	<?php
 
 	
