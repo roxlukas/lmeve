@@ -50,7 +50,7 @@ function ajax_append_table(URL, tableID, loaderID, callback) {
         var tableRef = document.getElementById(tableID).getElementsByTagName('tbody')[0];
         var loaderRef = document.getElementById(loaderID);
         
-        var length=0; var rowcount=0;
+        var length=0;var rowcount=0;
         
         $.ajax({
             url: URL+'&getlength=true',
@@ -114,4 +114,48 @@ function ajax_save(URL, itemID, itemlabelID) {
 	xmlhttp.open("GET",URL,true);
 	xmlhttp.send();
 	return;
+}
+
+function regionSelect(id) {
+    $.ajax({
+    url:'ajax.php?act=GET_REGIONS',
+    type:'GET',
+    //data: 'act=GET_REGIONS',
+    //dataType: 'json',
+    success: function( json ) {
+        $.each(json, function(i, value) {
+            $('#'+id).append($('<option>').text(value.regionName).attr('value', value.regionID));
+        });
+    }
+});
+}
+
+function systemSelect(id,regionID) {
+    $.ajax({
+    url:'ajax.php?act=GET_SOLARSYSTEMS&regionID='+regionID,
+    type:'GET',
+    success: function( json ) {
+        $('#'+id).empty();
+        $.each(json, function(i, value) {
+            $('#'+id).append($('<option>').text(value.solarSystemName).attr('value', value.solarSystemID));
+        });
+    }
+    });
+}
+
+function pollerRealTime(idDate,idFile,idMessage,idActive) {
+    var tmpkey='';
+    $.ajax({
+    url:'ajax.php?act=GET_POLLERMESSAGE',
+    type:'GET',
+    success: function( json ) {
+        //{"errorID":146,"keyID":"0","fileName":"CREST \/industry\/systems\/","date":"2015-03-23 20:25:20","errorCode":0,"errorCount":0,"errorMessage":"OK"}
+        if (json.keyID!=0) tmpkey='[KeyID:'+json.keyID+'] ';
+        $('#'+idDate).html(json.date);
+        $('#'+idFile).html(tmpkey+json.fileName);
+        $('#'+idMessage).html(json.errorMessage);
+        if (json.pollerActive==true) $('#'+idActive).html('<span style="color: #00A000; font-weight:bold;">YES</span>');
+        if (json.pollerActive!=true) $('#'+idActive).html('<span style="color: #808080;">NO</span>');
+    }
+    });
 }

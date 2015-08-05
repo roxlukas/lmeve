@@ -272,6 +272,42 @@ if ($act=='') $act=0;
                 }
             }
             break;
+        case 'GET_REGIONS':
+            $wspace=secureGETstr('wspace',5);
+            if (strtolower($wspace)=='true') $whereWSpace='TRUE'; else $whereWSpace='`regionID` < 11000000';
+            $regions=db_asocquery("SELECT `regionID`,`regionName` FROM $LM_EVEDB.`mapRegions` WHERE $whereWSpace ORDER BY `regionName;");
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($regions));
+            break;
+        case 'GET_SOLARSYSTEMS':
+            $regionID=secureGETnum('regionID');
+            if (!isset($regionID)) {
+                echo("Error: regionID required");
+                break;
+            }
+            $systems=db_asocquery("SELECT `solarSystemID`,`solarSystemName` FROM $LM_EVEDB.`mapSolarSystems` WHERE `regionID`=$regionID ORDER BY `solarSystemName;");
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($systems));
+            break;
+        case 'GET_POLLERMESSAGE':
+            if (!checkrights("Administrator,ViewAPIStats")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            $sql="SELECT *
+            FROM `apistatus`
+            ORDER BY date DESC
+            LIMIT 0,1;";
+            $errors = db_asocquery($sql);
+            $LOCKFILE="../var/poller.lock";
+            $message=$errors[0];
+            if (file_exists($LOCKFILE)) $message['pollerActive']=TRUE; else $message['pollerActive']=FALSE;
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($message));
+            break;    
 	default:
             echo('Error in AJAX call.');
     }

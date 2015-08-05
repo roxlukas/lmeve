@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="22";
+$POLLER_VERSION="23";
 $POLLER_MAX_TIME=900;
 set_time_limit($POLLER_MAX_TIME-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
@@ -37,6 +37,7 @@ date_default_timezone_set('Europe/Warsaw');
 //set_include_path("$mypath/../include");
 include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
+include_once("$mypath/../include/configuration.php");
 
 function microtime_float()
 {
@@ -1705,6 +1706,7 @@ inform("Main","Polling eve-central.com feeds...");
 //Parameters	 typeID, usesystem=30000142
 //Cache Time (minutes)	 60
 $MAXTYPES=30;
+$useSystem=getConfigItem('marketSystemID', '30000142');
 $amountTypes=db_query("SELECT COUNT(*) FROM cfgmarket;");
 $amountTypes=$amountTypes[0][0];
 for ($i=0; $i < ceil($amountTypes / $MAXTYPES); $i++) {
@@ -1716,7 +1718,7 @@ for ($i=0; $i < ceil($amountTypes / $MAXTYPES); $i++) {
 	}
 	//echo("DEBUG: ".$TYPES."\r\n");
 	if (!apiCheckErrors(0,"eve-central.com")) {
-		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem=30000142${TYPES}","${mycache}/marketstat_$i.xml",60*60);
+		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem=${useSystem}${TYPES}","${mycache}/marketstat_$i.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning(0,$dat->error,"eve-central.com/marketstat.xml");
 		} else {

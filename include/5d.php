@@ -20,7 +20,11 @@ global $LM_EVEDB;
                 if (!token_verify()) die("Invalid or expired token.");
                 setConfigItem('iskPerPoint', secureGETnum('iskPerPoint'));
                 setConfigItem('singletonTaskExpiration', secureGETnum('singletonTaskExpiration'));
-                setConfigItem('marketRegion', secureGETnum('marketRegion'));
+                $marketSystemID=secureGETnum('marketSystemID');
+                if (!empty($marketSystemID)) setConfigItem('marketSystemID', $marketSystemID);
+                $indexSystemID=secureGETnum('indexSystemID');
+                if (!empty($indexSystemID)) setConfigItem('indexSystemID', $indexSystemID);
+                
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
                 if ( in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
 		

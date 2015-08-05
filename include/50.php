@@ -79,22 +79,35 @@ Settings
             <form method="post" action="?id=5&id2=13">
                 <?php token_generate(); ?>
 		<input type="hidden" name="nr" value="<?=$nr?>">
-		    <table border="0" cellspacing="2" cellpadding="">
-                        <tr><td width="150" class="tab">
-                            ISK per point:<br></td><td width="200" class="tab">
-                                <input type="text" size="32" name="iskPerPoint" value="<?=getConfigItem('iskPerPoint','15000000')?>" />
-                        </td></tr>
-                        <tr><td width="150" class="tab">
-                            Enable Northbound API:<br></td><td width="200" class="tab">
+		    <table class="lmframework">
+                        <tr>
+                            <td width="150">
+                                ISK per point:<br/>
+                            </td>
+                            <td width="300">
+                                    <input type="text" size="32" name="iskPerPoint" value="<?=getConfigItem('iskPerPoint','15000000')?>" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Enable Northbound API:<br/>
+                            </td>
+                            <td>
                                 <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('northboundApi','disabled')=='enabled') echo('checked'); ?> />
-                        </td></tr>
-                        <tr><td width="150" class="tab">
-                            Non-recurring tasks expiration:<br></td><td width="200" class="tab">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Non-recurring tasks expiration:<br/>
+                            </td>
+                            <td>
                                 <input type="text" size="6" name="singletonTaskExpiration" value="<?=getConfigItem('singletonTaskExpiration','90');?>" /> days
-                        </td></tr>
-                        <tr><td width="150" class="tab">
-                            Relic to use for Tech III:<br></td><td width="200" class="tab">
-                                
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Relic to use for Tech III:<br/>
+                            </td><td>
                                 <select name="T3relicType"> <?php
                                 $relics=array("Intact","Malfunctioning","Wrecked");
                                 $currentRelic=getConfigItem('T3relicType','Wrecked');
@@ -103,19 +116,47 @@ Settings
                                             echo("<option value=\"$row\" $select>$row</option>");
                                 }
                                 ?></select>
-                        </td></tr>
-                        <tr><td width="150" class="tab">
-                            Get market prices from:<br></td><td width="200" class="tab">
-                                <select name="marketRegion"> <?php
-                                $regions=db_asocquery("SELECT `regionID`,`regionName` FROM `$LM_EVEDB`.`mapRegions` ORDER BY `regionName`;");
-                                $currentRegion=getConfigItem('marketRegion', '10000002');
-                                foreach($regions as $row) {
-                                            if ($row['regionID']==$currentRegion) $select='selected'; else $select='';
-                                            echo("<option value=\"${row['regionID']}\" $select>${row['regionName']}</option>");
-                                }
-                                ?></select>
-                        </td></tr>
-		</table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Get market prices from:<br/>
+                            </td>
+                            <td>
+                                <select name="marketRegion" id="marketRegion" onchange="systemSelect('marketSystemID',this.value);"></select>
+                                <select name="marketSystemID" id="marketSystemID">
+                                    <?php
+                                        $currentSystem=getConfigItem('marketSystemID', '30000142');
+                                        $systems=db_asocquery("SELECT `solarSystemName` FROM `$LM_EVEDB`.`mapSolarSystems` WHERE `solarSystemID`=$currentSystem;");
+                                        $row=$systems[0];
+                                        echo("<option value=\"${row['solarSystemID']}\" selected>${row['solarSystemName']}</option>");
+                                    ?>
+                                </select>
+                                <script type="text/javascript">
+                                    regionSelect('marketRegion');
+                                </script>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Get industry indices from:<br/>
+                            </td>
+                            <td>
+                                <select name="indexRegion" id="indexRegion" onchange="systemSelect('indexSystemID',this.value);"></select>
+                                <select name="indexSystemID" id="indexSystemID">
+                                    <?php
+                                        $currentSystem=getConfigItem('indexSystemID', '30000142');
+                                        $systems=db_asocquery("SELECT `solarSystemName` FROM `$LM_EVEDB`.`mapSolarSystems` WHERE `solarSystemID`=$currentSystem;");
+                                        $row=$systems[0];
+                                        echo("<option value=\"${row['solarSystemID']}\" selected>${row['solarSystemName']}</option>");
+                                    ?>
+                                </select>
+                                <script type="text/javascript">
+                                    regionSelect('indexRegion');
+                                </script>
+                            </td>
+                        </tr>
+                    </table>
                 <br/>
                 <input type="submit" value="Save configuration"/><br/>
 		
