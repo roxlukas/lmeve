@@ -793,7 +793,7 @@ function calcInventionCost($typeID) {
  * @global string $THOUSAND_SEP - thousand separator
  */
 function displayCosts($typeID) {
-    global $DECIMAL_SEP, $THOUSAND_SEP;
+    global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP;
     $DEBUG=FALSE;
     //Manufacturing costs
     if ($DEBUG) echo('Getting Manufacturing Costs...<br/>');
@@ -809,9 +809,21 @@ function displayCosts($typeID) {
         <?php }
         if ($invcost) { ?>
         <tr><td><strong>Invention</strong></td><td><div title="This quote covers invention cost of successful invention of a single T2 BPC, divided by the number of runs on this T2 BPC."><?php echo(number_format($invcost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td><td><div title="If LMeve has prices for all the ingredients, then the result will show as 'complete'. If one or more prices is missing, the result will show as 'prices missing'"><?php if ($invcost['accurate']) echo('Complete'); else echo('Some prices missing');  ?></div></td></tr>
-        <?php } ?>
-        <tr><td><strong>Manufacturing</strong></td><td colspan="2"><div title="This quote is NPC manufacturing fee (introduced in Crius). This will differ between systems! Assuming average system cost index=<?php echo(number_format(sqrt(1/5431), 4, $DECIMAL_SEP, $THOUSAND_SEP)); ?>."><?php echo(number_format(sqrt(1/5431)*$mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td></tr>
-        <tr><td><strong>Total</strong></td><td colspan="2"><div title="This quote is a sum of Materials and Invention quotes."><strong><?php echo(number_format($mancost['price']+$invcost['price']+sqrt(1/5431)*$mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</strong></div></td></tr>
+        <?php }
+        $indexSystemID=getConfigItem('indexSystemID', '30000142');
+        $indexData=db_asocquery("SELECT * FROM `crestindustrysystems` WHERE `solarSystemID`=$indexSystemID AND `activityID`=1;");
+        $systemData=db_asocquery("SELECT `solarSystemName` FROM $LM_EVEDB.`mapSolarSystems` WHERE `solarSystemID`=$indexSystemID;");
+        if (count($indexData)==1) {
+            $systemIndex=$indexData[0]['costIndex'];
+            if (count($systemData)==1) $systemName=$systemData[0]['solarSystemName']; else $systemName='Unknown';
+            $npcquote="This quote is NPC manufacturing fee (introduced in Crius).\r\nCurrent Manufacturing Index for '$systemName' equals ".number_format($systemIndex, 4, $DECIMAL_SEP, $THOUSAND_SEP);
+        } else {
+            $systemIndex=sqrt(1/5431);
+            $npcquote="This quote is NPC manufacturing fee (introduced in Crius).\r\nThis will differ between systems! Assuming average system cost index ".number_format($systemIndex, 4, $DECIMAL_SEP, $THOUSAND_SEP); 
+        }
+        ?>
+        <tr><td><strong>Manufacturing</strong></td><td colspan="2"><div title="<?=$npcquote?>"><?php echo(number_format($systemIndex*$mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</div></td></tr>
+        <tr><td><strong>Total</strong></td><td colspan="2"><div title="This quote is a sum of Materials and Invention quotes."><strong><?php echo(number_format($mancost['price']+$invcost['price']+$systemIndex*$mancost['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?> ISK</strong></div></td></tr>
         <?php
         if ($mancost['portionSize']>1) {
             ?>
@@ -825,11 +837,19 @@ function displayCosts($typeID) {
 }
 
 function calcTotalCosts($typeID) {
-    global $DECIMAL_SEP, $THOUSAND_SEP;
+    global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP;
+    //get 'Crius' System Index
+    $indexSystemID=getConfigItem('indexSystemID', '30000142');
+        $indexData=db_asocquery("SELECT * FROM `crestindustrysystems` WHERE `solarSystemID`=$indexSystemID AND `activityID`=1;");
+        if (count($indexData)==1) {
+            $systemIndex=$indexData[0]['costIndex'];
+        } else {
+            $systemIndex=sqrt(1/5431);
+        }
     //Manufacturing costs
     $mancost=calcManufacturingCost($typeID);
     $invcost=calcInventionCost($typeID);
-    $npccost=sqrt(1/5431)*$mancost['price'];
+    $npccost=$systemIndex*$mancost['price'];
     return $mancost['price']+$invcost['price']+$npccost;
 }
 ?>
