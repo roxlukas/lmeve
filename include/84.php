@@ -12,6 +12,36 @@ $PANELNAME='PVE Statistics'; //Panel name (optional)
 ?>
 
 <h2>EVE API Statistics</h2>
+<h3>Real time</h3>
+<table class="lmframework" style="width: 850px;">
+    <tr>
+        <th>
+            Active
+        </th>
+        <th colspan="3">
+            Last poller message
+        </th>
+    </tr>
+    <tr>
+        <td>
+            <center><span id="pollerActive"></span></center>
+        </td>
+        <td style="width: 20%;">
+            <center><span id="pollerDate"></span></center>
+        </td>
+        <td style="width: 35%;">
+            <span id="pollerFile"></span>
+        </td>
+        <td style="width: 45%;">
+            <span id="pollerMsg"></span>
+        </td>
+    </tr>
+</table>
+<script type="text/javascript">
+    pollerRealTime('pollerDate','pollerFile','pollerMsg','pollerActive');
+    window.setInterval(function(){ pollerRealTime('pollerDate','pollerFile','pollerMsg','pollerActive'); }, 5000);
+</script>
+
 	<?php
 		include("checkpoller.php");  
 	?>
@@ -132,7 +162,8 @@ $PANELNAME='PVE Statistics'; //Panel name (optional)
                             
                         </script>
     </div>
-
+<em><img src="ccp_icons/38_16_208.png" alt="(i)"/> In some circumstances, the following API endpoints can fail, and it is not an error: WalletJournal_10000, WalletTransactions_10000, FacWarStats.<br/>
+Failing ednpoints are locked out permanently after 10 unsuccessful attempts.</em>
 	<table class="lmframework">
 	<tr><th width="64">
 		<b>keyID</b>
