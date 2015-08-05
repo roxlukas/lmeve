@@ -86,7 +86,6 @@ if (strlen($date)==6) {
 		    <div class="tytul">
 			Wallet for <?php echo("$year-$month"); ?><br>
 		    </div>
-
 		    <div class="tekst">
 
 		    <?php //Monthly navigation
@@ -110,6 +109,7 @@ if (strlen($date)==6) {
 					$PREVYEAR=$year;
 			}
 		    ?>
+                        
 		    <table border="0" cellspacing="3" cellpadding="0">
 		    <tr><td>
 			<form method="get" action="">
@@ -134,7 +134,8 @@ if (strlen($date)==6) {
 
 			<a href="#down">Scroll down</a>
 		    </div>
-
+                        <em><img src="ccp_icons/38_16_208.png" alt="(i)"/> LMeve attempts to predict current month running cost, so to avoid counting previous month's wages and internal money transfers, <strong>refTypeID 37 (Corporation Account Withdrawal) is filtered out</strong>.<br/>
+                        Instead, current month wages estimate is subtracted from the wallet totals. <strong>This behavior will be configurable in a future release of LMeve.</strong></em><br />
 		    <?php
 
 		    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
