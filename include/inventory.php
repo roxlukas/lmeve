@@ -359,7 +359,7 @@ function showControlTowers($controltowers) {
                                 } else {
                                     $timeleft="$timeleft h";
                                 }
-                                echo('<tr><td style="padding: 0px; width: 32px;"><img src="'.getTypeIDicon($fuel['fuelTypeID']).' title="" /></td><td>'.$fuel['fuelTypeName'].'</td><td style="text-align: right;">'.$fuel['fuelQuantity'].'</td><td style="text-align: right;'.$style.'">'.$timeleft.'</td></tr>');
+                                echo('<tr><td style="padding: 0px; width: 32px;"><img src="'.getTypeIDicon($fuel['fuelTypeID']).'" title="" /></td><td>'.$fuel['fuelTypeName'].'</td><td style="text-align: right;">'.$fuel['fuelQuantity'].'</td><td style="text-align: right;'.$style.'">'.$timeleft.'</td></tr>');
                             }
                         ?>
                     </table>
