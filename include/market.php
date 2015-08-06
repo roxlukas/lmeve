@@ -47,7 +47,7 @@ function showBuyback($buybacklist) {
 	global $DECIMAL_SEP, $THOUSAND_SEP;
 	$rights_viewbuyorders=checkrights("Administrator,EditBuyOrders");
 	if (!sizeof($buybacklist)>0) {
-		echo('<h3>There is no buyback orders!</h3>');
+		echo('<h3>There are no buyback orders!</h3>');
 	} else {
 	?>
 	<table class="lmframework">
@@ -266,7 +266,7 @@ function showMarketOrders($orderlist,$label=null) {
         
 	if (!sizeof($orderlist)>0) {
                 if (is_null($label)) $label='market orders';
-		echo("<h3>There is no $label!</h3>");
+		echo("<h3>There are no $label!</h3>");
 	} else {
 	?>
 	<table class="lmframework">

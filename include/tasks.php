@@ -193,6 +193,7 @@ function getOrphanedTasksCount() {
 
 function clearOrphanedTasks() {
     $lista=getOrphanedTasks();
+    if (empty($lista)) return FALSE;
     $sql_del="DELETE FROM `lmtasks` WHERE `taskID` IN ($lista);";
     $ret=db_uquery($sql_del);
     if ($ret!==FALSE) {
@@ -295,7 +296,7 @@ function getMyChars($array=false) {
 function showTasks($tasklist) {
     global $MOBILE;
 	if (!sizeof($tasklist)>0) {
-		echo('<h3>There is no tasks assigned!</h3>');
+		echo('<h3>There are no tasks assigned!</h3>');
 	} else {
             echo("Found ".count($tasklist)." tasks.");
 	?>
@@ -441,7 +442,7 @@ function showTasks($tasklist) {
  */
 function showTasks_old($tasklist) {
 	if (!sizeof($tasklist)>0) {
-		echo('<h3>There is no tasks assigned!</h3>');
+		echo('<h3>There are no tasks assigned!</h3>');
 	} else {
 	?>
 	<table cellspacing="2" cellpadding="0">
@@ -551,7 +552,7 @@ function getCurrentJobs($MYTASKS, $SELECTEDCHAR, $ORDERBY) {
 function showCurrentJobs($jobslist) {
     global $MOBILE;
 	if (!sizeof($jobslist)>0) {
-		echo('<h3>There is no jobs in progress!</h3>');
+		echo('<h3>There are no jobs in progress!</h3>');
 	} else {
 	?>
         <em>All times shown in EVE time.</em>

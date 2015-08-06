@@ -364,9 +364,9 @@ ORDER BY art.refTypeName;";
 			    Description
 		    </th><th style="text-align: center;">
 				accountKey
-		    </th><th style="text-align: center;">
-				ISK Balance
-		    </th><th colspan="3" style="text-align: center;">
+		    </th><th style="text-align: center;" title="Always shows current ISK balance.">
+				Current ISK Balance
+		    </th><th colspan="3" style="text-align: center;"  title="Shows input and output ISK flows for the specified month.">
 				ISK Flows
 		    </th>
 		    </tr>
@@ -422,7 +422,7 @@ ORDER BY art.refTypeName;";
 				<b><?php echo(number_format($totals['total'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 		    </td>
 		    </tr>
-		    <tr><td style="text-align: left;">
+		    <tr><td style="text-align: left;" title="Shows corp members Wages in selected month.">
 			    <b>Wages</b>
 		    </td><td style="text-align: center;">
 				<b></b>
@@ -432,7 +432,7 @@ ORDER BY art.refTypeName;";
 				<b></b>
 		    </td><td style="text-align: center;">
 				<b></b>
-		    </td><td style="text-align: center;">
+		    </td><td style="text-align: right;" title="Shows corp members Wages in selected month.">
 				<b><?php echo(number_format(0-$wages[0]['wages'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); $netprofit=$totals['total']-$wages[0]['wages']?></b>
 		    </td>
 		    </tr>

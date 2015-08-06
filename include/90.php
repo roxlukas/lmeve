@@ -95,7 +95,7 @@ global $USERSTABLE;
 	}
 			
 			if (!sizeof($rearrange)>0) {
-				echo('<h3>There is no characters registered!</h3>');
+				echo('<h3>There are no characters registered!</h3>');
 			} else {
 			?>
 			<table class="lmframework">
