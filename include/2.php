@@ -13,7 +13,7 @@
         <td><form action="" method="get">
         <input type="hidden" name="id" value="2" />
         <input type="hidden" name="id2" value="0" />
-        <input type="submit" value="Inventory" />
+        <input type="submit" value="Stock" />
         </form></td>
     <?php } ?>
     <?php if (checkrights("Administrator,ViewPOS")) { ?>

@@ -7,7 +7,7 @@ if (!checkrights("Administrator,ViewInventory")) { //"Administrator,ViewOverview
 	return;
 }
 $MENUITEM=2; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Inventory'; //Panel name (optional)
+$PANELNAME='Stock'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
@@ -16,8 +16,8 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
 		<a name="top"></a>             
                 
 <div class="tytul">
-			Inventory<br/>
-
+    <?=$PANELNAME?><br/>
+</div>
                     <div id="pageContents"><em><img src="img/loader.png" /> Loading...</em></div>
                     <script type="text/javascript">
                         ajax_get('ajax.php?act=CACHE&page=20','pageContents');

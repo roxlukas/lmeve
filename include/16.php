@@ -7,7 +7,7 @@ if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
 	return;
 }
 $MENUITEM=1; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Clear Orphane Tasks'; //Panel name (optional)
+$PANELNAME='Clear Orphan Tasks'; //Panel name (optional)
 //standard header ends here
 include('tasks.php');
 
