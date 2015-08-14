@@ -31,6 +31,280 @@ function pocohrefedit($nr) {
     echo("<a href=\"index.php?id=2&id2=7&nr=$nr\" >");
 }
 
+function invhrefedit($nr=0,$crpID=0) {
+    echo("<a href=\"index.php?id=2&id2=8&nr=$nr&corporationID=$crpID\" title=\"Click to open\">");
+}
+
+function getInventory($parentItemID=0,$corporationID=0) {
+    global $LM_EVEDB;
+    if ($corporationID==0) $crp='TRUE'; else $crp="ast.`corporationID`=$corporationID";
+    $sql="SELECT ast.*,ing.`categoryID`,itp.`groupID`,
+        COALESCE(apl.`itemName`,itp.`typeName`) AS `typeName`,
+        COALESCE(map.`itemName`,sta.`stationName`) AS `locationName`,
+        COALESCE(apl.`itemName`,NULL) AS `itemName`,
+        apc.`corporationName`
+    FROM `apiassets` ast
+    JOIN $LM_EVEDB.`invTypes` itp
+    ON ast.`typeID`=itp.`typeID`
+    JOIN $LM_EVEDB.`invGroups` ing
+    ON itp.`groupID`=ing.`groupID`
+    JOIN `apicorps` apc
+    ON ast.`corporationID`=apc.`corporationID`
+    LEFT JOIN $LM_EVEDB.`mapDenormalize` map
+    ON ast.`locationID`=map.`itemID`
+    LEFT JOIN `apiconquerablestationslist` sta
+    ON ast.`locationID`=sta.`stationID`
+    LEFT JOIN `apilocations` apl
+    ON ast.`itemID`=apl.`itemID`
+    WHERE `parentItemID`=$parentItemID AND $crp
+    ORDER BY `locationName`,`flag`,itp.`groupID`,itp.`typeName`;";
+    //echo("DEBUG <pre>$sql</pre>");
+    $rawdata=db_asocquery($sql);
+    return($rawdata);
+}
+
+function showInventory($data,$parentItemID=0,$corporationID=0) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    if ($corporationID>0) {
+        $divisions=getCorpDivisions($corporationID);
+        $lastFlag=0;
+    }
+    if ($parentItemID==0) {
+        $lastLocation='';
+    }
+    echo('<table class="lmframework" style="width: 100%;"><tr><td>');
+    if (count($data)>0) {
+        foreach($data as $row) {
+            /*
+             * itemID 	parentItemID 	locationID 	typeID 	quantity 	flag 	singleton 	rawQuantity 	corporationID 	typeName 	locationName 	itemName
+    1212459367 	0 	66005021 	27 	1 	4 	1 	-1 	414731375 	Office 	NULL 	Unknown
+    1007028980226 	0 	60005020 	1944 	2 	62 	0 	NULL 	414731375 	Bestower 	Tollus X - Moon 4 - Republic Justice Department Tr... 	Unknown
+             */
+            
+            //Office Hack
+            if( $row['typeID']==27 ) {
+                //this is an office
+                //$row['typeName']=$row['locationName'];
+                $row['typeID']=28089;
+            }
+            //Corp Divisions Hack
+            if ($corporationID>0) {
+                if ($row['flag']!=$lastFlag) {
+                    $lastFlag=$row['flag'];
+                    echo("</td></tr><tr><th><h3>".$divisions[$row['flag']]."</h3></th></tr><tr><td>");
+                }
+            }
+            //Locations Hack
+            if ($parentItemID==0) {
+                if ($row['locationName']!=$lastLocation) {
+                    $lastLocation=$row['locationName'];
+                    echo("</td></tr><tr><th><h3>$lastLocation</h3></th></tr><tr><td>");
+                }
+            }
+            ?>
+            <div style="margin: 10px; width: 64px; height: 100px; float: left;">
+                <div style="position: absolute;">
+            <?php invhrefedit($row['itemID'], $row['corporationID']); ?>
+            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
+                </div>
+                <?php if ($row['singleton']==0) { ?>
+                <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">
+                    <span style="background: rgba(0,0,0,0.5); padding: 2px; font-size: 11px;"><?php echo(number_format($row['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)); ?></span>
+                </div>
+                <?php } ?>
+                <div style="margin-top: 66px; width: 64px; text-align: center;"><?=$row['typeName']?></div>
+            </div>
+            <?php          
+        }
+    } else {
+        echo('No items found.');
+    }
+    echo('</td></tr></table>');
+}
+
+function showInventoryFitting($data,$shipTypeID) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    
+    $SLOTS=array(
+        11 => array('x' => 423, 'y' => 445),
+        12 => array('x' => 387, 'y' => 464),
+        13 => array('x' => 348, 'y' => 481),
+        14 => array('x' => 308, 'y' => 488),
+        15 => array('x' => 267, 'y' => 488),
+        16 => array('x' => 225, 'y' => 480),
+        17 => array('x' => 186, 'y' => 466),
+        18 => array('x' => 150, 'y' => 445),
+        19 => array('x' => 484, 'y' => 114),
+        20 => array('x' => 505, 'y' => 149),
+        21 => array('x' => 519, 'y' => 188),
+        22 => array('x' => 528, 'y' => 230),
+        23 => array('x' => 529, 'y' => 271),
+        24 => array('x' => 521, 'y' => 313),
+        25 => array('x' => 507, 'y' => 353),
+        26 => array('x' => 487, 'y' => 388),
+        27 => array('x' => 151, 'y' => 57),
+        28 => array('x' => 187, 'y' => 35),
+        29 => array('x' => 227, 'y' => 21),
+        30 => array('x' => 268, 'y' => 13),
+        31 => array('x' => 309, 'y' => 13),
+        32 => array('x' => 349, 'y' => 21),
+        33 => array('x' => 390, 'y' => 35),
+        34 => array('x' => 427, 'y' => 55),
+        92 => array('x' => 100, 'y' => 103),
+        93 => array('x' => 77, 'y' => 139),
+        94 => array('x' => 60, 'y' => 180),
+        125 => array('x' => 49, 'y' => 236),
+        126 => array('x' => 49, 'y' => 279),
+        127 => array('x' => 59, 'y' => 322),
+        128 => array('x' => 76, 'y' => 362),
+        129 => array('x' => 100, 'y' => 398)
+    );
+    
+    ?>
+    <table class="lmframework" style="width: 100%;"><tr><td style="width:636px;">
+    <div style="width: 636px; height: 563px; float: left;">
+          <div style="position: absolute; margin-left: 52px; margin-top: 20px; ">
+              <img src="<?php echo(getTypeIDicon($shipTypeID,512));?>" style="width: 532px; height: 532px;" />
+          </div>
+          <div style="position: absolute; margin-left: 0px; margin-top: 0px; ">
+              <img src="img/fitting_mask.png" />
+          </div>
+    
+
+    <?php
+    if (count($data)>0) {
+        foreach($data as $row) {
+            /*
+             * itemID 	parentItemID 	locationID 	typeID 	quantity 	flag 	singleton 	rawQuantity 	corporationID 	typeName 	locationName 	itemName
+    1212459367 	0 	66005021 	27 	1 	4 	1 	-1 	414731375 	Office 	NULL 	Unknown
+    1007028980226 	0 	60005020 	1944 	2 	62 	0 	NULL 	414731375 	Bestower 	Tollus X - Moon 4 - Republic Justice Department Tr... 	Unknown
+             */
+            if (array_key_exists($row['flag'], $SLOTS)) {
+            ?>
+            <div style="position: absolute; margin-left: <?=$SLOTS[$row['flag']][x]?>px; margin-top: <?=$SLOTS[$row['flag']][y]?>px;">
+                <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" />
+            </div>
+            <?php   
+            }
+        }
+        
+        
+    }
+    ?>
+       </div>
+    </td><td style="vertical-align: top;">
+        <table class="lmframework" style="width:100%"><tr><td style="vertical-align: top;">
+    <?php
+        $flags=getInvFlags();
+        foreach($data as $row) {
+            if (!array_key_exists($row['flag'], $SLOTS)) {
+                //flagID hack
+                if ($row['flag']!=$lastFlag) {
+                    $lastFlag=$row['flag'];
+                    echo("</td></tr><tr><th><h3>".$flags[$row['flag']]."</h3></th></tr><tr><td>");
+                }
+            ?>
+            <div style="margin: 10px; width: 64px; height: 100px; float: left;">
+                <div style="position: absolute;">
+            <?php invhrefedit($row['itemID'], $row['corporationID']); ?>
+            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
+                </div>
+                <?php if ($row['singleton']==0) { ?>
+                <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">
+                    <span style="background: rgba(0,0,0,0.5); padding: 2px; font-size: 11px;"><?php echo(number_format($row['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)); ?></span>
+                </div>
+                <?php } ?>
+                <div style="margin-top: 66px; width: 64px; text-align: center;"><?=$row['typeName']?></div>
+            </div>
+            <?php   
+            }
+        }
+    ?>
+        </td></tr></table>
+    </td></tr></table>     
+    <?php
+}
+
+function getCorpDivisions($corporationID) {
+    $ret=array();
+    $sql="SELECT `accountKey`-885 AS `flag`, description FROM `apidivisions` WHERE `corporationID`=$corporationID;";
+    $raw=db_asocquery($sql);
+    if (count($raw)>0) {
+        foreach($raw as $row) {
+            if ($row['flag']==115) $row['flag']=4; // first hangar is actually a 'Hangar' (flag: 4), the rest is 'Corp Security Access Group' 2 through 7
+            $ret[$row['flag']]=$row['description'];
+        }
+    } else return FALSE;
+    return($ret);
+}
+
+function getInvFlags() {
+    global $LM_EVEDB;
+    $ret=array();
+    $sql="SELECT `flagID`, `flagText` FROM $LM_EVEDB.`invFlags`;";
+    $raw=db_asocquery($sql);
+    if (count($raw)>0) {
+        foreach($raw as $row) {
+            $ret[$row['flagID']]=$row['flagText'];
+        }
+    } else return FALSE;
+    return($ret);
+}
+
+function getInventoryHeader($itemID) {
+    global $LM_EVEDB;
+    $sql="SELECT ast.*,ing.`categoryID`,itp.`groupID`,
+        COALESCE(apl.`itemName`,itp.`typeName`) AS `typeName`,
+        COALESCE(map.`itemName`,sta.`stationName`) AS `locationName`,
+        COALESCE(apl.`itemName`,NULL) AS `itemName`,
+        apc.`corporationName`
+    FROM `apiassets` ast
+    JOIN $LM_EVEDB.`invTypes` itp
+    ON ast.`typeID`=itp.`typeID`
+    JOIN $LM_EVEDB.`invGroups` ing
+    ON itp.`groupID`=ing.`groupID`
+    JOIN `apicorps` apc
+    ON ast.`corporationID`=apc.`corporationID`
+    LEFT JOIN $LM_EVEDB.`mapDenormalize` map
+    ON ast.`locationID`=map.`itemID`
+    LEFT JOIN `apiconquerablestationslist` sta
+    ON ast.`locationID`=sta.`stationID`
+    LEFT JOIN `apilocations` apl
+    ON ast.`itemID`=apl.`itemID`
+    WHERE ast.`itemID`=$itemID;";
+    //echo("DEBUG <pre>$sql</pre>");
+    $rawdata=db_asocquery($sql);
+    return($rawdata);
+}
+
+function showInventoryHeader($itemdata,$corporationID) {
+    echo('<table class="lmframework" style="width:100%;"><tr>');
+    if (count($itemdata)==1) {
+        $row=$itemdata[0];
+        if( $row['typeID']==27 ) {
+                //this is an office
+                $row['typeID']=28089;
+            }
+        ?>
+            <th style="width: 64px;">
+                <?php if($row['parentItemID']==0) $crpID=0; else $crpID=$row['corporationID'];
+                    invhrefedit($row['parentItemID'], $crpID); ?>
+                <img src="ccp_icons/23_64_1.png" alt="&lt; back"/></a>
+            </th>
+            <th style="width: 64px;">
+                <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" />
+            </th>
+            <th style="text-align: center;">
+                <h2><?=$row['locationName']?></h2>
+                <em><?=$row['typeName']?></em>
+            </th>
+        <?php            
+    } else {
+        echo('<th>Parent item not found.</th>');
+    }
+    echo('</tr></table>');
+}
+
 function getControlTowers($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT asl.*,asd.*,asf.`typeID` AS `fuelTypeID`, asf.`quantity` AS `fuelQuantity`,
@@ -226,8 +500,8 @@ function showLabsAndTasks($towers) {
         if (true) { 
         ?>
         <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
-            <tr><th colspan="6" style="text-align: center;">
-                <?php echo($tower['location']['moonName'].' ("'.$tower['towerName'].'")'); ?>
+            <tr><th colspan="7" style="text-align: center;">
+                <h3><?php echo($tower['location']['moonName'].' ("'.$tower['towerName'].'")'); ?></h3>
             </th>
             </tr>
             <tr><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
@@ -242,6 +516,8 @@ function showLabsAndTasks($towers) {
                 Products
             </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
                 Kit
+            </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;" title="Inventory">
+                Inv
             </th>
             </tr>
             <?php
@@ -275,7 +551,11 @@ function showLabsAndTasks($towers) {
                     ?> 
                 </td><td>
                     <?php 
-                    labshrefedit($facilityID); echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" /></span>"); echo('</a>');
+                    labshrefedit($facilityID); echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" title=\"Show Kit\" /></span>"); echo('</a>');
+                     ?> 
+                </td><td>
+                    <?php 
+                     invhrefedit($facilityID); echo("<img src=\"ccp_icons/26_64_11.png\" style=\"width: 24px; height: 24px;\" title=\"Open Inventory\"/></span>"); echo('</a>');
                      ?> 
                 </td>
                 </tr>

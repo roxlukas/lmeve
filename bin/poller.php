@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="23";
+$POLLER_VERSION="24";
 $POLLER_MAX_TIME=900;
 set_time_limit($POLLER_MAX_TIME-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
@@ -359,6 +359,17 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 		}
 	}
         
+        function updateOfficeID($corporationID) {
+            // officeID to stationID conversion
+            //To convert locationIDs greater than or equal to 66000000 and less than 67000000 to stationIDs from staStations
+            // subtract 6000001 from the locationID.
+            // 
+            //To convert locationIDs greater than or equal to 67000000 and less than 68000000 to stationIDs from ConquerableStationList
+            // subtract 6000000 from the locationID.
+            $r1=db_asocquery("UPDATE `apiassets` SET `locationID`=`locationID`-6000001 WHERE `locationID` BETWEEN 66000000 AND 67000000 AND `corporationID`=$corporationID;");
+            $r1=db_asocquery("UPDATE `apiassets` SET `locationID`=`locationID`-6000000 WHERE `locationID` BETWEEN 67000000 AND 68000000 AND `corporationID`=$corporationID;");
+            return($r1 && $r2);
+	}
          
        function criusInsert($attrs,$corporationID) {
            global $LM_EVEDB;
@@ -1326,6 +1337,7 @@ foreach ($api_keys as $api_key) {
 			inform("Main","Polling assets, this may take a while...");
 			db_uquery("DELETE FROM `apiassets` WHERE corporationID=$corporationID;");
 			insertAssets($dat->result->rowset->row,0,0,$corporationID);
+                        updateOfficeID($corporationID);
 			apiSaveOK($keyid,"AssetList.xml");
 		}
 	} else {
