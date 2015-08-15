@@ -1,5 +1,7 @@
 <?php
 include_once("percentage.php");
+include_once("configuration.php");
+
 function shorthash($input) {
 	global $LM_SALT;
 	$hash = substr(strtolower(preg_replace('/[0-9_\/]+/','',base64_encode(sha1($LM_SALT.$input)))),0,14);
@@ -353,6 +355,7 @@ function buchrefedit($nr) {
 
 function getBuyCalc() {
     global $LM_EVEDB;
+    $buyCalcPriceModifier=getConfigItem('buyCalcPriceModifier', 1.0);
     $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, igp.`groupName`, apr.`max`
     FROM `cfgbuying` AS buy
     JOIN $LM_EVEDB.`invTypes` AS itp
@@ -369,7 +372,7 @@ function getBuyCalc() {
         $rearrange[$row['groupID']]['groupName']=$row['groupName'];
         $rearrange[$row['groupID']]['types'][$row['typeID']]['typeID']=$row['typeID'];
         $rearrange[$row['groupID']]['types'][$row['typeID']]['typeName']=$row['typeName'];
-        $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy']=$row['max'];
+        $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy']=round($buyCalcPriceModifier * $row['max'],2);
     }
     return($rearrange);
 }

@@ -120,6 +120,15 @@ Settings
                         </tr>
                         <tr>
                             <td>
+                                Buy calculator price multiplier:<br/>
+                                <em>1.0 = original price</em>
+                            </td>
+                            <td>
+                                <input type="text" size="6" name="buyCalcPriceModifier" value="<?=getConfigItem('buyCalcPriceModifier', 1.0);?>" />x
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Get market prices from:<br/>
                             </td>
                             <td>

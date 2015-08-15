@@ -20,6 +20,8 @@ global $LM_EVEDB;
                 if (!token_verify()) die("Invalid or expired token.");
                 setConfigItem('iskPerPoint', secureGETnum('iskPerPoint'));
                 setConfigItem('singletonTaskExpiration', secureGETnum('singletonTaskExpiration'));
+                $buyCalcPriceModifier=secureGETstr('buyCalcPriceModifier');
+                if (!is_numeric($buyCalcPriceModifier)) die('Wrong parameter value buyCalcPriceModifier: must be numeric'); else setConfigItem('buyCalcPriceModifier', $buyCalcPriceModifier);
                 $marketSystemID=secureGETnum('marketSystemID');
                 if (!empty($marketSystemID)) setConfigItem('marketSystemID', $marketSystemID);
                 $indexSystemID=secureGETnum('indexSystemID');

@@ -10,7 +10,8 @@ $MENUITEM=3; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Buy Calculator'; //Panel name (optional)
 //standard header ends here
 
-include("market.php");
+include_once("market.php");
+include_once("configuration.php");
 global $LM_EVEDB;
 
 if (!token_verify()) die("Invalid or expired token.");
@@ -27,7 +28,10 @@ $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, apr.`
 		
 $total=0;
 
+$buyCalcPriceModifier=getConfigItem('buyCalcPriceModifier', 1.0);
+
 foreach($buycalc as $row) {
+        $row['max']=round($buyCalcPriceModifier * $row['max'],2);
 	$q=secureGETnum('q_'.$row['typeID']);
 	if ($q>0) {
 		$order[$row['typeID']]['typeID']=$row['typeID'];
