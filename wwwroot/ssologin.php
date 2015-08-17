@@ -1,6 +1,6 @@
 <?php
 set_include_path("../include");
-date_default_timezone_set("Europe/Paris");
+date_default_timezone_set(@date_default_timezone_get());
 if (!is_file('../config/config.php')) die ($LANG['CONFIGERROR']);
 include_once('../config/config.php'); //load config file
 include_once("db.php");  //db access functions

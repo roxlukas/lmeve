@@ -33,7 +33,7 @@ $USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
 
-date_default_timezone_set('Europe/Warsaw');
+date_default_timezone_set(@date_default_timezone_get());
 //set_include_path("$mypath/../include");
 include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");

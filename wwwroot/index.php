@@ -32,7 +32,7 @@
 **********************************************************************************/
 
 set_include_path("../include");
-date_default_timezone_set("Europe/Paris");
+date_default_timezone_set(@date_default_timezone_get());
 if (!is_file('../config/config.php')) die('Config file not found.');
 include_once('../config/config.php'); //load config file
 if ($LM_DEBUG==TRUE) error_reporting(E_ALL ^ E_NOTICE); else error_reporting(0);

@@ -6,7 +6,7 @@ $mypath=str_replace('\\','/',dirname(__FILE__));
 $mycache=$mypath."/../var";
 $mytmp=$mypath."/../tmp";
 
-date_default_timezone_set('Europe/Warsaw');
+date_default_timezone_set(@date_default_timezone_get());
 set_include_path("$mypath/../include");
 include_once("log.php");
 include_once("db.php");

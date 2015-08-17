@@ -6,7 +6,7 @@
 //api.php?key=<apikey>&endpoint=TASKS&characterID=<charID>
 
 set_include_path("../include");
-date_default_timezone_set("Europe/Paris");
+date_default_timezone_set(@date_default_timezone_get());
 include_once('../config/config.php'); //load config file
 include_once("db.php");  //db access functions
 include_once("log.php");  //logging facility
