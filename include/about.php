@@ -47,6 +47,27 @@ Changelog:
 <!-- changelog start -->
 
 <tr><td class="tab" width="180">
+<div class="tytul2">2015.08.18</div></td>
+<td valign="top" class="tab">
+<b>0.1.54 beta:</b><br>
+<b>Poller version 24</b>
+<ul>
+	<li>Improved corporation Inventory browser</li>
+	<li>Ship Fitting browser in corporation Inventory</li>
+	<li>CCP WebGL update</li>
+	<li>Custom SKIN support</li>
+	<li>Additional tooltips</li>
+	<li>New icon support for ingame items</li>
+	<li>Customizable market hub to get material prices from</li>
+	<li>Customizable manufacturing sytem Index (Crius NPC cost formula)</li>
+	<li>Customizable price modifier for Buy Calculator</li>
+	<li>Real time API poller stats</li>
+	<li>Bug fixes</li>
+</ul>
+</td></tr>
+
+
+<tr><td class="tab" width="180">
 <div class="tytul2">2015.06.25</div></td>
 <td valign="top" class="tab">
 <b>0.1.53 beta:</b><br>

@@ -46,7 +46,7 @@ include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
 
-$lmver="0.1.53 beta";
+$lmver="0.1.54 beta";
  
 //setting session cookie params
 $param=session_get_cookie_params();
