@@ -7,6 +7,7 @@
 	include_once("$mypath/../include/log.php");
 	include_once("$mypath/../include/db.php");
 	include_once("$mypath/../include/yaml_graphics.php");
+        include_once("$mypath/../include/yaml_skins.php");
         include_once("$mypath/../include/yaml_certificates.php");
         include_once("$mypath/../include/yaml_blueprints.php");
         
@@ -32,6 +33,7 @@
             $updateCertificates=TRUE;
             $updateBlueprints=TRUE;
             $updateLegacy=TRUE;
+            $updateSkins=TRUE;
         } else if ($argc>=2) {
             foreach($argv as $arg) {
                 if ($arg=='--typeIDs') $updateTypeIDs=TRUE;
@@ -39,6 +41,7 @@
                 if ($arg=='--certificates') $updateCertificates=TRUE;
                 if ($arg=='--blueprints') $updateBlueprints=TRUE;
                 if ($arg=='--legacy') $updateLegacy=TRUE;
+                if ($arg=='--skins') $updateSkins=TRUE;
             }
         } else if ($argc==1 || ($argc==2 && ($argv[1]=='--usage' || $argv[1]='--help' || $argv[1]='/?')) ) {
             echo('--usage, --help, /? - display this help'.PHP_EOL);
@@ -48,6 +51,7 @@
             echo('--certificates - update certificates'.PHP_EOL);
             echo('--blueprints - update yasmlblueprints'.PHP_EOL);
             echo('--legacy - convert yamlblueprints into invBlueprintTypes and ramTypeRequirements'.PHP_EOL);
+            echo('--skins - update new skin tables (Galatea and later)'.PHP_EOL);
             return;
         } 
         
@@ -80,6 +84,21 @@
     if ($updateLegacy) {
         echo('Calling recreateLegacyTables(), please wait... '); 
             recreateLegacyTables();
+        echo("done\r\n");
+    }
+    
+    if ($updateSkins) {
+        echo('Calling updateYamlSkins(), please wait... '); 
+            updateYamlSkins(FALSE);
+        echo("done\r\n");
+        echo('Calling updateYamlSkinLicenses(), please wait... '); 
+            updateYamlSkinLicenses(FALSE);
+        echo("done\r\n");
+        echo('Calling updateYamlSkinMaterials(), please wait... '); 
+            updateYamlSkinMaterials(FALSE);
+        echo("done\r\n");
+        echo('Calling updateYamlSkinMaterialSets(), please wait... '); 
+            updateYamlSkinMaterialSets(FALSE);
         echo("done\r\n");
     }
 ?>

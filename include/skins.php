@@ -6,7 +6,7 @@ function getShipSkins($shipTypeID) {
 	$sql="SELECT shp.*,skn.*,mat.*,lic.* FROM $LM_EVEDB.`skinShip` shp
 	JOIN $LM_EVEDB.`skins` skn
 	ON shp.`skinID` = skn.`skinID`
-	JOIN $LM_EVEDB.`skinMaterials` mat
+	JOIN $LM_EVEDB.`skinMaterialsRGB` mat
 	ON skn.`skinMaterialID` = mat.`skinMaterialID`
 	JOIN $LM_EVEDB.`skinLicense` lic
 	ON lic.`skinID` = skn.`skinID`
@@ -63,7 +63,7 @@ function getSkin($skinLicenseID) {
 	$sql="SELECT * FROM $LM_EVEDB.`skinLicense` lic
 	JOIN $LM_EVEDB.`skins` skn
 	ON lic.`skinID` = skn.`skinID`
-	JOIN $LM_EVEDB.`skinMaterials` mat
+	JOIN $LM_EVEDB.`skinMaterialsRGB` mat
 	ON skn.`skinMaterialID` = mat.`skinMaterialID`
 	WHERE lic.`licenseTypeID` = $skinLicenseID";
 	$skins=db_asocquery($sql);
@@ -124,6 +124,7 @@ function showSkins($skins) {
 	var_dump($skins);
 	echo('</pre>');*/
 	if (count($skins)>0) {
+            echo("<pre>DEBUG: ".print_r($skins,TRUE)."</pre>");
 		?><table class="lmframework" width="100%"><tr><th colspan="3">Ship SKINs</th></tr><?php
 		foreach ($skins as $skin) {
 			$rnd=md5(random_pseudo_bytes_wrapper(24));
