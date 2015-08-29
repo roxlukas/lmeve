@@ -286,10 +286,10 @@ function updateYamlSkinMaterialSets($silent=true) {
     sma.`skinMaterialID`,
     sms.`sofFactionName` AS `material`,
     sma.`displayNameID`,
-    LOWER(CONCAT(HEX(FLOOR(256*sms.`colorWindowR`)),HEX(FLOOR(256*sms.`colorWindowG`)),HEX(FLOOR(256*sms.`colorWindowB`)))) AS `colorWindow`,
-    LOWER(CONCAT(HEX(FLOOR(256*sms.`colorPrimaryR`)),HEX(FLOOR(256*sms.`colorPrimaryG`)),HEX(FLOOR(256*sms.`colorPrimaryB`)))) AS `colorPrimary`,
-    LOWER(CONCAT(HEX(FLOOR(256*sms.`colorSecondaryR`)),HEX(FLOOR(256*sms.`colorSecondaryG`)),HEX(FLOOR(256*sms.`colorSecondaryB`)))) AS `colorSecondary`,
-    LOWER(CONCAT(HEX(FLOOR(256*sms.`colorHullR`)),HEX(FLOOR(256*sms.`colorHullG`)),HEX(FLOOR(256*sms.`colorHullB`)))) AS `colorHull`
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorWindowR`)),HEX(FLOOR(255*sms.`colorWindowG`)),HEX(FLOOR(255*sms.`colorWindowB`)))) AS `colorWindow`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorPrimaryR`)),HEX(FLOOR(255*sms.`colorPrimaryG`)),HEX(FLOOR(255*sms.`colorPrimaryB`)))) AS `colorPrimary`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorSecondaryR`)),HEX(FLOOR(255*sms.`colorSecondaryG`)),HEX(FLOOR(255*sms.`colorSecondaryB`)))) AS `colorSecondary`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorHullR`)),HEX(FLOOR(255*sms.`colorHullG`)),HEX(FLOOR(255*sms.`colorHullB`)))) AS `colorHull`
     FROM `$LM_EVEDB`.`skinMaterialSets` sms
     JOIN `$LM_EVEDB`.`skinMaterials` sma
     ON sma.`materialSetID`=sms.`skinMaterialSetID`;";
