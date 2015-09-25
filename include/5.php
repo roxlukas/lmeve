@@ -27,7 +27,10 @@
     </td>
     <?php } ?>
     </tr></table>
-    <?php if (checkrights("Administrator,UseNorthboundApi")) { ?>
+    <?php if (checkrights("Administrator")) { ?>
+    <input type="button" value="EVE API Keys" onclick="location.href='?id=5&id2=17';"/>
+    <?php }
+    if (checkrights("Administrator,UseNorthboundApi")) { ?>
     <input type="button" value="LMeve Northbound API" onclick="location.href='?id=5&id2=14';"/>
     <?php
     }
@@ -85,6 +88,18 @@
                 break;
             case 16:
                 include("5g.php"); //delete Northbound API keys
+                break;
+            case 17:
+                include("5h.php"); //corp API keys - list
+                break;
+            case 18:
+                include("5i.php"); //corp API keys - add new
+                break;
+            case 19:
+                include("5j.php"); //corp API keys - save
+                break;
+            case 20:
+                include("5k.php"); //corp API keys - delete
                 break;
 	    }
 ?>

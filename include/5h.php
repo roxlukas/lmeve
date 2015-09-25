@@ -1,69 +1,74 @@
 <?php
 //standard header for each included file
 checksession(); //check if we are called by a valid session
-if (!checkrights("Administrator,UseNorthboundApi")) { //"Administrator,ViewOverview"
+if (!checkrights("Administrator")) { //"Administrator,ViewOverview"
 	global $LANG;
 	echo("<h2>${LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='LMeve Northbound API keys'; //Panel name (optional)
+$PANELNAME='EVE Corp API keys'; //Panel name (optional)
 //standard header ends here
-global $LM_EVEDB, $USERSTABLE;
+global $LM_EVEDB;
 
-function nbapihrefedit($nr) {
-    echo("<a href=\"index.php?id=5&id2=16&nr=$nr\" title=\"Click to delete this key\">");
+function apikeyhrefedit($nr) {
+    echo("<a href=\"index.php?id=5&id2=20&nr=$nr\" title=\"Click to delete this key\">");
 }
 
 ?>
 <div class="tytul">
 <?php echo($PANELNAME); ?>
 </div>
-<form method="post" action="?id=5&id2=15">
-    <?php token_generate(); ?>
-    <input type="submit" value="Create key" /><br/>
-</form>
+<img src="ccp_icons/7_64_5.png"  alt="Corporation" style="float: left;"/>
+<table><tr><td>
+    <form method="post" action="?id=5&id2=18">
+        <?php token_generate(); ?>
+        <input type="submit" value="Add new API Key" /><br/>
+    </form>
+</td><td>
+    <form method="post" action="?id=8&id2=4">
+        <?php token_generate(); ?>
+        <input type="submit" value="Check API Statistics" /><br/>
+    </form>            
+</td></tr></table>
 <div><br/>
-<img src="ccp_icons/38_16_208.png" alt="(!) "/> LMeve can provide information to other third party apps that support it, such as <a href="http://evernus.com/" target="_blank">Evernus</a> or <a href="http://caldariprimeponyclub.com/" target="_blank">Jeremy</a>.<br/>
+<img src="ccp_icons/38_16_208.png" alt="(!) "/> LMeve <u>only</u> works with Corporation level API Keys.<br/>
 <br/></div>
 <table class="lmframework">
     <tr><th>
-        API Key
+        Key ID
     </th><th>
-    <?php if (checkrights("Administrator")) {
-                echo('User login</th><th>');  
-            }
-     ?>
-        Last Used
+        Verification
     </th><th>		
-        Last IP Address
-    </th><th>
-        
+        Corporation
+    </th><th>		
+        Last used
+    </th><th>		
+
     </th>
     </tr>
     <?php
-    if (!checkrights("Administrator")) {
-        //if user is not admin, he can only delete their own keys
-        $owner="lma.`userID`=${_SESSION['granted']}";
-    } else {
-        //if user is admin, he can delete any key
-        $owner="TRUE";
-    }
-    $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE $owner;");
+    
+    $keys=db_asocquery("SELECT cak.*,aps.date,apc.`corporationName`
+            FROM `cfgapikeys` cak 
+            LEFT JOIN (SELECT `keyID`,MAX(`date`) AS `date` FROM `apistatus` GROUP BY `keyID`) aps
+            ON cak.`keyID`=aps.`keyID`
+            LEFT JOIN `apicorps` apc
+            ON cak.`keyID`=apc.`keyID`
+            GROUP BY cak.keyID;");
+    
     if (count($keys)>0) {
         foreach($keys as $key) {
             echo('<tr><td>');
-            echo($key['apiKey']);
+            echo($key['keyID']);
             echo('</td><td>');
-            if (checkrights("Administrator")) {
-                echo($key['login']);
-                echo('</td><td>');  
-            }
-            echo($key['lastAccess']);
+            echo(substr($key['vCode'],0,6).'*********************');
             echo('</td><td>');
-            echo($key['lastIP']);
+            echo($key['corporationName']);
             echo('</td><td>');
-            nbapihrefedit($key['apiKeyID']);
+            echo($key['date']);
+            echo('</td><td>');
+            apikeyhrefedit($key['apiKeyID']);
             echo('<img src="img/del.gif" alt="Delete key" />');
             echo("</a>");
             echo('</td></tr>');

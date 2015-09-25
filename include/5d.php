@@ -28,6 +28,7 @@ global $LM_EVEDB;
                 if (!empty($indexSystemID)) setConfigItem('indexSystemID', $indexSystemID);
                 
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
+                if (secureGETstr('useCRESTkillmails')=='on') setConfigItem('useCRESTkillmails','enabled'); else setConfigItem('useCRESTkillmails','disabled');
                 if ( in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
 		
 		?>

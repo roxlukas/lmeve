@@ -98,6 +98,14 @@ Settings
                         </tr>
                         <tr>
                             <td>
+                                Use CREST killmails:<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="useCRESTkillmails" <?php if (getConfigItem('useCRESTkillmails','disabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Non-recurring tasks expiration:<br/>
                             </td>
                             <td>
