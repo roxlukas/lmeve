@@ -115,7 +115,10 @@ $pointsDisplayed=false;
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
                         $days="";
-                        $activities="";
+                        $missions="";
+                        $incursions="";
+                        $ratting="";
+                        $daystab="";
 				echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
 ?>
 
