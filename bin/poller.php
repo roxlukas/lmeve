@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="24";
+$POLLER_VERSION="26";
 $POLLER_MAX_TIME=900;
 set_time_limit($POLLER_MAX_TIME-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
@@ -32,12 +32,14 @@ $CREST_BASEURL="https://public-crest.eveonline.com";
 $USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
+$FEED_URL_PROBLEM="Can't get CREST url from CREST root.";
 
 date_default_timezone_set(@date_default_timezone_get());
 //set_include_path("$mypath/../include");
 include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
 include_once("$mypath/../include/configuration.php");
+include_once("$mypath/../include/killboard.php");
 
 function microtime_float()
 {
@@ -113,7 +115,7 @@ function apiSaveWarning($keyID,$error,$fileName) {
                 }
 		db_uquery("UPDATE `apistatus` SET $setdate errorCode=$errorCode, errorCount=$errcount, errorMessage='$errorMessage' WHERE keyID='$keyID' AND fileName='$fileName';");
 	}
-	if ($errorCode > 0)	warning($fileName,"ERROR $errorCode: $errorMessage");
+	if ($errorCode > 0) warning($fileName,"ERROR $errorCode: $errorMessage");
 }
 
 function apiSaveOK($keyID,$fileName) {
@@ -167,14 +169,14 @@ function cache_file($url, $cache, $interval) { //DEPRECATED, do not use!
 	}
 }
 
-function get_xml_contents($url, $cache, $interval) {
+function get_xml_contents($url, $cache, $interval, $getCachedFile=FALSE) {
 	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
 	//thus we cut 20 seconds
 	if ($interval>20) $interval=$interval-20;
 	global $httplog,$USER_AGENT;
 	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
-   		$data = file_get_contents($cache);
-		$xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="0">Cached</error><cachedUntil></cachedUntil></eveapi>');
+   		$data = simplexml_load_file($cache);
+		$getCachedFile?$xml_data=$data:$xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="0">Cached</error><cachedUntil></cachedUntil></eveapi>');
 	} else {
                  $ctx = stream_context_create(array(
                         'http' => array (
@@ -250,7 +252,24 @@ class crestError {
     }
 }
 
+
+
+function get_crest_root($root_crest_url) {
+    global $mycache;
+    $root=get_crest_contents($root_crest_url,"${mycache}/crest_root.json",0);
+    //if (isset($root->userCounts))
+    if (isset($root)) {
+        apiSaveOK(0,"CREST /");
+        return $root;
+    } else {
+        $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="404">Cannot get CREST root</error><cachedUntil></cachedUntil></eveapi>');
+        apiSaveWarning(0, $xml_data->error, "CREST /");
+        return FALSE;
+    }
+}
+
 function get_crest_contents($url, $cache, $interval) {
+        $CREST_RATE_LIMIT=30;
 	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
 	//thus we cut 20 seconds
 	if ($interval>20) $interval=$interval-20;
@@ -292,6 +311,7 @@ function get_crest_contents($url, $cache, $interval) {
                 }
    	}
 	$json_data = json_decode($data);
+        if ($interval==0) usleep(1000000/$CREST_RATE_LIMIT); //if interval == 0, make sure to respect rate limits
         return $json_data;
 }
 
@@ -1059,7 +1079,7 @@ foreach ($api_keys as $api_key) {
 			$rows=$ppl->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();		
-				$sql="INSERT INTO `apipocolist` VALUES(".
+				$sql="INSERT IGNORE INTO `apipocolist` VALUES(".
 				$attrs->itemID.",".
 				$attrs->solarSystemID.",".
 				ins_string($attrs->solarSystemName).",".
@@ -1335,7 +1355,7 @@ foreach ($api_keys as $api_key) {
 			apiSaveWarning($keyid,$dat->error,"AssetList.xml");
 		} else {
 			inform("Main","Polling assets, this may take a while...");
-			db_uquery("DELETE FROM `apiassets` WHERE corporationID=$corporationID;");
+			db_uquery("DELETE FROM `apiassets` WHERE `corporationID`=$corporationID;");
 			insertAssets($dat->result->rowset->row,0,0,$corporationID);
                         updateOfficeID($corporationID);
 			apiSaveOK($keyid,"AssetList.xml");
@@ -1406,7 +1426,7 @@ foreach ($api_keys as $api_key) {
 		if (isset($mtr->error)) {
 			apiSaveWarning($keyid,$mtr->error,"Blueprints.xml");
 		} else {
-			db_uquery("DELETE FROM apiblueprints WHERE corporationID=$corporationID;");
+			db_uquery("DELETE FROM `apiblueprints` WHERE `corporationID`=$corporationID;");
 			$rows=$mtr->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();
@@ -1472,15 +1492,132 @@ foreach ($api_keys as $api_key) {
 	//Base URL	$API_BASEURL/corp/Titles.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
-	
+
 	//KILLBOARD: $API_BASEURL/corp/KillLog.xml.aspx
 	//Parameters	 userID, apiKey, beforeKillID, characterID
 	//Cache Time (minutes)	 60
         if (!apiCheckErrors($keyid,"KillLog.xml")) {
 		$klg=get_xml_contents("$API_BASEURL/corp/KillLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/KillLog_$keyid.xml",60*60);
+                //echo($klg);
                 if (isset($klg->error)) {
                       apiSaveWarning($keyid,$klg->error,"KillLog.xml");
-                }
+                }  else {
+			$kills=$klg->result->rowset->row;
+			if (count($kills)>0) foreach ($kills as $kill) {
+                            $finalBlowCharacterID=0;
+                            //var_dump($kill);
+				$a=$kill->attributes();
+                                $at=array();
+                                $i=array(); //XML kill items
+                                $v=$kill->victim->attributes();
+                                
+                                foreach ($kill->rowset as $rowset) {
+                                    $attr=$rowset->attributes();
+                                    switch ($attr['name']) {
+                                        case 'attackers':
+                                            $at=$rowset;
+                                            break;
+                                        case 'items':
+                                            $i=$rowset;
+                                            break;
+                                    }
+                                }
+                                
+                                $sql="SELECT COUNT(*) AS `count` FROM `apikills` WHERE `killID`=".$a->killID.";";
+                                $ret=db_asocquery($sql);
+                                $ret=$ret[0]['count'];
+                                echo("ret=$ret\r\n");
+                                if ($ret>0) {
+                                    //inform('Killog.xml','KillID '.$a->killID.' already exists in db, skipping.');
+                                    continue; //skip the rest of the loop if kill already was in the db
+                                }
+                                
+				$sql="INSERT IGNORE INTO `apikills` VALUES( ".
+                                    $a->killID.",".
+                                    $a->solarSystemID.",".
+                                    ins_string($a->killTime).",".
+                                    $a->moonID.");";
+                                db_uquery($sql);
+                                 
+                                $sql="INSERT IGNORE INTO `apikillvictims` VALUES( ".
+                                    $a->killID.",".
+                                    $v->characterID.",".
+                                    ins_string($v->characterName).",".
+                                    $v->corporationID.",".
+                                    ins_string($v->corporationName).",".
+                                    $v->allianceID.",".
+                                    ins_string($v->allianceName).",".
+                                    $v->factionID.",".
+                                    ins_string($v->factionName).",".
+                                    $v->damageTaken.",".
+                                    $v->shipTypeID.");";
+				db_uquery($sql);
+  
+                                if (count($at)>0) foreach($at as $row) {
+                                    $attr=$row->attributes();
+                                    $sql="INSERT IGNORE INTO `apikillattackers` VALUES( ".
+                                        $a->killID.",".
+                                        $attr->characterID.",".
+                                        ins_string($attr->characterName).",".
+                                        $attr->corporationID.",".
+                                        ins_string($attr->corporationName).",".
+                                        $attr->allianceID.",".
+                                        ins_string($attr->allianceName).",".
+                                        $attr->factionID.",".
+                                        ins_string($attr->factionName).",".
+                                        $attr->securityStatus.",".
+                                        $attr->damageDone.",".
+                                        $attr->finalBlow.",".
+                                        $attr->weaponTypeID.",".
+                                        $attr->shipTypeID.");";
+                                    if ($attr->finalBlow==1) $finalBlowCharacterID=$attr->characterID;
+                                    db_uquery($sql);
+                                }
+                                
+                                //get kill items from CREST
+                                $killurl="$CREST_BASEURL/killmails/".$a->killID.'/'. killmail_hash($v->characterID, $finalBlowCharacterID, $v->shipTypeID, $a->killTime).'/';
+                                $crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail.json", 0);
+                                //$crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail_".$a->killID.".json", 0);
+                                
+                                if (isset($crest_killmail->victim->items) && getConfigItem('useCRESTkillmails', 'disabled')=='enabled') {
+                                    apiSaveOK(0,"CREST /killmails/");
+                                    //inform("Killog.xml","Using CREST killmail item list for killID=".$a->killID);
+                                    if (count($i)>0) foreach($crest_killmail->victim->items as $row) {
+                                        if (!isset($row->quantityDropped)) $row->quantityDropped=0;
+                                        if (!isset($row->quantityDestroyed)) $row->quantityDestroyed=0;
+                                        $sql="INSERT IGNORE INTO `apikillitems` VALUES( ".
+                                            $a->killID.",".
+                                            $row->itemType->id.",".
+                                            $row->flag.",".
+                                            $row->quantityDropped.",".
+                                            $row->quantityDestroyed.",".
+                                            $row->singleton.");";
+                                        db_uquery($sql);
+                                    }
+                                } else {
+                                    if (getConfigItem('useCRESTkillmails', 'disabled')!='enabled') {
+                                        warning("Killog.xml","FAILED fetching CREST killmail for killID=".$a->killID." URL=$killurl");
+                                        apiSaveWarning(0, $crest_killmail, "CREST /killmails/");
+                                    }
+                                    //warning("Killog.xml","DATA=".print_r($crest_killmail,TRUE));
+                                    //inform("Killog.xml","Using XML data for items.");
+                                    //inform("Killog.xml",print_r($kill,TRUE));
+                                    //if CREST call didn't work, use XML data instead (which is known to be incomplete)
+                                    if (count($i)>0) foreach($i as $row) {
+                                        $attr=$row->attributes();
+                                        $sql="INSERT IGNORE INTO `apikillitems` VALUES( ".
+                                            $a->killID.",".
+                                            $attr->typeID.",".
+                                            $attr->flag.",".
+                                            $attr->qtyDropped.",".
+                                            $attr->qtyDestroyed.",".
+                                            $attr->singleton.");";
+                                        db_uquery($sql);
+                                    }
+                                }
+			}
+			apiSaveOK($keyid,"KillLog.xml");
+		}
 	} else {
 		warning("KillLog.xml",$FEED_BLOCKED);
 	}
@@ -1658,53 +1795,65 @@ inform("Main","Polling public CREST feeds...");
 //Cache Time (minutes)	 23*60
 
 if (!apiCheckErrors(0,"CREST /market/prices/")) {
-	$dat=get_crest_contents("$CREST_BASEURL/market/prices/","${mycache}/crest_market_prices.xml",23*60*60);
-	if (isset($dat->error)) {
-		apiSaveWarning(0,$dat,"CREST /market/prices/");
-	} else {
-		db_uquery("TRUNCATE TABLE crestmarketprices;");
-		$rows=$dat->items;
-		foreach ($rows as $row) {
-                    if (!isset($row->adjustedPrice)) $row->adjustedPrice=0.0;
-                    if (!isset($row->averagePrice)) $row->averagePrice=0.0;
-                    //typeID (type->id), adjustedPrice, averagePrice
-			$sql="INSERT INTO crestmarketprices VALUES(".
-			$row->type->id.",".
-			$row->adjustedPrice.",".
-                        $row->averagePrice.
-			");";
-			db_uquery($sql);
-		}
-                //var_dump($dat);
-		apiSaveOK(0,"CREST /market/prices/");
-	}
+        $crestroot=get_crest_root($CREST_BASEURL);
+        $urladdr=$crestroot->marketPrices->href;
+        //echo("DEBUG: urladdr=$urladdr\r\n");
+        if ($urladdr) {
+            $dat=get_crest_contents("$CREST_BASEURL/market/prices/","${mycache}/crest_market_prices.json",23*60*60);
+            if (isset($dat->error)) {
+                    apiSaveWarning(0,$dat,"CREST /market/prices/");
+            } else {
+                    db_uquery("TRUNCATE TABLE crestmarketprices;");
+                    $rows=$dat->items;
+                    foreach ($rows as $row) {
+                        if (!isset($row->adjustedPrice)) $row->adjustedPrice=0.0;
+                        if (!isset($row->averagePrice)) $row->averagePrice=0.0;
+                        //typeID (type->id), adjustedPrice, averagePrice
+                            $sql="INSERT INTO crestmarketprices VALUES(".
+                            $row->type->id.",".
+                            $row->adjustedPrice.",".
+                            $row->averagePrice.
+                            ");";
+                            db_uquery($sql);
+                    }
+                    //var_dump($dat);
+                    apiSaveOK(0,"CREST /market/prices/");
+            }
+        } else {
+            warning("CREST /market/prices/",$FEED_URL_PROBLEM);
+        }
 } else {
 	warning("CREST /market/prices/",$FEED_BLOCKED);
 }
 
 if (!apiCheckErrors(0,"CREST /industry/systems/")) {
-	$dat=get_crest_contents("$CREST_BASEURL/industry/systems/","${mycache}/crest_industry_systems.xml",1*60*60);
-	if (isset($dat->error)) {
-		apiSaveWarning(0,$dat,"CREST /industry/systems/");
-	} else {
-		db_uquery("TRUNCATE TABLE crestindustrysystems;");
-		$rows=$dat->items;
-		foreach ($rows as $row) {
-                    $solarsystemID=$row->solarSystem->id;
-                    foreach ($row->systemCostIndices as $sci) {
-                        $costIndex=$sci->costIndex;
-                        $activityID=$sci->activityID_str;
-                        //echo("$solarsystemID,$costIndex,$activityID\r\n");
-			$sql="INSERT INTO crestindustrysystems VALUES(".
-			$solarsystemID.",".
-			$costIndex.",".
-                        $activityID.
-			");";
-			db_uquery($sql);
+        $crestroot=get_crest_root($CREST_BASEURL);
+        $urladdr=$crestroot->industry->systems->href;
+        //echo("DEBUG: urladdr=$urladdr\r\n");
+        if ($urladdr) {
+            $dat=get_crest_contents($urladdr,"${mycache}/crest_industry_systems.json",1*60*60);
+            if (isset($dat->error)) {
+                    apiSaveWarning(0,$dat,"CREST /industry/systems/");
+            } else {
+                    db_uquery("TRUNCATE TABLE crestindustrysystems;");
+                    $rows=$dat->items;
+                    foreach ($rows as $row) {
+                        $solarsystemID=$row->solarSystem->id;
+                        foreach ($row->systemCostIndices as $sci) {
+                            $costIndex=$sci->costIndex;
+                            $activityID=$sci->activityID_str;
+                            //echo("$solarsystemID,$costIndex,$activityID\r\n");
+                            $sql="INSERT INTO crestindustrysystems VALUES(".
+                            $solarsystemID.",".
+                            $costIndex.",".
+                            $activityID.
+                            ");";
+                            db_uquery($sql);
+                        }
                     }
-		}
-                //var_dump($dat);
-		apiSaveOK(0,"CREST /industry/systems/");
+                    //var_dump($dat);
+                    apiSaveOK(0,"CREST /industry/systems/");
+            }
 	}
 } else {
 	warning("CREST /industry/systems/",$FEED_BLOCKED);
