@@ -88,8 +88,8 @@
  <?php if (checkrights("Administrator,ViewActivity")) { ?>
         <td><form action="" method="get">
         <input type="hidden" name="id" value="<?php echo ($id); ?>" />
-        <input type="hidden" name="id2" value="5" />
-        <input type="submit" value="PVP Activity" title="Coming soon(tm)" disabled />
+        <input type="hidden" name="id2" value="6" />
+        <input type="submit" value="PVP Activity" />
         </form></td>
     <?php } ?>
     </tr>
@@ -136,6 +136,9 @@
             break;
         case 5:
             include("85.php");  //WebGL Proxy Statistics
+            break;
+        case 6:
+            include("86.php");  //activity - pvp
             break;
     }
 ?>
