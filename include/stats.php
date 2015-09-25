@@ -579,6 +579,7 @@ function showIndustryActivities($corporationID,$year,$month,$industryActivitySta
                       foreach ($activityGraph['data'] as $row) {
                           if (in_array($row['day'],$days)) $tmpdaystab[$row['day']]=$row['activity'];
                       }
+                      $obj = new stdClass();
                       $obj->label=$activityGraph['activityName'];
                       $obj->fillColor="rgba(".$colors[$activityID].",0.5)";
                       $obj->strokeColor="rgba(".$colors[$activityID].",1.0)";

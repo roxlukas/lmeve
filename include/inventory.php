@@ -122,43 +122,64 @@ function showInventory($data,$parentItemID=0,$corporationID=0) {
     echo('</td></tr></table>');
 }
 
-function showInventoryFitting($data,$shipTypeID) {
+function getSlotFlags() {
+    $SLOTS=array(
+        //low slots
+        11 => array('x' => 423+32, 'y' => 445+32),
+        12 => array('x' => 387+32, 'y' => 464+32),
+        13 => array('x' => 348+32, 'y' => 481+32),
+        14 => array('x' => 308+32, 'y' => 488+32),
+        15 => array('x' => 267+32, 'y' => 488+32),
+        16 => array('x' => 225+32, 'y' => 480+32),
+        17 => array('x' => 186+32, 'y' => 466+32),
+        18 => array('x' => 150+32, 'y' => 445+32),
+        //med slots
+        19 => array('x' => 484+32, 'y' => 114+32),
+        20 => array('x' => 505+32, 'y' => 149+32),
+        21 => array('x' => 519+32, 'y' => 188+32),
+        22 => array('x' => 528+32, 'y' => 230+32),
+        23 => array('x' => 529+32, 'y' => 271+32),
+        24 => array('x' => 521+32, 'y' => 313+32),
+        25 => array('x' => 507+32, 'y' => 353+32),
+        26 => array('x' => 487+32, 'y' => 388+32),
+        //high slots
+        27 => array('x' => 151+32, 'y' => 57+32),
+        28 => array('x' => 187+32, 'y' => 35+32),
+        29 => array('x' => 227+32, 'y' => 21+32),
+        30 => array('x' => 268+32, 'y' => 13+32),
+        31 => array('x' => 309+32, 'y' => 13+32),
+        32 => array('x' => 349+32, 'y' => 21+32),
+        33 => array('x' => 390+32, 'y' => 35+32),
+        34 => array('x' => 427+32, 'y' => 55+32),
+        //rig slots
+        92 => array('x' => 100+32, 'y' => 103+32),
+        93 => array('x' => 77+32, 'y' => 139+32),
+        94 => array('x' => 60+32, 'y' => 180+32),
+        //subsystem slots
+        125 => array('x' => 49+32, 'y' => 236+32),
+        126 => array('x' => 49+32, 'y' => 279+32),
+        127 => array('x' => 59+32, 'y' => 322+32),
+        128 => array('x' => 76+32, 'y' => 362+32),
+        129 => array('x' => 100+32, 'y' => 398+32)
+    );
+    //echo("<pre>".serialize($SLOTS)."</pre>");
+    return $SLOTS;
+}
+
+function drawTypeIDIcon($typeID,$typeName,$x,$y,$size) {
+    ?>
+    <div style="position: absolute; margin-left: <?=$x-floor($size/2)?>px; margin-top: <?=$y-floor($size/2)?>px;">
+        <img src="<?php echo(getTypeIDicon($typeID,64));?>" title="<?=$typeName?>" style="width: <?=$size?>px; height: <?=$size?>px;" />
+    </div>
+    <?php
+}
+
+function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
     
-    $SLOTS=array(
-        11 => array('x' => 423, 'y' => 445),
-        12 => array('x' => 387, 'y' => 464),
-        13 => array('x' => 348, 'y' => 481),
-        14 => array('x' => 308, 'y' => 488),
-        15 => array('x' => 267, 'y' => 488),
-        16 => array('x' => 225, 'y' => 480),
-        17 => array('x' => 186, 'y' => 466),
-        18 => array('x' => 150, 'y' => 445),
-        19 => array('x' => 484, 'y' => 114),
-        20 => array('x' => 505, 'y' => 149),
-        21 => array('x' => 519, 'y' => 188),
-        22 => array('x' => 528, 'y' => 230),
-        23 => array('x' => 529, 'y' => 271),
-        24 => array('x' => 521, 'y' => 313),
-        25 => array('x' => 507, 'y' => 353),
-        26 => array('x' => 487, 'y' => 388),
-        27 => array('x' => 151, 'y' => 57),
-        28 => array('x' => 187, 'y' => 35),
-        29 => array('x' => 227, 'y' => 21),
-        30 => array('x' => 268, 'y' => 13),
-        31 => array('x' => 309, 'y' => 13),
-        32 => array('x' => 349, 'y' => 21),
-        33 => array('x' => 390, 'y' => 35),
-        34 => array('x' => 427, 'y' => 55),
-        92 => array('x' => 100, 'y' => 103),
-        93 => array('x' => 77, 'y' => 139),
-        94 => array('x' => 60, 'y' => 180),
-        125 => array('x' => 49, 'y' => 236),
-        126 => array('x' => 49, 'y' => 279),
-        127 => array('x' => 59, 'y' => 322),
-        128 => array('x' => 76, 'y' => 362),
-        129 => array('x' => 100, 'y' => 398)
-    );
+    $SLOTS=getSlotFlags();
+    $ICONSIZE=48;
+    $AMMOICONSIZE=32;
     
     ?>
     <table class="lmframework" style="width: 100%;"><tr><td style="width:636px;">
@@ -169,30 +190,37 @@ function showInventoryFitting($data,$shipTypeID) {
           <div style="position: absolute; margin-left: 0px; margin-top: 0px; ">
               <img src="img/fitting_mask.png" />
           </div>
-    
 
     <?php
+    //fitting mask center
+    $xcen=318;
+    $ycen=281;
     if (count($data)>0) {
         foreach($data as $row) {
-            /*
-             * itemID 	parentItemID 	locationID 	typeID 	quantity 	flag 	singleton 	rawQuantity 	corporationID 	typeName 	locationName 	itemName
-    1212459367 	0 	66005021 	27 	1 	4 	1 	-1 	414731375 	Office 	NULL 	Unknown
-    1007028980226 	0 	60005020 	1944 	2 	62 	0 	NULL 	414731375 	Bestower 	Tollus X - Moon 4 - Republic Justice Department Tr... 	Unknown
-             */
             if (array_key_exists($row['flag'], $SLOTS)) {
+                if (isset($row['categoryID']) && $row['categoryID']==8) {
+                    $x=$SLOTS[$row['flag']][x];
+                    $y=$SLOTS[$row['flag']][y];
+                    $dx=$xcen-$x;
+                    $dy=$ycen-$y;
+                    $rprim=$ICONSIZE/2+($ICONSIZE-$AMMOICONSIZE)/2;
+                    $r=round(sqrt($dx*$dx+$dy*$dy));
+                    $xprim=round($rprim*$dx/$r);
+                    $yprim=round($rprim*$dy/$r);
+                    //echo("DEBUG: x=$x y=$y dx=$dx dy=$dy r=$r rprim=$rprim xprim=$xprim yprim=$yprim<br/>");
+                    drawTypeIDIcon($row['typeID'],$row['typeName'],$SLOTS[$row['flag']][x]+$xprim,$SLOTS[$row['flag']][y]+$yprim,$AMMOICONSIZE);
+                } else {
+                    drawTypeIDIcon($row['typeID'],$row['typeName'],$SLOTS[$row['flag']][x],$SLOTS[$row['flag']][y],$ICONSIZE);
+                }
             ?>
-            <div style="position: absolute; margin-left: <?=$SLOTS[$row['flag']][x]?>px; margin-top: <?=$SLOTS[$row['flag']][y]?>px;">
-                <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" />
-            </div>
+            
             <?php   
             }
         }
-        
-        
     }
     ?>
        </div>
-    </td><td style="vertical-align: top;">
+    </td><?php if($vertical) echo("</tr><tr>"); ?><td style="vertical-align: top;">
         <table class="lmframework" style="width:100%"><tr><td style="vertical-align: top;">
     <?php
         $flags=getInvFlags();
@@ -211,7 +239,25 @@ function showInventoryFitting($data,$shipTypeID) {
                 </div>
                 <?php if ($row['singleton']==0) { ?>
                 <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">
-                    <span style="background: rgba(0,0,0,0.5); padding: 2px; font-size: 11px;"><?php echo(number_format($row['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)); ?></span>
+                    <?php
+                        //inventory support
+                        if (isset($row['quantity'])) {
+                            ?><span style="background: rgba(0,0,0,0.5); padding: 2px; font-size: 11px;"><?php 
+                            echo(number_format($row['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
+                            ?></span><?php
+                        }
+                        //killboard support
+                        if (isset($row['qtyDropped']) && $row['qtyDropped'] > 0) {
+                            ?><span title="Dropped" style="background: rgba(0,128,0,0.5); padding: 2px; font-size: 11px;"><?php 
+                            echo(number_format($row['qtyDropped'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
+                            ?></span><?php
+                        }
+                        if (isset($row['qtyDestroyed']) && $row['qtyDestroyed'] > 0) {
+                            ?><span title="Destroyed" style="background: rgba(128,0,0,0.5); padding: 2px; font-size: 11px;"><?php 
+                            echo(number_format($row['qtyDestroyed'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
+                            ?></span><?php
+                        }
+                    ?>
                 </div>
                 <?php } ?>
                 <div style="margin-top: 66px; width: 64px; text-align: center;"><?=$row['typeName']?></div>

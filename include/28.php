@@ -34,7 +34,7 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
     } else {
         $headerData=getInventoryHeader($nr,$corporationID);
         $data=getInventory($nr,$corporationID);
-        showInventoryHeader($headerData);
+        showInventoryHeader($headerData,$corporationID);
         if (count($headerData)>0 && $headerData[0]['categoryID']==6 && $headerData[0]['singleton']==1) showInventoryFitting ($data, $headerData[0]['typeID']); else showInventory($data,$nr,$corporationID);
     }
     
