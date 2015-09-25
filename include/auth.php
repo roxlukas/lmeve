@@ -10,7 +10,20 @@ function check_includes_for_auth_php() {
 }
 
 function checksession() {
-	if ($_SESSION['status']!=1) die("Wrong script call. <a href=\"index.php\">$LM_APP_NAME</a>");
+	if ($_SESSION['status']!=1) die("Wrong script call. <a href=\"index.php\">$LM_APP_NAME</a>");       
+}
+
+function check_expired_accounts() {
+    global $USERSTABLE,$MOBILE;
+	if (isset($_SESSION['granted'])) {
+		$sql="SELECT `act` FROM `$USERSTABLE` WHERE `userID`=${_SESSION['granted']};";
+		$result=db_query($sql);
+		if ($result[0][0]==0) { 
+                    $_SESSION=array();
+                    $MOBILE ? mobile_template_logout('This session has expired.') : template_logout('This session has expired.');
+                    die();
+                }
+	}
 }
 
 function check_changed_session_ip() {

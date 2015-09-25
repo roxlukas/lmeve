@@ -267,7 +267,7 @@ function template_badlogon() {
 	<?php
 }
 
-function template_logout() {
+function template_logout($msg='Logged out.') {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -288,7 +288,7 @@ function template_logout() {
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td><br><div class="tcen">Logged out.</div></td></tr>
+	<tr><td><br><div class="tcen"><?=$msg?></div></td></tr>
 	<tr><td><div class="tcen"><br>
 		 <form method="get" action="">
 			<input type="submit" value="Login again">

@@ -218,7 +218,7 @@ function mobile_template_badlogon() {
 	<?php
 }
 
-function mobile_template_logout() {
+function mobile_template_logout($msg='Logged out.') {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
 	?>
 	<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
@@ -240,7 +240,7 @@ function mobile_template_logout() {
 	<table border="0" cellspacing="0" cellpadding="0" width="90%" class="login">
 	
 	
-	<tr><td><br><div class="tcen">Logged out.</div></td></tr>
+	<tr><td><br><div class="tcen"><?=$msg?></div></td></tr>
 	<tr><td><div class="tcen"><br>
 		 <form method="get" action="">
 			<input type="submit" value="Login again">

@@ -111,6 +111,7 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 			}
 		}
 	} else if ($_SESSION['status']==1) { //LOGGED ON
+            check_expired_accounts();
 		if ($_GET['logoff']==1) { //TRYING TO LOG OUT?
 			$_SESSION=array();
 			$MOBILE ? mobile_template_logout() : template_logout();
