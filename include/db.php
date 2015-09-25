@@ -199,7 +199,7 @@ function db_uquery($sql) {
 	$result=array();
 	
         try {
-            $stmt = $my_link->query($sql); 
+            $stmt = $my_link->query($sql);
         } catch(PDOException $ex) {
             loguj(dirname(__FILE__).'/../var/error.txt',"Error in query: $sql MySQL reply: ".$ex->getMessage());
             if ($LM_DEBUG==1) {
@@ -210,7 +210,7 @@ function db_uquery($sql) {
             die();
         }
 	
-	return($my_result);
+	return($stmt->rowCount());
 }
 
 //zwraca wiersz tabeli, kt�rego pole $field zawiera warto�� $id, je�li rekord nie istnieje zwracana jest pusta tablica
