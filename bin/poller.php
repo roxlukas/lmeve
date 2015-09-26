@@ -1526,7 +1526,7 @@ foreach ($api_keys as $api_key) {
                                 $sql="SELECT COUNT(*) AS `count` FROM `apikills` WHERE `killID`=".$a->killID.";";
                                 $ret=db_asocquery($sql);
                                 $ret=$ret[0]['count'];
-                                echo("ret=$ret\r\n");
+                                //echo("ret=$ret\r\n");
                                 if ($ret>0) {
                                     //inform('Killog.xml','KillID '.$a->killID.' already exists in db, skipping.');
                                     continue; //skip the rest of the loop if kill already was in the db
@@ -1579,7 +1579,7 @@ foreach ($api_keys as $api_key) {
                                 $crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail.json", 0);
                                 //$crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail_".$a->killID.".json", 0);
                                 
-                                if (isset($crest_killmail->victim->items) && getConfigItem('useCRESTkillmails', 'disabled')=='enabled') {
+                                if (isset($crest_killmail->victim->items) && getConfigItem('useCRESTkillmails', 'enabled')=='enabled') {
                                     apiSaveOK(0,"CREST /killmails/");
                                     //inform("Killog.xml","Using CREST killmail item list for killID=".$a->killID);
                                     if (count($i)>0) foreach($crest_killmail->victim->items as $row) {
@@ -1595,7 +1595,7 @@ foreach ($api_keys as $api_key) {
                                         db_uquery($sql);
                                     }
                                 } else {
-                                    if (getConfigItem('useCRESTkillmails', 'disabled')!='enabled') {
+                                    if (getConfigItem('useCRESTkillmails', 'enabled')!='enabled') {
                                         warning("Killog.xml","FAILED fetching CREST killmail for killID=".$a->killID." URL=$killurl");
                                         apiSaveWarning(0, $crest_killmail, "CREST /killmails/");
                                     }

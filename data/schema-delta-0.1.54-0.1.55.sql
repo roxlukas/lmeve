@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS `apikillvictims` (
   `factionName` varchar(255) null,
   `damageTaken` int(11) not null,
   `shipTypeID` int(11) not null,
-  PRIMARY KEY (`killID`,`characterID`),
   KEY `apikillvictims_IX_killID` (`killID`),
   KEY `apikillvictims_IX_characterID` (`characterID`),
   KEY `apikillvictims_IX_corporationID` (`corporationID`),
@@ -45,7 +44,6 @@ CREATE TABLE IF NOT EXISTS `apikillattackers` (
   `finalBlow` int(11) not null,
   `weaponTypeID` int(11) not null,
   `shipTypeID` int(11) not null,
-  PRIMARY KEY (`killID`,`characterID`),
   KEY `apikillattackers_IX_killID` (`killID`),
   KEY `apikillattackers_IX_characterID` (`characterID`),
   KEY `apikillattackers_IX_corporationID` (`corporationID`),
@@ -62,7 +60,6 @@ CREATE TABLE IF NOT EXISTS `apikillitems` (
   `qtyDropped` int(11) null,
   `qtyDestroyed` int(11) null,
   `singleton` int(11) not null,
-  PRIMARY KEY (`killID`,`typeID`),
   KEY `apikillitems_IX_killID` (`killID`),
   KEY `apikillitems_IX_typeID` (`typeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

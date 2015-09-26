@@ -60,7 +60,8 @@ function getDestroyedItems($killID) {
     ON itp.`groupID`=igp.`groupID`
     WHERE `killID`=$killID
     ORDER BY `flag`;";
-    $items=killMailToInventory(db_asocquery($sql));
+    //$items=killMailToInventory(db_asocquery($sql));
+    $items=db_asocquery($sql);
     //echo("<pre>".var_dump($items)."</pre>");
     return $items;
 }

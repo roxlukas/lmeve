@@ -101,7 +101,7 @@ Settings
                                 Use CREST killmails:<br/>
                             </td>
                             <td>
-                                <input type="checkbox" size="32" name="useCRESTkillmails" <?php if (getConfigItem('useCRESTkillmails','disabled')=='enabled') echo('checked'); ?> />
+                                <input type="checkbox" size="32" name="useCRESTkillmails" <?php if (getConfigItem('useCRESTkillmails','enabled')=='enabled') echo('checked'); ?> />
                             </td>
                         </tr>
                         <tr>
