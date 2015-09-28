@@ -29,7 +29,9 @@ global $LM_EVEDB;
                 
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
                 if (secureGETstr('useCRESTkillmails')=='on') setConfigItem('useCRESTkillmails','enabled'); else setConfigItem('useCRESTkillmails','disabled');
-                if ( in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
+                if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');
+                
+                if (in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
 		
 		?>
 		<br>

@@ -230,131 +230,16 @@ if ($model=getResourceFromYaml($nr)) {
 		<script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
 		<script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
 		<script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
+                <script type="text/javascript" src="webgl.js"></script>
 		<script type="text/javascript">
-		function checkwglsuprt() {
-		  if (!window.WebGLRenderingContext) {
-			  //window.alert("Cannot create WebGLRenderingContext. WebGL disabled.");
-			  return false;   
-		  }
-		  var canvas = document.getElementById('wglCanvas');
-		  var experimental = false;
-		  try { gl = canvas.getContext("webgl"); }
-		  catch (x) { gl = null; }
-		  
-		  if (gl == null) {
-				try { gl = canvas.getContext("experimental-webgl"); experimental = true; }
-				catch (x) { return false; }
-				if (!gl) {
-					return false;
-				}
-		  }
-		  return true;
-		}
-		
-		var scene = null,
-			ship = null,
-			WGLSUPPORT = checkwglsuprt();
-		
-		function loadPreview(skin) {
-						<?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
-						//ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
-						if (skin=='default' || !skin ) skin='<?=$model['sofFactionName']?>';
-						if (scene != null) {
-							if (ship != null) scene.removeObject(ship);
-							ship = scene.loadShip('<?=$model['sofHullName']?>:'+skin+':<?=$model['sofRaceName']?>', undefined);
-							return;
-						}
-						var canvas = document.getElementById('wglCanvas');
-						ccpwgl.initialize(canvas);
-						scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
-						//sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
-					var camera = new TestCamera(canvas);
-						camera.minDistance = 10;
-						camera.maxDistance = 10000;
-						camera.fov = 30;
-						camera.distance = <?php
-							if ($item['volume']==0 && ($item['categoryID']==3 || $item['categoryID']==2) ) echo('100000'); else
-							if ($item['volume']<100) echo('30'); else 
-							if (($item['volume']>=100) && ($item['volume']<6000)) echo('50'); else
-							if (($item['volume']>=6000) && ($item['volume']<29000)) echo('150'); else
-							if (($item['volume']>=29000) && ($item['volume']<50000)) echo('250'); else
-							if (($item['volume']>=50000) && ($item['volume']<120000)) echo('500'); else
-							if (($item['volume']>=120000) && ($item['volume']<600000)) echo('1600'); else
-							if (($item['volume']>=600000)) echo('2500');
-						?>;
-						camera.rotationX = 0.5;
-						camera.rotationY = 0.1;
-						camera.nearPlane = 1;
-						camera.farPlane = 10000000;
-						camera.minPitch = -0.5;
-						camera.maxPitch = 0.65;
-						ccpwgl.setCamera(camera);
-						<?php
-							if ($item['categoryID']==6 || $item['categoryID']==18 || $item['categoryID']==11) {
-								//if ship, NPC or drone - use loadShip
-								//use new SOF data
-								?>ship = scene.loadShip('<?=$model['sofHullName']?>:'+skin+':<?=$model['sofRaceName']?>', undefined);<?php
-								
-							} else if ($item['categoryID']==3 || $item['categoryID']==2) {
-								echo("ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
-							} else {
-								//echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
-								$model = false;
-							}
-						?>
-						
-						<?php //ccpwgl.enablePostprocessing(true); ?>
-		
-					ccpwgl.onPreRender = function () 
-					{ 
-							/*var shipTransform = ship.getTransform();
-							shipTransform[5] = shipTransform[15] = 1.0;
-							X = Y * (Math.PI / 180.0);
-							Y=Y+.1;
-							shipTransform[0]=Math.cos(X);
-							shipTransform[2]=Math.sin(X);
-							shipTransform[8]=-1 * Math.sin(X);
-							shipTransform[10]=Math.cos(X);
-							ship.setTransform(shipTransform);*/
-					};
-						
-		}
-					
-		function togglefull() {
-			var canvas=document.getElementById('wglCanvas');
-			var button=document.getElementById('buttonFull');
-			var skinpanel=document.getElementById('skinpanel');
-			if (canvas.style.position=="absolute") {
-				//minimize!
-				canvas.style.position="static";
-				canvas.style.width="720px";
-				canvas.style.height="420px";
-				button.style.position="relative";
-				button.style.left="2px";
-				button.style.top="-418px";
-				button.value="Fullscreen";
-				skinpanel.style.zIndex="auto";
-				skinpanel.style.position="static";
-				skinpanel.style.right="0px";
-			} else {
-				//maximize!
-				window.scrollTo(0,0);
-				canvas.style.position="absolute";
-				canvas.style.top="0px";
-				canvas.style.left="0px";
-				canvas.style.width="100%";
-				canvas.style.height="100%";
-				button.style.position="absolute";
-				button.style.left="2px";
-				button.style.top="2px";
-				button.value="Minimize";
-				skinpanel.style.top="0px";
-				skinpanel.style.zIndex=10;
-				skinpanel.style.position="absolute";
-				skinpanel.style.right="0px";
-			}
-		}
-		
+                    settings.canvasID = 'wglCanvas';
+                    settings.sofHullName = '<?=$model['sofHullName']?>';
+                    settings.sofRaceName = '<?=$model['sofRaceName']?>';
+                    settings.sofFactionName = '<?=$model['sofFactionName']?>';
+                    settings.background = '<?=$model['background']?>';
+                    settings.categoryID = <?=$item['categoryID']?>;
+                    settings.volume = <?=$item['volume']?>;
+                    settings.graphicFile = '<?=$model['graphicFile']?>';
 		</script> 
 		<div id="skinpanel">
 		<?php if (count($skins)>0) showSkins($skins); else echo('<table><tr><th>Ship has no in-game SKINs</th></tr></table>'); ?>

@@ -45,6 +45,21 @@ Changelog:
 
 <table width="90%" border="0" cellspacing="2" cellpadding="0">
 <!-- changelog start -->
+<tr><td class="tab" width="180">
+<div class="tytul2">2015.09.25</div></td>
+<td valign="top" class="tab">
+<b>0.1.55 beta:</b><br>
+<b>Poller version 26</b>
+<ul>
+        <li>Fully functional Killboard</li>
+	<li>XML and CREST killmail support in API Poller</li>
+	<li>Can use either XML or CREST killmail endpoint (configurable in Settings)</li>
+        <li>CCP WebGL preview in Inventory and Killboard ship fitting window</li>
+	<li>You can now input Corp API Keys in GUI</li>
+        <li>Disabled accounts have existing sessions terminated immediately</li>
+	<li>Bug fixes</li>
+</ul>
+</td></tr>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2015.08.18</div></td>

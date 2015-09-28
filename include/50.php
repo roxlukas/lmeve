@@ -106,6 +106,14 @@ Settings
                         </tr>
                         <tr>
                             <td>
+                                Use CCP WebGL in Killboard and Inventory<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="useWebGLpreview" <?php if (getConfigItem('useWebGLpreview','enabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Non-recurring tasks expiration:<br/>
                             </td>
                             <td>

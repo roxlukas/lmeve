@@ -1,9 +1,8 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+include_once('materials.php');
+include_once('yaml_graphics.php');
+include_once('skins.php');
 include_once("percentage.php");
 
 function dbhrefedit($nr) {
@@ -175,19 +174,38 @@ function drawTypeIDIcon($typeID,$typeName,$x,$y,$size) {
 }
 
 function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
-    global $DECIMAL_SEP, $THOUSAND_SEP;
+    global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP;
     
     $SLOTS=getSlotFlags();
     $ICONSIZE=48;
     $AMMOICONSIZE=32;
     
+    $model=getResourceFromYaml($shipTypeID);
+    
+    $item=db_asocquery("SELECT itp.*,igp.`categoryID`
+		FROM $LM_EVEDB.`invTypes` itp
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+		WHERE `typeID` = $shipTypeID ;");
+    if (count($item)>0) {
+        $item=$item[0];
+    } else {
+        $item['volume']=30000;
+        $item['categoryID']=6;
+    }
+    
     ?>
+    
+    
     <table class="lmframework" style="width: 100%;"><tr><td style="width:636px;">
     <div style="width: 636px; height: 563px; float: left;">
           <div style="position: absolute; margin-left: 52px; margin-top: 20px; ">
               <img src="<?php echo(getTypeIDicon($shipTypeID,512));?>" style="width: 532px; height: 532px;" />
           </div>
-          <div style="position: absolute; margin-left: 0px; margin-top: 0px; ">
+          <div style="position: absolute; margin-left: 52px; margin-top: 20px; ">
+              <canvas id="wglCanvas" width="532" height="532" style="width: 532px; height: 532px;"></canvas>
+          </div>
+          <div style="position: absolute; margin-left: 0px; margin-top: 0px; pointer-events: none; ">
               <img src="img/fitting_mask.png" />
           </div>
 
@@ -267,8 +285,29 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
         }
     ?>
         </td></tr></table>
-    </td></tr></table>     
+    </td></tr></table>
+<?php if (getConfigItem(useWebGLpreview,'enabled')=='enabled') { ?>
+    <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+    <script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
+    <script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
+    <script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
+    <script type="text/javascript" src="webgl.js"></script>
+    <script type="text/javascript">
+        //webgl suprt
+        settings.canvasID = 'wglCanvas';
+        settings.sofHullName = '<?=$model['sofHullName']?>';
+        settings.sofRaceName = '<?=$model['sofRaceName']?>';
+        settings.sofFactionName = '<?=$model['sofFactionName']?>';
+        settings.background = '<?=$model['background']?>';
+        settings.categoryID = <?=$item['categoryID']?>;
+        settings.volume = <?=$item['volume']?>;
+        settings.graphicFile = '<?=$model['graphicFile']?>';
+        if (WGLSUPPORT) {
+            loadPreview('default');
+        }
+    </script>
     <?php
+    }
 }
 
 function getCorpDivisions($corporationID) {
