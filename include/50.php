@@ -81,16 +81,16 @@ Settings
 		<input type="hidden" name="nr" value="<?=$nr?>">
 		    <table class="lmframework">
                         <tr>
-                            <td width="150">
+                            <td width="300">
                                 ISK per point:<br/>
                             </td>
-                            <td width="300">
+                            <td width="200">
                                     <input type="text" size="32" name="iskPerPoint" value="<?=getConfigItem('iskPerPoint','15000000')?>" />
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                Enable Northbound API:<br/>
+                                Enable LMeve Northbound API:<br/>
                             </td>
                             <td>
                                 <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('northboundApi','disabled')=='enabled') echo('checked'); ?> />
@@ -98,7 +98,15 @@ Settings
                         </tr>
                         <tr>
                             <td>
-                                Use CREST killmails:<br/>
+                                Enable public Killboard:<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="publicKillboard" <?php if (getConfigItem('publicKillboard','disabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Use hybrid XML API / CREST killmail fetching:<br/>
                             </td>
                             <td>
                                 <input type="checkbox" size="32" name="useCRESTkillmails" <?php if (getConfigItem('useCRESTkillmails','enabled')=='enabled') echo('checked'); ?> />

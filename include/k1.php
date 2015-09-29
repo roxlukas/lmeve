@@ -7,7 +7,7 @@ if (!checkrights("Administrator,ViewKillboard")) { //"Administrator,ViewOverview
 	return;
 }
 $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Statistics'; //Panel name (optional)
+$PANELNAME='Killboard'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB;

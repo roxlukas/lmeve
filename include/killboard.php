@@ -205,7 +205,8 @@ function killMailToInventory($kill_items) {
 
 function showKills($kills) {
     ?>
-    <table class="lmframework" style="width: 90%; min-width: 600px;">
+    <center>
+    <table class="lmframework" style="width: 95%; min-width: 600px;">
     <?php
     if(count($kills)>0) {
         ?><tr><th>Date</th><th></th><th>Location</th><th colspan="2">Victim</th><th colspan="2">Final Blow</th></tr><?php
@@ -255,7 +256,7 @@ function showKills($kills) {
         ?><tr><th style="text-align: center;">No kills found.</th></tr><?php
     }
     ?>
-    </table>
+    </table></center>
     <?php
 }
 
