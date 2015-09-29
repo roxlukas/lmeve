@@ -346,6 +346,10 @@ function showVictim($victim) {
 }
 
 function showKill($kill) {
+    if ($kill===FALSE) {
+        echo("No such killID");
+        return FALSE;
+    }
     ?>
     <table style="width: 100%"><tr><td style="width: 636px; vertical-align: top;">
     <?php
