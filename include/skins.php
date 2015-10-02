@@ -6,7 +6,7 @@ function getShipSkins($shipTypeID) {
 	$sql="SELECT shp.*,skn.*,mat.*,lic.* FROM $LM_EVEDB.`skinShip` shp
 	JOIN $LM_EVEDB.`skins` skn
 	ON shp.`skinID` = skn.`skinID`
-	JOIN $LM_EVEDB.`skinMaterialsRGB` mat
+	LEFT JOIN $LM_EVEDB.`skinMaterialsRGB` mat
 	ON skn.`skinMaterialID` = mat.`skinMaterialID`
 	JOIN $LM_EVEDB.`skinLicense` lic
 	ON lic.`skinID` = skn.`skinID`
@@ -63,7 +63,7 @@ function getSkin($skinLicenseID) {
 	$sql="SELECT * FROM $LM_EVEDB.`skinLicense` lic
 	JOIN $LM_EVEDB.`skins` skn
 	ON lic.`skinID` = skn.`skinID`
-	JOIN $LM_EVEDB.`skinMaterialsRGB` mat
+	LEFT JOIN $LM_EVEDB.`skinMaterialsRGB` mat
 	ON skn.`skinMaterialID` = mat.`skinMaterialID`
 	WHERE lic.`licenseTypeID` = $skinLicenseID";
 	$skins=db_asocquery($sql);
@@ -104,6 +104,11 @@ function skinhrefedit($nr) {
 }
 
 function displaySkinIcon($skin,$size=64) {
+    //falback
+    if (empty($skin['colorWindow'])) $skin['colorWindow']='a0a0a0';
+    if (empty($skin['colorPrimary'])) $skin['colorPrimary']='808080';
+    if (empty($skin['colorSecondary'])) $skin['colorSecondary']='a0a0a0';
+    if (empty($skin['colorHull'])) $skin['colorHull']='404040';
 	$rnd=md5(random_pseudo_bytes_wrapper(24));
 	?>
 	<canvas id="skin_<?=$rnd?>" width="<?=$size?>" height="<?=$size?>" />

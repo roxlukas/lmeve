@@ -198,6 +198,57 @@ function updateYamlSkinMaterials($silent=true) {
     return true;
 }
 
+function createYamlSkinMaterialSets() {
+    global $LM_EVEDB;
+    $createyamlSkinMaterialSets="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`skinMaterialSets` (
+          `skinMaterialSetID` int(11) NOT NULL,
+          `colorHullR` decimal(17,15) DEFAULT NULL,
+          `colorHullG` decimal(17,15) DEFAULT NULL,
+          `colorHullB` decimal(17,15) DEFAULT NULL,
+          `colorHullA` decimal(17,15) DEFAULT NULL,
+          `colorPrimaryR` decimal(17,15) DEFAULT NULL,
+          `colorPrimaryG` decimal(17,15) DEFAULT NULL,
+          `colorPrimaryB` decimal(17,15) DEFAULT NULL,
+          `colorPrimaryA` decimal(17,15) DEFAULT NULL,
+          `colorSecondaryR` decimal(17,15) DEFAULT NULL,
+          `colorSecondaryG` decimal(17,15) DEFAULT NULL,
+          `colorSecondaryB` decimal(17,15) DEFAULT NULL,
+          `colorSecondaryA` decimal(17,15) DEFAULT NULL,
+          `colorWindowR` decimal(17,15) DEFAULT NULL,
+          `colorWindowG` decimal(17,15) DEFAULT NULL,
+          `colorWindowB` decimal(17,15) DEFAULT NULL,
+          `colorWindowA` decimal(17,15) DEFAULT NULL,   
+          `description` varchar(128) DEFAULT NULL,
+          `sofFactionName` varchar(32) DEFAULT NULL,
+          PRIMARY KEY (`skinMaterialSetID`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+     return db_uquery($createyamlSkinMaterialSets);
+}
+
+function dropYamlSkinMaterialSets () {
+    global $LM_EVEDB;
+    $dropyamlSkinMaterialSets="DROP TABLE IF EXISTS `$LM_EVEDB`.`skinMaterialSets`;";
+    return db_uquery($dropyamlSkinMaterialSets);
+}
+
+function createSkinMaterialsRGBview() {
+    global $LM_EVEDB;
+    $sql="CREATE OR REPLACE VIEW `$LM_EVEDB`.`skinMaterialsRGB` AS
+    SELECT 
+    sma.`skinMaterialID`,
+    sms.`sofFactionName` AS `material`,
+    sma.`displayNameID`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorWindowR`)),HEX(FLOOR(255*sms.`colorWindowG`)),HEX(FLOOR(255*sms.`colorWindowB`)))) AS `colorWindow`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorPrimaryR`)),HEX(FLOOR(255*sms.`colorPrimaryG`)),HEX(FLOOR(255*sms.`colorPrimaryB`)))) AS `colorPrimary`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorSecondaryR`)),HEX(FLOOR(255*sms.`colorSecondaryG`)),HEX(FLOOR(255*sms.`colorSecondaryB`)))) AS `colorSecondary`,
+    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorHullR`)),HEX(FLOOR(255*sms.`colorHullG`)),HEX(FLOOR(255*sms.`colorHullB`)))) AS `colorHull`
+    FROM `$LM_EVEDB`.`skinMaterialSets` sms
+    JOIN `$LM_EVEDB`.`skinMaterials` sma
+    ON sma.`materialSetID`=sms.`skinMaterialSetID`;";
+    
+    return db_uquery($sql);
+}
+
 /**
  * Updates graphicMaterialSetsinformation from graphicMaterialSets.yaml file
  * 
@@ -209,36 +260,15 @@ function updateYamlSkinMaterialSets($silent=true) {
     $file="../data/$LM_EVEDB/graphicMaterialSets.yaml";
     
     if (!file_exists($file)) {
-        echo("File $file does not exist. Make sure YAML files from EVE SDE are in appropriate directories.");
+        echo("File $file does not exist.\r\nThis file might not yet be part of the SDE, in which case I will only create empty tables for the SKIN data.");
+        createYamlSkinMaterialSets();
+        createSkinMaterialsRGBview();
         return FALSE;
     }
        
-    $dropyamlSkinMaterialSets="DROP TABLE IF EXISTS `$LM_EVEDB`.`skinMaterialSets`;";
-    db_uquery($dropyamlSkinMaterialSets);
+    dropYamlSkinMaterialSets();
     
-    $createyamlSkinMaterialSets="CREATE TABLE IF NOT EXISTS `$LM_EVEDB`.`skinMaterialSets` (
-      `skinMaterialSetID` int(11) NOT NULL,
-      `colorHullR` decimal(17,15) DEFAULT NULL,
-      `colorHullG` decimal(17,15) DEFAULT NULL,
-      `colorHullB` decimal(17,15) DEFAULT NULL,
-      `colorHullA` decimal(17,15) DEFAULT NULL,
-      `colorPrimaryR` decimal(17,15) DEFAULT NULL,
-      `colorPrimaryG` decimal(17,15) DEFAULT NULL,
-      `colorPrimaryB` decimal(17,15) DEFAULT NULL,
-      `colorPrimaryA` decimal(17,15) DEFAULT NULL,
-      `colorSecondaryR` decimal(17,15) DEFAULT NULL,
-      `colorSecondaryG` decimal(17,15) DEFAULT NULL,
-      `colorSecondaryB` decimal(17,15) DEFAULT NULL,
-      `colorSecondaryA` decimal(17,15) DEFAULT NULL,
-      `colorWindowR` decimal(17,15) DEFAULT NULL,
-      `colorWindowG` decimal(17,15) DEFAULT NULL,
-      `colorWindowB` decimal(17,15) DEFAULT NULL,
-      `colorWindowA` decimal(17,15) DEFAULT NULL,   
-      `description` varchar(128) DEFAULT NULL,
-      `sofFactionName` varchar(32) DEFAULT NULL,
-      PRIMARY KEY (`skinMaterialSetID`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-    db_uquery($createyamlSkinMaterialSets);
+    createYamlSkinMaterialSets();
       
     if (!$silent) echo('loading YAML...');
     
@@ -281,22 +311,8 @@ function updateYamlSkinMaterialSets($silent=true) {
     db_uquery($biginsertSkinMaterials);
     
     //view
-    $sql="CREATE OR REPLACE VIEW `$LM_EVEDB`.`skinMaterialsRGB` AS
-    SELECT 
-    sma.`skinMaterialID`,
-    sms.`sofFactionName` AS `material`,
-    sma.`displayNameID`,
-    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorWindowR`)),HEX(FLOOR(255*sms.`colorWindowG`)),HEX(FLOOR(255*sms.`colorWindowB`)))) AS `colorWindow`,
-    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorPrimaryR`)),HEX(FLOOR(255*sms.`colorPrimaryG`)),HEX(FLOOR(255*sms.`colorPrimaryB`)))) AS `colorPrimary`,
-    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorSecondaryR`)),HEX(FLOOR(255*sms.`colorSecondaryG`)),HEX(FLOOR(255*sms.`colorSecondaryB`)))) AS `colorSecondary`,
-    LOWER(CONCAT(HEX(FLOOR(255*sms.`colorHullR`)),HEX(FLOOR(255*sms.`colorHullG`)),HEX(FLOOR(255*sms.`colorHullB`)))) AS `colorHull`
-    FROM `$LM_EVEDB`.`skinMaterialSets` sms
-    JOIN `$LM_EVEDB`.`skinMaterials` sma
-    ON sma.`materialSetID`=sms.`skinMaterialSetID`;";
-    
     if (!$silent) echo('creating RGB view...');
-    
-    db_uquery($sql);
+    createSkinMaterialsRGBview();
     
     return true;
 }
