@@ -168,7 +168,15 @@ function url_replace($input) {
 		</tr></table>
 
 		<?php
-	
+                
+//PREV-NEXT NAVIGATION
+        
+        $previous=db_asocquery("SELECT `typeID` FROM $LM_EVEDB.`invTypes` WHERE `typeID` < $nr ORDER BY `typeID` DESC LIMIT 1;"); 
+        if (count($previous)>0) $previous_id=$previous[0]['typeID']; else $previous_id=$nr;
+        $next=db_asocquery("SELECT `typeID` FROM $LM_EVEDB.`invTypes` WHERE `typeID` > $nr ORDER BY `typeID` ASC LIMIT 1;");
+        if (count($next)>0) $next_id=$next[0]['typeID']; else $next_id=$nr;
+        ?> <input type="button" value="&laquo;" title="Previous typeID" onclick="location.href='?id=10&id2=1&nr=<?=$previous_id?>';"/>
+        <input type="button" value="&raquo;" title="Next typeID" onclick="location.href='?id=10&id2=1&nr=<?=$next_id?>';"/> <?php	
 
 //BREADCRUMB NAVIGATION
 	function getMarketNode($marketGroupID) {
@@ -197,6 +205,8 @@ function url_replace($input) {
 	} while(TRUE);
 	echo("<a href=\"?id=10&id2=0\"> Start </a> $breadcrumbs <br />");
 
+
+        
         //echo("<h2>${item['typeName']}</h2>");
         //
 //CATEGORY ID DEBUG        
