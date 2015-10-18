@@ -210,6 +210,7 @@ function db_uquery($sql) {
             die();
         }
 	
+        error_reporting(E_ALL & ~E_NOTICE);
 	return($stmt->rowCount());
 }
 
