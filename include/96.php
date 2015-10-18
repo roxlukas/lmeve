@@ -10,7 +10,8 @@ $MENUITEM=9; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Characters'; //Panel name (optional)
 //standard header ends here
 
-include("tasks.php");
+include_once("tasks.php");
+include_once("killboard.php");
 
 global $USERSTABLE,$LM_EVEDB;
 
@@ -164,6 +165,11 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
                             echo('<h2>Currently in progress:</h2>');
                             showCurrentJobs($jobslist);
                         }
+                    echo('</td></tr><tr><td class="tab" colspan="3">');
+			echo('<h2>Recent Kills & Losses:</h2>');
+			
+			showKills(getKills(0, 0, 0, 0, $nr, 0, 10));
+                        ?> <center><input type="button" value="More kills..." onclick="location.href='?id=12&id2=0&characterID=<?=$nr?>';"/></center> <?php
 			
 		    echo('</td></tr></table>');
 		    
