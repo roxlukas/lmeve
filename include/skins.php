@@ -29,7 +29,7 @@ function showAllRacialSkins($skins) {
 	if (count($skins)>0) {
 		?>
                 <table class="lmframework" width="100%"><tr><th>Custom SKINs</th></tr>
-                    <tr><td>Select custom skin: <select id="customskins" onchange="loadPreview(this.value);">
+                    <tr><td>Select custom skin: <select id="customskins" onchange="loadPreview(settings,this.value);">
                             <?php
                                 foreach ($skins as $race) {
                                     $skin=$race['sofFactionName'];
@@ -138,7 +138,7 @@ function showSkins($skins) {
 					<?php displaySkinIcon($skin,32); ?>
 				</td>
 				<td><?php skinhrefedit($skin['licenseTypeID']); echo($skin['internalName']); ?></a></td>
-				<td style="width: 36px; text-align: center;"><input type="button" id="3dbutton_<?=$rnd?>" onclick="toggler_on('3dpreview'); loadPreview('<?=$skin['material']?>');" value="3D" disabled/>
+				<td style="width: 36px; text-align: center;"><input type="button" id="3dbutton_<?=$rnd?>" onclick="toggler_on('3dpreview'); loadPreview(settings,'<?=$skin['material']?>');" value="3D" disabled/>
 					<script type="text/javascript">
 						if (WGLSUPPORT) {
 							document.getElementById('3dbutton_<?=$rnd?>').disabled=false;

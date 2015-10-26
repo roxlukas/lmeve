@@ -11,16 +11,16 @@ settings.graphicFile = null;
 function checkwglsuprt() {
 		  if (!window.WebGLRenderingContext) {
 			  //window.alert("Cannot create WebGLRenderingContext. WebGL disabled.");
-			  console.log('WebGL is NOT supported! (Cannot create WebGLRenderingContext)'); return false;   
+			  console.log('WebGL is NOT supported! (Cannot create WebGLRenderingContext)');return false;   
 		  }
 		  var canvas = document.getElementById(settings.canvasID);
 		  var experimental = false;
-		  try { gl = canvas.getContext("webgl"); }
-		  catch (x) { gl = null; }
+		  try {gl = canvas.getContext("webgl");}
+		  catch (x) {gl = null;}
 		  
 		  if (gl == null) {
-				try { gl = canvas.getContext("experimental-webgl"); experimental = true; }
-				catch (x) { console.log('Experimental WebGL is NOT supported (experimental-webgl)'); return false; }
+				try {gl = canvas.getContext("experimental-webgl");experimental = true;}
+				catch (x) {console.log('Experimental WebGL is NOT supported (experimental-webgl)');return false;}
 				if (!gl) {
                                         console.log('WebGL is NOT supported! (canvas.getContext==false)');
 					return false;
@@ -34,7 +34,7 @@ var scene = null,
 ship = null,
 WGLSUPPORT = checkwglsuprt();
 	
-function loadPreview(skin) {
+function loadPreview(settings,skin) {
     if (skin=='default' || !skin ) skin=settings.sofFactionName;
     if (scene != null) {
             if (ship != null) scene.removeObject(ship);
@@ -49,13 +49,13 @@ function loadPreview(skin) {
     camera.minDistance = 10;
     camera.maxDistance = 10000;
     camera.fov = 30;
-    if (settings.volume==0 && (settings.categoryID==3 || settings.categoryID==2) ) camera.distance=100000; else
-    if (settings.volume<=1000) camera.distance=30; else 
-    if ((settings.volume>1000) && (settings.volume<6000)) camera.distance=50; else
-    if ((settings.volume>=6000) && (settings.volume<29000)) camera.distance=150; else
-    if ((settings.volume>=29000) && (settings.volume<50000)) camera.distance=250; else
-    if ((settings.volume>=50000) && (settings.volume<120000)) camera.distance=500; else
-    if ((settings.volume>=120000) && (settings.volume<600000)) camera.distance=1600; else
+    if (settings.volume==0 && (settings.categoryID==3 || settings.categoryID==2) ) camera.distance=100000;else
+    if (settings.volume<=1000) camera.distance=30;else 
+    if ((settings.volume>1000) && (settings.volume<6000)) camera.distance=50;else
+    if ((settings.volume>=6000) && (settings.volume<29000)) camera.distance=150;else
+    if ((settings.volume>=29000) && (settings.volume<50000)) camera.distance=250;else
+    if ((settings.volume>=50000) && (settings.volume<120000)) camera.distance=500;else
+    if ((settings.volume>=120000) && (settings.volume<600000)) camera.distance=1600;else
     if ((settings.volume>=600000)) camera.distance=2500;
     camera.rotationX = 0.5;
     camera.rotationY = 0.1;
@@ -87,6 +87,26 @@ function loadPreview(skin) {
             ship.setTransform(shipTransform);*/
     };
 
+}
+
+function loadTurret(index, resource) {
+    //console.log('loadTurret('+index+', '+resource+')');
+    if (scene != null) {
+        if (ship != null) {
+            if (ship.isLoaded()) {
+                if (index <= ship.getTurretSlotCount()) {
+                    ship.mountTurret(index,resource);
+                    return true;
+                }
+            } else {
+                console.log('loadTurret('+index+', '+resource+') ship is still loading, will retry in a moment...');
+                window.setTimeout(setTimeout(function() {
+                    loadTurret(index, resource);
+                },1000));
+            }
+        }
+    }
+    return false;
 }
 					
 function togglefull() {

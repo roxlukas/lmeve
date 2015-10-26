@@ -20,6 +20,7 @@ function getKill($killID) {
         $kill=$kills[0];
         $kill['involved']=getAttackers($killID);
         $kill['items']=getDestroyedItems($killID);
+        $kill['graphics']=getDestroyedItems($killID,TRUE);
         return $kill;
     } else return FALSE;
 }
@@ -51,15 +52,35 @@ function getAttackers($killID) {
     return db_asocquery($sql);
 }
 
-function getDestroyedItems($killID) {
+function getDestroyedItems($killID,$getGraphics=FALSE) {
     global $LM_EVEDB;
-    $sql="SELECT aki.*,itp.`typeName`,igp.`groupID`,igp.`groupName`,igp.`categoryID` FROM `apikillitems` aki
-    JOIN `$LM_EVEDB`.`invTypes` itp
-    ON aki.`typeID`=itp.`typeID`
-    JOIN `$LM_EVEDB`.`invGroups` igp
-    ON itp.`groupID`=igp.`groupID`
-    WHERE `killID`=$killID
-    ORDER BY `flag`;";
+    if ($getGraphics===TRUE) {
+        $sql="SELECT aki.*,itp.`typeName`,igp.`groupID`,igp.`groupName`,igp.`categoryID`,ygi.`graphicFile`,cmp.`averagePrice` 
+        FROM `apikillitems` aki
+        JOIN `$LM_EVEDB`.`invTypes` itp
+        ON aki.`typeID`=itp.`typeID`
+        JOIN `$LM_EVEDB`.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+        JOIN `$LM_EVEDB`.`yamlTypeIDs` yti
+        ON aki.`typeID`=yti.`typeID`
+        JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
+        ON yti.`graphicID`=ygi.`graphicID`
+        LEFT JOIN `crestmarketprices` cmp
+        ON aki.`typeID`=cmp.`typeID`
+        WHERE `killID`=$killID AND ygi.`graphicFile` IS NOT NULL AND aki.`flag` BETWEEN 27 AND 34
+        ORDER BY `flag`;";
+    } else {
+        $sql="SELECT aki.*,itp.`typeName`,igp.`groupID`,igp.`groupName`,igp.`categoryID`,cmp.`averagePrice` 
+        FROM `apikillitems` aki
+        JOIN `$LM_EVEDB`.`invTypes` itp
+        ON aki.`typeID`=itp.`typeID`
+        JOIN `$LM_EVEDB`.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+        LEFT JOIN `crestmarketprices` cmp
+        ON aki.`typeID`=cmp.`typeID`
+        WHERE `killID`=$killID
+        ORDER BY `flag`;";
+    }
     //$items=killMailToInventory(db_asocquery($sql));
     $items=db_asocquery($sql);
     //echo("<pre>".var_dump($items)."</pre>");
@@ -208,7 +229,7 @@ function killMailToInventory($kill_items) {
 function showKills($kills) {
     ?>
     <center>
-    <table class="lmframework" style="width: 95%; min-width: 600px;">
+    <table class="lmframework" style="width: 95%; min-width: 600px; max-width: 1280px;">
     <?php
     if(count($kills)>0) {
         ?><tr><th>Date</th><th></th><th>Location</th><th colspan="2">Victim</th><th colspan="2">Final Blow</th></tr><?php
@@ -312,12 +333,40 @@ function showInvolved($involved) {
     <?php
 }
 
+function getAveragePrice($typeID) {
+    if (empty($typeID)) return FALSE;
+    global $LM_EVEDB;
+        $sql="SELECT `typeID`,`averagePrice` 
+        FROM `crestmarketprices` cmp
+        WHERE `typeID`=$typeID;";
+    $ret=db_asocquery($sql);
+    if (count($ret)>0) return $ret[0]['averagePrice']; else return FALSE;
+}
+
+function getFinalBlowCharID($attackers) {
+    if (count($attackers)>0) {
+        foreach ($attackers as $attacker) {
+            if ($attacker['finalBlow']==1) return $attacker['characterID'];
+        }
+    } else return FALSE;
+}
+
 function showVictim($victim) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
+    $items=$victim['items'];
     ?>
     <table class="lmframework" style="min-width: <?=getKbMinWidth()?>;">
     <?php
     if(count($victim)>0) {
+        $iskLost=0;
+        $iskDropped=0;
+        $iskShip=getAveragePrice($victim['shipTypeID']);
+        if (count($items)>0) {
+            foreach($items as $item) {
+                $iskLost+=$item['qtyDestroyed']*$item['averagePrice'];
+                $iskDropped+=$item['qtyDropped']*$item['averagePrice'];
+            }
+        }
         ?><tr><th colspan="3">Victim</th><th>Damage</th></tr>
             <tr>
             <?php showCharacter($victim,TRUE,TRUE); ?>
@@ -337,6 +386,22 @@ function showVictim($victim) {
                 <th style="text-align: right;" colspan="2">Time:</th>
                 <td style="text-align: left;" colspan="2"><?=$victim['killTime']?></td>
             </tr>
+            <tr>
+                <th style="text-align: right;" colspan="2">Dropped:</th>
+                <td style="text-align: left;" colspan="2"><?=number_format($iskDropped, 0, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td>
+            </tr>
+            <tr>
+                <th style="text-align: right;" colspan="2">Destroyed:</th>
+                <td style="text-align: left;" colspan="2"><span style="color: red;"><?=number_format($iskLost+$iskShip, 0, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</span></td>
+            </tr>
+            
+            <tr>
+                <th style="text-align: right;" colspan="2">Total:</th>
+                <th style="text-align: left;" colspan="2"><?=number_format($iskDropped+$iskLost+$iskShip, 0, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
+            </tr>
+            <tr>
+                <th style="text-align: right;" colspan="4"><a href="https://public-crest.eveonline.com/killmails/<?=$victim['killID']?>/<?=killmail_hash($victim['characterID'], getFinalBlowCharID($victim['involved']), $victim['shipTypeID'], $victim['killTime'])?>/" target="_blank" style="color: green;"><img src="ccp_icons/38_16_193.png" alt="" style="vertical-align: middle;"/> CREST verified</a></th>
+            </tr>
             <?php
         
     } else {
@@ -353,7 +418,7 @@ function showKill($kill) {
         return FALSE;
     }
     ?>
-    <table style="width: 100%"><tr><td style="width: 636px; vertical-align: top;">
+    <table style="width: 100%; max-width: 1280px;"><tr><td style="width: 636px; vertical-align: top;">
     <?php
         showInventoryFitting($kill['items'], $kill['shipTypeID'],TRUE);
     ?>
@@ -364,6 +429,21 @@ function showKill($kill) {
     ?>
     </td></tr></table>
     <?php
+    generateTurretCode($kill['graphics']);
+}
+
+function generateTurretCode($graphics) {
+    $index=1;
+    if (count($graphics)>0) {
+        ?><script type="text/javascript">
+        <?php
+        foreach ($graphics as $turret) {
+            ?>
+                loadTurret(<?=$index++?>, '<?=$turret['graphicFile']?>');
+            <?php
+        }
+        ?></script><?php
+    }
 }
 
 function showSummary($kills) {

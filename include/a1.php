@@ -304,7 +304,7 @@ if ($model=getResourceFromYaml($nr)) {
 <?php echo($item['typeName']);
 if ($model) {
     ?>
-    <input type="button" id="3dbutton_main" onclick="toggler('3dpreview'); loadPreview('default');" value="3D" disabled/>
+    <input type="button" id="3dbutton_main" onclick="toggler('3dpreview'); loadPreview(settings,'default');" value="3D" disabled/>
     <script type="text/javascript">
         if (WGLSUPPORT) {
             document.getElementById('3dbutton_main').disabled=false;

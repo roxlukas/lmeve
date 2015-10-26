@@ -303,7 +303,9 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
         settings.volume = <?=$item['volume']?>;
         settings.graphicFile = '<?=$model['graphicFile']?>';
         if (WGLSUPPORT && settings.categoryID==6) {
-            loadPreview('default');
+            loadPreview(settings,'default');
+            
+            
         }
     </script>
     <?php
