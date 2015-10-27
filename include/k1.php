@@ -40,5 +40,9 @@ include_once('inventory.php');
 </div>
 <?php
     $killID=secureGETnum('killID');
+    if (empty($killID)) {
+        echo("killID cannot be empty.");
+        return;
+    }
     showKill(getKill($killID));
 ?>

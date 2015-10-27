@@ -147,6 +147,10 @@ function page_singlekill() {
     <center>
     <?php
         $killID=secureGETnum('killID');
+        if (empty($killID)) {
+            echo("killID cannot be empty.");
+            return;
+        }
         showKill(getKill($killID));
     ?></center><?php
 }

@@ -67,7 +67,7 @@ function getDestroyedItems($killID,$getGraphics=FALSE) {
         ON yti.`graphicID`=ygi.`graphicID`
         LEFT JOIN `crestmarketprices` cmp
         ON aki.`typeID`=cmp.`typeID`
-        WHERE `killID`=$killID AND ygi.`graphicFile` IS NOT NULL AND aki.`flag` BETWEEN 27 AND 34
+        WHERE `killID`=$killID AND igp.`categoryID`=7 AND ygi.`graphicFile` IS NOT NULL AND aki.`flag` BETWEEN 27 AND 34
         ORDER BY `flag`;";
     } else {
         $sql="SELECT aki.*,itp.`typeName`,igp.`groupID`,igp.`groupName`,igp.`categoryID`,cmp.`averagePrice` 
