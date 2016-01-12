@@ -1,5 +1,5 @@
 <?php
-$POLLER_VERSION="21";
+$POLLER_VERSION="27";
 $POLLER_MAX_TIME=900;
 set_time_limit($POLLER_MAX_TIME-20); //poller can work for up to 15 minutes 
 //(minus 20 seconds so the next cron cycle can work correctly), afterwards it should die
@@ -28,481 +28,20 @@ $MAX_ERRORS=10; //ignore first x errors
  * $CREST_BASEURL="http://public-crest-sisi.testeveonline.com";
  */
 $API_BASEURL="https://api.eveonline.com"; 
-$CREST_BASEURL="http://public-crest.eveonline.com";
+$CREST_BASEURL="https://public-crest.eveonline.com";
 $USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
+$FEED_URL_PROBLEM="Can't get CREST url from CREST root.";
 
-date_default_timezone_set('Europe/Warsaw');
+date_default_timezone_set(@date_default_timezone_get());
 //set_include_path("$mypath/../include");
 include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
+include_once("$mypath/../include/configuration.php");
+include_once("$mypath/../include/killboard.php");
 
-function microtime_float()
-{
-    list($usec, $sec) = explode(" ", microtime());
-    return ((float)$usec + (float)$sec);
-}
-
-function critical($origin,$error) {
-	global $mylog,$mylock;
-	$message="[CRITICAL] $origin: $error\n";
-	loguj($mylog,$message);
-	die($message);	
-}
-
-function warning($origin,$errorText) {
-	global $mylog;
-	$message="[WARNING] $origin: $errorText\n";
-	echo($message);
-	loguj($mylog,$message);	
-}
-
-function inform($origin,$errorText) {
-	global $mylog;
-	$message="[INFORM] $origin: $errorText\n";
-	echo($message);
-	loguj($mylog,$message);	
-}
-
-function apiCheckStatus($keyID,$fileName) {
-//checks if there are ANY entries in apistatus table
-	if (db_count("SELECT * FROM `apistatus` WHERE keyID='$keyID' AND fileName='$fileName';")>0) {
-		return true;  //returns true when there are enes
-	} else {
-		return false; //returns false if there have been no entries
-	}
-}
-
-function apiCheckWarnings($keyID,$fileName) {
-//checks if there are TEMPORARY ERROR entries in apistatus table
-	if (db_count("SELECT * FROM `apistatus` WHERE errorCode>=500 AND keyID='$keyID' AND fileName='$fileName';")>0) {
-		return true;  //returns true when there are temporary errors
-	} else {
-		return false; //returns false if there have been no temporary errors
-	}
-}
-
-function apiCheckErrors($keyID,$fileName) {
-//checks if there are UNRECOVERABLE ERROR entries in apistatus table
-    global $MAX_ERRORS;
-	if (db_count("SELECT * FROM `apistatus` WHERE errorCode>0 AND errorCode<500 AND errorCount >= $MAX_ERRORS AND keyID='$keyID' AND fileName='$fileName';")>0) {
-		return true;  //returns true when there are unrecoverable errors
-	} else {
-		return false; //returns false if there have been no unrecoverable errors
-	}
-}
-
-function apiSaveWarning($keyID,$error,$fileName) {
-	$attrs=$error->attributes();
-	$errorCode=$attrs->code;
-	$errorMessage=$error;
-	if (!apiCheckStatus($keyID,$fileName)) {
-		db_uquery("INSERT INTO `apistatus` VALUES (DEFAULT,'$keyID','$fileName',NOW(),$errorCode,1,'$errorMessage');");
-	} else {
-                if ($errorCode > 0) {
-                    $errcount='errorCount+1';
-                } else {
-                    $errcount='0';
-                }
-                if (!(strtolower($errorMessage)==='cached')) {
-                    $setdate='date=NOW(),';
-                } else {
-                    $setdate='';
-                }
-		db_uquery("UPDATE `apistatus` SET $setdate errorCode=$errorCode, errorCount=$errcount, errorMessage='$errorMessage' WHERE keyID='$keyID' AND fileName='$fileName';");
-	}
-	if ($errorCode > 0)	warning($fileName,"ERROR $errorCode: $errorMessage");
-}
-
-function apiSaveOK($keyID,$fileName) {
-	if (!apiCheckStatus($keyID,$fileName)) {
-		db_uquery("INSERT INTO `apistatus` VALUES (DEFAULT,'$keyID','$fileName',NOW(),0,0,'OK');");
-	} else {
-		db_uquery("UPDATE `apistatus` SET date=NOW(), errorCode=0, errorCount=0, errorMessage='OK' WHERE keyID='$keyID' AND fileName='$fileName';");
-	}
-}
-
-function lock_check($lock) {
-	if (file_exists($lock)) {
-		return true;
-	} else {
-		return false;	
-	}
-}
-
-function lock_set($lock) {
-	if (!lock_check($lock)) {
-		touch($lock);
-		return true;
-	} else {
-		return false;
-	}
-}
-
-function lock_unset($lock) {
-	if (lock_check($lock)) {
-		unlink($lock);
-		return true;
-	} else {
-		return false;
-	}
-} 
-
-function cache_file($url, $cache, $interval) { //DEPRECATED, do not use!
-	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
-	//thus we cut 20 seconds
-	if ($interval>20) $interval=$interval-20;
-	
-	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
-   		$data = file_get_contents($cache);
-	} else {
-   		$data = file_get_contents($url);
-   		if ($data===false) {
-			//http errors
-   		} else {
-   		   	file_put_contents($cache, $data, LOCK_EX);
-   		}
-	}
-}
-
-function get_xml_contents($url, $cache, $interval) {
-	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
-	//thus we cut 20 seconds
-	if ($interval>20) $interval=$interval-20;
-	global $httplog,$USER_AGENT;
-	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
-   		$data = file_get_contents($cache);
-		$xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="0">Cached</error><cachedUntil></cachedUntil></eveapi>');
-	} else {
-                 $ctx = stream_context_create(array(
-                        'http' => array (
-                            'ignore_errors' => TRUE,
-                            'method'=>"GET",
-                            'header'=>"User-Agent: $USER_AGENT\r\n"
-                         )
-                    ));
-                $data=file_get_contents($url, FALSE, $ctx); 
-   		//$data = file_get_contents($url);
-   		//if ($data === false) {
-                if (!empty($http_response_header)) {
-                    $http_parse=explode(' ',$http_response_header[0]);
-                    $http_code=$http_parse[1];
-                    if ($http_code!=200) {
-                            //http errors
-                            if (empty($http_code)) $http_code=500;
-                            $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="'.$http_code.'">HTTP ERROR! Return code: '.$http_response_header[0].'</error><cachedUntil></cachedUntil></eveapi>');
-                            //additional logging!!
-                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
-                    } else {
-                            file_put_contents($cache, $data, LOCK_EX);
-                            $xml_data = simplexml_load_file( $cache );
-                            if ($xml_data === false) {
-                                    //parser errors
-                                    $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="500">XML Parser error </error><cachedUntil></cachedUntil></eveapi>');
-                            }
-                    }
-                } else {
-                    //network problem?
-                    $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="500">NETWORK PROBLEM!</error><cachedUntil></cachedUntil></eveapi>');
-                    loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nNETWORK PROBLEM!\r\n");
-                }
-   	}
-	return $xml_data;
-}
-
-class crestError {
-    private $errorCode=0;
-    private $errorText='';
-    public $error='';
-   
-    public function __toString () {
-        return $this->errorText;
-    }
-    
-    public function getErrorCode() {
-        return $this->errorCode;
-    }
-
-    public function setErrorCode($errorCode) {
-        $this->errorCode = $errorCode;
-    }
-
-    public function getErrorText() {
-        return $this->errorText;
-    }
-
-    public function setErrorText($errorText) {
-        $this->errorText = $errorText;
-    }
-
-    public function __construct($errorCode, $errorText) {
-        $this->setErrorCode($errorCode);
-        $this->setErrorText($errorText);
-        $this->error=$errorText;
-    }
-    
-    public function attributes() {
-        $ret = new stdClass();
-        $ret->code=$this->getErrorCode();
-        return $ret;
-    }
-}
-
-function get_crest_contents($url, $cache, $interval) {
-	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
-	//thus we cut 20 seconds
-	if ($interval>20) $interval=$interval-20;
-	global $httplog,$USER_AGENT;
-	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
-   		$data = file_get_contents($cache);
-                $ret=new crestError(0,'Cached');
-                return $ret;
-	} else {
-                 $ctx = stream_context_create(array(
-                        'http' => array (
-                            'ignore_errors' => TRUE,
-                            'method'=>"GET",
-                            'header'=>"User-Agent: $USER_AGENT\r\n"
-                         )
-                    ));
-                $data=file_get_contents($url, FALSE, $ctx); 
-   		//$data = file_get_contents($url);
-   		//if ($data === false) {
-                if (!empty($http_response_header)) {
-                    $http_parse=explode(' ',$http_response_header[0]);
-                    $http_code=$http_parse[1];
-                    if ($http_code!=200) {
-                            //http errors
-                            if (empty($http_code)) {
-                                $ret=new crestError($http_code,'HTTP Errors');
-                                return $ret;
-                            }
-                            //additional logging!!
-                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
-                    } else {
-                            file_put_contents($cache, $data, LOCK_EX);
-                    }
-                } else {
-                    //network problem?
-                    loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nNETWORK PROBLEM!\r\n");
-                    $ret=new crestError(500,'Network problems');
-                    return $ret;
-                }
-   	}
-	$json_data = json_decode($data);
-        return $json_data;
-}
-/*
-PHP Warning:  file_get_contents($API_BASEURL/account/APIKeyInfo.xml.aspx?keyID=1141058&vCode=zd6cxEv98sMKyxOTwRiqkh3fYRGlYiDPBBEGVNM5vcwGTWSn6jPLb5KVuTEkWpPL): 
- * failed to open stream: php_network_getaddresses: getaddrinfo failed: No address associated with hostname in /home/lukas/lmeve/bin/poller.php on line 157
-PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 160
-PHP Notice:  Undefined offset: 1 in /home/lukas/lmeve/bin/poller.php on line 161
-PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 164
-PHP Notice:  Undefined variable: http_response_header in /home/lukas/lmeve/bin/poller.php on line 166
-<br><table class="error"><tr><td>Error in query: UPDATE `apistatus` SET date=NOW(), errorCode=, errorCount=0, errorMessage='HTTP ERROR! Return code: ' WHERE keyID='1141058' AND fileName='APIKeyInfo.xml';<br />MySQL reply: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ' errorCount=0, errorMessage='HTTP ERROR! Return code: ' WHERE keyID='1141058' AN' at line 1</td></tr></table><input type="button" value="&lt; Back" onclick="history.back();">
- */
-
-function load_apikeys_from_file() { //DEPRECATED
-	$handle=fopen($myconfig,"r");
-	if ($handle) {
-		while (($buffer = fgets($handle, 1024)) !== false) {
-			$api_line=explode("\t",$buffer);
-			$api_keys[$i]['keyID']=$api_line[0];
-			$api_keys[$i]['vCode']=$api_line[1];
-		}
-		if (!feof($handle)) {
-			critical("Main","Error while reading configuration");
-		}
-		fclose($handle);
-	}
-	return $api_keys;
-}
-
-function ins_string($string) {
-	$out="'".addslashes($string)."'";
-	return $out;
-}
-
-function load_apikeys_from_db() {
-	$api_keys=db_asocquery("SELECT keyID,vCode FROM cfgapikeys;");
-	return $api_keys;
-}
-
-function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=0 - root node
-		foreach ($rowset as $row) {
-			$attrs=$row->attributes();
-
-			if ($parentID==0)	{ 				//if root node
-				$locID=$attrs->locationID;  //then take locationID of the row
-				$parID=0;					//set parentID=0
-			} else {
-				$locID=$locationID; 		//otherwise take locationID of the parent
-				$parID=$parentID;			//and set parentID as ID of the parent
-			}
-			
-			if (isset($attrs->rawQuantity)) {
-				$rawQuantity=$attrs->rawQuantity;
-			} else {
-				$rawQuantity='NULL';
-			}
-			
-			$sql="INSERT INTO `apiassets` VALUES(".
-			$attrs->itemID.",".
-			$parID.",".
-			$locID.",".
-			$attrs->typeID.",".
-			$attrs->quantity.",".
-			$attrs->flag.",".
-			$attrs->singleton.",".
-			$rawQuantity.",".
-			$corporationID.
-			");";
-			db_uquery($sql);
-			//echo($attrs->itemID.",".$locID."\r\n");
-			if (isset($row->rowset)) {
-				//echo("HAS CONTENTS!\r\n");
-				insertAssets($row->rowset->row,$attrs->itemID,$locID,$corporationID);
-			}
-		}
-	}
-        
-         
-       function criusInsert($attrs,$corporationID) {
-           global $LM_EVEDB;
-           //FIELD TRANSLATION
-                                
-                                if ($attrs->productTypeID != 0) {
-                                    $productTypeID=$attrs->productTypeID;
-                                } else {
-                                    switch($attrs->activityID) {
-                                        case 1:
-                                            //inform("IndustryJobs.xml", "Looking up productTypeID");
-                                            $dbq=db_asocquery("SELECT `productTypeID` FROM `$LM_EVEDB`.`yamlBlueprintProducts` WHERE `blueprintTypeID`=".$attrs->blueprintTypeID." AND `activityID`=1;");
-                                            $productTypeID=$dbq[0]['productTypeID'];
-                                            //inform("IndustryJobs.xml", "productTypeID=$productTypeID");
-                                            break;
-                                        default:
-                                            $productTypeID=$attrs->blueprintTypeID;
-                                            break;
-                                    }
-                                    
-                                }
-           //// INSERT TO CRIUS TABLE
-				$sql="INSERT INTO apiindustryjobscrius VALUES (".
-				$attrs->jobID.",".
-                                $attrs->installerID.",".
-                                ins_string($attrs->installerName).",".
-                                $attrs->facilityID.",".
-                                $attrs->solarSystemID.",".
-                                ins_string($attrs->solarSystemName).",".
-                                $attrs->stationID.",".
-                                $attrs->activityID.",".
-                                $attrs->blueprintID.",".
-                                $attrs->blueprintTypeID.",".
-                                ins_string($attrs->blueprintTypeName).",".
-                                $attrs->blueprintLocationID.",".
-                                $attrs->outputLocationID.",".
-                                $attrs->runs.",".
-                                $attrs->cost.",".
-                                $attrs->teamID.",".
-                                $attrs->licensedRuns.",".
-                                $attrs->probability.",".
-                                $productTypeID.",".
-                                ins_string($attrs->productTypeName).",".
-                                $attrs->status.",".
-                                $attrs->timeInSeconds.",".
-                                ins_string($attrs->startDate).",".
-                                ins_string($attrs->endDate).",".
-                                ins_string($attrs->pauseDate).",".
-                                ins_string($attrs->completedDate).",".
-                                $attrs->completedCharacterID.",".
-                                $attrs->successfulRuns.",".
-				$corporationID.
-				") ON DUPLICATE KEY UPDATE".
-				" status=".$attrs->status.
-				",completedDate=".ins_string($attrs->completedDate).
-				",completedCharacterID=".$attrs->completedCharacterID.
-                                ",successfulRuns=".$attrs->successfulRuns.
-                                ",productTypeID=".$attrs->productTypeID.
-                                ",productTypeName=".ins_string($attrs->productTypeName);
-				db_uquery($sql);
-//// INSERT TO COMPATIBILITY TABLE
-                                
-                                
-                                switch($attrs->status) {
-                                    case 1: //in progress
-                                        $completed=0;
-                                        $completedSuccessfully=0;
-                                        $completedStatus=0;
-                                        break;
-                                    case 104: //finished
-                                        $completed=1;
-                                        $completedSuccessfully=0;
-                                        $completedStatus=1;
-                                        break;
-                                    case 105: //failed
-                                        $completed=1;
-                                        $completedSuccessfully=0;
-                                        $completedStatus=0;
-                                        break;
-                                    case 101: //phoebe
-                                        $completed=1;
-                                        $completedSuccessfully=0;
-                                        $completedStatus=0;
-                                        break;
-                                    default:
-                                        $completed=0;
-                                        $completedSuccessfully=0;
-                                        $completedStatus=0;
-                                }
-                                
-                                //QUERY
-                                $sql2="INSERT INTO apiindustryjobs VALUES (".
-				$attrs->jobID.",".
-				$attrs->facilityID.",".
-				$attrs->blueprintLocationID.",".
-				$attrs->blueprintID.",".
-				$attrs->blueprintLocationID.",".
-				"1,".
-				"0,".
-				"0,".
-				$attrs->licensedRuns.",".
-				$attrs->outputLocationID.",".
-				$attrs->installerID.",".
-				$attrs->runs.",".
-				$attrs->licensedRuns.",".
-				$attrs->solarSystemID.",".
-				$attrs->blueprintLocationID.",".
-				"0,".
-				"0,".
-				"0,".
-				"0,".
-				$attrs->blueprintTypeID.",".
-				$productTypeID.",".
-				"0,".
-				"0,".
-				$completed.",".
-				$completedSuccessfully.",".
-                                $attrs->successfulRuns.",".
-				"0,".
-				"0,".
-				$attrs->activityID.",".
-				$completedStatus.",".
-				ins_string($attrs->startDate).",".
-				ins_string($attrs->startDate).",".
-				ins_string($attrs->endDate).",".
-				ins_string($attrs->pauseDate).",".
-				$corporationID.
-				") ON DUPLICATE KEY UPDATE".
-				" completed=".$completed.
-				",completedSuccessfully=".$completedSuccessfully.
-				",completedStatus=".$completedStatus.
-                                ",successfulRuns=".$attrs->successfulRuns.
-                                ",outputTypeID=".$productTypeID;
-				db_uquery($sql2);
-       }
-       
+include_once('libpoller.php');       
 
 /*************************************************************************************************/
 
@@ -919,6 +458,127 @@ foreach ($api_keys as $api_key) {
 	} else {
 		warning("StarbaseList.xml",$FEED_BLOCKED);
 	}
+        
+        //StarbaseDetails.
+	//First: max_value = SELECT MAX(`contractID`) FROM `apicontractitems`;
+	//If null, then = 0
+	//Then: SELECT `contractID` FROM apicontracts WHERE `contractID` > max_value;
+	//for each contract - fetch items, inert to DB
+	//maybe it will work without php checking? i.e. max_value as sub query?
+	//it works!! if there is a not-null value. A record with all zeros will do just fine.
+	//ContractItems: $API_BASEURL/corp/ContractItems.xml.aspx
+	//Parameters	 userID, apiKey, contractID 
+	//Cache Time (minutes)	 15
+	$starbases=db_asocquery("SELECT `itemID` FROM apistarbaselist WHERE `corporationID`=$corporationID;");
+	if (sizeof($starbases) > 0) {
+		foreach($starbases as $starbase) {
+			$itemID=$starbase['itemID'];
+			if (!apiCheckErrors($keyid,"StarbaseDetail.xml")) {
+				$stb=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID=${keyid}&vCode=${vcode}&itemID=$itemID","${mycache}/StarbaseDetail_${keyid}_${itemID}.xml",0);
+				if (isset($stb->error)) {
+					apiSaveWarning($keyid,"Error for starbase itemID=${itemID}: ".$stb->error,"StarbaseDetail.xml");
+				} else {
+                                        $state=$stb->result->state;
+                                        $stateTimestamp=$stb->result->stateTimestamp;
+                                        $onlineTimestamp=$stb->result->onlineTimestamp;
+                                        $usageFlags=$stb->result->generalSettings->usageFlags;
+                                        $deployFlags=$stb->result->generalSettings->deployFlags;
+                                        $allowCorporationMembers=$stb->result->generalSettings->allowCorporationMembers;
+                                        $allowAllianceMembers=$stb->result->generalSettings->allowAllianceMembers;
+                                        $attrs=$stb->result->combatSettings->useStandingsFrom->attributes();
+                                            $useStandingsFrom=$attrs->ownerID;
+                                        $attrs=$stb->result->combatSettings->onStandingDrop->attributes();
+                                            $onStandingDrop=$attrs->standing;
+                                        $attrs=$stb->result->combatSettings->onStatusDrop->attributes();
+                                            $onStatusDrop=$attrs->enabled;
+                                            $onStatusDropStanding=$attrs->standing;
+                                        $attrs=$stb->result->combatSettings->onAggression->attributes();
+                                            $onAggression=$attrs->enabled;
+                                        $attrs=$stb->result->combatSettings->onCorporationWar->attributes();
+                                            $onCorporationWar=$attrs->enabled;
+                                        //BIG SQL INSERT
+                                        $sql="INSERT INTO apistarbasedetail VALUES (".
+                                        $itemID.",".
+                                        $state.",".
+                                        ins_string($stateTimestamp).",".
+                                        ins_string($onlineTimestamp).",".
+                                        $usageFlags.",".
+                                        $deployFlags.",".
+                                        $allowCorporationMembers.",".
+                                        $allowAllianceMembers.",".
+                                        $useStandingsFrom.",".
+                                        $onStandingDrop.",".
+                                        $onStatusDrop.",".
+                                        $onStatusDropStanding.",".
+                                        $onAggression.",".
+                                        $onCorporationWar.",".
+                                        $corporationID.
+                                        ") ON DUPLICATE KEY UPDATE".
+                                            " `state`=".$state.
+                                            ",`stateTimestamp`=".ins_string($stateTimestamp).
+                                            ",`onlineTimestamp`=".ins_string($onlineTimestamp).
+                                            ",`usageFlags`=".$usageFlags.
+                                            ",`deployFlags`=".$deployFlags.
+                                            ",`allowCorporationMembers`=".$allowCorporationMembers.
+                                            ",`allowAllianceMembers`=".$allowAllianceMembers.
+                                            ",`useStandingsFrom`=".$useStandingsFrom.
+                                            ",`onStandingDrop`=".$onStandingDrop.
+                                            ",`onStatusDrop`=".$onStatusDrop.
+                                            ",`onStatusDropStanding`=".$onStatusDropStanding.
+                                            ",`onAggression`=".$onAggression.
+                                            ",`onCorporationWar`=".$onCorporationWar.';';
+                                        db_uquery($sql);
+                                        //FUEL
+					$rows=$stb->result->rowset->row; //fuel
+					foreach ($rows as $row) {
+						$attrs=$row->attributes();
+						$sql="INSERT INTO apistarbasefuel VALUES (".
+						$itemID.",".
+						$attrs->typeID.",".
+						$attrs->quantity.",".
+						$corporationID.
+						") ON DUPLICATE KEY UPDATE".
+                                                    " quantity=".$attrs->quantity;
+						db_uquery($sql);
+					}
+					apiSaveOK($keyid,"StarbaseDetail.xml");
+				}
+			} else {
+				warning("StarbaseDetail.xml",$FEED_BLOCKED);
+			}	
+		}
+	}
+        
+        
+       /*
+<eveapi version="2">
+<currentTime>2015-03-23 15:25:14</currentTime>
+<result>
+<state>4</state>
+<stateTimestamp>2015-03-23 15:54:03</stateTimestamp>
+<onlineTimestamp>2014-03-03 16:47:13</onlineTimestamp>
+<generalSettings>
+<usageFlags>15</usageFlags>
+<deployFlags>0</deployFlags>
+<allowCorporationMembers>1</allowCorporationMembers>
+<allowAllianceMembers>0</allowAllianceMembers>
+</generalSettings>
+<combatSettings>
+<useStandingsFrom ownerID="xxxxxxxx"/>
+<onStandingDrop standing="0"/>
+<onStatusDrop enabled="0" standing="0"/>
+<onAggression enabled="0"/>
+<onCorporationWar enabled="1"/>
+</combatSettings>
+<rowset name="fuel" key="typeID" columns="typeID,quantity">
+<row typeID="4051" quantity="2899"/>
+<row typeID="16275" quantity="16666"/>
+<row typeID="24594" quantity="12663"/>
+</rowset>
+</result>
+<cachedUntil>2015-03-23 16:12:14</cachedUntil>
+</eveapi>
+        */
 	
 	//POCOS LIST: $API_BASEURL/corp/CustomsOffices.xml.aspx
 	//Parameters	 userID, apiKey, characterID
@@ -935,7 +595,7 @@ foreach ($api_keys as $api_key) {
 			$rows=$ppl->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();		
-				$sql="INSERT INTO `apipocolist` VALUES(".
+				$sql="INSERT IGNORE INTO `apipocolist` VALUES(".
 				$attrs->itemID.",".
 				$attrs->solarSystemID.",".
 				ins_string($attrs->solarSystemName).",".
@@ -1092,10 +752,15 @@ foreach ($api_keys as $api_key) {
 	//for each contract - fetch items, inert to DB
 	//maybe it will work without php checking? i.e. max_value as sub query?
 	//it works!! if there is a not-null value. A record with all zeros will do just fine.
+        //BUGFIX the loop below would fail if there were two corporation in LMeve with contract items to refresh
+        //       because there was no corporationID filter in the "SELECT" query
+        //       as a result, poller cycle for corp A would ask for corp A and corp B contracts
+        //       but API would fail for corp B contracts.
+        //       In the corp B cycle, API would fail for corp A contracts instead
 	//ContractItems: $API_BASEURL/corp/ContractItems.xml.aspx
 	//Parameters	 userID, apiKey, contractID 
 	//Cache Time (minutes)	 15
-	$contracts=db_asocquery("SELECT `contractID` FROM apicontracts WHERE `contractID` > (SELECT MAX(`contractID`) FROM `apicontractitems`) AND `type`!='Courier';");
+	$contracts=db_asocquery("SELECT `contractID` FROM apicontracts WHERE `corporationID`=$corporationID AND `contractID` > (SELECT MAX(`contractID`) FROM `apicontractitems`) AND `type`!='Courier';");
 	if (sizeof($contracts) > 0) {
 		foreach($contracts as $con) {
 			$contractID=$con['contractID'];
@@ -1206,8 +871,9 @@ foreach ($api_keys as $api_key) {
 			apiSaveWarning($keyid,$dat->error,"AssetList.xml");
 		} else {
 			inform("Main","Polling assets, this may take a while...");
-			db_uquery("DELETE FROM `apiassets` WHERE corporationID=$corporationID;");
+			db_uquery("DELETE FROM `apiassets` WHERE `corporationID`=$corporationID;");
 			insertAssets($dat->result->rowset->row,0,0,$corporationID);
+                        updateOfficeID($corporationID);
 			apiSaveOK($keyid,"AssetList.xml");
 		}
 	} else {
@@ -1243,6 +909,7 @@ foreach ($api_keys as $api_key) {
                     if (isset($dat->error)) {
                             apiSaveWarning($keyid,$dat->error,"Locations.xml");
                     } else {
+                        //itemID itemName x y z corporationID
                             db_uquery("DELETE FROM `apilocations` WHERE corporationID=$corporationID;");
                             $rows=$dat->result->rowset->row;
                             foreach ($rows as $row) {
@@ -1254,7 +921,12 @@ foreach ($api_keys as $api_key) {
                                     $attrs->y.",".
                                     $attrs->z.",".
                                     $corporationID.
-                                    ");";
+                                    ") ON DUPLICATE KEY UPDATE ".
+                                    "itemName=".ins_string($attrs->itemName).",".
+                                    "x=".$attrs->x.",".
+                                    "y=".$attrs->y.",".
+                                    "z=".$attrs->z.",".
+                                    "corporationID=".$corporationID.";";
                                     db_uquery($sql);
                             }
                             apiSaveOK($keyid,"Locations.xml");
@@ -1270,7 +942,7 @@ foreach ($api_keys as $api_key) {
 		if (isset($mtr->error)) {
 			apiSaveWarning($keyid,$mtr->error,"Blueprints.xml");
 		} else {
-			db_uquery("DELETE FROM apiblueprints WHERE corporationID=$corporationID;");
+			db_uquery("DELETE FROM `apiblueprints` WHERE `corporationID`=$corporationID;");
 			$rows=$mtr->result->rowset->row;
 			foreach ($rows as $row) {
 				$attrs=$row->attributes();
@@ -1336,15 +1008,132 @@ foreach ($api_keys as $api_key) {
 	//Base URL	$API_BASEURL/corp/Titles.xml.aspx
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
-	
+
 	//KILLBOARD: $API_BASEURL/corp/KillLog.xml.aspx
 	//Parameters	 userID, apiKey, beforeKillID, characterID
 	//Cache Time (minutes)	 60
         if (!apiCheckErrors($keyid,"KillLog.xml")) {
 		$klg=get_xml_contents("$API_BASEURL/corp/KillLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/KillLog_$keyid.xml",60*60);
+                //echo($klg);
                 if (isset($klg->error)) {
                       apiSaveWarning($keyid,$klg->error,"KillLog.xml");
-                }
+                }  else {
+			$kills=$klg->result->rowset->row;
+			if (count($kills)>0) foreach ($kills as $kill) {
+                            $finalBlowCharacterID=0;
+                            //var_dump($kill);
+				$a=$kill->attributes();
+                                $at=array();
+                                $i=array(); //XML kill items
+                                $v=$kill->victim->attributes();
+                                
+                                foreach ($kill->rowset as $rowset) {
+                                    $attr=$rowset->attributes();
+                                    switch ($attr['name']) {
+                                        case 'attackers':
+                                            $at=$rowset;
+                                            break;
+                                        case 'items':
+                                            $i=$rowset;
+                                            break;
+                                    }
+                                }
+                                
+                                $sql="SELECT COUNT(*) AS `count` FROM `apikills` WHERE `killID`=".$a->killID.";";
+                                $ret=db_asocquery($sql);
+                                $ret=$ret[0]['count'];
+                                //echo("ret=$ret\r\n");
+                                if ($ret>0) {
+                                    //inform('Killog.xml','KillID '.$a->killID.' already exists in db, skipping.');
+                                    continue; //skip the rest of the loop if kill already was in the db
+                                }
+                                
+				$sql="INSERT IGNORE INTO `apikills` VALUES( ".
+                                    $a->killID.",".
+                                    $a->solarSystemID.",".
+                                    ins_string($a->killTime).",".
+                                    $a->moonID.");";
+                                db_uquery($sql);
+                                 
+                                $sql="INSERT IGNORE INTO `apikillvictims` VALUES( ".
+                                    $a->killID.",".
+                                    $v->characterID.",".
+                                    ins_string($v->characterName).",".
+                                    $v->corporationID.",".
+                                    ins_string($v->corporationName).",".
+                                    $v->allianceID.",".
+                                    ins_string($v->allianceName).",".
+                                    $v->factionID.",".
+                                    ins_string($v->factionName).",".
+                                    $v->damageTaken.",".
+                                    $v->shipTypeID.");";
+				db_uquery($sql);
+  
+                                if (count($at)>0) foreach($at as $row) {
+                                    $attr=$row->attributes();
+                                    $sql="INSERT IGNORE INTO `apikillattackers` VALUES( ".
+                                        $a->killID.",".
+                                        $attr->characterID.",".
+                                        ins_string($attr->characterName).",".
+                                        $attr->corporationID.",".
+                                        ins_string($attr->corporationName).",".
+                                        $attr->allianceID.",".
+                                        ins_string($attr->allianceName).",".
+                                        $attr->factionID.",".
+                                        ins_string($attr->factionName).",".
+                                        $attr->securityStatus.",".
+                                        $attr->damageDone.",".
+                                        $attr->finalBlow.",".
+                                        $attr->weaponTypeID.",".
+                                        $attr->shipTypeID.");";
+                                    if ($attr->finalBlow==1) $finalBlowCharacterID=$attr->characterID;
+                                    db_uquery($sql);
+                                }
+                                
+                                //get kill items from CREST
+                                $killurl="$CREST_BASEURL/killmails/".$a->killID.'/'. killmail_hash($v->characterID, $finalBlowCharacterID, $v->shipTypeID, $a->killTime).'/';
+                                $crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail.json", 0);
+                                //$crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail_".$a->killID.".json", 0);
+                                
+                                if (isset($crest_killmail->victim->items) && getConfigItem('useCRESTkillmails', 'enabled')=='enabled') {
+                                    apiSaveOK(0,"CREST /killmails/");
+                                    //inform("Killog.xml","Using CREST killmail item list for killID=".$a->killID);
+                                    if (count($i)>0) foreach($crest_killmail->victim->items as $row) {
+                                        if (!isset($row->quantityDropped)) $row->quantityDropped=0;
+                                        if (!isset($row->quantityDestroyed)) $row->quantityDestroyed=0;
+                                        $sql="INSERT IGNORE INTO `apikillitems` VALUES( ".
+                                            $a->killID.",".
+                                            $row->itemType->id.",".
+                                            $row->flag.",".
+                                            $row->quantityDropped.",".
+                                            $row->quantityDestroyed.",".
+                                            $row->singleton.");";
+                                        db_uquery($sql);
+                                    }
+                                } else {
+                                    if (getConfigItem('useCRESTkillmails', 'enabled')!='enabled') {
+                                        warning("Killog.xml","FAILED fetching CREST killmail for killID=".$a->killID." URL=$killurl");
+                                        apiSaveWarning(0, $crest_killmail, "CREST /killmails/");
+                                    }
+                                    //warning("Killog.xml","DATA=".print_r($crest_killmail,TRUE));
+                                    //inform("Killog.xml","Using XML data for items.");
+                                    //inform("Killog.xml",print_r($kill,TRUE));
+                                    //if CREST call didn't work, use XML data instead (which is known to be incomplete)
+                                    if (count($i)>0) foreach($i as $row) {
+                                        $attr=$row->attributes();
+                                        $sql="INSERT IGNORE INTO `apikillitems` VALUES( ".
+                                            $a->killID.",".
+                                            $attr->typeID.",".
+                                            $attr->flag.",".
+                                            $attr->qtyDropped.",".
+                                            $attr->qtyDestroyed.",".
+                                            $attr->singleton.");";
+                                        db_uquery($sql);
+                                    }
+                                }
+			}
+			apiSaveOK($keyid,"KillLog.xml");
+		}
 	} else {
 		warning("KillLog.xml",$FEED_BLOCKED);
 	}
@@ -1522,28 +1311,68 @@ inform("Main","Polling public CREST feeds...");
 //Cache Time (minutes)	 23*60
 
 if (!apiCheckErrors(0,"CREST /market/prices/")) {
-	$dat=get_crest_contents("$CREST_BASEURL/market/prices/","${mycache}/crest_market_prices.xml",23*60*60);
-	if (isset($dat->error)) {
-		apiSaveWarning(0,$dat,"CREST /market/prices/");
-	} else {
-		db_uquery("DELETE FROM crestmarketprices WHERE true;");
-		$rows=$dat->items;
-		foreach ($rows as $row) {
-                    if (!isset($row->adjustedPrice)) $row->adjustedPrice=0.0;
-                    if (!isset($row->averagePrice)) $row->averagePrice=0.0;
-                    //typeID (type->id), adjustedPrice, averagePrice
-			$sql="INSERT INTO crestmarketprices VALUES(".
-			$row->type->id.",".
-			$row->adjustedPrice.",".
-                        $row->averagePrice.
-			");";
-			db_uquery($sql);
-		}
-                //var_dump($dat);
-		apiSaveOK(0,"CREST /market/prices/");
-	}
+        $crestroot=get_crest_root($CREST_BASEURL);
+        $urladdr=$crestroot->marketPrices->href;
+        //echo("DEBUG: urladdr=$urladdr\r\n");
+        if ($urladdr) {
+            $dat=get_crest_contents("$CREST_BASEURL/market/prices/","${mycache}/crest_market_prices.json",23*60*60);
+            if (isset($dat->error)) {
+                    apiSaveWarning(0,$dat,"CREST /market/prices/");
+            } else {
+                    db_uquery("TRUNCATE TABLE crestmarketprices;");
+                    $rows=$dat->items;
+                    foreach ($rows as $row) {
+                        if (!isset($row->adjustedPrice)) $row->adjustedPrice=0.0;
+                        if (!isset($row->averagePrice)) $row->averagePrice=0.0;
+                        //typeID (type->id), adjustedPrice, averagePrice
+                            $sql="INSERT INTO crestmarketprices VALUES(".
+                            $row->type->id.",".
+                            $row->adjustedPrice.",".
+                            $row->averagePrice.
+                            ");";
+                            db_uquery($sql);
+                    }
+                    //var_dump($dat);
+                    apiSaveOK(0,"CREST /market/prices/");
+            }
+        } else {
+            warning("CREST /market/prices/",$FEED_URL_PROBLEM);
+        }
 } else {
 	warning("CREST /market/prices/",$FEED_BLOCKED);
+}
+
+if (!apiCheckErrors(0,"CREST /industry/systems/")) {
+        $crestroot=get_crest_root($CREST_BASEURL);
+        $urladdr=$crestroot->industry->systems->href;
+        //echo("DEBUG: urladdr=$urladdr\r\n");
+        if ($urladdr) {
+            $dat=get_crest_contents($urladdr,"${mycache}/crest_industry_systems.json",1*60*60);
+            if (isset($dat->error)) {
+                    apiSaveWarning(0,$dat,"CREST /industry/systems/");
+            } else {
+                    db_uquery("TRUNCATE TABLE crestindustrysystems;");
+                    $rows=$dat->items;
+                    foreach ($rows as $row) {
+                        $solarsystemID=$row->solarSystem->id;
+                        foreach ($row->systemCostIndices as $sci) {
+                            $costIndex=$sci->costIndex;
+                            $activityID=$sci->activityID_str;
+                            //echo("$solarsystemID,$costIndex,$activityID\r\n");
+                            $sql="INSERT INTO crestindustrysystems VALUES(".
+                            $solarsystemID.",".
+                            $costIndex.",".
+                            $activityID.
+                            ");";
+                            db_uquery($sql);
+                        }
+                    }
+                    //var_dump($dat);
+                    apiSaveOK(0,"CREST /industry/systems/");
+            }
+	}
+} else {
+	warning("CREST /industry/systems/",$FEED_BLOCKED);
 }
 
 /******************** EVE-CENTRAL PUBLIC FEEDS **************************/
@@ -1554,6 +1383,7 @@ inform("Main","Polling eve-central.com feeds...");
 //Parameters	 typeID, usesystem=30000142
 //Cache Time (minutes)	 60
 $MAXTYPES=30;
+$useSystem=getConfigItem('marketSystemID', '30000142');
 $amountTypes=db_query("SELECT COUNT(*) FROM cfgmarket;");
 $amountTypes=$amountTypes[0][0];
 for ($i=0; $i < ceil($amountTypes / $MAXTYPES); $i++) {
@@ -1565,7 +1395,7 @@ for ($i=0; $i < ceil($amountTypes / $MAXTYPES); $i++) {
 	}
 	//echo("DEBUG: ".$TYPES."\r\n");
 	if (!apiCheckErrors(0,"eve-central.com")) {
-		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem=30000142${TYPES}","${mycache}/marketstat_$i.xml",60*60);
+		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem=${useSystem}${TYPES}","${mycache}/marketstat_$i.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning(0,$dat->error,"eve-central.com/marketstat.xml");
 		} else {

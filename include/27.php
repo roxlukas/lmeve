@@ -10,7 +10,7 @@ $MENUITEM=2; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Inventory'; //Panel name (optional)
 //standard header ends here
 
-include('inventory.php');
+include_once('inventory.php');
 
 global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
 

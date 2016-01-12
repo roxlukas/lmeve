@@ -86,7 +86,6 @@ if (strlen($date)==6) {
 		    <div class="tytul">
 			Wallet for <?php echo("$year-$month"); ?><br>
 		    </div>
-
 		    <div class="tekst">
 
 		    <?php //Monthly navigation
@@ -110,6 +109,7 @@ if (strlen($date)==6) {
 					$PREVYEAR=$year;
 			}
 		    ?>
+                        
 		    <table border="0" cellspacing="3" cellpadding="0">
 		    <tr><td>
 			<form method="get" action="">
@@ -134,7 +134,8 @@ if (strlen($date)==6) {
 
 			<a href="#down">Scroll down</a>
 		    </div>
-
+                        <em><img src="ccp_icons/38_16_208.png" alt="(i)"/> LMeve attempts to predict current month running cost, so to avoid counting previous month's wages and internal money transfers, <strong>refTypeID 37 (Corporation Account Withdrawal) is filtered out</strong>.<br/>
+                        Instead, current month wages estimate is subtracted from the wallet totals. <strong>This behavior will be configurable in a future release of LMeve.</strong></em><br />
 		    <?php
 
 		    $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
@@ -143,7 +144,7 @@ if (strlen($date)==6) {
 
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
-                        echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+                        echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
                         $width=730;
 			$days="";
                         $incomes="";
@@ -363,9 +364,9 @@ ORDER BY art.refTypeName;";
 			    Description
 		    </th><th style="text-align: center;">
 				accountKey
-		    </th><th style="text-align: center;">
-				ISK Balance
-		    </th><th colspan="3" style="text-align: center;">
+		    </th><th style="text-align: center;" title="Always shows current ISK balance.">
+				Current ISK Balance
+		    </th><th colspan="3" style="text-align: center;"  title="Shows input and output ISK flows for the specified month.">
 				ISK Flows
 		    </th>
 		    </tr>
@@ -421,7 +422,7 @@ ORDER BY art.refTypeName;";
 				<b><?php echo(number_format($totals['total'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
 		    </td>
 		    </tr>
-		    <tr><td style="text-align: left;">
+		    <tr><td style="text-align: left;" title="Shows corp members Wages in selected month.">
 			    <b>Wages</b>
 		    </td><td style="text-align: center;">
 				<b></b>
@@ -431,7 +432,7 @@ ORDER BY art.refTypeName;";
 				<b></b>
 		    </td><td style="text-align: center;">
 				<b></b>
-		    </td><td style="text-align: center;">
+		    </td><td style="text-align: right;" title="Shows corp members Wages in selected month.">
 				<b><?php echo(number_format(0-$wages[0]['wages'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); $netprofit=$totals['total']-$wages[0]['wages']?></b>
 		    </td>
 		    </tr>

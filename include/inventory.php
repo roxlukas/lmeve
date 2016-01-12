@@ -1,9 +1,8 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+include_once('materials.php');
+include_once('yaml_graphics.php');
+include_once('skins.php');
 include_once("percentage.php");
 
 function dbhrefedit($nr) {
@@ -31,7 +30,438 @@ function pocohrefedit($nr) {
     echo("<a href=\"index.php?id=2&id2=7&nr=$nr\" >");
 }
 
+function invhrefedit($nr=0,$crpID=0) {
+    echo("<a href=\"index.php?id=2&id2=8&nr=$nr&corporationID=$crpID\" title=\"Click to open\">");
+}
+
+function getInventory($parentItemID=0,$corporationID=0) {
+    global $LM_EVEDB;
+    if ($corporationID==0) $crp='TRUE'; else $crp="ast.`corporationID`=$corporationID";
+    $sql="SELECT ast.*,ing.`categoryID`,itp.`groupID`,
+        COALESCE(apl.`itemName`,itp.`typeName`) AS `typeName`,
+        COALESCE(map.`itemName`,sta.`stationName`) AS `locationName`,
+        COALESCE(apl.`itemName`,NULL) AS `itemName`,
+        apc.`corporationName`
+    FROM `apiassets` ast
+    JOIN $LM_EVEDB.`invTypes` itp
+    ON ast.`typeID`=itp.`typeID`
+    JOIN $LM_EVEDB.`invGroups` ing
+    ON itp.`groupID`=ing.`groupID`
+    JOIN `apicorps` apc
+    ON ast.`corporationID`=apc.`corporationID`
+    LEFT JOIN $LM_EVEDB.`mapDenormalize` map
+    ON ast.`locationID`=map.`itemID`
+    LEFT JOIN `apiconquerablestationslist` sta
+    ON ast.`locationID`=sta.`stationID`
+    LEFT JOIN `apilocations` apl
+    ON ast.`itemID`=apl.`itemID`
+    WHERE `parentItemID`=$parentItemID AND $crp
+    ORDER BY `locationName`,`flag`,itp.`groupID`,itp.`typeName`;";
+    //echo("DEBUG <pre>$sql</pre>");
+    $rawdata=db_asocquery($sql);
+    return($rawdata);
+}
+
+function showInventory($data,$parentItemID=0,$corporationID=0) {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    if ($corporationID>0) {
+        $divisions=getCorpDivisions($corporationID);
+        $lastFlag=0;
+    }
+    if ($parentItemID==0) {
+        $lastLocation='';
+    }
+    echo('<table class="lmframework" style="width: 100%;"><tr><td>');
+    if (count($data)>0) {
+        foreach($data as $row) {
+            /*
+             * itemID 	parentItemID 	locationID 	typeID 	quantity 	flag 	singleton 	rawQuantity 	corporationID 	typeName 	locationName 	itemName
+    1212459367 	0 	66005021 	27 	1 	4 	1 	-1 	414731375 	Office 	NULL 	Unknown
+    1007028980226 	0 	60005020 	1944 	2 	62 	0 	NULL 	414731375 	Bestower 	Tollus X - Moon 4 - Republic Justice Department Tr... 	Unknown
+             */
+            
+            //Office Hack
+            if( $row['typeID']==27 ) {
+                //this is an office
+                //$row['typeName']=$row['locationName'];
+                $row['typeID']=28089;
+            }
+            //Corp Divisions Hack
+            if ($corporationID>0) {
+                if ($row['flag']!=$lastFlag) {
+                    $lastFlag=$row['flag'];
+                    echo("</td></tr><tr><th><h3>".$divisions[$row['flag']]."</h3></th></tr><tr><td>");
+                }
+            }
+            //Locations Hack
+            if ($parentItemID==0) {
+                if ($row['locationName']!=$lastLocation) {
+                    $lastLocation=$row['locationName'];
+                    echo("</td></tr><tr><th><h3>$lastLocation</h3></th></tr><tr><td>");
+                }
+            }
+            ?>
+            <div style="margin: 10px; width: 64px; height: 100px; float: left;">
+                <div style="position: absolute;">
+            <?php invhrefedit($row['itemID'], $row['corporationID']); ?>
+            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
+                </div>
+                <?php if ($row['singleton']==0) { ?>
+                <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">
+                    <span style="background: rgba(0,0,0,0.5); padding: 2px; font-size: 11px;"><?php echo(number_format($row['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)); ?></span>
+                </div>
+                <?php } ?>
+                <div style="margin-top: 66px; width: 64px; text-align: center;"><?=$row['typeName']?></div>
+            </div>
+            <?php          
+        }
+    } else {
+        echo('No items found.');
+    }
+    echo('</td></tr></table>');
+}
+
+function getSlotFlags() {
+    $SLOTS=array(
+        //low slots
+        11 => array('x' => 423+32, 'y' => 445+32),
+        12 => array('x' => 387+32, 'y' => 464+32),
+        13 => array('x' => 348+32, 'y' => 481+32),
+        14 => array('x' => 308+32, 'y' => 488+32),
+        15 => array('x' => 267+32, 'y' => 488+32),
+        16 => array('x' => 225+32, 'y' => 480+32),
+        17 => array('x' => 186+32, 'y' => 466+32),
+        18 => array('x' => 150+32, 'y' => 445+32),
+        //med slots
+        19 => array('x' => 484+32, 'y' => 114+32),
+        20 => array('x' => 505+32, 'y' => 149+32),
+        21 => array('x' => 519+32, 'y' => 188+32),
+        22 => array('x' => 528+32, 'y' => 230+32),
+        23 => array('x' => 529+32, 'y' => 271+32),
+        24 => array('x' => 521+32, 'y' => 313+32),
+        25 => array('x' => 507+32, 'y' => 353+32),
+        26 => array('x' => 487+32, 'y' => 388+32),
+        //high slots
+        27 => array('x' => 151+32, 'y' => 57+32),
+        28 => array('x' => 187+32, 'y' => 35+32),
+        29 => array('x' => 227+32, 'y' => 21+32),
+        30 => array('x' => 268+32, 'y' => 13+32),
+        31 => array('x' => 309+32, 'y' => 13+32),
+        32 => array('x' => 349+32, 'y' => 21+32),
+        33 => array('x' => 390+32, 'y' => 35+32),
+        34 => array('x' => 427+32, 'y' => 55+32),
+        //rig slots
+        92 => array('x' => 100+32, 'y' => 103+32),
+        93 => array('x' => 77+32, 'y' => 139+32),
+        94 => array('x' => 60+32, 'y' => 180+32),
+        //subsystem slots
+        125 => array('x' => 49+32, 'y' => 236+32),
+        126 => array('x' => 49+32, 'y' => 279+32),
+        127 => array('x' => 59+32, 'y' => 322+32),
+        128 => array('x' => 76+32, 'y' => 362+32),
+        129 => array('x' => 100+32, 'y' => 398+32)
+    );
+    //echo("<pre>".serialize($SLOTS)."</pre>");
+    return $SLOTS;
+}
+
+function drawTypeIDIcon($typeID,$typeName,$x,$y,$size) {
+    ?>
+    <div style="position: absolute; margin-left: <?=$x-floor($size/2)?>px; margin-top: <?=$y-floor($size/2)?>px;">
+        <img src="<?php echo(getTypeIDicon($typeID,64));?>" title="<?=$typeName?>" style="width: <?=$size?>px; height: <?=$size?>px;" />
+    </div>
+    <?php
+}
+
+function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
+    global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP;
+    
+    $SLOTS=getSlotFlags();
+    $ICONSIZE=48;
+    $AMMOICONSIZE=32;
+    
+    $model=getResourceFromYaml($shipTypeID);
+    
+    $item=db_asocquery("SELECT itp.*,igp.`categoryID`
+		FROM $LM_EVEDB.`invTypes` itp
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+		WHERE `typeID` = $shipTypeID ;");
+    if (count($item)>0) {
+        $item=$item[0];
+    } else {
+        $item['volume']=30000;
+        $item['categoryID']=6;
+    }
+    
+    ?>
+    
+    
+    <table class="lmframework" style="width: 100%;"><tr><td style="width:636px;">
+    <div style="width: 636px; height: 563px; float: left;">
+          <div style="position: absolute; margin-left: 52px; margin-top: 20px; ">
+              <img src="<?php echo(getTypeIDicon($shipTypeID,512));?>" style="width: 532px; height: 532px;" />
+          </div>
+          <div style="position: absolute; margin-left: 52px; margin-top: 20px; ">
+              <canvas id="wglCanvas" width="532" height="532" style="width: 532px; height: 532px;"></canvas>
+          </div>
+          <div style="position: absolute; margin-left: 0px; margin-top: 0px; pointer-events: none; ">
+              <img src="img/fitting_mask.png" />
+          </div>
+
+    <?php
+    //fitting mask center
+    $xcen=318;
+    $ycen=281;
+    if (count($data)>0) {
+        foreach($data as $row) {
+            if (array_key_exists($row['flag'], $SLOTS)) {
+                if (isset($row['categoryID']) && $row['categoryID']==8) {
+                    $x=$SLOTS[$row['flag']][x];
+                    $y=$SLOTS[$row['flag']][y];
+                    $dx=$xcen-$x;
+                    $dy=$ycen-$y;
+                    $rprim=$ICONSIZE/2+($ICONSIZE-$AMMOICONSIZE)/2;
+                    $r=round(sqrt($dx*$dx+$dy*$dy));
+                    $xprim=round($rprim*$dx/$r);
+                    $yprim=round($rprim*$dy/$r);
+                    //echo("DEBUG: x=$x y=$y dx=$dx dy=$dy r=$r rprim=$rprim xprim=$xprim yprim=$yprim<br/>");
+                    drawTypeIDIcon($row['typeID'],$row['typeName'],$SLOTS[$row['flag']][x]+$xprim,$SLOTS[$row['flag']][y]+$yprim,$AMMOICONSIZE);
+                } else {
+                    drawTypeIDIcon($row['typeID'],$row['typeName'],$SLOTS[$row['flag']][x],$SLOTS[$row['flag']][y],$ICONSIZE);
+                }
+            ?>
+            
+            <?php   
+            }
+        }
+    }
+    ?>
+       </div>
+    </td><?php if($vertical) echo("</tr><tr>"); ?><td style="vertical-align: top;">
+        <table class="lmframework" style="width:100%"><tr><td style="vertical-align: top;">
+    <?php
+        $flags=getInvFlags();
+        foreach($data as $row) {
+            if (!array_key_exists($row['flag'], $SLOTS)) {
+                //flagID hack
+                if ($row['flag']!=$lastFlag) {
+                    $lastFlag=$row['flag'];
+                    echo("</td></tr><tr><th><h3>".$flags[$row['flag']]."</h3></th></tr><tr><td>");
+                }
+            ?>
+            <div style="margin: 10px; width: 64px; height: 100px; float: left;">
+                <div style="position: absolute;">
+            <?php invhrefedit($row['itemID'], $row['corporationID']); ?>
+            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
+                </div>
+                <?php if ($row['singleton']==0) { ?>
+                <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">
+                    <?php
+                        //inventory support
+                        if (isset($row['quantity'])) {
+                            ?><span style="background: rgba(0,0,0,0.5); padding: 2px; font-size: 11px;"><?php 
+                            echo(number_format($row['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
+                            ?></span><?php
+                        }
+                        //killboard support
+                        if (isset($row['qtyDropped']) && $row['qtyDropped'] > 0) {
+                            ?><span title="Dropped" style="background: rgba(0,128,0,0.5); padding: 2px; font-size: 11px;"><?php 
+                            echo(number_format($row['qtyDropped'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
+                            ?></span><?php
+                        }
+                        if (isset($row['qtyDestroyed']) && $row['qtyDestroyed'] > 0) {
+                            ?><span title="Destroyed" style="background: rgba(128,0,0,0.5); padding: 2px; font-size: 11px;"><?php 
+                            echo(number_format($row['qtyDestroyed'], 0, $DECIMAL_SEP, $THOUSAND_SEP));
+                            ?></span><?php
+                        }
+                    ?>
+                </div>
+                <?php } ?>
+                <div style="margin-top: 66px; width: 64px; text-align: center;"><?=$row['typeName']?></div>
+            </div>
+            <?php   
+            }
+        }
+    ?>
+        </td></tr></table>
+    </td></tr></table>
+<?php if (getConfigItem(useWebGLpreview,'enabled')=='enabled') { ?>
+    <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+    <script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
+    <script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
+    <script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
+    <script type="text/javascript" src="webgl.js"></script>
+    <script type="text/javascript">
+        //webgl suprt
+        settings.canvasID = 'wglCanvas';
+        settings.sofHullName = '<?=$model['sofHullName']?>';
+        settings.sofRaceName = '<?=$model['sofRaceName']?>';
+        settings.sofFactionName = '<?=$model['sofFactionName']?>';
+        settings.background = '<?=$model['background']?>';
+        settings.categoryID = <?=$item['categoryID']?>;
+        settings.volume = <?=$item['volume']?>;
+        settings.graphicFile = '<?=$model['graphicFile']?>';
+        if (WGLSUPPORT && settings.categoryID==6) {
+            loadPreview(settings,'default');
+            
+            
+        }
+    </script>
+    <?php
+    }
+}
+
+function getCorpDivisions($corporationID) {
+    $ret=array();
+    $sql="SELECT `accountKey`-885 AS `flag`, description FROM `apidivisions` WHERE `corporationID`=$corporationID;";
+    $raw=db_asocquery($sql);
+    if (count($raw)>0) {
+        foreach($raw as $row) {
+            if ($row['flag']==115) $row['flag']=4; // first hangar is actually a 'Hangar' (flag: 4), the rest is 'Corp Security Access Group' 2 through 7
+            $ret[$row['flag']]=$row['description'];
+        }
+    } else return FALSE;
+    return($ret);
+}
+
+function getInvFlags() {
+    global $LM_EVEDB;
+    $ret=array();
+    $sql="SELECT `flagID`, `flagText` FROM $LM_EVEDB.`invFlags`;";
+    $raw=db_asocquery($sql);
+    if (count($raw)>0) {
+        foreach($raw as $row) {
+            $ret[$row['flagID']]=$row['flagText'];
+        }
+    } else return FALSE;
+    return($ret);
+}
+
+function getInventoryHeader($itemID) {
+    global $LM_EVEDB;
+    $sql="SELECT ast.*,ing.`categoryID`,itp.`groupID`,
+        COALESCE(apl.`itemName`,itp.`typeName`) AS `typeName`,
+        COALESCE(map.`itemName`,sta.`stationName`) AS `locationName`,
+        COALESCE(apl.`itemName`,NULL) AS `itemName`,
+        apc.`corporationName`
+    FROM `apiassets` ast
+    JOIN $LM_EVEDB.`invTypes` itp
+    ON ast.`typeID`=itp.`typeID`
+    JOIN $LM_EVEDB.`invGroups` ing
+    ON itp.`groupID`=ing.`groupID`
+    JOIN `apicorps` apc
+    ON ast.`corporationID`=apc.`corporationID`
+    LEFT JOIN $LM_EVEDB.`mapDenormalize` map
+    ON ast.`locationID`=map.`itemID`
+    LEFT JOIN `apiconquerablestationslist` sta
+    ON ast.`locationID`=sta.`stationID`
+    LEFT JOIN `apilocations` apl
+    ON ast.`itemID`=apl.`itemID`
+    WHERE ast.`itemID`=$itemID;";
+    //echo("DEBUG <pre>$sql</pre>");
+    $rawdata=db_asocquery($sql);
+    return($rawdata);
+}
+
+function showInventoryHeader($itemdata,$corporationID) {
+    echo('<table class="lmframework" style="width:100%;"><tr>');
+    if (count($itemdata)==1) {
+        $row=$itemdata[0];
+        if( $row['typeID']==27 ) {
+                //this is an office
+                $row['typeID']=28089;
+            }
+        ?>
+            <th style="width: 64px;">
+                <?php if($row['parentItemID']==0) $crpID=0; else $crpID=$row['corporationID'];
+                    invhrefedit($row['parentItemID'], $crpID); ?>
+                <img src="ccp_icons/23_64_1.png" alt="&lt; back"/></a>
+            </th>
+            <th style="width: 64px;">
+                <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" />
+            </th>
+            <th style="text-align: center;">
+                <h2><?=$row['locationName']?></h2>
+                <em><?=$row['typeName']?></em>
+            </th>
+        <?php            
+    } else {
+        echo('<th>Parent item not found.</th>');
+    }
+    echo('</tr></table>');
+}
+
 function getControlTowers($where='TRUE') {
+    global $LM_EVEDB;
+    $sql="SELECT asl.*,asd.*,asf.`typeID` AS `fuelTypeID`, asf.`quantity` AS `fuelQuantity`,
+          iftp.`typeName` AS `fuelTypeName`,ictr.`purpose`,ictr.`quantity` AS `requiredQuantity`,
+          apl.itemName,apl.x,apl.y,apl.z,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
+    FROM `apistarbaselist` asl
+    JOIN `apistarbasedetail` asd
+    ON asl.`itemID`=asd.`itemID`
+    JOIN `apistarbasefuel` asf
+    ON asl.`itemID`=asf.`itemID`
+    JOIN $LM_EVEDB.`invControlTowerResources` ictr
+    ON asf.`typeID`=ictr.`resourceTypeID` AND asl.`typeID`=ictr.`controlTowerTypeID`
+    JOIN $LM_EVEDB.`invTypes` iftp
+    ON asf.`typeID`=iftp.`typeID`
+    JOIN $LM_EVEDB.`invNames` ssn
+    ON asl.`locationID`=ssn.`itemID`
+    JOIN $LM_EVEDB.`invNames` ssm
+    ON asl.`moonID`=ssm.`itemID`
+    JOIN $LM_EVEDB.`invTypes` itp
+    ON asl.`typeID`=itp.`typeID`
+    LEFT JOIN `apilocations` apl
+    ON asl.`itemID`=apl.`itemID`
+    WHERE $where
+    ORDER BY ssm.`itemName`,ictr.`purpose`,iftp.`typeName`;";
+    //echo("DEBUG: $sql");
+    $rawdata=db_asocquery($sql);
+    $ret=array();
+    foreach($rawdata as $row) { //zmiana struktury danych
+        $itemID=$row['itemID'];
+        $fuelTypeID=$row['fuelTypeID'];
+        $ret[$itemID]['itemID']=$itemID;
+        $ret[$itemID]['state']=$row['state'];
+        $ret[$itemID]['towerTypeID']=$row['typeID'];
+        $ret[$itemID]['towerTypeName']=$row['typeName'];
+        $ret[$itemID]['towerName']=$row['itemName'];
+        $ret[$itemID]['locationID']=$row['locationID'];
+        $ret[$itemID]['moonID']=$row['moonID'];
+        $ret[$itemID]['stateTimestamp']=$row['stateTimestamp'];
+        $ret[$itemID]['onlineTimestamp']=$row['onlineTimestamp'];
+        $ret[$itemID]['standingOwnerID']=$row['standingOwnerID'];
+        $ret[$itemID]['usageFlags']=$row['usageFlags'];
+        $ret[$itemID]['deployFlags']=$row['deployFlags'];
+        $ret[$itemID]['allowCorporationMembers']=$row['allowCorporationMembers'];
+        $ret[$itemID]['allowAllianceMembers']=$row['allowAllianceMembers'];
+        $ret[$itemID]['onStandingDrop']=$row['onStandingDrop'];
+        $ret[$itemID]['onStatusDrop']=$row['onStatusDrop'];
+        $ret[$itemID]['onStatusDropStanding']=$row['onStatusDropStanding'];
+        $ret[$itemID]['onAggression']=$row['onAggression'];
+        $ret[$itemID]['onCorporationWar']=$row['onCorporationWar'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['fuelTypeID']=$fuelTypeID;
+        $ret[$itemID]['fuel'][$fuelTypeID]['fuelTypeName']=$row['fuelTypeName'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['fuelQuantity']=$row['fuelQuantity'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['requiredQuantity']=$row['requiredQuantity'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['purpose']=$row['purpose'];
+        $ret[$itemID]['fuel'][$fuelTypeID]['timeLeft']=floor($row['fuelQuantity']/$row['requiredQuantity']);
+        $ret[$itemID]['location']['x']=$row['x'];
+        $ret[$itemID]['location']['y']=$row['y'];
+        $ret[$itemID]['location']['z']=$row['z'];
+        $ret[$itemID]['location']['solarSystemName']=$row['solarSystemName'];
+        $ret[$itemID]['location']['moonName']=$row['moonName'];
+        
+    }
+    if ($rawdata !== FALSE) {
+        return $ret;
+    } else {
+        return FALSE;
+    }
+}
+
+function getControlTowersOld($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT asl.*,apl.itemName,apl.x,apl.y,apl.z,itp.`typeName`,ssn.`itemName` AS `solarSystemName`,ssm.`itemName` AS `moonName` 
     FROM `apistarbaselist` asl
@@ -107,19 +537,27 @@ function getSimpleTasks($where='TRUE') {
 
 function getLabsAndTasks($corporationID) {
     global $LM_EVEDB;
+    $DEBUG=FALSE;
     $raw_towers=getControlTowers("asl.`corporationID`=$corporationID");
+    if ($DEBUG) {
+        echo('DEBUG:<br/>$raw_towers=<pre>'); var_dump($raw_towers); echo('</pre>');
+    }
     
     $towers=array();
     $labs=array();
     if (count($raw_towers)>0) {
         $raw_tasks=getSimpleTasks();
         foreach($raw_towers as $tower) {
-            //var_dump($tower);
-            $x=$tower[x];
-            $y=$tower[y];
-            $z=$tower[z];
+            if ($DEBUG) {
+                echo('$tower=<pre>'); var_dump($tower); echo('</pre>');
+            }
+            $x=$tower['location'][x];
+            $y=$tower['location'][y];
+            $z=$tower['location'][z];
             $raw_labs=getLabs("SQRT(POW($x-apl.x,2)+POW($y-apl.y,2)+POW($z-apl.z,2)) < 30000");
-            //var_dump($raw_labs);
+            if ($DEBUG) {
+                echo('$raw_labs=<pre>'); var_dump($raw_labs); echo('</pre>');
+            }
             $towers[$tower['itemID']]=$tower;
             foreach($raw_labs as $lab) {
                 $towers[$tower['itemID']]['labs'][$lab['facilityID']]=$lab;
@@ -149,8 +587,8 @@ function showLabsAndTasks($towers) {
         if (true) { 
         ?>
         <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
-            <tr><th colspan="6" style="text-align: center;">
-                <?php echo($tower['moonName'].' ("'.$tower['itemName'].'")'); ?>
+            <tr><th colspan="7" style="text-align: center;">
+                <h3><?php echo($tower['location']['moonName'].' ("'.$tower['towerName'].'")'); ?></h3>
             </th>
             </tr>
             <tr><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
@@ -165,13 +603,15 @@ function showLabsAndTasks($towers) {
                 Products
             </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
                 Kit
+            </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;" title="Inventory">
+                Inv
             </th>
             </tr>
             <?php
             if (count($tower['labs'])>0) foreach ($tower['labs'] as $facilityID => $row) {
                 ?>
                 <tr><td width="32" style="padding: 0px; text-align: center;">
-                    <?php dbhrefedit($row['typeID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                    <?php dbhrefedit($row['typeID']); echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
                 </td><td>
                     <?php 
                     labshrefedit($facilityID); echo(stripslashes($row['itemName'])); echo('</a>');
@@ -184,7 +624,7 @@ function showLabsAndTasks($towers) {
                     <?php 
                     if (count($row['users'])>0) foreach ($row['users'] as $user => $name) {
                         if ($rights_viewallchars) toonhrefedit($user);
-                        echo("<img src=\"https://image.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
+                        echo("<img src=\"https://imageserver.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
 			if ($rights_viewallchars) echo('</a>');
                     }
                     ?>
@@ -192,13 +632,17 @@ function showLabsAndTasks($towers) {
                     <?php 
                     if (count($row['products'])>0) foreach ($row['products'] as $product => $name) {
                         dbhrefedit($product);
-                        echo("<img src=\"ccp_img/${product}_32.png\" title=\"$name\">");
+                        echo("<img src=\"".getTypeIDicon($product)."\" title=\"$name\">");
                         echo('</a>');
                     }
                     ?> 
                 </td><td>
                     <?php 
-                    labshrefedit($facilityID); echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" /></span>"); echo('</a>');
+                    labshrefedit($facilityID); echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" title=\"Show Kit\" /></span>"); echo('</a>');
+                     ?> 
+                </td><td>
+                    <?php 
+                     invhrefedit($facilityID); echo("<img src=\"ccp_icons/26_64_11.png\" style=\"width: 24px; height: 24px;\" title=\"Open Inventory\"/></span>"); echo('</a>');
                      ?> 
                 </td>
                 </tr>
@@ -214,8 +658,146 @@ function showLabsAndTasks($towers) {
     }
 }
 
-function showControlTowers($controltowers) {
-    
+function showControlTowers($controltowers) {   
+        if (count($controltowers)>0) {
+            ?>
+            <table class="lmframework" style="min-width: 800px; width: 90%;" id="">
+			
+	    <?php
+			foreach ($controltowers as $row) {
+            ?>
+            <tr>
+                <td width="30%" style="text-align: center;">
+                    <?php towershrefedit($row['itemID']); ?>
+                    <h1 style="text-align: center;"><?=$row['towerName']?></h1>
+                    <img src="<?php echo(getTypeIDicon($row['towerTypeID'],64)); ?>" title="<?=$row['towerTypeName']?>" />
+                    <h3 style="text-align: center;"><?=$row['location']['moonName']?></h3>
+                    <i><?=$row['towerTypeName']?></i>
+                    </a>
+                </td>
+                <td width="40%" style="vertical-align: top;">
+                    <table class="lmframework" style="width: 100%;">
+                        <tr>
+                            <th colspan="2" style="text-align: center;">
+                                State
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                State
+                            </td>
+                            <td>
+                                <?php
+                                switch($row['state']) {
+                                case 1:
+                                    echo('anchored');
+                                    break;
+                                case 4:
+                                    echo('online');
+                                    break;
+                                default:
+                                    echo('unknown');
+                                }?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Online since
+                            </td>
+                            <td>
+                                <?=$row['onlineTimestamp']?>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="lmframework" style="width: 100%;">
+                        <tr>
+                            <th colspan="4" style="text-align: center;">
+                                Fuel
+                            </th>
+                        </tr>
+                        <?php
+                            foreach ($row['fuel'] as $fuel) {
+                                $timeleft=$fuel['timeLeft'];
+                                if ($timeleft < 48 && $fuel['purpose']==1) $style=" color: red; font-weight: bold;"; else $style="";
+                                if ($timeleft > 24) {
+                                    $days=floor($timeleft/24);
+                                    $hours=$timeleft%24;
+                                    $timeleft="$days d $hours h";
+                                } else {
+                                    $timeleft="$timeleft h";
+                                }
+                                echo('<tr><td style="padding: 0px; width: 32px;"><img src="'.getTypeIDicon($fuel['fuelTypeID']).'" title="" /></td><td>'.$fuel['fuelTypeName'].'</td><td style="text-align: right;">'.$fuel['fuelQuantity'].'</td><td style="text-align: right;'.$style.'">'.$timeleft.'</td></tr>');
+                            }
+                        ?>
+                    </table>
+
+                </td>
+                <td width="30%" style="vertical-align: top;">
+                    <table class="lmframework" style="width: 100%;">
+                        <tr>
+                            <th colspan="2" style="text-align: center;">
+                                Usage settings
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                Allow corp
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['allowCorporationMembers']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Allow alliance
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['allowAllianceMembers']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="text-align: center">
+                                Defense settings
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                Attack on standings
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['onStandingDrop']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Attack on aggression
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['onAggression']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Attack when at war
+                            </td>
+                            <td style="text-align: right;">
+                                <?php echo($row['onCorporationWar']==1 ? 'yes' : 'no'); ?>
+                            </td>
+                        </tr>
+                    </table>
+                </td>    
+            </tr>
+            <?php
+            }
+            ?>
+	    </table>
+	    <?php
+        } else {
+		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t have any POSes</th</tr></table>');
+        }
+}
+
+function showControlTowersOld($controltowers) {   
         if (count($controltowers)>0) {
 			?>
 		    <table class="lmframework" style="" id="">
@@ -237,7 +819,7 @@ function showControlTowers($controltowers) {
 			foreach ($controltowers as $row) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
-                <?php towershrefedit($row['itemID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                <?php towershrefedit($row['itemID']); echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
             </td><td>
                 <?php towershrefedit($row['itemID']);
                 echo($row['itemName']); echo('</a>'); ?>
@@ -273,10 +855,8 @@ function showControlTowers($controltowers) {
         } else {
 		echo('<table class="lmframework" style="width: 564px;"><tr><th style="text-align: center;">Corporation doesn\'t have any POSes</th</tr></table>');
         }
-        
-    
-    
 }
+
 /*
  * Laurvier II = 40316877 (mapping: invNames)
  * Laurvier II planet typeID=2016 (mapping: invItems)
@@ -303,12 +883,15 @@ function getPocos($where='TRUE') {
     //refresh mapDenormalize VIEW for Stored Procedure
     db_uquery("CREATE OR REPLACE VIEW `mapDenormalize` AS SELECT * FROM `$LM_EVEDB`.`mapDenormalize`");
     //do the real select
+    //`solarsystemID` BETWEEN 30000001 AND 31002604 is a fix for XML API bug that keeps returning destroyed POCOs
+    //in solar systems like: solarSystemID=1915	solarSystemName='EVE Singleton Parent Junkyard - Week 15'
     $sql="SELECT apo.*, thirtyDayIncome(`planetItemID`) AS `planetIncome`, ina.`itemName` AS `planetName`, ite.`typeID` AS `planetTypeID`, itp.`typeName` AS `planetTypeName`
     FROM 
         (SELECT apo1.*,apl.itemName, findNearest(apl.x, apl.y, apl.z, apo1.solarSystemID) AS `planetItemID`
         FROM `apipocolist` apo1
         LEFT JOIN `apilocations` apl
-        ON apo1.`itemID`=apl.`itemID`) AS apo
+        ON apo1.`itemID`=apl.`itemID`
+        WHERE `solarsystemID` BETWEEN 30000001 AND 31002604) AS apo
     LEFT JOIN `$LM_EVEDB`.`invItems` AS ite
     ON apo.`planetItemID`=ite.itemID
     LEFT JOIN `$LM_EVEDB`.`invNames` AS ina
@@ -446,7 +1029,7 @@ function showPocoClients($clients) {
         foreach ($clients as $row) {
             echo('<tr><td style="width: 32px; padding: 0px; text-align: center;">');
                 outsiderhrefedit($row['characterName']);
-                    echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['characterName']}\" />");
+                    echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['characterName']}\" />");
                 echo('</a>');
             echo('</td><td style="text-align: left;">');
                 outsiderhrefedit($row['characterName']);
@@ -470,7 +1053,7 @@ function showPocoClients($clients) {
 
 function showPocos($pocos, $income=null) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
-    $TABWIDTH='1016px';
+    $TABWIDTH='1024px';
         if (count($pocos)>0) {
             //find max monthly income for percentage scaling
             $maxIncome=0.0;
@@ -479,7 +1062,7 @@ function showPocos($pocos, $income=null) {
             }
             //display header
 			?>
-			<table class="lmframework" style="width: <?php echo($TABWIDTH); ?>" id="pocos">
+			<table class="lmframework" style="width: 90%; min-width: <?php echo($TABWIDTH); ?>" id="pocos">
 			<tr><th style="width: 64px; padding: 0px; text-align: center;" rowspan="2">
 				Icon
 			</th><th style="width: 100px; text-align: center;" rowspan="2">
@@ -519,8 +1102,8 @@ function showPocos($pocos, $income=null) {
             ?>
                 <tr><td style="padding: 0px; text-align: center;">
                     <?php 
-                    echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"ccp_img/2233_32.png\" title=\"Customs Office\" /></a>");
-                    echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_32.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                    echo("<a href=\"?id=10&id2=1&nr=2233\"><img src=\"".getTypeIDicon(2233)."\" title=\"Customs Office\" /></a>");
+                    echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"".getTypeIDicon($row['planetTypeID'])."\" title=\"".$row['planetTypeName']."\" /></a>");
                     ?>
                     
                 </td>
@@ -615,13 +1198,13 @@ function showPocoDetail($pocos,$income=null) {
 			</th></tr>
                         <tr><td style="padding: 0px; text-align: center;">
                             <?php 
-                            echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"ccp_img/".$row['planetTypeID']."_64.png\" title=\"".$row['planetTypeName']."\" /></a>");
+                            echo("<a href=\"?id=10&id2=1&nr=".$row['planetTypeID']."\"><img src=\"".getTypeIDicon($row['planetTypeID'],64)."\" title=\"".$row['planetTypeName']."\" /></a>");
                             ?>
 			</td><td style="text-align: center;">
                             <h2><?=$row['planetName']?></h2>
                             <?=$row['planetTypeName']?>
                         </td><td style="text-align: center;">
-                            <h2><img src="https://image.eveonline.com/Corporation/<?=$row['corporationID']?>_32.png" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
+                            <h2><img src="https://imageserver.eveonline.com/Corporation/<?=$row['corporationID']?>_32.png" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
 				
 			</td></tr>
                         </table>
@@ -798,7 +1381,7 @@ function showStock($inventory, $corpID) {
         foreach ($group['types'] as $typeID => $row) {
             ?>
             <tr><td width="32" style="padding: 0px; text-align: center;">
-                <?php dbhrefedit($row['typeID']); echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
+                <?php dbhrefedit($row['typeID']); echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />"); echo('</a>'); ?>
             </td><td>
                 <?php dbhrefedit($row['typeID']);
                 if (($LM_BUYCALC_SHOWHINTS) && (isset($inventory[$groupID]['types'][$typeID]['amount'])) && (isset($inventory[$groupID]['types'][$typeID]['quantity']))) {

@@ -55,6 +55,8 @@ $menu[10]['name']='Database';
 $menu[10]['php']='a.php';
 $menu[11]['name']='Wiki';
 $menu[11]['php']='b.php';
+$menu[12]['name']='Killboard';
+$menu[12]['php']='k.php';
 $menu[254]['name']='About';
 $menu[254]['php']='about.php';
 
@@ -98,6 +100,7 @@ function showTabContents($id) {
 function menu($id) {
 	showMenuTab(0,$id);
 	showMenuTab(8,$id);
+        showMenuTab(12,$id);
 	showMenuTab(1,$id);
 	showMenuTab(9,$id);
 	showMenuTab(10,$id);

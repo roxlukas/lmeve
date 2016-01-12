@@ -63,10 +63,16 @@ function template_main() {
 	<table class="tab-container">
 	<tr><td width="100%" class="tab-horizbar">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
-		<tr><td width="50%" align="left"><div class="top">Logged in as:<b> <?php
+		<tr><td width="33%" align="left"><div class="top">Logged in as:<b> <?php
 			echo(getusername());
 		?></b><br></div></td>
-		<td width="50%"><div class="top2"><a href="?id=5"><img src="img/settings.gif" alt="Settings" style="vertical-align: middle;"></a><a href="index.php?logoff=1"><img src="img/log.gif" alt="Log off" style="vertical-align: middle;"> <b>Log off</b></a>
+                <td width="34%"><div id="evetime" title="Current EVE Time" style="margin-left: auto; margin-right: auto; width: 36px;" class="top">--:--</div>
+                <script type="text/javascript">
+                    window.setInterval(function(){ showEvetime('evetime'); }, 5000);
+                    showEvetime('evetime');
+                </script>
+                </td>
+		<td width="33%"><div class="top2"><a href="?id=5"><img src="img/settings.gif" alt="Settings" style="vertical-align: middle;"></a><a href="index.php?logoff=1"><img src="img/log.gif" alt="Log off" style="vertical-align: middle;"> <b>Log off</b></a>
 		<br></div></div></td></tr>
 		</table>
 	</td></tr>
@@ -261,7 +267,7 @@ function template_badlogon() {
 	<?php
 }
 
-function template_logout() {
+function template_logout($msg='Logged out.') {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -282,7 +288,7 @@ function template_logout() {
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	
 	
-	<tr><td><br><div class="tcen">Logged out.</div></td></tr>
+	<tr><td><br><div class="tcen"><?=$msg?></div></td></tr>
 	<tr><td><div class="tcen"><br>
 		 <form method="get" action="">
 			<input type="submit" value="Login again">

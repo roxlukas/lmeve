@@ -14,10 +14,19 @@ $PANELNAME='Characters'; //Panel name (optional)
 ?>	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
-	    <img src="ccp_icons/2_64_16.png"  alt="Characters" style="float: left;"/><h2>Input your personal API Key to link characters to LMeve account</h2>
-            <img src="ccp_icons/38_16_208.png" alt="(!) " style="float: left;"/><a href="https://community.eveonline.com/support/api-key/CreatePredefined?accessMask=16777216" target="_blank">Click this link to go to EVE Online Support site</a> and generate a predefined key with an access mask of 16777216<br/><br/>
-            <strong style="color: red;">Your personal API Key will not be stored in LMeve.</strong><br/><br/>
+	    <img src="ccp_icons/2_64_16.png"  alt="Characters" style="float: left;"/><h2>Input your personal API Key to link your in-game characters to your LMeve account</h2>
+<?php
+//Users sometimes attempt to use LMeve with personal API keys in this form, without first setting up a corp API Key
+//so if there are no corp API KEYs set first, this form should not be available to avoid confusion.
+$keys=db_asocquery("SELECT COUNT(*) AS `count` FROM `cfgapikeys`;");
+$count=$keys[0]['count'];
+if ($count > 0) {
+?>
+            <img src="ccp_icons/38_16_208.png" alt="(!) " style="float: left;"/><a href="https://community.eveonline.com/support/api-key/CreatePredefined?accessMask=16777216" target="_blank">Click this link to go to EVE Online Support site</a> and generate a predefined personal API key with an access mask of 16777216<br/><br/>
+            <strong style="color: red;">Your personal API Key will only be accessed once, and will not be stored in LMeve.</strong><br/><br/>
 	<?php
+
+
 
 //API IMPORT HERE
 
@@ -39,3 +48,9 @@ $PANELNAME='Characters'; //Panel name (optional)
 		<input type="submit" value="Cancel" />
         </form>
     </td></tr></table>
+<?php
+} else {
+    ?>
+          <strong style="color: red;">You must set up Corp API Key first in "Settings".</strong><br/><br/>  
+    <?php
+}

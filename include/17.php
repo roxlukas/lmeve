@@ -23,8 +23,7 @@ $singletonTaskExpiration=getConfigItem('singletonTaskExpiration','90');
 			
 	if ($do==1) {
             if (!token_verify()) die("Invalid or expired token.");
-                clearExpiredSingletonTasks();
-		echo('Tasks have been deleted.');
+                if (clearExpiredSingletonTasks()) echo('Tasks have been deleted.'); else echo('No tasks have been deleted.');
 		
 		?>
                 <form method="get" action="">

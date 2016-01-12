@@ -10,7 +10,8 @@ $MENUITEM=9; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Characters'; //Panel name (optional)
 //standard header ends here
 
-include("tasks.php");
+include_once("tasks.php");
+include_once("killboard.php");
 
 global $USERSTABLE,$LM_EVEDB;
 
@@ -80,12 +81,12 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			$industry_tasks=db_asocquery($sql);
 		    
 		    echo('<table border="0" cellspacing="2" cellpadding=""><tr><td width="256" class="tab">');
-		    echo("<img src=\"https://image.eveonline.com/character/${char['characterID']}_256.jpg\" title=\"${char['name']}\" />");
+		    echo("<img src=\"https://imageserver.eveonline.com/character/${char['characterID']}_256.jpg\" title=\"${char['name']}\" />");
 		    echo('</td><td width="256" class="tab" style="vertical-align:top;">');
 		    echo("<h2>${char['name']}</h2>");
 		    if (!empty($char['title'])) echo("${char['title']}<br>");	
                     $corp['corporationName']=str_replace(' ','&nbsp;',$corp['corporationName']);
-		    echo("<h3><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
+		    echo("<h3><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
 		    echo("<strong>Joined:</strong> ${char['startDateTime']}<br>");
 		    if (!empty($char['base'])) echo("<strong>Base:</strong> ${char['base']}<br>");
                     //real name ident
@@ -137,7 +138,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			echo('</td></tr><tr><td class="tab" colspan="3">');
 			echo('<h2>Produced items:</h2>');
 			foreach($industry_tasks as $items) {
-				echo("<img src=\"ccp_img/${items['typeID']}_32.png\" title=\"${items['typeName']}\n${items['activityName']}\nJobs: ${items['jobsCount']}\nAmount: ${items['runCount']}\" />");
+				echo("<img src=\"".getTypeIDicon($items['typeID'])."\" title=\"${items['typeName']}\n${items['activityName']}\nJobs: ${items['jobsCount']}\nAmount: ${items['runCount']}\" />");
 			}
 		    echo('</td></tr><tr><td class="tab" colspan="3">');
 			echo('<h2>Tasks assigned:</h2>');
@@ -164,6 +165,11 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
                             echo('<h2>Currently in progress:</h2>');
                             showCurrentJobs($jobslist);
                         }
+                    echo('</td></tr><tr><td class="tab" colspan="3">');
+			echo('<h2>Recent Kills & Losses:</h2>');
+			
+			showKills(getKills(0, 0, 0, 0, $nr, 0, 10));
+                        ?> <center><input type="button" value="More kills..." onclick="location.href='?id=12&id2=0&characterID=<?=$nr?>';"/></center> <?php
 			
 		    echo('</td></tr></table>');
 		    

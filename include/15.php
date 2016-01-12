@@ -88,7 +88,7 @@ function althrefedit($nr) {
 				foreach($items as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 						althrefedit($row[typeID]);
-						echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 						echo('</a>');
 					echo('</td><td class="tab">');
 						althrefedit($row[typeID]);
@@ -99,8 +99,7 @@ function althrefedit($nr) {
 							echo('<input type="button" value="Manufacturing" onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=1\';">');
 						}
 						if (!empty($row['blueprintTypeID'])) {
-							if ($row['bpoTechLevel']==2) echo('<input type="button" value="Invention" onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=8\';">');
-							if ($row['bpoTechLevel']==3) echo('<input type="button" value="Reverse Eng." onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=7\';">');
+							if ($row['bpoTechLevel']==2 || $row['bpoTechLevel']==3) echo('<input type="button" value="Invention" onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=8\';">');
 							echo('<input type="button" value="Copying" onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=5\';">');
 							echo('<input type="button" value="ME" onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=4\';">');
 							echo('<input type="button" value="PE" onclick="location.href=\'?id=1&id2=1&nr='.$nr.'&typeID='.$row[typeID].'&activityID=3\';">');

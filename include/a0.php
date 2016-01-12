@@ -23,7 +23,7 @@ if (!empty($marketGroupID)) {
 	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
-	    <?php echo("<em>Static Data schema: $LM_EVEDB</em><br />"); ?>
+	    <?php echo("<em><img src=\"ccp_icons/38_16_208.png\" alt=\"(i)\"/> Static Data schema: $LM_EVEDB</em><br />"); ?>
 	<?php
 		if (!empty($marketGroupID)) {
 				$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`
@@ -130,7 +130,7 @@ if (!empty($marketGroupID)) {
 				foreach($items as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 						hrefedit_item($row['typeID']);
-						echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 						echo('</a>');
 					echo('</td><td class="tab">');
 						hrefedit_item($row['typeID']);

@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('Europe/Warsaw');
+date_default_timezone_set(@date_default_timezone_get());
 set_include_path("../include");
 include_once("log.php");
 include_once("db.php");

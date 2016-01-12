@@ -7,7 +7,7 @@ if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
 	return;
 }
 $MENUITEM=1; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='Clear Orphane Tasks'; //Panel name (optional)
+$PANELNAME='Clear Orphan Tasks'; //Panel name (optional)
 //standard header ends here
 include('tasks.php');
 
@@ -21,8 +21,7 @@ include('tasks.php');
 			
 	if ($do==1) {
             if (!token_verify()) die("Invalid or expired token.");
-                clearOrphanedTasks();
-		echo('Tasks have been deleted.');
+                if (clearOrphanedTasks()) echo('Tasks have been deleted.'); else echo('No tasks have been deleted.');
 		
 		?>
                 <form method="get" action="">
@@ -36,8 +35,8 @@ include('tasks.php');
 	} else {
 		?>
 		
-                <strong>Are you sure to delete <?php echo(getOrphanedTasksCount()); ?> Orphane Tasks?</strong><br/>
-                <em>Orphane Tasks are tasks assigned to Characters who left Corporation.</em><br/>
+                <strong>Are you sure to delete <?php echo(getOrphanedTasksCount()); ?> Orphan Tasks?</strong><br/>
+                <em>Orphan Tasks are tasks assigned to Characters who left Corporation.</em><br/>
 		
 		<table border="0"><tr><td>
 		<form method="post" action="?id=1&id2=6"><?php

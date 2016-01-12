@@ -97,7 +97,7 @@ if (strlen($date)==6) {
 		    		    
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
-				echo("<h1><img src=\"https://image.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+				echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
 				
 if ($mychars==1) {
         echo('<em>The list is filtered by your characters only. Click "All characters" button to show entire corp.</em>');
@@ -165,7 +165,7 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 			foreach($rearrange as $row) {
 				echo('<tr><td>');
 				althrefedit($row['typeID']);
-				echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 				echo('</a>');
 				echo('</td><td>');
 				althrefedit($row['typeID']);
@@ -180,7 +180,7 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 				echo('<table class="lmframework" width="100%">');
 				foreach($row['characters'] as $contrib) {
 					echo('<tr><td width="32" style="padding: 0px;">');
-					echo("<img src=\"https://image.eveonline.com/character/${contrib['installerID']}_32.jpg\" title=\"${contrib['name']}\" />");
+					echo("<img src=\"https://imageserver.eveonline.com/character/${contrib['installerID']}_32.jpg\" title=\"${contrib['name']}\" />");
 					echo('</td><td style="text-align: left;">');
 						if ($rights_viewallchars) hrefedit($contrib['installerID']);
 							echo(stripslashes($contrib['name']));

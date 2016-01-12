@@ -97,7 +97,11 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
         $singletonOrNot="((singleton=0 AND beginProductionTime $thisMonth) OR (singleton=1 AND taskCreateTimestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL $howOldSingletons day) AND beginProductionTime > taskCreateTimestamp))";
         //$singletonOrNot="beginProductionTime $thisMonth";
         
-	$sql="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
+	$sql="SELECT a.*,COALESCE(b.runsDone,0) AS runsDone,
+	COALESCE(b.jobsDone,0) AS jobsDone,
+	COALESCE(c.jobsSuccess,0) AS jobsSuccess,
+	COALESCE(d.jobsCompleted,0) AS jobsCompleted,
+	COALESCE(e.runsCompleted,0) AS runsCompleted
 	FROM (SELECT acm.name, lmt.characterID, itp.typeName, lmt.typeID, rac.activityName, lmt.activityID, lmt.taskID, lmt.runs, lmt.taskCreateTimestamp, lmt.singleton
 	FROM lmtasks lmt
 	JOIN apicorpmembers acm
@@ -154,11 +158,10 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS e
 	ON a.taskID=e.taskID
-        WHERE ((a.singleton=1 AND b.runsDone < a.runs) OR (a.singleton=0))
-	$ORDERBY";
-        //        WHERE ((a.singleton=1 AND a.taskCreateTimestamp $thisMonth) OR (a.singleton=0))
+        WHERE ((a.singleton=1 AND a.taskCreateTimestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL $howOldSingletons day)) OR (a.singleton=0))
+	$ORDERBY"; 
 	//echo("NEW QUERY DEBUG:<hr/> $sql<hr/>");
-        //echo("OLD QUERY DEBUG:<hr/> $sql_original<hr/>");
+    //echo("OLD QUERY DEBUG:<hr/> $sql_original<hr/>");
 	return(db_asocquery($sql));
 }
 
@@ -190,6 +193,7 @@ function getOrphanedTasksCount() {
 
 function clearOrphanedTasks() {
     $lista=getOrphanedTasks();
+    if (empty($lista)) return FALSE;
     $sql_del="DELETE FROM `lmtasks` WHERE `taskID` IN ($lista);";
     $ret=db_uquery($sql_del);
     if ($ret!==FALSE) {
@@ -292,7 +296,7 @@ function getMyChars($array=false) {
 function showTasks($tasklist) {
     global $MOBILE;
 	if (!sizeof($tasklist)>0) {
-		echo('<h3>There is no tasks assigned!</h3>');
+		echo('<h3>There are no tasks assigned!</h3>');
 	} else {
             echo("Found ".count($tasklist)." tasks.");
 	?>
@@ -323,10 +327,14 @@ function showTasks($tasklist) {
 		//var_dump($tasklist);
 		$rights=checkrights("Administrator,EditTasks");
 		foreach($tasklist as $row) {
+                    //dirty hack to hide completed one time tasks
+                    if ($row['singleton']==1 && $row['runsDone'] >= $row['runs']) continue;
+                    //end dirty hack
+                    
 			echo('<tr><td style="padding: 0px; width: 32px;">');
                         echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+				echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -346,7 +354,7 @@ function showTasks($tasklist) {
                     }
                         echo('<td style="padding: 0px; width: 32px;">');
 			itemhrefedit($row['typeID']);
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -434,7 +442,7 @@ function showTasks($tasklist) {
  */
 function showTasks_old($tasklist) {
 	if (!sizeof($tasklist)>0) {
-		echo('<h3>There is no tasks assigned!</h3>');
+		echo('<h3>There are no tasks assigned!</h3>');
 	} else {
 	?>
 	<table cellspacing="2" cellpadding="0">
@@ -464,7 +472,7 @@ function showTasks_old($tasklist) {
 		foreach($tasklist as $row) {
 			echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+				echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</a>');
 			echo('</td><td class="tab">');
 			taskhrefedit($row['characterID'],$year.$month);
@@ -472,7 +480,7 @@ function showTasks_old($tasklist) {
 			echo('</a>');
 			echo('</td><td class="tab" style="padding: 0px; width: 32px;">');
 			if ($rights) edittaskhrefedit($row['taskID']);
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 			if ($rights) echo('</a>');
 			echo('</td><td class="tab">');
 			if ($rights) edittaskhrefedit($row['taskID']);
@@ -544,7 +552,7 @@ function getCurrentJobs($MYTASKS, $SELECTEDCHAR, $ORDERBY) {
 function showCurrentJobs($jobslist) {
     global $MOBILE;
 	if (!sizeof($jobslist)>0) {
-		echo('<h3>There is no jobs in progress!</h3>');
+		echo('<h3>There are no jobs in progress!</h3>');
 	} else {
 	?>
         <em>All times shown in EVE time.</em>
@@ -568,7 +576,7 @@ function showCurrentJobs($jobslist) {
 	<?php
 		foreach($jobslist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
-                            echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+                            echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
 			echo('</td>');
                         if (!$MOBILE) {
                             echo('<td>');
@@ -578,7 +586,7 @@ function showCurrentJobs($jobslist) {
                         echo('<td>');
                             echo($row['activityName']);    
 			echo('</td><td style="padding: 0px; width: 32px;">');
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 			echo('</td><td>');
                                 itemhrefedit($row['typeID']);
 				echo($row['typeName']);
@@ -641,10 +649,11 @@ function showPoints($points) {
     echo('<br/>');
 }
 
-function getTimesheet($corporationID, $year, $month) {
+function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
     global $LM_EVEDB;
     $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
     
+    if (!$aggregate) {
     $sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
 	SELECT `characterID`,`name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
 	FROM `apiindustryjobs` aij
@@ -658,7 +667,26 @@ function getTimesheet($corporationID, $year, $month) {
 	AND aij.corporationID=$corporationID
 	GROUP BY `characterID`,`name`,`activityName`
 	ORDER BY `name`,`activityName`) AS wages;";
-	
+    } else {
+        $sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
+	SELECT lmc.`userID` AS `characterID`,lmu.`login` AS `name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
+	FROM `apiindustryjobs` aij
+	JOIN $LM_EVEDB.`ramActivities` rac
+	ON aij.`activityID`=rac.`activityID`
+	JOIN cfgpoints cpt
+	ON aij.`activityID`=cpt.`activityID`
+	JOIN apicorpmembers acm
+	ON aij.`installerID`=acm.`characterID`
+        JOIN lmchars lmc
+        ON aij.`installerID`=lmc.`charID`
+        JOIN lmusers lmu
+        ON lmc.`userID`=lmu.`userID`
+	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	AND aij.corporationID=$corporationID
+	GROUP BY lmu.`userID`,lmu.`login`,`activityName`
+	ORDER BY lmu.`login`,`activityName`) AS wages;";
+    }
+    //echo("<h3>DEBUG</h3><pre>$sql_all</pre>");	
     $data=db_asocquery($sql_all);
 
     //echo("<pre>DB=\n");
@@ -674,7 +702,7 @@ function getTimesheet($corporationID, $year, $month) {
             $rearrange[$row['characterID']]['wage']+=stripslashes($row['wage']);
             $rearrange[$row['characterID']]['name']=stripslashes($row['name']);
             $rearrange[$row['characterID']]['characterID']=$row['characterID'];
-    }
+    }  
     return $rearrange;
 }
 
@@ -716,17 +744,21 @@ function timesheetFooter() {
     <?php  
 }
 
-function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE) {
+function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE,$aggregate=FALSE) {
     global $DECIMAL_SEP, $THOUSAND_SEP, $MOBILE;
     
     echo('<tr><td style="padding: 0px;">');
+        if (!$aggregate) {
             if ($rights_viewallchars) charhrefedit($row['characterID']);
-                    echo("<img src=\"https://image.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+                    echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
             if ($rights_viewallchars) echo('</a>');
+        } else {
+                    echo("<img src=\"https://imageserver.eveonline.com/character/0_32.jpg\" title=\"${row['name']}\" />");
+        }
     echo('</td><td>');
-            if ($rights_viewallchars) charhrefedit($row['characterID']);
+            if ($rights_viewallchars && !$aggregate) charhrefedit($row['characterID']);
                     echo(stripslashes($row['name']));
-            if ($rights_viewallchars) echo('</a>');
+            if ($rights_viewallchars && !$aggregate) echo('</a>');
     echo('</td><td style="text-align: center;">');
     if (!$MOBILE) {
         echo(number_format($row['activities']['Copying']['points'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
@@ -793,7 +825,7 @@ function timesheetTotals($totals,$label='Total') {
     <?php
 }
     
-function showTimesheet($timesheet) {
+function showTimesheet($timesheet,$aggregate=FALSE) {
     $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
     
     $mychars=getMyChars(true);   
@@ -815,8 +847,14 @@ function showTimesheet($timesheet) {
     }
     //display data for "My characters"
     foreach($timesheet as $row) {
-        if ($mychars!=false && in_array($row['characterID'], $mychars)) {
-            timesheetRow($row,$totals,$rights_viewallchars);
+        if (!$aggregate) {
+            if ($mychars!=false && in_array($row['characterID'], $mychars)) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
+        } else {
+            if ($row['characterID']==$_SESSION['granted']) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
         }
     }
     //display subtotal for "My Characters"
@@ -825,8 +863,14 @@ function showTimesheet($timesheet) {
     }
     //display data for everyone else
     foreach($timesheet as $row) {
-        if ($mychars==false || !in_array($row['characterID'], $mychars)) {
-            timesheetRow($row,$totals,$rights_viewallchars);
+        if (!$aggregate) {
+            if ($mychars==false || !in_array($row['characterID'], $mychars)) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
+        } else {
+            if ($row['characterID']!=$_SESSION['granted']) {
+                timesheetRow($row,$totals,$rights_viewallchars,$aggregate);
+            }
         }
     }
     //display total for everyone

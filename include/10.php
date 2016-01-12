@@ -104,7 +104,7 @@ $nr=secureGETnum("nr");
 	    <td><form action="" method="get">
 		<input type="hidden" name="id" value="1">
 		<input type="hidden" name="id2" value="6">
-		<input type="submit" value="Clear Orphane Tasks">
+		<input type="submit" value="Clear Orphan Tasks">
 		</form></td>
 		<?php } ?>
             <?php if (checkrights("Administrator,EditTasks")) { ?>
@@ -115,7 +115,8 @@ $nr=secureGETnum("nr");
 		</form></td>
 		<?php } ?>
 		</tr></table>
-	    
+	    <em><img src="ccp_icons/38_16_208.png" alt="(i)"/> Tasks are only contributed to by the characters they have been assigned to. If you'd like to use an alt for production, ask administrator to assign that task to your alt.<br/></em>
+            <br/>
 	<?php
 
 	

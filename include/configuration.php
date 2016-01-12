@@ -7,7 +7,7 @@ function setConfigItem($itemLabel,$itemValue) {
 
 function getConfigItem($itemLabel,$default=FALSE) {
     $ret=db_asocquery("SELECT `itemValue` FROM `lmconfig` WHERE `itemLabel`='$itemLabel';");
-    if (count($ret)==1) return $ret[0]['itemValue']; else return $default;
+    if (count($ret)==1 && !empty($ret[0]['itemValue'])) return $ret[0]['itemValue']; else return $default;
 }
 
 ?>

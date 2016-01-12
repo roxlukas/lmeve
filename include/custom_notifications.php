@@ -32,6 +32,8 @@
 **********************************************************************************/
 
 //put custom notifications here
-	include("checkpoller.php");
         include("checkinstall.php");
+        include("checkapierrors.php");
+        include("checkpoller.php");
+        include("checkfuel.php");
 ?>

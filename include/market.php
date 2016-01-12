@@ -1,5 +1,7 @@
 <?php
 include_once("percentage.php");
+include_once("configuration.php");
+
 function shorthash($input) {
 	global $LM_SALT;
 	$hash = substr(strtolower(preg_replace('/[0-9_\/]+/','',base64_encode(sha1($LM_SALT.$input)))),0,14);
@@ -47,7 +49,7 @@ function showBuyback($buybacklist) {
 	global $DECIMAL_SEP, $THOUSAND_SEP;
 	$rights_viewbuyorders=checkrights("Administrator,EditBuyOrders");
 	if (!sizeof($buybacklist)>0) {
-		echo('<h3>There is no buyback orders!</h3>');
+		echo('<h3>There are no buyback orders!</h3>');
 	} else {
 	?>
 	<table class="lmframework">
@@ -230,7 +232,7 @@ function showBuybackOrder($row) {
 		foreach($items as $item) {
 			$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`=${item['typeID']};");
 			$typeName=$typeName[0][0];
-			echo('<tr><td class="tab"><a href="?id=10&id2=1&nr='.$item['typeID'].'"><img src="ccp_img/'.$item['typeID'].'_32.png" style="width: 16px; height: 16px; vertical-align: text-bottom;" /> '.$typeName.'</td><td class="tab" style="text-align: right;"> '.number_format($item['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP).'</td></tr>');
+			echo('<tr><td class="tab"><a href="?id=10&id2=1&nr='.$item['typeID'].'"><img src="'.getTypeIDicon($item['typeID']).'" style="width: 16px; height: 16px; vertical-align: text-bottom;" /> '.$typeName.'</td><td class="tab" style="text-align: right;"> '.number_format($item['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP).'</td></tr>');
 		}
 		echo('</table>');
 	echo("</td></tr>");
@@ -266,7 +268,7 @@ function showMarketOrders($orderlist,$label=null) {
         
 	if (!sizeof($orderlist)>0) {
                 if (is_null($label)) $label='market orders';
-		echo("<h3>There is no $label!</h3>");
+		echo("<h3>There are no $label!</h3>");
 	} else {
 	?>
 	<table class="lmframework">
@@ -302,7 +304,7 @@ function showMarketOrders($orderlist,$label=null) {
 			echo('</td>');
 			echo('<td style="padding: 0px; width: 32px;">');
                             if ($rights_viewallchars) charhrefedit($row['charID']);
-                                echo("<img src=\"https://image.eveonline.com/character/${row['charID']}_32.jpg\" title=\"${row['name']}\" />");
+                                echo("<img src=\"https://imageserver.eveonline.com/character/${row['charID']}_32.jpg\" title=\"${row['name']}\" />");
                             if ($rights_viewallchars) echo("</a>");
 			echo('</td>');
                         echo('<td>');
@@ -312,7 +314,7 @@ function showMarketOrders($orderlist,$label=null) {
 			echo('</td>');
                         echo('<td style="padding: 0px; width: 32px;">');
                             itemhrefedit($row['typeID']);
-                                echo("<img src=\"ccp_img/${row['typeID']}_32.png\" title=\"${row['typeName']}\" />");
+                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
                             echo("</a>");
 			echo('</td>');
                         echo('<td>');
@@ -353,6 +355,7 @@ function buchrefedit($nr) {
 
 function getBuyCalc() {
     global $LM_EVEDB;
+    $buyCalcPriceModifier=getConfigItem('buyCalcPriceModifier', 1.0);
     $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, igp.`groupName`, apr.`max`
     FROM `cfgbuying` AS buy
     JOIN $LM_EVEDB.`invTypes` AS itp
@@ -369,7 +372,7 @@ function getBuyCalc() {
         $rearrange[$row['groupID']]['groupName']=$row['groupName'];
         $rearrange[$row['groupID']]['types'][$row['typeID']]['typeID']=$row['typeID'];
         $rearrange[$row['groupID']]['types'][$row['typeID']]['typeName']=$row['typeName'];
-        $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy']=$row['max'];
+        $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy']=round($buyCalcPriceModifier * $row['max'],2);
     }
     return($rearrange);
 }
@@ -439,7 +442,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
 			foreach($group['types'] as $typeID => $row) {
 				echo('<tr><td style="padding: 0px; width: 32px;">');
 				if ($rights_viewdatabase) buchrefedit($row['typeID']);
-					echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+					echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 				if ($rights_viewdatabase) echo('</a>');
 				echo('</td>');
 				echo('<td>');

@@ -18,11 +18,21 @@ global $LM_EVEDB;
 <?php
 
                 if (!token_verify()) die("Invalid or expired token.");
-       
                 setConfigItem('iskPerPoint', secureGETnum('iskPerPoint'));
                 setConfigItem('singletonTaskExpiration', secureGETnum('singletonTaskExpiration'));
-                setConfigItem('marketRegion', secureGETnum('marketRegion'));
+                $buyCalcPriceModifier=secureGETstr('buyCalcPriceModifier');
+                if (!is_numeric($buyCalcPriceModifier)) die('Wrong parameter value buyCalcPriceModifier: must be numeric'); else setConfigItem('buyCalcPriceModifier', $buyCalcPriceModifier);
+                $marketSystemID=secureGETnum('marketSystemID');
+                if (!empty($marketSystemID)) setConfigItem('marketSystemID', $marketSystemID);
+                $indexSystemID=secureGETnum('indexSystemID');
+                if (!empty($indexSystemID)) setConfigItem('indexSystemID', $indexSystemID);
+                
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
+                if (secureGETstr('publicKillboard')=='on') setConfigItem('publicKillboard','enabled'); else setConfigItem('publicKillboard','disabled');
+                if (secureGETstr('useCRESTkillmails')=='on') setConfigItem('useCRESTkillmails','enabled'); else setConfigItem('useCRESTkillmails','disabled');
+                if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');
+                
+                if (in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
 		
 		?>
 		<br>

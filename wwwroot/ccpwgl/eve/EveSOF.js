@@ -31,7 +31,7 @@ function EveSOF() {
         if (!_get(faction, 'resPathInsert', '').length) {
             return path;
         }
-        if (name == 'PgrMap' || name == 'PgsMap' || name == 'SpecularMap' || name == 'MaskMap' || name == 'SubMaskMap') {
+        if (name == 'PgrMap' || name == 'PgsMap' || name == 'MaterialMap' || name == 'PmdgMap') {
             var index = path.lastIndexOf('/');
             var pathCopy = path;
             if (index >= 0) {
@@ -158,8 +158,11 @@ function EveSOF() {
             decal.boneIndex = _get(hullDecal, 'boneIndex', -1);
             decal.indexBuffer = new Uint16Array(hullDecal.indexBuffer);
             decal.decalEffect = effect;
+            decal.name = _get(hullDecals[i], 'name', '');
+            if ('groupIndex' in hullDecals[i]) {
+                    decal.groupIndex = hullDecals[i].groupIndex; 
+            }
             decal.Initialize();
-
             ship.decals.push(decal);
         }
     }
@@ -169,6 +172,7 @@ function EveSOF() {
         var factionSets = _get(faction, 'spriteSets', {});
         for (var i = 0; i < hullSets.length; ++i) {
             var spriteSet = new EveSpriteSet();
+            spriteSet.name = _get(hullSets[i], 'name', '');
             spriteSet.effect = hullSets[i]['skinned'] ? spriteEffectSkinned : spriteEffect;
             var hullData = _get(hullSets[i], 'items', []);
             for (var j = 0; j < hullData.length; ++j) {
@@ -186,6 +190,11 @@ function EveSOF() {
                 item.falloff = _get(hullData[j], 'falloff', 0);
                 item.maxScale = _get(hullData[j], 'maxScale', 10);
                 item.minScale = _get(hullData[j], 'minScale', 1);
+                item.name = _get(hullData[j], 'name', '');
+                if ('groupIndex' in hullData[j]) {
+                    item.groupIndex = hullData[j].groupIndex; 
+                }
+                item.groupName = factionSet.name;
                 if ('position' in hullData[j]) {
                     item.position = hullData[j].position;
                 }
@@ -208,7 +217,7 @@ function EveSOF() {
         var factionSets = _get(faction, 'spotlightSets', {});
         for (var i = 0; i < hullSets.length; ++i) {
             var spotlightSet = new EveSpotlightSet();
-
+            spotlightSet.name = _get(hullSets[i], 'name', '');
             spotlightSet.coneEffect = new Tw2Effect();
             spotlightSet.glowEffect = new Tw2Effect();
             if (hullSets[i]['skinned']) {
@@ -228,6 +237,10 @@ function EveSOF() {
             var hullData = _get(hullSets[i], 'items', []);
             for (var j = 0; j < hullData.length; ++j) {
                 var item = new EveSpotlightSetItem();
+                item.name = _get(hullData[j], 'name', '');
+                if ('groupIndex' in hullData[j]){
+                    item.groupIndex = hullData[j].groupIndex;
+                }
                 item.boneIndex = _get(hullData[j], 'boneIndex', 0);
                 item.boosterGainInfluence = _get(hullData[j], 'boosterGainInfluence', 0);
                 var factionSet = factionSets['group' + _get(hullData[j], 'groupIndex', -1)];
@@ -266,7 +279,7 @@ function EveSOF() {
         var factionSets = _get(faction, 'planeSets', {});
         for (var i = 0; i < hullSets.length; ++i) {
             var planeSet = new EvePlaneSet();
-
+            planeSet.name = _get(hullSets[i], 'name', '');
             planeSet.effect = new Tw2Effect();
             if (hullSets[i]['skinned']) {
                 planeSet.effect.effectFilePath = 'res:/graphics/effect/managed/space/spaceobject/fx/skinned_planeglow.fx';
@@ -283,6 +296,8 @@ function EveSOF() {
             var hullData = _get(hullSets[i], 'items', []);
             for (var j = 0; j < hullData.length; ++j) {
                 var item = new EvePlaneSetItem();
+                _assignIfExists(item, hullData[j], 'groupIndex');
+                _assignIfExists(item, hullData[j], 'name');
                 _assignIfExists(item, hullData[j], 'position');
                 _assignIfExists(item, hullData[j], 'rotation');
                 _assignIfExists(item, hullData[j], 'scaling');
@@ -501,22 +516,21 @@ function EveSOF() {
         }
     };
 
-    var materialPrefixes = ["Material", "Mask", "SubMask"];
-
-    function GetTurretMaterialParameter(name, matUsageMain, matUsageMask, areaData) {
-        var materialId = -1;
-        if (name.substr(0, materialPrefixes[0].length).toLowerCase() == materialPrefixes[0].toLowerCase()) {
-            materialId = matUsageMain;
-            name = name.substr(materialPrefixes[0].length);
+    function GetTurretMaterialParameter(name, parentFaction, areaData) {
+        var materialIdx = -1;
+        for (var i = 0; i < data['generic']['materialPrefixes'].length; ++i) {
+            if (name.substr(0, data['generic']['materialPrefixes'][i].str.length) == data['generic']['materialPrefixes'][i].str) {
+                materialIdx = i;
+                name = name.substr(data['generic']['materialPrefixes'][i].str.length);
+            }
         }
-        else if (name.substr(0, materialPrefixes[1].length).toLowerCase() == materialPrefixes[1].toLowerCase()) {
-            materialId = matUsageMask;
-            name = name.substr(materialPrefixes[1].length);
-        }
-        if (materialId >= 0 && materialId < 3) {
-            name = materialPrefixes[materialId] + name;
-            if (name in areaData.parameters) {
-                return areaData.parameters[name].value;
+        if (materialIdx != -1) {
+            var turretMaterialIndex = _get(parentFaction, 'materialUsageMtl' + (materialIdx + 1), materialIdx);
+            if (turretMaterialIndex >= 0 && turretMaterialIndex < data['generic']['materialPrefixes'].length) {
+                name = data['generic']['materialPrefixes'][turretMaterialIndex].str + name;
+                if (name in areaData.parameters) {
+                    return areaData.parameters[name].value;
+                }
             }
         }
     }
@@ -562,10 +576,10 @@ function EveSOF() {
                 var parentValue = null;
                 var turretValue = null;
                 if (parentArea) {
-                    parentValue = GetTurretMaterialParameter(i, _get(parentFaction, 'materialUsageMain', 0), _get(parentFaction, 'materialUsageMask', 1), parentArea);
+                    parentValue = GetTurretMaterialParameter(i, parentFaction, parentArea);
                 }
                 if (turretArea) {
-                    turretValue = GetTurretMaterialParameter(i, _get(parentFaction, 'materialUsageMain', 0), _get(parentFaction, 'materialUsageMask', 1), parentArea);
+                    turretValue = GetTurretMaterialParameter(i, parentFaction, parentArea);
                 }
                 quat4.set(CombineTurretMaterial(i, parentValue, turretValue, turretSet.turretEffect.name), params[i].value);
             }
@@ -591,11 +605,15 @@ function EveSOF() {
     };
 
     function getDataKeys(name) {
-        var names = {};
-        for (var i in data[name]) {
-            names[i] = data[name][i].description || '';
+        if (name !== 'all') {
+            var names = {};
+            for (var i in data[name]) {
+                names[i] = data[name][i].description || '';
+            }
+            return names;
+        } else {
+            return data
         }
-        return names;
     }
 
     this.GetHullNames = function (callback) {
@@ -615,4 +633,12 @@ function EveSOF() {
             callback(getDataKeys('race'));
        });
     };
+    
+    this.GetSofData = function (callback) {
+        this.LoadData(function () {
+            callback(getDataKeys('all'));
+        })
+    };
+
+    
 }

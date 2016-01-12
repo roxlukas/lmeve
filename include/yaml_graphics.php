@@ -1,6 +1,6 @@
 <?php
 //YAML - graphics related functions
-include_once('spyc/Spyc.php');
+//include_once('spyc/Spyc.php');
 include_once('yaml_common.php');
 
 /**
@@ -37,14 +37,11 @@ function updateYamlTypeIDs($silent=true) {
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     db_uquery($createyamlInvTraits);
     
-    if (!$silent) echo('Converting YAML compact in-line notation...');
-    $fileraw=file_get_contents($file);
-    $fileraw=str_replace('bonusText: ', "bonusText: ingore\r\n                    ", $fileraw);
-    
     if (!$silent) echo('loading YAML...');
-    $typeIDs = Spyc::YAMLLoadString($fileraw);
     
-    //$typeIDs = Spyc::YAMLLoad($file);
+    //switching from Spyc to YAML PECL module
+    $typeIDs = yaml_parse_wrapper($file);
+    
     if (!empty($typeIDs)) {
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlTypeIDs`;");
         db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlInvTraits`;");
@@ -58,11 +55,12 @@ function updateYamlTypeIDs($silent=true) {
         $radius=yaml_prepare($row['radius']);
         $soundID=yaml_prepare($row['soundID']);
         $biginsertTypeIDs.="($typeID, $graphicID, $iconID, $radius, $soundID),";
+        //var_dump($row['traits']);
         if (is_array($row['traits'])) { //if there are traits
             foreach ($row['traits'] as $skillID => $traits) {
                 foreach ($traits as $trait) {
                     $bonus=yaml_prepare($trait['bonus']);
-                    $bonusText=yaml_prepare($trait['bonusText']);
+                    $bonusText=yaml_prepare($trait['bonusText']['en']);
                     $unitID=yaml_prepare($trait['unitID']);
                     $biginsertTraits.="($typeID, $skillID, $bonus, '$bonusText', $unitID),";
                 }
@@ -96,7 +94,7 @@ function updateYamlGraphicIDs($silent=true) {
         return FALSE;
     }
     
-    $drop="DROP TABLE `$LM_EVEDB`.`yamlGraphicIDs`;";
+    $drop="DROP TABLE IF EXISTS `$LM_EVEDB`.`yamlGraphicIDs`;";
     
     $create="CREATE TABLE `$LM_EVEDB`.`yamlGraphicIDs` (
       `graphicID` int(11) NULL,
@@ -109,7 +107,9 @@ function updateYamlGraphicIDs($silent=true) {
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     
     if (!$silent) echo('loading YAML...');
-    $graphicIDs = Spyc::YAMLLoad($file);
+    
+    //switching from Spyc to YAML PECL module
+    $graphicIDs = yaml_parse_wrapper($file);
     
     if (!empty($graphicIDs)) {
         //db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`yamlGraphicIDs`;");

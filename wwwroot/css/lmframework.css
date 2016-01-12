@@ -1,3 +1,6 @@
+body {
+	margin: 0px;
+}
 BODY,P,TD,DIV,A,SPAN {
 	font-family:"helvetica ce","arial ce",helvetica,arial,sans-serif;
 	text-decoration:none;
@@ -340,7 +343,7 @@ img {
 .tab-container {
 	border-spacing: 0;
         border-collapse: collapse;
-        width: 90%;
+        width: 100%;
 }
 
 .yellow {

@@ -90,7 +90,7 @@ $runs=secureGETnum('runs');
 				AND itp.`published`=1;");
 				$typeName=$typeName[0];
 				echo('<table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td width="36">');
-				echo("<img src=\"ccp_img/${task['typeID']}_32.png\" title=\"${typeName['typeName']}\" /></td><td style=\"vertical-align: middle;\"> ${typeName['typeName']}</td></tr></table>");
+				echo("<img src=\"".getTypeIDicon($task['typeID'])."\" title=\"${typeName['typeName']}\" /></td><td style=\"vertical-align: middle;\"> ${typeName['typeName']}</td></tr></table>");
 				//var_dump($typeName);
 			} else {
 				echo("No item selected.<br/>");

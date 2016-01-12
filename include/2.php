@@ -13,9 +13,17 @@
         <td><form action="" method="get">
         <input type="hidden" name="id" value="2" />
         <input type="hidden" name="id2" value="0" />
+        <input type="submit" value="Stock" />
+        </form></td>
+    <?php } ?>
+    <?php if (checkrights("Administrator,ViewInventory")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="2" />
+        <input type="hidden" name="id2" value="8" />
         <input type="submit" value="Inventory" />
         </form></td>
     <?php } ?>
+        <?php if ($MOBILE) echo("<br/>");?>
     <?php if (checkrights("Administrator,ViewPOS")) { ?>
         <td><form action="" method="get">
         <input type="hidden" name="id" value="2" />
@@ -61,6 +69,9 @@
             break;
         case 7:
             include("27.php");  //POCO details
+            break;
+        case 8:
+            include("28.php");  //inventory explorer
             break;
     }
 ?>

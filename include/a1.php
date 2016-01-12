@@ -13,6 +13,7 @@ $PANELNAME='Item Database'; //Panel name (optional)
 global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE;
 include_once('materials.php');
 include_once('yaml_graphics.php');
+include_once('skins.php');
 
 $nr=secureGETnum('nr');
 
@@ -26,6 +27,7 @@ function url_replace($input) {
 
 ?>	    
 		<script type="text/javascript" src="ajax.js"></script>
+		<script type="text/javascript" src="skin-icon.js"></script>
 		<div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
@@ -34,6 +36,19 @@ function url_replace($input) {
 			echo('Wrong parameter nr.');
 			return;
 		}
+		$item=db_asocquery("SELECT itp.*,igp.`categoryID`
+		FROM $LM_EVEDB.`invTypes` itp
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+		WHERE `typeID` = $nr ;");
+		
+		if (count($item)==0) {
+			echo('There is no such record in the database.');
+			return;
+		}
+		
+		$item=$item[0];
+		
 		?>
 
 		<table cellpadding="0" cellspacing="2" width="95%">
@@ -69,8 +84,7 @@ function url_replace($input) {
 					$isBlueprint=FALSE;
 				}
 				if (!empty($tasks['blueprintTypeID'])) {
-					if ($tasks['bpoTechLevel']==2) echo('<input type="button" value="Invention" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=8\';">');
-					if ($tasks['bpoTechLevel']==3) echo('<input type="button" value="Reverse Eng." onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=7\';">');
+					if ($tasks['bpoTechLevel']==2 || $tasks['bpoTechLevel']==3) echo('<input type="button" value="Invention" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=8\';">');
 					echo('<input type="button" value="Copying" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=5\';">');
 					echo('<input type="button" value="ME" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=4\';">');
 					echo('<input type="button" value="PE" onclick="location.href=\'?id=1&id2=1&nr=new&typeID='.$nr.'&activityID=3\';">');
@@ -79,9 +93,9 @@ function url_replace($input) {
 			}
 			echo('</td>');
 		}
-                if ($MOBILE) echo('</tr><tr>');
-                $hasMarketGroup=db_asocquery("SELECT * FROM $LM_EVEDB.`invTypes` WHERE `typeID`=$nr AND `marketGroupID` IS NOT NULL;");
-		if (count($hasMarketGroup)>0) {
+        if ($MOBILE) echo('</tr><tr>');
+                
+		if (!is_null($item['marketGroupID'])) {
 			$pricesDisabled='';
 		} else {
 			$pricesDisabled='disabled';
@@ -154,13 +168,16 @@ function url_replace($input) {
 		</tr></table>
 
 		<?php
-	
-		$item=db_asocquery("SELECT itp.*,igp.`categoryID`
-		FROM $LM_EVEDB.`invTypes` itp
-                JOIN $LM_EVEDB.`invGroups` igp
-                ON itp.`groupID`=igp.`groupID`
-		WHERE `typeID` = $nr ;");
-		$item=$item[0];
+                
+//PREV-NEXT NAVIGATION
+        
+        $previous=db_asocquery("SELECT `typeID` FROM $LM_EVEDB.`invTypes` WHERE `typeID` < $nr ORDER BY `typeID` DESC LIMIT 1;"); 
+        if (count($previous)>0) $previous_id=$previous[0]['typeID']; else $previous_id=$nr;
+        $next=db_asocquery("SELECT `typeID` FROM $LM_EVEDB.`invTypes` WHERE `typeID` > $nr ORDER BY `typeID` ASC LIMIT 1;");
+        if (count($next)>0) $next_id=$next[0]['typeID']; else $next_id=$nr;
+        ?> <input type="button" value="&laquo;" title="Previous typeID" onclick="location.href='?id=10&id2=1&nr=<?=$previous_id?>';"/>
+        <input type="button" value="&raquo;" title="Next typeID" onclick="location.href='?id=10&id2=1&nr=<?=$next_id?>';"/> <?php	
+
 //BREADCRUMB NAVIGATION
 	function getMarketNode($marketGroupID) {
 		global $LM_EVEDB;
@@ -188,141 +205,63 @@ function url_replace($input) {
 	} while(TRUE);
 	echo("<a href=\"?id=10&id2=0\"> Start </a> $breadcrumbs <br />");
 
+
+        
         //echo("<h2>${item['typeName']}</h2>");
         //
 //CATEGORY ID DEBUG        
         
         //echo("DEBUG: categoryID=".$item['categoryID']."<br/>");
 
-//CCP WebGL -- 3D Preview!
-        
-    if ($model=getResourceFromYaml($nr)) {
+
+
+    
+if ($model=getResourceFromYaml($nr)) {
+    //CCP WebGL -- 3D Preview!
+    $skins = getShipSkins($nr);
+    $racial = getAllRacialSkins($model['sofRaceName']);
+    
     //var_dump($model);
 ?>
-<script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
-<script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
-<script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
-<script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
-<script type="text/javascript">
-function loadPreview()
-            {
-                <?php //check if we use proxy or not. If so, use proxy.php path, otherwise go to CCP CDN ?>
-                //ccpwgl.setResourcePath('res', '<?php echo($LM_CCPWGL_USEPROXY ? 'ccpwgl/proxy.php?fetch=' : $LM_CCPWGL_URL); ?>');
-                var canvas = document.getElementById('wglCanvas');
-                ccpwgl.initialize(canvas);
-                var scene = ccpwgl.loadScene('<?php echo($model['background']); ?>');
-                //sun = scene.loadSun('res:/dx9/model/lensflare/orange.red', undefined);
-       		var camera = new TestCamera(canvas);
-                camera.minDistance = 10;
-                camera.maxDistance = 10000;
-                camera.fov = 30;
-                camera.distance = <?php
-                    if ($item['volume']==0 && ($item['categoryID']==3 || $item['categoryID']==2) ) echo('100000'); else
-                    if ($item['volume']<100) echo('30'); else 
-                    if (($item['volume']>=100) && ($item['volume']<6000)) echo('50'); else
-                    if (($item['volume']>=6000) && ($item['volume']<29000)) echo('150'); else
-                    if (($item['volume']>=29000) && ($item['volume']<50000)) echo('250'); else
-                    if (($item['volume']>=50000) && ($item['volume']<120000)) echo('500'); else
-                    if (($item['volume']>=120000) && ($item['volume']<600000)) echo('1600'); else
-                    if (($item['volume']>=600000)) echo('2500');
-                ?>;
-                camera.rotationX = 0.5;
-                camera.rotationY = 0.1;
-                camera.nearPlane = 1;
-                camera.farPlane = 10000000;
-                camera.minPitch = -0.5;
-                camera.maxPitch = 0.65;
-                ccpwgl.setCamera(camera);
-                <?php
-                    if ($item['categoryID']==6 || $item['categoryID']==18 || $item['categoryID']==11) {
-                        //if ship, NPC or drone - use loadShip
-                        //use new SOF data
-                        echo("var ship = scene.loadShip('${model['sofHullName']}:${model['sofFactionName']}:${model['sofRaceName']}', undefined);\r\n");
-                        
-                    } else if ($item['categoryID']==3 || $item['categoryID']==2) {
-                        echo("var ship = scene.loadObject('${model['graphicFile']}', undefined);\r\n");
-                    } else {
-                        //echo("var ship = scene.loadObject('${model['shipModel']}', undefined);");
-                        $model = false;
-                    }
-                ?>
-                
-
-                
-                
-                <?php //ccpwgl.enablePostprocessing(true); ?>
-
-        	ccpwgl.onPreRender = function () 
-        	{ 
-                    /*var shipTransform = ship.getTransform();
-                    shipTransform[5] = shipTransform[15] = 1.0;
-                    X = Y * (Math.PI / 180.0);
-                    Y=Y+.1;
-                    shipTransform[0]=Math.cos(X);
-                    shipTransform[2]=Math.sin(X);
-                    shipTransform[8]=-1 * Math.sin(X);
-                    shipTransform[10]=Math.cos(X);
-                    ship.setTransform(shipTransform);*/
-        	};
-        		
-            }
-            
-function togglefull() {
-    var canvas=document.getElementById('wglCanvas');
-    var button=document.getElementById('buttonFull');
-    if (canvas.style.position=="absolute") {
-        //minimize!
-        canvas.style.position="static";
-        canvas.style.width="100%";
-        canvas.style.height="420px";
-        button.style.position="relative";
-        button.style.left="2px";
-        button.style.top="-418px";
-        button.value="Fullscreen";
-    } else {
-        //maximize!
-        canvas.style.position="absolute";
-        canvas.style.top="0px";
-        canvas.style.left="0px";
-        canvas.style.width="100%";
-        canvas.style.height="100%";
-        button.style.position="absolute";
-        button.style.left="2px";
-        button.style.top="2px";
-        button.value="Minimize";
-    }
-}
-
-function checkwglsuprt() {
-  if (!window.WebGLRenderingContext) {
-      //window.alert("Cannot create WebGLRenderingContext. WebGL disabled.");
-      return false;   
-  }
-  var canvas = document.getElementById('wglCanvas');
-  var experimental = false;
-  try { gl = canvas.getContext("webgl"); }
-  catch (x) { gl = null; }
-  
-  if (gl == null) {
-        try { gl = canvas.getContext("experimental-webgl"); experimental = true; }
-        catch (x) { return false; }
-        if (!gl) {
-            return false;
-        }
-  }
-  return true;
-}
-</script>
 <?php if (!$MOBILE) { ?>
-    <div id="3dpreview" style="width: 70%; min-width: 718px; display: none;">
+    <div id="3dpreview" style="width: 100%; min-width: 720px; display: none;">
 <?php } else { ?>
     <div id="3dpreview" style="width: 100%; display: none;">
 <?php } ?>
 <table class="lmframework" style="width: 100%;">
-    <tr><th>3D Preview</th><th style="width: 14px;"><img src="img/del.gif" alt="x" onclick="toggler('3dpreview');" value="x"/></th></tr>
-    <tr><td colspan="2"><canvas id="wglCanvas" style="width:100%; height:420px;"></canvas><input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td></tr>
+    <tr><th colspan="2">3D Preview <img src="img/del.gif" alt="x" onclick="toggler('3dpreview'); scene=null; ship=null;" value="x" style="float: right;"/></th></tr>
+    <tr><td width="725">
+            <div style="width: 720px; height: 420px; background: url(<?php echo(getTypeIDicon($item['typeID'],512)); ?>) no-repeat center center; background-size: cover;">
+                <canvas id="wglCanvas" width="720" height="420" style="width: 720px; height: 420px;"></canvas>
+            </div>
+    <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td>
+    <td style="vertical-align: top;">
+		<script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+		<script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
+		<script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
+		<script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
+                <script type="text/javascript" src="webgl.js"></script>
+		<script type="text/javascript">
+                    settings.canvasID = 'wglCanvas';
+                    settings.sofHullName = '<?=$model['sofHullName']?>';
+                    settings.sofRaceName = '<?=$model['sofRaceName']?>';
+                    settings.sofFactionName = '<?=$model['sofFactionName']?>';
+                    settings.background = '<?=$model['background']?>';
+                    settings.categoryID = <?=$item['categoryID']?>;
+                    settings.volume = <?=$item['volume']?>;
+                    settings.graphicFile = '<?=$model['graphicFile']?>';
+		</script> 
+		<div id="skinpanel">
+		<?php if (count($skins)>0) showSkins($skins); else echo('<table><tr><th>Ship has no in-game SKINs</th></tr></table>'); ?>
+                <?php if (count($racial)>0) showAllRacialSkins($racial); ?>
+		</div>
+    </td>
+    
+    </tr>
 </table>
-</div>                  
+</div> 
+
+             
                 
 <?php
     } //end if
@@ -332,7 +271,7 @@ function checkwglsuprt() {
 ?>
 
 <?php if (!$MOBILE) { ?>
-    <table cellspacing="2" cellpadding="0" style="width: 70%; min-width: 718px;">
+    <table cellspacing="2" cellpadding="0" style="width: 100%; min-width: 718px;">
 <?php } else { ?>
     <table cellspacing="2" cellpadding="0" style="width: 100%;">
 <?php } ?>      
@@ -340,7 +279,7 @@ function checkwglsuprt() {
 <tr>
     
 <?php if (!$MOBILE) { ?> 
-    <td style="vertical-align: top; width:55%;">
+    <td style="vertical-align: top; width:50%;">
 <?php } else { ?>
     <td style="vertical-align: top; width:100%;">
 <?php } ?>   
@@ -351,18 +290,27 @@ function checkwglsuprt() {
 </th>
 </tr>
 <tr><td class="tab" style="padding: 0px; width: 32px;">
-<img src="ccp_img/<?php echo($item[typeID]); ?>_64.png" title="<?php echo($item['typeName']); ?>" id="miniature" />
+<?php if ($item['groupID']!=1311) { 
+        if ($model) echo("<a href=\"".getTypeIDicon($item['typeID'],512)."\" target=\"_blank\">");
+        ?>
+	<img src="<?php echo(getTypeIDicon($item['typeID'],64));?>" title="<?php echo($item['typeName']); ?>" id="miniature" />
+<?php 
+        if ($model) echo("</a>");
+} else {
+	$skin = getSkin($nr);
+	if (count($skin)>0) displaySkinIcon($skin[0],64);
+} ?>
 </td><td class="tab" style="text-align: center;"><h2>
 <?php echo($item['typeName']);
 if ($model) {
     ?>
-    <input type="button" id="3dbutton" onclick="toggler('3dpreview'); loadPreview();" value="3D" disabled/>
+    <input type="button" id="3dbutton_main" onclick="toggler('3dpreview'); loadPreview(settings,'default');" value="3D" disabled/>
     <script type="text/javascript">
-        if (checkwglsuprt()) {
-            document.getElementById('3dbutton').disabled=false;
-            document.getElementById('3dbutton').title="Click to view the 3D model";
+        if (WGLSUPPORT) {
+            document.getElementById('3dbutton_main').disabled=false;
+            document.getElementById('3dbutton_main').title="Click to preview the 3D model";
         } else {
-            document.getElementById('3dbutton').title="Your browser does not support WebGL";
+            document.getElementById('3dbutton_main').title="Your browser does not support WebGL";
         }
     </script>    
     <?php
@@ -411,6 +359,9 @@ if ($model) {
 </table>
 
 <?php
+//SKINS
+	showSkins($skins);
+
 //PRICE DATA
 	$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=$nr;");
         $crestPriceData=db_asocquery("SELECT * FROM `crestmarketprices` WHERE `typeID`=$nr;");
@@ -605,7 +556,7 @@ if ($model) {
 		foreach($metaTypes as $row) {
 			echo('<tr><td width="32" style="padding: 0px; text-align: center;">');
 				hrefedit_item($row['typeID']);
-				echo("<img src=\"ccp_img/${row[typeID]}_32.png\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 				echo('</a>');
 			echo('</td><td>');
 				hrefedit_item($row['typeID']);
@@ -618,7 +569,7 @@ if ($model) {
         
         
 if (!$MOBILE) {
-    echo('</td><td style="width: 45%; vertical-align: top;">');
+    echo('</td><td style="width: 50%; vertical-align: top;">');
 } else {
     echo('</td></tr><tr><td style="width: 100%; vertical-align: top;">');
 }
@@ -633,25 +584,32 @@ if (!$MOBILE) {
 	echo("<table border=\"0\" cellspacing=\"3\" cellpadding=\"0\" style=\"width: 100%;\">");
 	echo('<tr><td colspan="2" class="tab-header"><strong>Attributes</strong></td></tr>');
 	//echo("<tr><td width=\"50%\"><b>Size/Radius:</b></td><td width=\"50%\">${item[5]} m</td></tr>");
+        //if item is a SKIN
+        if ($item['groupID']=1311) {
+            $ship=getShipBySkin($nr);
+            if ($ship) echo("<tr><td class=\"tab\"><b>SKIN applies to:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${ship['typeID']}\"><img src=\"".getTypeIDicon($ship['typeID'])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px; margin-right: 3px;\" /> ${ship['typeName']}</a></td></tr>"); 
+        }
+        //continue
 	echo("<tr><td class=\"tab\"><b>Mass:</b></td><td class=\"tab\">".number_format($item['mass'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." kg</td></tr>");
 	echo("<tr><td class=\"tab\"><b>Volume (unpacked):</b></td><td class=\"tab\">".number_format($item['volume'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup></td></tr>");
 	echo("<tr><td class=\"tab\"><b>Cargohold:</b></td><td class=\"tab\">".number_format($item['capacity'], 2, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup></td></tr>");
 	echo("<tr><td class=\"tab\"><b>Baseprice:</b></td><td class=\"tab\">".number_format($item['basePrice'], 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</td></tr>");
+        
         if ($item['portionSize']>1) $items='items'; else $items='item';
         echo("<tr><td class=\"tab\"><b>Portion size:</b></td><td class=\"tab\">".$item['portionSize']." $items</td></tr>");
         
 	if (count($blueprint) > 0 ) {
 		$blueprint=$blueprint[0];
-		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> look up</a></td></tr>");
+		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
 	}
 	
 	if (count($produceditem) > 0 ) {
 		$produceditem=$produceditem[0];
-		echo("<tr><td class=\"tab\"><b>Produced item:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${produceditem[2]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> look up</a></td></tr>");
+		echo("<tr><td class=\"tab\"><b>Produced item:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${produceditem[2]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
 		if ($produceditem[4]==2) echo("<tr><td class=\"tab\"><b>Base Invention chance:</b></td><td class=\"tab\">${produceditem[12]}</td></tr>");
 	}
 
-	$sql="SELECT valueFloat,valueInt,displayName,description
+	$sql="SELECT COALESCE(valueFloat,valueInt),COALESCE(valueFloat,valueInt),displayName,description
 	FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
 	JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
 	ON dta.attributeID=da.attributeID
@@ -659,12 +617,12 @@ if (!$MOBILE) {
 	AND displayName != '';";
 	$attr=db_query($sql); //dogma! [0]=valueFloat [1]=valueInt [2]=displayName [3]=description
 	foreach ($attr as $element) {
-		if (eregi(".*resistance$", $element[2], $regs)) {
+		if (preg_match("/.*resistance$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%6.1f%%",100*(1.0-$element[0]));
 		}
-		if (eregi(".*skill.*", $element[2], $regs)) {
+		if (preg_match("/.*skill.*/i", $element[2], $regs)) {
 			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$skill[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$skill[0][0]);
 		}
 		if ($element[2]=="Used with (chargegroup)") {
 			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
@@ -683,56 +641,50 @@ if (!$MOBILE) {
                                 $element[0]=$groupid[0]['groupName'];
                             } else {
                                 $groupid=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE typeID = $canbeID;");
-                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$canbeID,$groupid[0]['typeName']);
+                                $element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> %s</a>",$canbeID,$groupid[0]['typeName']);
                             }
                         }
 		}
 		//Jump Drive Fuel Need
 		if (strstr("Jump Drive Fuel Need",$element[2])) {
 			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_img/${element[1]}_32.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$fuel[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"".getTypeIDicon($element[1])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$fuel[0][0]);
 		}
-		if (eregi(".*duration$", $element[2], $regs)) {
+		if (preg_match("/.*duration$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
-		if (eregi("Drone Capacity|.*Bay Capacity|.*Hangar Capacity|.*Hold Capacity", $element[2], $regs)) {
+		if (preg_match("/Drone Capacity|.*Bay Capacity|.*Hangar Capacity|.*Hold Capacity/i", $element[2], $regs)) {
 			$element[0]=number_format($element[0], 0, $DECIMAL_SEP, $THOUSAND_SEP)." m<sup>3</sup>";
 		}
-		if (eregi(".*Velocity$", $element[2], $regs)) {
+		if (preg_match("/.*Velocity$/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d m/s",$element[0]);
 		}
-		if (eregi("Bandwidth", $element[2], $regs)) {
+		if (preg_match("/Bandwidth/i", $element[2], $regs)) {
 			$element[0]=sprintf("%d MB/s",$element[0]);
 		}
 		if (strstr("Planet Type Restriction",$element[2])) {
 			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left;\" />  %s</a>",$element[1],$planettype[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$planettype[0][0]);
 		}
-		/*if (strstr("Can be fitted to",$element[2])) {
-			if (!empty($element[1])) $fittedto=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"> %s</a>",$element[1],$fittedto[0][0]);
-		}*/
-		//if (eregi(".*Damage Resistance$", $element[2], $regs)) {
-		//	$element[0]=sprintf("%d %%",100*(1.0-$element[0]));
-		//}
-		if (eregi("Warp Speed Multiplier",$element[2], $regs)) {
+
+		if (preg_match("/Warp Speed Multiplier/i",$element[2], $regs)) {
 			$element[0]=sprintf("%6.2f AU/s",$element[0]);
 			//$element[2]="Warp Speed";
 		}
-                if (eregi("powergrid usage",$element[2], $regs)) {
+                if (preg_match("/powergrid usage/i",$element[2], $regs)) {
 			$element[0]=sprintf("%d MW",$element[1]);
 			//$element[2]="Warp Speed";
 		}
-                if (eregi("CPU usage",$element[2], $regs)) {
+                if (preg_match("/CPU usage/i",$element[2], $regs)) {
 			$element[0]=sprintf("%d tf",$element[1]);
 			//$element[2]="Warp Speed";
 		}
-		if (eregi(".*echarge time$", $element[2], $regs) || strstr("Rate of fire",$element[2])) {
+		if (preg_match("/.*echarge time$/i", $element[2], $regs) || strstr("Rate of fire",$element[2])) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
 		if (strstr("Consumption Type",$element[2])) {
 			$type=db_query("SELECT typeName FROM $LM_EVEDB.invTypes WHERE typeID = ${element[1]};");
-			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/51_64_11.png\" style=\"width: 16px; height: 16px; float: left;\" /> %s</a>",$element[1],$type[0][0]);
+			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/51_64_11.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> %s</a>",$element[1],$type[0][0]);
 		}
 		//echo("<tr><td><b>${element[2]}</b><br /><i>${element[1]}</i></td><td>${element[0]}</td></tr>");
 		if (isset($element[0])) $value=$element[0]; else $value=$element[1];

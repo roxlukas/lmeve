@@ -77,7 +77,7 @@ function displayCharacters($chars) {
         foreach($chars as $toon) {
             $attrs=$toon->attributes();
             ?>
-            <img src="https://image.eveonline.com/Character/<?php echo($attrs->characterID); ?>_64.jpg" alt="<?php echo($attrs->name); ?>" title="<?php echo($attrs->name); ?>" /> <img src="https://image.eveonline.com/Corporation/<?php echo($attrs->corporationID); ?>_64.png" alt="<?php echo($attrs->corporationName); ?>" title="<?php echo($attrs->corporationName); ?>" /><br />
+            <img src="https://imageserver.eveonline.com/Character/<?php echo($attrs->characterID); ?>_64.jpg" alt="<?php echo($attrs->name); ?>" title="<?php echo($attrs->name); ?>" /> <img src="https://imageserver.eveonline.com/Corporation/<?php echo($attrs->corporationID); ?>_64.png" alt="<?php echo($attrs->corporationName); ?>" title="<?php echo($attrs->corporationName); ?>" /><br />
             <?php
         }   
     } else {

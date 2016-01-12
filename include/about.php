@@ -45,6 +45,119 @@ Changelog:
 
 <table width="90%" border="0" cellspacing="2" cellpadding="0">
 <!-- changelog start -->
+<tr><td class="tab" width="180">
+<div class="tytul2">2015.09.25</div></td>
+<td valign="top" class="tab">
+<b>0.1.55 beta:</b><br>
+<b>Poller version 26</b>
+<ul>
+        <li>Fully functional Killboard</li>
+	<li>XML and CREST killmail support in API Poller</li>
+	<li>Can use either XML or CREST killmail endpoint (configurable in Settings)</li>
+        <li>CCP WebGL preview in Inventory and Killboard ship fitting window</li>
+	<li>You can now input Corp API Keys in GUI</li>
+        <li>Disabled accounts have existing sessions terminated immediately</li>
+	<li>Bug fixes</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
+<div class="tytul2">2015.08.18</div></td>
+<td valign="top" class="tab">
+<b>0.1.54 beta:</b><br>
+<b>Poller version 24</b>
+<ul>
+	<li>Improved corporation Inventory browser</li>
+	<li>Ship Fitting browser in corporation Inventory</li>
+	<li>CCP WebGL update</li>
+	<li>Custom SKIN support</li>
+	<li>Additional tooltips</li>
+	<li>New icon support for ingame items</li>
+	<li>Customizable market hub to get material prices from</li>
+	<li>Customizable manufacturing sytem Index (Crius NPC cost formula)</li>
+	<li>Customizable price modifier for Buy Calculator</li>
+	<li>Real time API poller stats</li>
+	<li>Bug fixes</li>
+</ul>
+</td></tr>
+
+
+<tr><td class="tab" width="180">
+<div class="tytul2">2015.06.25</div></td>
+<td valign="top" class="tab">
+<b>0.1.53 beta:</b><br>
+<b>Poller version 22</b>
+<ul>
+<li>
+    SPYC library removed and code rewritten to use YAML PECL extension in PHP<ul>
+        <li><strong>Please note:</strong> LMeve now requires YAML PECL extenstion installed on your host</li>
+        <li>as a side effect, YAML import now takes several seconds instead of several minutes</li>
+        <li>this was necessary to make LMeve compatible with SDE changes in Aegis release</li>
+    </ul>
+        
+</li>
+<li>
+	EVE Time has been added on the top bar
+</li>
+<li>
+	Industry Statistics have been divided by activity type (stacked bar chart breaking down into Manufacturing, Invention and so on)
+</li>
+<li>
+	Timesheet can be now aggregated by LMeve user rather than by in game character. It means that work and ISK made by all characters belonging to a user will be summed up for a less cluttered Timesheet view.
+</li>
+<li>Bug fixes:<ul>
+    <li>
+        Ore Chart now properly displays it's contents again
+    </li>
+    <li>
+        Session now correctly times out since last action in LMeve, instead of since logging in
+    </li>
+    <li>
+        CREST now properly uses HTTPS instead of HTTP
+    </li>
+</ul>
+</li>
+</ul>
+</td></tr>
+
+<tr><td class="tab" width="180">
+<div class="tytul2">2015.03.26</div></td>
+<td valign="top" class="tab">
+<b>0.1.52 beta:</b><br>
+<b>Poller version 22</b>
+<ul>
+<li>
+	Poller now fetches StarbaseDetails.xml and CREST industry cost indexes
+</li>
+<li>
+        New POS management screen - displays fuel amounts and how long it will last
+</li>
+<li>
+        There is now a notification when any tower has less than 48 hours of fuel left
+</li>
+<li>
+        Tech III invention added. You can now add Tech III invention tasks and get price estimates for Tech III
+</li>
+<li>
+        New global setting for the default Relic type for use with Tech III Invention (Intact, Malfunctioning or Wrecked)
+</li>
+<li>Bug fixes:<ul>
+    <li>
+        Non-recurring Tasks (singleton) bug fix - they did not display correctly
+    </li>
+    <li>
+        Bug fix in db.php "Notice: LM_dbhost is not defined" - added $LM_dbhost to global declaration
+    </li>
+    <li>
+        Bug fix in Database - "function eregi() is deprecated" - replaced with preg_match()
+    </li>
+    <li>
+        Bug fix in YAML updater - DROP TABLE <strong>IF EXISTS</strong>
+    </li>
+    </ul>
+</li>
+</ul>
+</td></tr>
 
 <tr><td class="tab" width="180">
 <div class="tytul2">2015.01.05</div></td>
@@ -1260,35 +1373,6 @@ on or functioning of this website, nor can it be liable for any damage arising f
 	OF THE POSSIBILITY OF SUCH DAMAGE.<br/>
 </div>
 
-<h3>Spyc -- A Simple PHP YAML Class</h3>
-<pre>version 0.5.1
-author Vlad Andersen <vlad.andersen@gmail.com>
-author Chris Wanstrath <chris@ozmm.org>
-link http://code.google.com/p/spyc/
-copyright Copyright 2005-2006 Chris Wanstrath, 2006-2011 Vlad Andersen
-
-The MIT License
-
-Copyright (c) 2011 Vladimir Andersen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</pre>
-
 <h3>jQuery, jQuery UI</h3>
 <pre>Copyright 2013 jQuery Foundation and other contributors
 http://jquery.com/
@@ -1332,6 +1416,31 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
 THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+
+<h3>StackedBar chart plugin for chart.js</h3>
+<strong>https://github.com/Regaddi/Chart.StackedBar.js</strong>
+
+<pre>The MIT License (MIT)
+
+Copyright (c) 2015 @Regaddi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre>
 
 </td></tr>
 </table>
