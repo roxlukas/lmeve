@@ -35,10 +35,12 @@ ship = null,
 WGLSUPPORT = checkwglsuprt();
 	
 function loadPreview(settings,skin) {
-    if (skin=='default' || !skin ) skin=settings.sofFactionName;
+    if (skin=='default' || !skin || skin=='NULL') skin=settings.sofFactionName;
+    var dna=settings.sofHullName+':'+skin+':'+settings.sofRaceName;
+    console.log("Loading Standard SKIN "+dna);
     if (scene != null) {
             if (ship != null) scene.removeObject(ship);
-            ship = scene.loadShip(settings.sofHullName+':'+skin+':'+settings.sofRaceName, undefined);
+            ship = scene.loadShip(dna, undefined);
             return;
     }
     var canvas = document.getElementById(settings.canvasID);
@@ -68,7 +70,7 @@ function loadPreview(settings,skin) {
     if (settings.categoryID==6 || settings.categoryID==18 || settings.categoryID==11) {
             //if ship, NPC or drone - use loadShip
             //use new SOF data
-            ship = ship = scene.loadShip(settings.sofHullName+':'+skin+':'+settings.sofRaceName, undefined);
+            ship = ship = scene.loadShip(dna, undefined);
 
     } else if (settings.categoryID==3 || settings.categoryID==2) {
             ship = scene.loadObject(settings.graphicFile, undefined);
@@ -87,6 +89,39 @@ function loadPreview(settings,skin) {
             ship.setTransform(shipTransform);*/
     };
 
+}
+
+function loadDesignerSkin(settings,sof) {
+    var dna=settings.sofHullName+':'+settings.sofFactionName+':'+settings.sofRaceName+sof;
+    console.log("Loading Designer SKIN "+dna);
+    if (scene != null) {
+        if (ship != null) scene.removeObject(ship);
+        ship = scene.loadShip(dna, undefined);
+        return;
+    } else {
+        loadPreview(settings,skin);
+        if (scene != null) {
+            if (ship != null) scene.removeObject(ship);
+            ship = scene.loadShip(dna, undefined);
+            return;
+        }
+    }
+}
+
+function getDesignerSkin(skinId, elementId) {
+    var uri=ccpwgl_int.resMan.BuildUrl('res:/staticdata/skins.json');
+    $.getJSON( uri, function( data, elementId ) {
+      $.each( data, function( key, val ) {
+          //console.log("key=" + key + " sof="+val.sof);
+          if (key == skinId) {
+              //console.log("FOUND! key=" + key + " name="+val.name+" sof="+val.sof);
+              $('#'+elementId).click(function() {
+                toggler_on('3dpreview');
+                loadDesignerSkin(settings,val.sof);
+              });
+          }
+      });
+    });
 }
 
 function loadTurret(index, resource) {

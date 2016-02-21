@@ -143,6 +143,7 @@ function showSkins($skins) {
 						if (WGLSUPPORT) {
 							document.getElementById('3dbutton_<?=$rnd?>').disabled=false;
 							document.getElementById('3dbutton_<?=$rnd?>').title="Click to preview this SKIN";
+                                                        getDesignerSkin(<?=$skin['skinID']?>, '3dbutton_<?=$rnd?>');
 						}
 					</script>
 				</td>
@@ -150,6 +151,19 @@ function showSkins($skins) {
 		}
 		?></table><?php
 	}
+}
+
+function showWglCtrlPanel() {
+    ?>
+    <table class="lmframework" width="100%"><tr><th colspan="2">Ship Control Panel</th></tr>
+        <tr><td>
+                <strong>Thrusters</strong>
+            </td><td>
+                <input type="range" min="0" max="200" step="1" oninput="ship.setBoosterStrength(1.0 * this.value / 100.0);" onchange="ship.setBoosterStrength(1.0 * this.value / 100.0);"/>
+            </td>
+        </tr>
+    </table>
+    <?php
 }
 
 

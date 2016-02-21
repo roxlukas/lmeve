@@ -337,7 +337,8 @@ img {
     BORDER-TOP: #85a5cf 0px solid;
     BACKGROUND: url(../img/stumbler.png) #ffffff no-repeat right bottom;
     BORDER-LEFT: #85a5cf 0px solid;
-    BORDER-BOTTOM: #85a5cf 0px solid
+    BORDER-BOTTOM: #85a5cf 0px solid;
+    padding: 5px 20px 20px 20px;
 }
 
 .tab-container {

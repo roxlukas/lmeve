@@ -254,6 +254,7 @@ if ($model=getResourceFromYaml($nr)) {
 		<div id="skinpanel">
 		<?php if (count($skins)>0) showSkins($skins); else echo('<table><tr><th>Ship has no in-game SKINs</th></tr></table>'); ?>
                 <?php if (count($racial)>0) showAllRacialSkins($racial); ?>
+                <?php showWglCtrlPanel(); ?>
 		</div>
     </td>
     

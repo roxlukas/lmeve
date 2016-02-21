@@ -1,4 +1,14 @@
-﻿function Tw2InstancedMesh()
+/**
+ * Tw2InstancedMesh
+ * @property instanceGeometryResource
+ * @property {string} instanceGeometryResPath
+ * @property {number} instanceMeshIndex
+ * @property {vec3} minBounds
+ * @property {vec3} maxBounds
+ * @inherit Tw2Mesh
+ * @constructor
+ */
+function Tw2InstancedMesh()
 {
     this._super.constructor.call(this);
     this.instanceGeometryResource = null;
@@ -10,33 +20,33 @@
 
 Inherit(Tw2InstancedMesh, Tw2Mesh);
 
-Tw2InstancedMesh.prototype.Initialize = function ()
+/**
+ * Initializes the Tw2InstancedMesh
+ * @prototype
+ */
+Tw2InstancedMesh.prototype.Initialize = function()
 {
     this._super.Initialize.call(this);
     if (this.instanceGeometryResPath != '')
     {
         this.instanceGeometryResource = resMan.GetResource(this.instanceGeometryResPath);
-        this.instanceGeometryResource.RegisterNotification(this);
-    }
-    else
-    {
-        if (this.instanceGeometryResource && this.geometryResource)
-        {
-            this.geometryResource.SetInstanceCount(this.instanceGeometryResource.GetMaxInstanceCount(this.instanceMeshIndex));
-        }
     }
 };
 
-Tw2InstancedMesh.prototype.RebuildCachedData = function (res)
+/**
+ * _GetAreaBatches
+ * @param {Array.<Tw2MeshArea>} areas
+ * @param {RenderMode} mode
+ * @param {Tw2BatchAccumulator} accumulator
+ * @param {Tw2PerObjectData} perObjectData
+ * @private
+ */
+Tw2InstancedMesh.prototype._GetAreaBatches = function(areas, mode, accumulator, perObjectData)
 {
-    if (this.instanceGeometryResource && this.geometryResource)
+    if (!device.instancedArrays)
     {
-        this.geometryResource.SetInstanceCount(this.instanceGeometryResource.GetMaxInstanceCount(this.instanceMeshIndex));
+        return;
     }
-};
-
-Tw2InstancedMesh.prototype._GetAreaBatches = function (areas, mode, accumulator, perObjectData)
-{
     for (var i = 0; i < areas.length; ++i)
     {
         var area = areas[i];
@@ -56,7 +66,15 @@ Tw2InstancedMesh.prototype._GetAreaBatches = function (areas, mode, accumulator,
     }
 };
 
-Tw2InstancedMesh.prototype.RenderAreas = function (effect)
+/**
+ * RenderAreas
+ * @param {number} meshIx
+ * @param {number} start
+ * @param {number} count
+ * @param {Tw2Effect} effect
+ * @prototype
+ */
+Tw2InstancedMesh.prototype.RenderAreas = function(meshIx, start, count, effect)
 {
     if (this.geometryResource)
     {
@@ -68,30 +86,57 @@ Tw2InstancedMesh.prototype.RenderAreas = function (effect)
     }
     if (this.geometryResource && this.instanceGeometryResource)
     {
-        if (this.instanceGeometryResource.GetMaxInstanceCount(this.instanceMeshIndex) > this.geometryResource.GetInstanceCount()) {
-            this.geometryResource.SetInstanceCount(this.instanceGeometryResource.GetMaxInstanceCount(this.instanceMeshIndex));
-        }
         if (!this.geometryResource.IsGood())
         {
             return;
         }
-        this.instanceGeometryResource.Render(effect, this.geometryResource.meshes[0].buffer, this.geometryResource.meshes[0].indexes, this.geometryResource.meshes[0].declaration, this.geometryResource.meshes[0].declaration.stride);
+        var buffer = this.instanceGeometryResource.GetInstanceBuffer(this.instanceMeshIndex);
+        if (buffer)
+        {
+            this.geometryResource.RenderAreasInstanced(meshIx, start, count, effect,
+                buffer,
+                this.instanceGeometryResource.GetInstanceDeclaration(this.instanceMeshIndex),
+                this.instanceGeometryResource.GetInstanceStride(this.instanceMeshIndex),
+                this.instanceGeometryResource.GetInstanceCount(this.instanceMeshIndex));
+        }
     }
 };
 
+
+/**
+ * Tw2InstancedMeshBatch
+ * @property {Tw2InstancedMesh} instanceMesh
+ * @property {Tw2GeometryRes} geometryRes
+ * @property {number} meshIx
+ * @property {number} start
+ * @property {number} count
+ * @property {Tw2Effect|null} effect
+ * @inherit Tw2RenderBatch
+ * @constructor
+ */
 function Tw2InstancedMeshBatch()
 {
     this._super.constructor.call(this);
     this.instanceMesh = null;
+    this.geometryRes = null;
+    this.meshIx = 0;
+    this.start = 0;
+    this.count = 1;
+    this.effect = null;
 }
 
 Inherit(Tw2InstancedMeshBatch, Tw2RenderBatch);
 
-Tw2InstancedMeshBatch.prototype.Commit = function (overrideEffect)
+/**
+ * Commits the Tw2InstancedMeshBatch for rendering
+ * @param {Tw2Effect} [overrideEffect]
+ * @prototype
+ */
+Tw2InstancedMeshBatch.prototype.Commit = function(overrideEffect)
 {
-    var effect = typeof (overrideEffect) == 'undefined' ? this.effect : overrideEffect;
+    var effect = typeof(overrideEffect) == 'undefined' ? this.effect : overrideEffect;
     if (this.instanceMesh && effect)
     {
-        this.instanceMesh.RenderAreas(effect);
+        this.instanceMesh.RenderAreas(this.meshIx, this.start, this.count, effect);
     }
 };

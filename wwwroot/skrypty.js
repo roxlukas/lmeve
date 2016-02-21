@@ -336,9 +336,14 @@ function sub(editbox) {
             var now = new Date(); 
             var hh = now.getUTCHours();
             var mm = now.getUTCMinutes();
+            var yc = now.getUTCFullYear()-1898;
+            var mo = now.getUTCMonth()+1;
+            var dd = now.getUTCDate();
             if (hh<10) hh="0"+hh;
             if (mm<10) mm="0"+mm;
-            var evetime = hh + ":" + mm;
+            if (mo<10) mo="0"+mo;
+            if (dd<10) dd="0"+dd;
+            var evetime = "<span title=\"YC " + yc + "." + mo + "."+ dd + "\">" + hh + ":" + mm + "</span>";
             //console.log("evetime="+evetime);
             evetimeDiv.innerHTML=evetime;
         }
