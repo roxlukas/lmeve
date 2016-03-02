@@ -17,6 +17,9 @@ Settings
 </div>
 <div class="tleft">
 <h2>Change password</h2><br>
+<?php
+    if (secureGETnum('legacy')==1) echo('<h3>Your password must be changed.</h3><i>Your old password was hashed using less secure md5 algorithm. New password will be hashed 10.000 times using a more secure algorithm, sha256.</i>');
+?>
 <form method="post" action="?id=5&id2=3">
 <?php
 token_generate();

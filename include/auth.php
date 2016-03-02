@@ -254,21 +254,47 @@ function updatelast($date,$ip) {
 	}	
 }
 
-function hashpass($pass) { //create a salted hash
+function hashpassLegacy($pass) { //create a salted hash
 	global $LM_SALT;
 	return md5($LM_SALT.$pass);
+}
+
+function hashpass($pass) { //create a salted hash
+	global $LM_SALT;
+        $algo='sha256'; $repeats=10000;
+        $hash=hash($algo,$password);
+        for ($i=0; $i<$repeats; $i++) {
+                $hash=hash($algo,$LM_SALT.$hash.$password);
+        }
+	return $hash;
+}
+
+function updateUserstable() {
+    global $USERSTABLE;
+    $table=db_asocquery("DESCRIBE $USERSTABLE;");
+    foreach ($table as $column) {
+        if ($column['Field']=='pass' && $column['Type']!='varchar(64)') {
+            db_uquery("ALTER TABLE  `$USERSTABLE` CHANGE  `pass` `pass` VARCHAR(64) NOT NULL DEFAULT  '';");
+        }
+    }
+    //var_dump($table);
 }
 
 function checkpass($pass) {
 	global $USERSTABLE;
 	if (isset($_SESSION['granted'])) {
-		$password=hashpass($pass);
-		$sql="SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='${_SESSION['granted']}' AND pass='$password';";
-		$result=db_query($sql);
-		$ileadmin=count($result);
-		if ($ileadmin==1) {
+		$hash=hashpass($pass);
+		$result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='${_SESSION['granted']}' AND pass='$hash';");
+		if (count($result)==1) {
 			return TRUE;
-		}
+		} else {
+                    //fallback to md5 password
+                    $hash=hashpassLegacy($pass);
+                    $result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='${_SESSION['granted']}' AND pass='$hash';");
+                    if (count($result)==1) {
+                            return TRUE;
+                    }
+                }
 	}
 	return FALSE;
 }
@@ -276,6 +302,7 @@ function checkpass($pass) {
 function setpass($newpass) {
 	if (!userexists()) return FALSE;
 	global $USERSTABLE;
+        updateUserstable();
 	$newpass=hashpass($newpass);
 	if (isset($_SESSION['granted'])) {
 			$sql="UPDATE `$USERSTABLE` SET pass='$newpass' WHERE `userID`=${_SESSION['granted']};";
@@ -291,18 +318,28 @@ function auth_user($login,$password) {
 	//LDAP
 	if (ldap_auth($login, $password)) {
                 //if password is valid in LDAP, we only have to check if user exists in the DB
-                $sql="SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND act=1;";
+                $result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND act=1;");
+                if (count($result)==1) {
+                        return($result[0][0]);
+                }
         } else {
                 //if LDAP didn't work, we check both login and passwd
-                $password=hashpass($password);
-                $sql="SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND pass='$password' AND act=1;";
+                $hash=hashpass($password);
+                $result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND pass='$hash' AND act=1;");
+                if (count($result)==1) {
+                        return($result[0][0]);
+                } else {
+                    //fallback to old MD5 password
+                    $hash=hashpassLegacy($password);
+                    $result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE login='$login' AND pass='$hash' AND act=1;");
+                    if (count($result)==1) {
+                        header("Location: index.php?id=5&id2=2&legacy=1");
+                        //no die() here because we want the auth process to complete
+                        return($result[0][0]);
+                    }
+                }
         }
 	//END LDAP
-	$result=db_query($sql);
-	$ileadmin=count($result);
-	if ($ileadmin==1) {
-		return($result[0][0]);
-	}
 	return(-1);
 }
 
