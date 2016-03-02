@@ -50,6 +50,13 @@ global $MOBILE;
     </form>
     </td>
     <?php } ?>
+    <td>
+    <form method="get" action="">
+    <input type="hidden" name="id" value="10" />
+    <input type="hidden" name="id2" value="10" />
+    <input type="submit" value="Ship Explorer" title="Explore all ships in the game"/>
+    </form>
+    </td>
     </tr></table>
     <?php
 //end submenu
@@ -85,6 +92,9 @@ global $MOBILE;
 		break;
                 case 9:
 		include("a9.php");  //Profit Chart
+		break;
+                case 10:
+		include("aa.php");  //Ship Explorer
 		break;
 	    }
 ?>

@@ -62,7 +62,7 @@ function getInventory($parentItemID=0,$corporationID=0) {
     return($rawdata);
 }
 
-function showInventory($data,$parentItemID=0,$corporationID=0) {
+function showInventory($data,$parentItemID=0,$corporationID=0,$db_links=FALSE) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
     if ($corporationID>0) {
         $divisions=getCorpDivisions($corporationID);
@@ -103,7 +103,12 @@ function showInventory($data,$parentItemID=0,$corporationID=0) {
             ?>
             <div style="margin: 10px; width: 64px; height: 100px; float: left;">
                 <div style="position: absolute;">
-            <?php invhrefedit($row['itemID'], $row['corporationID']); ?>
+            <?php if (!$db_links) {
+                invhrefedit($row['itemID'], $row['corporationID']);
+            } else {
+                dbhrefedit($row['typeID']);
+            }
+?>
             <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
                 </div>
                 <?php if ($row['singleton']==0) { ?>
