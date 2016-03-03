@@ -262,9 +262,9 @@ function hashpassLegacy($pass) { //create a salted hash
 function hashpass($pass) { //create a salted hash
 	global $LM_SALT;
         $algo='sha256'; $repeats=10000;
-        $hash=hash($algo,$password);
+        $hash=hash($algo,$LM_SALT.$pass);
         for ($i=0; $i<$repeats; $i++) {
-                $hash=hash($algo,$LM_SALT.$hash.$password);
+                $hash=hash($algo,$hash);
         }
 	return $hash;
 }
