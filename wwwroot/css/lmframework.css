@@ -423,8 +423,6 @@ img {
 	background: none !important; color: #ffffff !important; font-weight: bold; text-align: center; height: 16px; margin-top: -15px; z-index: 1; padding: 0px !important; border-spacing: 0px !important;
 }
 
-//jQueryUI
-
 .ui-accordion-header {
 	cursor: pointer;
 }
