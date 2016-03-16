@@ -205,7 +205,7 @@ function recreateLegacyTables() {
     
     db_uquery("TRUNCATE TABLE `$LM_EVEDB`.`ramTypeRequirements`;");
     
-    $insertramTypeRequirements="INSERT INTO `$LM_EVEDB`.`ramTypeRequirements`      
+    $insertramTypeRequirements="INSERT IGNORE INTO `$LM_EVEDB`.`ramTypeRequirements`      
     SELECT DISTINCT ybp.`productTypeID` AS `typeID`,
         ybp.`activityID`,
         ybm.`materialTypeID` AS `requiredTypeID`,
