@@ -11,7 +11,10 @@ $PANELNAME='Ship Explorer'; //Panel name (optional)
 //standard header ends here
 
 include_once 'inventory.php';
-global $LM_EVEDB;
+include_once('yaml_graphics.php');
+include_once('skins.php');
+
+global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE;
 ?>
 <div class="tytul">
     <?php echo($PANELNAME); ?><br>
@@ -24,6 +27,45 @@ FROM $LM_EVEDB.`invTypes` itp
 JOIN $LM_EVEDB.`invGroups` ing ON itp.`groupID` = ing.`groupID`
 WHERE ing.`categoryID` = 6;");
 
-showInventory($allships,0,0,TRUE);
+$typeID=secureGETnum('typeID');
+
+if (!empty($typeID) && $model=getResourceFromYaml($typeID)) {
+    $item=db_asocquery("SELECT itp.*,igp.`categoryID`
+        FROM $LM_EVEDB.`invTypes` itp
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+        WHERE `typeID` = $typeID ;");
+		
+    if (count($item)==0) {
+            echo('There is no such record in the database.');
+            return;
+    }
+
+    $item=$item[0];
+    ?>
+    <div style="width: 100%; height: 420px; background: url(<?php echo(getTypeIDicon($typeID,512)); ?>) no-repeat center center; background-size: cover;">
+        <canvas id="wglCanvas" width="720" height="420" style="width: 100%; height: 420px;"></canvas>
+    </div>
+    <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/>
+    <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+    <script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
+    <script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
+    <script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
+    <script type="text/javascript" src="webgl.js"></script>
+    <script type="text/javascript">
+        settings.canvasID = 'wglCanvas';
+        settings.sofHullName = '<?=$model['sofHullName']?>';
+        settings.sofRaceName = '<?=$model['sofRaceName']?>';
+        settings.sofFactionName = '<?=$model['sofFactionName']?>';
+        settings.background = '<?=$model['background']?>';
+        settings.categoryID = <?=$item['categoryID']?>;
+        settings.volume = <?=$item['volume']?>;
+        settings.graphicFile = '<?=$model['graphicFile']?>';
+        loadPreview(settings,'default');
+    </script> 
+    <?php
+}
+
+showInventory($allships,0,0,'dbhrefedit');
 
 ?>

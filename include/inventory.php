@@ -9,6 +9,10 @@ function dbhrefedit($nr) {
     echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"Click to open database\">");
 }
 
+function shipshrefedit($nr) {
+    echo("<a href=\"index.php?id=10&id2=10&typeID=$nr\" title=\"Click to display ship in CCP WebGL\">");
+}
+
 function towershrefedit($nr) {
     echo("<a href=\"index.php?id=2&id2=2&towerid=$nr\" title=\"Click to view Labs\">");
 }
@@ -62,7 +66,7 @@ function getInventory($parentItemID=0,$corporationID=0) {
     return($rawdata);
 }
 
-function showInventory($data,$parentItemID=0,$corporationID=0,$db_links=FALSE) {
+function showInventory($data,$parentItemID=0,$corporationID=0,$hrefcallback='invhrefedit') {
     global $DECIMAL_SEP, $THOUSAND_SEP;
     if ($corporationID>0) {
         $divisions=getCorpDivisions($corporationID);
@@ -103,11 +107,9 @@ function showInventory($data,$parentItemID=0,$corporationID=0,$db_links=FALSE) {
             ?>
             <div style="margin: 10px; width: 64px; height: 100px; float: left;">
                 <div style="position: absolute;">
-            <?php if (!$db_links) {
-                invhrefedit($row['itemID'], $row['corporationID']);
-            } else {
-                dbhrefedit($row['typeID']);
-            }
+            <?php 
+            if (function_exists($hrefcallback)) call_user_func($hrefcallback,$row['itemID'], $row['corporationID']);
+            
 ?>
             <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
                 </div>
