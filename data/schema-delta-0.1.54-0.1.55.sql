@@ -63,3 +63,5 @@ CREATE TABLE IF NOT EXISTS `apikillitems` (
   KEY `apikillitems_IX_killID` (`killID`),
   KEY `apikillitems_IX_typeID` (`typeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+ALTER TABLE  `lmusers` CHANGE  `pass`  `pass` VARCHAR( 64 );

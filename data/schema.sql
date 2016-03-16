@@ -1365,7 +1365,7 @@ INSERT INTO `lmuserroles` (`userID`, `roleID`) VALUES
 CREATE TABLE IF NOT EXISTS `lmusers` (
   `userID` int(8) NOT NULL,
   `login` varchar(24) CHARACTER SET latin2 NOT NULL,
-  `pass` varchar(32) NOT NULL DEFAULT '',
+  `pass` varchar(64) NOT NULL DEFAULT '',
   `lastip` varchar(16) CHARACTER SET latin2 DEFAULT '127.0.0.1',
   `last` varchar(24) CHARACTER SET latin2 DEFAULT NULL,
   `defaultPage` int(8) DEFAULT NULL,
