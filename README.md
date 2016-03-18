@@ -8,7 +8,8 @@ For the most current version check the "Releases" page. The trunk code is unstab
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
-<h3>ISK donations are welcome - send to "Lukas Rox" in game</h3>
+<h3>Please do not contact "Lukas Rox" in game for support, because I do not read eve-mail</h3>
+If you find a problem, please open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
 
 Try LMeve's Database module here: http://pozniak.pl/database/index.php
 
@@ -43,3 +44,10 @@ Please refer to LMeve Wiki: https://github.com/roxlukas/lmeve/wiki/Installation-
 * Crysis McNally - for excellent ideas and thorough testing
 * Aideron Technologies - for excellent closed beta
 * CCP Games - for making such a great game and providing API for us, developer kind, to tinker with
+
+<h3>Donations are welcome</h3>
+
+According to CCP Developers License paragraph 4 section 4 (https://developers.eveonline.com/resource/license-agreement)
+you can buy me a coffe or help fund the server.
+
+If you'd like to support the development, feel free to do so: https://www.paypal.me/roxlukas
