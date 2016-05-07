@@ -79,7 +79,8 @@ function checkApiKey($key) {
 }
 
 function RESTfulError($msg,$http_error_code=400) {
-    header("HTTP/1.0 $http_error_code");
+    header("HTTP/1.1 $http_error_code $msg");
+    header("Status: $http_error_code $msg");
      echo(json_encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
     die();
 }
@@ -93,7 +94,7 @@ header("Content-type: application/json");
 //Add CORS header in header so API can be used with web apps on other servers
 header("Access-Control-Allow-Origin: *");
 
-if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",400);
+if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",503);
 
 //check if LMeve API key is valid -OR- if user is logged on to LMeve GUI - SESSION status = 1
 //this will allow LMeve itself to use the api calls if needed
@@ -137,6 +138,13 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
                 ON dta.attributeID=da.attributeID
                 WHERE dta.typeID=$typeID
                 AND displayName != '';");
+            $graphicData=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
+                JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
+                ON yti.`graphicID`=ygi.`graphicID`
+                JOIN `$LM_EVEDB`.`invTypes` itp
+                ON yti.`typeID`=itp.`typeID`
+                WHERE yti.`typeID`=$typeID;");
+            if (count($graphicData) > 0) $item['sofDNA'] = $graphicData[0]['sofHullName'].':'.$graphicData[0]['sofFactionName'].':'.$graphicData[0]['sofRaceName'];    
             if (count($traitData) > 0) $item['traits']=$traitData;
             if (count($bonusData) > 0) $item['bonuses']=$bonusData;
             if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
@@ -163,14 +171,15 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
         case 'GRAPHICID':
             $typeID=secureGETnum('typeID');
             if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
-            $items=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
+            $graphicData=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
                 JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
                 ON yti.`graphicID`=ygi.`graphicID`
                 JOIN `$LM_EVEDB`.`invTypes` itp
                 ON yti.`typeID`=itp.`typeID`
                 WHERE yti.`typeID`=$typeID;");
-            if (count($items)==0) RESTfulError('typeID not found.',404);
-            $item=$items[0];
+            if (count($graphicData)==0) RESTfulError('typeID not found.',404);
+            $item=$graphicData[0];
+            if (count($graphicData) > 0) $item['sofDNA']=$graphicData[0]['sofHullName'].':'.$graphicData[0]['sofFactionName'].':'.$graphicData[0]['sofRaceName'];
             output(json_encode($item));
             break;
         case 'ALLGRAPHICIDS':

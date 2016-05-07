@@ -254,10 +254,10 @@ function createSkinMaterialsRGBview() {
  * 
  * @global $LM_EVEDB - EVE Static Data db name
  */
-function updateYamlSkinMaterialSets($silent=true) {
+function updateYamlSkinMaterialSets($silent=true,$file=null) {
     global $LM_EVEDB;
     
-    $file="../data/$LM_EVEDB/graphicMaterialSets.yaml";
+    if (is_null($file)) $file="../data/$LM_EVEDB/graphicMaterialSets.yaml";
     
     if (!file_exists($file)) {
         echo("File $file does not exist.\r\nThis file might not yet be part of the SDE, in which case I will only create empty tables for the SKIN data.");

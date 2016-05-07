@@ -104,6 +104,7 @@ function db_connect() {
     try {
         $ret = new PDO("$dsn:host=$LM_dbhost;dbname=$LM_dbname;charset=utf8", $LM_dbuser, $LM_dbpass, array(PDO::ATTR_EMULATE_PREPARES => false, 
                                                                                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+        $ret->exec("SET CHARACTER SET utf8");
     } catch(PDOException $ex) {
         if ($LM_DEBUG==1) {
                     printerr("No connection to the database.<br />MySQL reply: ".$ex->getMessage());

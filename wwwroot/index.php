@@ -45,8 +45,9 @@ include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
+include_once('hooks.php'); //hooks - login hook
 
-$lmver="0.1.55 beta";
+$lmver="0.1.56 beta";
  
 //setting session cookie params
 $param=session_get_cookie_params();
@@ -97,6 +98,8 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 			if ($granted>-1) { //LOGIN SUCCESS?
 				$_SESSION["granted"]=$granted;
 				$_SESSION["status"]=1;
+                                //LOGIN HOOK
+                                login_hook();
 				//MAIN WINDOW
 				updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
                                 $MOBILE ? mobile_template_main() : template_main();

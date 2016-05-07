@@ -237,7 +237,7 @@ function getprefs() {
 
 function getusers($options='') {
 	global $USERSTABLE;
-	$sql="SELECT * FROM $USERSTABLE $options";
+	$sql="SELECT `userID` , `login` , `pass` , `lastip` , STR_TO_DATE( `last` , '%d.%m.%Y %H:%i' ) AS last, `defaultPage` , `css` , `act` FROM $USERSTABLE $options";
 	$result=db_asocquery($sql);
 	return($result);
 }

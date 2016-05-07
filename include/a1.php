@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Item Database'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE;
+global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE, $USERSTABLE, $CREST_BASEURL;
 include_once('materials.php');
 include_once('yaml_graphics.php');
 include_once('skins.php');
@@ -434,6 +434,8 @@ if ($model) {
                     <td>&raquo; <a href="http://eve-central.com/home/quicklook.html?typeid=<?php echo($nr); ?>" target="_blank">Check on eve-central.com</a></td>
                 </tr>
                 </table>
+                
+                
             <?php
         }
  
@@ -565,9 +567,29 @@ if ($model) {
 				echo('</a>');
 			echo('</td></tr>');
 		}
-        ?> </table> <?php
+        ?> </table> 
+        
+            
+            <?php
 	}
         
+
+//API URLs 
+        ?>
+            <table class="lmframework" style="width:100%;">
+                    <tr><th>API invTypes URLs</th></tr>
+		<tr>
+                    <?php
+                    $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`=${_SESSION['granted']};");
+                    if (count($keys)>0) $apikey='key='.$keys[0]['apiKey'].'&'; else $apikey='';
+                    ?>
+                    <td>LMeve API <a href="api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?></a></td>
+                </tr>
+                <tr>
+                    <td>CREST <a href="<?=$CREST_BASEURL?>/types/<?=$nr?>/" target="_blank"><?=$CREST_BASEURL?>/types/<?=$nr?>/</a></td>
+                </tr>
+            </table>
+        <?php
         
 if (!$MOBILE) {
     echo('</td><td style="width: 50%; vertical-align: top;">');

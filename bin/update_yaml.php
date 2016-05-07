@@ -25,15 +25,18 @@
         //--blueprints - update blueprints
         //--legacy - update legacy industry tables
         
-        echo('LMeve YAML static data updater'.PHP_EOL.'(c) 2014 by Lukasz "Lukas Rox" Pozniak'.PHP_EOL.PHP_EOL);
+        echo('LMeve YAML static data updater'.PHP_EOL.'(c) 2014-2016 by Lukasz "Lukas Rox" Pozniak'.PHP_EOL.PHP_EOL);
+        echo('This tool is deprecated as of Citadel release.'.PHP_EOL);
         
         if ($argc==2 && $argv[1]=='--all') {
-            $updateTypeIDs=TRUE;
-            $updateGraphicIDs=TRUE;
-            $updateCertificates=TRUE;
-            $updateBlueprints=TRUE;
-            $updateLegacy=TRUE;
-            $updateSkins=TRUE;
+            //$updateTypeIDs=TRUE;
+            //$updateGraphicIDs=TRUE;
+            //$updateCertificates=TRUE;
+            //$updateBlueprints=TRUE;
+            //$updateLegacy=TRUE;
+            //$updateSkins=TRUE;
+            echo('This tool is deprecated as of Citadel release. LMeve recreates required tables on first login.'.PHP_EOL);
+            die();
         } else if ($argc>=2) {
             foreach($argv as $arg) {
                 if ($arg=='--typeIDs') $updateTypeIDs=TRUE;

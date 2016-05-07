@@ -41,6 +41,8 @@ $SSO_CLIENT_ID='sso_client_id';
 $SSO_CLIENT_SECRET='sso_client_secret';
 //Auth server can be either login.eveonline.com for Tranquility, or sisilogin.testeveonline.com when trying to use Sisi.
 $SSO_AUTH_SERVER='sisilogin.testeveonline.com';
+$API_BASEURL="https://api.eveonline.com"; 
+$CREST_BASEURL="https://public-crest.eveonline.com";
 //CSRF token expiry time (in seconds)
 $LM_SECUREFORMSEXPIRY=300;
 //Buy calculator can show colored hints green - we buy, yellow - we have enough, red - we have way more than enough - we dont buy
