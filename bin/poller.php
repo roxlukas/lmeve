@@ -27,8 +27,18 @@ $MAX_ERRORS=10; //ignore first x errors
  * $API_BASEURL="https://api.testeveonline.com"; 
  * $CREST_BASEURL="http://public-crest-sisi.testeveonline.com";
  */
-$API_BASEURL="https://api.eveonline.com"; 
-$CREST_BASEURL="https://public-crest.eveonline.com";
+
+include_once("$mypath/../config/config.php"); //API URLs are now in config.php
+
+if (!isset($API_BASEURL)) {
+    echo('WARNING: $API_BASEURL isn\'t set in config.php. Using default XML API URL https://api.eveonline.com');
+    $API_BASEURL="https://api.eveonline.com"; 
+}
+if (!isset($CREST_BASEURL)) {
+    echo('WARNING: $CREST_BASEURL isn\'t set in config.php. Using default CREST API URL https://crest-tq.eveonline.com');
+    $CREST_BASEURL="https://crest-tq.eveonline.com"; 
+}    
+    
 $USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";
 
 $FEED_BLOCKED="This feed is blocked due to previous errors.";
