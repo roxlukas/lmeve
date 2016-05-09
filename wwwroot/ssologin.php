@@ -11,6 +11,7 @@ include_once("menu.php");  //menu
 include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
+include_once('hooks.php'); //hooks - login hook
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  
@@ -171,6 +172,8 @@ if (!$SSOENABLED) { //if sso is not enabled, exit immediately
         //everything green! authorize user.
         $_SESSION["granted"]=$userID;
         $_SESSION["status"]=1;
+        //LOGIN HOOK
+        login_hook();
         $_SESSION['LOGIN_REALM']='EVE_SSO';
         updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
         header("Location: index.php");

@@ -16,12 +16,15 @@ function recreateSdeCompatViews() {
         SELECT `typeID` as `blueprintTypeID`, `maxProductionLimit` FROM `$LM_EVEDB`.`industryBlueprints`");
     
     if (!checkIfTableExists('yamlBlueprintProducts')) db_uquery("CREATE OR REPLACE VIEW `$LM_EVEDB`.`yamlBlueprintProducts` AS
-        SELECT iap.`typeID` AS `blueprintTypeID`,
+        SELECT 
+        iap.`typeID` AS `blueprintTypeID`,
         iap.`productTypeID`,
         iap.`activityID`,
-        iap.`probability`,
+        iapr.`probability`,
         iac.`time`
-        FROM `$LM_EVEDB`.`industryActivityProbabilities` iap
+        FROM `$LM_EVEDB`.`industryActivityProducts` iap
+        LEFT JOIN `$LM_EVEDB`.`industryActivityProbabilities` iapr
+        ON iap.`typeID`=iapr.`typeID` AND iap.`activityID`=8
         JOIN `$LM_EVEDB`.`industryActivity` iac
         ON iap.`typeID`=iac.`typeID` AND iac.`activityID`=iap.`activityID`;");
     
