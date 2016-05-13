@@ -26,8 +26,8 @@ function url_replace($input) {
 }
 
 ?>	    
-		<script type="text/javascript" src="ajax.js"></script>
-		<script type="text/javascript" src="skin-icon.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
 		<div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
@@ -229,18 +229,18 @@ if ($model=getResourceFromYaml($nr)) {
     <div id="3dpreview" style="width: 100%; display: none;">
 <?php } ?>
 <table class="lmframework" style="width: 100%;">
-    <tr><th colspan="2">3D Preview <img src="img/del.gif" alt="x" onclick="toggler('3dpreview'); scene=null; ship=null;" value="x" style="float: right;"/></th></tr>
+    <tr><th colspan="2">3D Preview <img src="<?=getUrl()?>img/del.gif" alt="x" onclick="toggler('3dpreview'); scene=null; ship=null;" value="x" style="float: right;"/></th></tr>
     <tr><td width="725">
             <div style="width: 720px; height: 420px; background: url(<?php echo(getTypeIDicon($item['typeID'],512)); ?>) no-repeat center center; background-size: cover;">
                 <canvas id="wglCanvas" width="720" height="420" style="width: 720px; height: 420px;"></canvas>
             </div>
     <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td>
     <td style="vertical-align: top;">
-		<script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
-		<script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
-		<script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
-		<script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
-                <script type="text/javascript" src="webgl.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
+                <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
 		<script type="text/javascript">
                     settings.canvasID = 'wglCanvas';
                     settings.sofHullName = '<?=$model['sofHullName']?>';
@@ -474,7 +474,7 @@ if ($model) {
         	displaySkills(getSkills($bpo[0],1));
 
 		?>
-		<script type="text/javascript" src="skrypty.js"></script>
+		<script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 		<script type="text/javascript">
 			function func(s) {
 				//var s=document.getElementById('melevel');

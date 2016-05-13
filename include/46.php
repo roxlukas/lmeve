@@ -45,7 +45,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 		  $wyl=0;
 		    echo('<tr><td class="tab">');
 		    hrefedit($row['id']);
-			echo('<img src="img/msg.gif" alt="MSG"> ');
+			echo('<img src="'.getUrl().'img/msg.gif" alt="MSG"> ');
 		    echo(stripslashes($row['msgtopic']));
 		    echo('</a></td><td class="tab">');
 		    hrefedit($row['id']);

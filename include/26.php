@@ -19,7 +19,7 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
 			Player-owned Customs Offices<br/>
 		</div>
 
-                <div id="pageContents"><em><img src="img/loader.png" /> Loading...</em></div>
+                <div id="pageContents"><em><img src="<?=getUrl()?>img/loader.png" /> Loading...</em></div>
                 <script type="text/javascript">
                         ajax_get('ajax.php?act=CACHE&page=26','pageContents');
                 </script>

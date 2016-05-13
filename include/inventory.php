@@ -213,7 +213,7 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
               <canvas id="wglCanvas" width="532" height="532" style="width: 532px; height: 532px;"></canvas>
           </div>
           <div style="position: absolute; margin-left: 0px; margin-top: 0px; pointer-events: none; ">
-              <img src="img/fitting_mask.png" />
+              <img src="<?=getUrl()?>img/fitting_mask.png" />
           </div>
 
     <?php
@@ -294,11 +294,11 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
         </td></tr></table>
     </td></tr></table>
 <?php if (getConfigItem(useWebGLpreview,'enabled')=='enabled') { ?>
-    <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
-    <script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
-    <script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
-    <script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
-    <script type="text/javascript" src="webgl.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
     <script type="text/javascript">
         //webgl suprt
         settings.canvasID = 'wglCanvas';
@@ -383,7 +383,7 @@ function showInventoryHeader($itemdata,$corporationID) {
             <th style="width: 64px;">
                 <?php if($row['parentItemID']==0) $crpID=0; else $crpID=$row['corporationID'];
                     invhrefedit($row['parentItemID'], $crpID); ?>
-                <img src="ccp_icons/23_64_1.png" alt="&lt; back"/></a>
+                <img src="<?=getUrl()?>ccp_icons/23_64_1.png" alt="&lt; back"/></a>
             </th>
             <th style="width: 64px;">
                 <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" />
@@ -1364,7 +1364,7 @@ function showStock($inventory, $corpID) {
         $subtotal=0;
     ?>
     <table class="lmframework" style="width: 70%; min-width: 595px;" id="inv_group_name_<?php echo($corpID.'_'.$group['groupID']); ?>" title="Click to show/hide items in this group" onclick="div_toggler('inv_group_<?php echo($corpID.'_'.$group['groupID']); ?>')">
-        <tr><th style="width: 100%; text-align: center;"><img src="img/plus.gif" style="float: left;"/> <?php echo($group['groupName']); ?></th></tr>
+        <tr><th style="width: 100%; text-align: center;"><img src="<?=getUrl()?>img/plus.gif" style="float: left;"/> <?php echo($group['groupName']); ?></th></tr>
     </table>
     
 <div id="inv_group_<?php echo($corpID.'_'.$group['groupID']); ?>" style="display: none;">
@@ -1398,11 +1398,11 @@ function showStock($inventory, $corpID) {
                                         if ($amount>0) {
                                             $percent=100*$quantity/$amount;
                                             if ($percent < $LM_HINTLOW) {
-                                                echo('<img src="'.$LM_HINTGREENIMG.'" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="'.$LM_HINTGREEN.'" />');
+                                                echo('<img src="'.getUrl().$LM_HINTGREENIMG.'" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="'.$LM_HINTGREEN.'" />');
                                             } else if ($percent < $LM_HINTHIGH) {
-                                                echo('<img src="'.$LM_HINTYELLOWIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTYELLOW.'" />');
+                                                echo('<img src="'.getUrl().$LM_HINTYELLOWIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTYELLOW.'" />');
                                             } else {
-                                                echo('<img src="'.$LM_HINTREDIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTRED.'" />');
+                                                echo('<img src="'.getUrl().$LM_HINTREDIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTRED.'" />');
                                             }
                                         }
                                     }

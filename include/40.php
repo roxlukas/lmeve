@@ -48,9 +48,9 @@ $PANELNAME='Messages'; //Panel name (optional)
 		    hrefedit($row['id']);
 		    if ($row['msgread']==0) {
 		    	$wyl=formatowanie(0,1,0,-1);
-		    	echo('<img src="img/msgnew.gif" alt="MSGnew"> ');
+		    	echo('<img src="'.getUrl().'img/msgnew.gif" alt="MSGnew"> ');
 		    } else {
-			echo('<img src="img/msg.gif" alt="MSG"> ');
+			echo('<img src="'.getUrl().'img/msg.gif" alt="MSG"> ');
 		    }
 		    echo(stripslashes($row['msgtopic']));
 		    odformatowanie($wyl);

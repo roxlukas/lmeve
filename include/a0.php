@@ -95,7 +95,7 @@ if (!empty($marketGroupID)) {
 	if (!empty($marketGroupID)) {
 		/*
 			<tr><td class="tab">
-				<b><a href="?id=10&id2=0"><img src="ccp_icons/23_64_4.png" style="width: 32px; height: 32px;" title="Market Home" /></a></b>
+				<b><a href="?id=10&id2=0"><img src="<?=getUrl()?>ccp_icons/23_64_4.png" style="width: 32px; height: 32px;" title="Market Home" /></a></b>
 			</td><td class="tab">
 				<b><a href="?id=10&id2=0">/</a></b>
 			</td>
@@ -103,7 +103,7 @@ if (!empty($marketGroupID)) {
 		*/
 		?>
 			<tr><td class="tab">
-				<b><a href="?id=10&id2=0&marketGroupID=<?php echo($parentGroupID); ?>"><img src="ccp_icons/23_64_1.png" style="width: 32px; height: 32px;" title="Parent Group" /></a></b>
+				<b><a href="?id=10&id2=0&marketGroupID=<?php echo($parentGroupID); ?>"><img src="<?=getUrl()?>ccp_icons/23_64_1.png" style="width: 32px; height: 32px;" title="Parent Group" /></a></b>
 			</td><td class="tab">
 				<b><a href="?id=10&id2=0&marketGroupID=<?php echo($parentGroupID); ?>">..</a></b>
 			</td>
@@ -115,7 +115,7 @@ if (!empty($marketGroupID)) {
 				foreach($groups as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 						hrefedit_group($row['marketGroupID']);
-						echo("<img src=\"ccp_icons/22_32_29.png\" title=\"${row['marketGroupName']}\" />");
+						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"${row['marketGroupName']}\" />");
 						echo('</a>');
 					echo('</td><td class="tab">');
 						hrefedit_group($row['marketGroupID']);

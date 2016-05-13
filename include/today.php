@@ -45,8 +45,8 @@ $PANELNAME='Today'; //Panel name (optional)
 ?>
 <table border="0" cellspacing="0" cellpadding="0" width="100%" class="today">
 <tr><td width="1">
-	<script type="text/javascript" src="resizer.js"></script>
-  	<script type="text/javascript" src="skrypty.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>resizer.js"></script>
+  	<script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 </td><td width="60%" valign="top">
 	<?php
 		include("checkpoller.php");
@@ -118,7 +118,7 @@ if($nowe_wiad==1) {
 
 		foreach($message as $row) {
 		    hrefedit2($row['id']);
-	    	    echo('<img src="img/msgnew.gif" alt="MSGnew"> ');
+	    	    echo('<img src="'.getUrl().'img/msgnew.gif" alt="MSGnew"> ');
 			echo(' <b>');
 		    echo($row['msgtopic']);
 			echo('</b>, from user <b> ');

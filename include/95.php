@@ -116,7 +116,7 @@ $connected=connectCharacters($final_chars);
         
         <table class="lmframework">
             <tr><th>Characters available in Your personal API</th><td></td><th>Characters eligible to link</th><td></td><th>Characters available in Corporation API</th></tr>
-            <tr><td style="text-align: center;"><?php displayCharacters($chars); ?></td><td><img src="ccp_icons/9_64_6.png" alt="-&gt;" /></td><td style="text-align: center;"><?php displayCharacters($valid_chars); ?></td><td><img src="ccp_icons/9_64_6.png" alt="-&gt;" /></td><td style="text-align: center;"><?php displayCharacters($final_chars); ?></td></tr>
+            <tr><td style="text-align: center;"><?php displayCharacters($chars); ?></td><td><img src="<?=getUrl()?>ccp_icons/9_64_6.png" alt="-&gt;" /></td><td style="text-align: center;"><?php displayCharacters($valid_chars); ?></td><td><img src="<?=getUrl()?>ccp_icons/9_64_6.png" alt="-&gt;" /></td><td style="text-align: center;"><?php displayCharacters($final_chars); ?></td></tr>
         </table>
 <?php
     if ($connected>0) {

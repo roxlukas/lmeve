@@ -19,7 +19,7 @@ function apikeyhrefedit($nr) {
 <div class="tytul">
 <?php echo($PANELNAME); ?>
 </div>
-<img src="ccp_icons/7_64_5.png"  alt="Corporation" style="float: left;"/>
+<img src="<?=getUrl()?>ccp_icons/7_64_5.png"  alt="Corporation" style="float: left;"/>
 <table><tr><td>
     <form method="post" action="?id=5&id2=18">
         <?php token_generate(); ?>
@@ -32,7 +32,7 @@ function apikeyhrefedit($nr) {
     </form>            
 </td></tr></table>
 <div><br/>
-<img src="ccp_icons/38_16_208.png" alt="(!) "/> LMeve <u>only</u> works with Corporation level API Keys.<br/>
+<img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(!) "/> LMeve <u>only</u> works with Corporation level API Keys.<br/>
 <br/></div>
 <table class="lmframework">
     <tr><th>
@@ -69,7 +69,7 @@ function apikeyhrefedit($nr) {
             echo($key['date']);
             echo('</td><td>');
             apikeyhrefedit($key['apiKeyID']);
-            echo('<img src="img/del.gif" alt="Delete key" />');
+            echo('<img src="'.getUrl().'img/del.gif" alt="Delete key" />');
             echo("</a>");
             echo('</td></tr>');
         }

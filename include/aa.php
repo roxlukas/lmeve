@@ -19,7 +19,7 @@ global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE;
 <div class="tytul">
     <?php echo($PANELNAME); ?><br>
 </div>
-<em><img src="ccp_icons/38_16_208.png" alt="(i)"/> This page show all items in the Static Data Export which belong to categoryID 6 - ships. It contains both ships which are available to players in game, and those which remain hidden deep in the database.</em>
+<em><img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(i)"/> This page show all items in the Static Data Export which belong to categoryID 6 - ships. It contains both ships which are available to players in game, and those which remain hidden deep in the database.</em>
 <?php
 //itemID 	parentItemID 	locationID 	typeID 	quantity 	flag 	singleton 	rawQuantity 	corporationID 	typeName 	locationName 	itemName
 $allships=db_asocquery("SELECT itp.`typeID` AS `itemID`, 0 AS `parentItemID`, 0 AS `locationID`, itp.`typeID`, 1 AS `quantity`, 1 AS `flag`, 1 AS `singleton`, 0 AS `rawQuantity`, 0 AS `corporationID`, itp.`typeName`, '' AS `locationName`,itp.`typeName` AS `itemName`
@@ -47,11 +47,11 @@ if (!empty($typeID) && $model=getResourceFromYaml($typeID)) {
         <canvas id="wglCanvas" width="720" height="420" style="width: 100%; height: 420px;"></canvas>
     </div>
     <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/>
-    <script type="text/javascript" src="./ccpwgl/external/glMatrix-0.9.5.min.js"></script>
-    <script type="text/javascript" src="./ccpwgl/ccpwgl_int.js"></script>
-    <script type="text/javascript" src="./ccpwgl/test/TestCamera2.js"></script>
-    <script type="text/javascript" src="./ccpwgl/ccpwgl.js"></script>
-    <script type="text/javascript" src="webgl.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
     <script type="text/javascript">
         settings.canvasID = 'wglCanvas';
         settings.sofHullName = '<?=$model['sofHullName']?>';

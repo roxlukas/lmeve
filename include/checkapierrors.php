@@ -19,7 +19,7 @@
         foreach ($errors as $error) {
             ?>
             <div class="newmsg">
-                <img src="img/exc.gif" alt="Warning" />
+                <img src="<?=getUrl()?>img/exc.gif" alt="Warning" />
                 <a href="?id=8&id2=4"><?=$error['fileName']?>: <?=$error['errorMessage']?></a>
             </div>
             <?php

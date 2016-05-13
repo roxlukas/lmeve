@@ -41,10 +41,10 @@
 	  $g++;
 	}
 	if ($g==1) {
-		printf(' <b><div class="newmsg">Notification: <a href="?id=4"><img src="img/msgnew.gif" alt="MSGnew">You have 1 unread message.</a></div>');
+		printf(' <b><div class="newmsg">Notification: <a href="?id=4"><img src="'.getUrl().'img/msgnew.gif" alt="MSGnew">You have 1 unread message.</a></div>');
 	}
 	if ($g>1) {
-		printf(' <b><div class="newmsg">Notification: <a href="?id=4"><img src="img/msgnew.gif" alt="MSGnew"> You have %d unread messages.</a></div>',$g);
+		printf(' <b><div class="newmsg">Notification: <a href="?id=4"><img src="'.getUrl().'img/msgnew.gif" alt="MSGnew"> You have %d unread messages.</a></div>',$g);
 	}
 
 ?>

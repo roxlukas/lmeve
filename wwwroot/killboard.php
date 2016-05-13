@@ -181,11 +181,11 @@ function template_public() {
 	<link type="text/css" href="css/rixx_fullscreen.css" rel="stylesheet">
         <!--<link rel="stylesheet" href="jquery-ui/css/ui-darkness/jquery-ui-1.10.3.custom.min.css" />-->
 	<link rel="icon" href="favicon.ico" type="image/ico">
-        <script type="text/javascript" src="jquery-ui/js/jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
-        <script type="text/javascript" src="chart.js/Chart.min.js"></script>
-        <script type="text/javascript" src="ajax.js"></script>
-        <script type="text/javascript" src="skrypty.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>chart.js/Chart.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
@@ -204,7 +204,7 @@ function template_public() {
 		</table>
 	</td></tr>
 	<tr><td width="100%" class="tab-logo">
-	<img src="img/LMeve.png" alt="Logo">
+	<img src="<?=getUrl()?>img/LMeve.png" alt="Logo">
 	</td></tr>
 	<tr><td width="100%" style="padding: 0;">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -235,7 +235,7 @@ function template_public() {
 	<?php
 	include("copyright.php");
 	?>
-	<script type="text/javascript" src="resizer.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>resizer.js"></script>
 	</center>
 	</body>
 	</html>

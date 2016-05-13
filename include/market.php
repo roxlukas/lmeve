@@ -36,13 +36,13 @@ function charhrefedit($nr) {
 //38_16_118.png - OK 38_16_111.png -NOK
 //38_16_193.png - OK 38_16_194.png -NOK
 function OKIMG() {
-	return('<img src="ccp_icons/38_16_193.png" style="vertical-align: text-bottom;" />');
+	return('<img src="'.getUrl().'ccp_icons/38_16_193.png" style="vertical-align: text-bottom;" />');
 }
 function NOKIMG() {
-	return('<img src="ccp_icons/38_16_194.png" style="vertical-align: text-bottom;" />');
+	return('<img src="'.getUrl().'ccp_icons/38_16_194.png" style="vertical-align: text-bottom;" />');
 }
 function RDYIMG() {
-	return('<img src="ccp_icons/38_16_118.png" style="vertical-align: text-bottom;" />');
+	return('<img src="'.getUrl().'ccp_icons/38_16_118.png" style="vertical-align: text-bottom;" />');
 }
 
 function showBuyback($buybacklist) {
@@ -169,10 +169,10 @@ function showBuybackOrder($row) {
 		echo('<table border="0" cellspacing="2" cellpadding="0">');
 		echo('<tr><td class="tab"><strong>Hash:</strong></td><td class="tab">'.$order_fullhash.'</td></tr>');
 		if ($row['fullHash']==$order_fullhash) {
-			echo('<tr><td class="tab"><strong>Valid:</strong></td><td class="tab"><img src="ccp_icons/38_16_193.png" style="vertical-align: text-bottom;" /> VALID</td></tr>');
+			echo('<tr><td class="tab"><strong>Valid:</strong></td><td class="tab"><img src="'.getUrl().'ccp_icons/38_16_193.png" style="vertical-align: text-bottom;" /> VALID</td></tr>');
 		} else {
 			echo('<tr><td class="tab"><strong>Should be:</strong></td><td class="tab">'.$row['fullHash'].'</td></tr>');
-			echo('<tr><td class="tab"><strong>Valid:</strong></td><td class="tab"><img src="ccp_icons/38_16_194.png" style="vertical-align: text-bottom;" /> TAMPERED</td></tr>');
+			echo('<tr><td class="tab"><strong>Valid:</strong></td><td class="tab"><img src="'.getUrl().'ccp_icons/38_16_194.png" style="vertical-align: text-bottom;" /> TAMPERED</td></tr>');
 		}
 		echo('</table>');
 	echo("</td></tr>");
@@ -399,8 +399,8 @@ function showBuyCalc($buycalc,$inventory=array()) {
         echo("];\r\n");
 	?>
 	</script>
-	<script type="text/javascript" src="buycalc.js"></script>
-	<script type="text/javascript" src="skrypty.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>buycalc.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 	<!--<form method="post" action="index.php?id=3&id2=2" onsubmit="return confirm('Are you sure you want to submit this order?');">-->
 	<form method="post" action="index.php?id=3&id2=2">
         <?php token_generate(); ?>
@@ -412,16 +412,16 @@ function showBuyCalc($buycalc,$inventory=array()) {
                 ?>
                     <table class="lmframework" style="width: 80%; min-width: 455px;">
                         <tr><th>Hints:</th></tr>
-                        <tr><td><img src="<?php echo($LM_HINTGREENIMG); ?>" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="<?php echo($LM_HINTGREEN); ?>" /><?php echo($LM_HINTGREEN); ?></td></tr>
-                        <tr><td><img src="<?php echo($LM_HINTYELLOWIMG); ?>" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="<?php echo($LM_HINTYELLOW); ?>" /><?php echo($LM_HINTYELLOW); ?></td></tr>
-                        <tr><td><img src="<?php echo($LM_HINTREDIMG); ?>" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="<?php echo($LM_HINTRED); ?>" /><?php echo($LM_HINTRED); ?></td></tr>
+                        <tr><td><img src="<?=getUrl()?><?php echo($LM_HINTGREENIMG); ?>" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="<?php echo($LM_HINTGREEN); ?>" /><?php echo($LM_HINTGREEN); ?></td></tr>
+                        <tr><td><img src="<?=getUrl()?><?php echo($LM_HINTYELLOWIMG); ?>" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="<?php echo($LM_HINTYELLOW); ?>" /><?php echo($LM_HINTYELLOW); ?></td></tr>
+                        <tr><td><img src="<?=getUrl()?><?php echo($LM_HINTREDIMG); ?>" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="<?php echo($LM_HINTRED); ?>" /><?php echo($LM_HINTRED); ?></td></tr>
                     </table>
                 <?php
                 }
 		foreach($buycalc as $groupID => $group) {
                     ?>
                     <table class="lmframework" style="width: 80%; min-width: 455px;" id="buc_group_name_<?php echo($group['groupID']); ?>" title="Click to show/hide items in this group" onclick="div_toggler('buc_group_<?php echo($group['groupID']); ?>')">
-                    <tr><th style="width: 100%; text-align: center;"><img src="img/plus.gif" style="float: left;"/> <?php echo($group['groupName']); ?></th></tr>
+                    <tr><th style="width: 100%; text-align: center;"><img src="<?=getUrl()?>img/plus.gif" style="float: left;"/> <?php echo($group['groupName']); ?></th></tr>
                     </table>
                     <div id="buc_group_<?php echo($group['groupID']); ?>" style="display: none;">
                     <table class="lmframework" style="width: 80%; min-width: 455px;" >
@@ -455,11 +455,11 @@ function showBuyCalc($buycalc,$inventory=array()) {
                                         if ($amount>0) {
                                             $percent=100*$quantity/$amount;
                                             if ($percent < $LM_HINTLOW) {
-                                                echo('<img src="'.$LM_HINTGREENIMG.'" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="'.$LM_HINTGREEN.'" />');
+                                                echo('<img src="'.getUrl().$LM_HINTGREENIMG.'" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="'.$LM_HINTGREEN.'" />');
                                             } else if ($percent < $LM_HINTHIGH) {
-                                                echo('<img src="'.$LM_HINTYELLOWIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTYELLOW.'" />');
+                                                echo('<img src="'.getUrl().$LM_HINTYELLOWIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTYELLOW.'" />');
                                             } else {
-                                                echo('<img src="'.$LM_HINTREDIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTRED.'" />');
+                                                echo('<img src="'.getUrl().$LM_HINTREDIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTRED.'" />');
                                             }
                                         }
                                     }

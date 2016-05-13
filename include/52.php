@@ -18,7 +18,7 @@ Settings
 <div class="tleft">
 <h2>Change password</h2><br>
 <?php
-    if (secureGETnum('legacy')==1) echo('<h3>Your password must be changed.</h3><em><img src="ccp_icons/38_16_208.png" alt="(i)"/> Your old password was hashed using less secure md5 algorithm. New password will be hashed 10.000 times using a more secure algorithm, sha256.</em>');
+    if (secureGETnum('legacy')==1) echo('<h3>Your password must be changed.</h3><em><img src="'.getUrl().'ccp_icons/38_16_208.png" alt="(i)"/> Your old password was hashed using less secure md5 algorithm. New password will be hashed 10.000 times using a more secure algorithm, sha256.</em>');
 ?>
 <form method="post" action="?id=5&id2=3">
 <?php

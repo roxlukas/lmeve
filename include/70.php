@@ -60,7 +60,7 @@ function gethost($ip)
   
         <table class="lmframework" width="422">
 	    <tr><th width="100%">
-	    <img src="ccp_icons/38_16_170.png" alt="[+]" style="vertical-align: middle;" /> Active users
+	    <img src="<?=getUrl()?>ccp_icons/38_16_170.png" alt="[+]" style="vertical-align: middle;" /> Active users
 	    </th></tr>
         </table>
         <?php
@@ -68,7 +68,7 @@ function gethost($ip)
         ?>
         <table class="lmframework" width="422">
 	    <tr><th width="100%">
-	    <img src="ccp_icons/38_16_169.png" alt="[x]" style="vertical-align: middle;" /> Disabled users
+	    <img src="<?=getUrl()?>ccp_icons/38_16_169.png" alt="[x]" style="vertical-align: middle;" /> Disabled users
 	    </th></tr>
         </table>
         <?php 
@@ -82,16 +82,16 @@ function gethost($ip)
 	    */ ?>
 	    <table cellspacing="2" cellpadding="0" border="0">
 	    <tr><td class="tab-header">
-	    <img src="img/info.gif" alt="i"><b>Legend:</b><br>
+	    <img src="<?=getUrl()?>img/info.gif" alt="i"><b>Legend:</b><br>
 	    </td></tr><tr><td>
 		<table cellspacing="0" cellpadding="0" border="0">
 		<tr><td width="50" class="tab-act"><br></td><td>- online user<br></td>
 		<td width="50" class="tab"><br></td><td>- offline user<br></td>
 		</tr>
 		</table>
-	    </td></tr><tr><td class="tab"><img src="img/msg.gif" alt="MSG"> - Send message<br></td>
+	    </td></tr><tr><td class="tab"><img src="<?=getUrl()?>img/msg.gif" alt="MSG"> - Send message<br></td>
 	    </tr></table>
-	<script type="text/javascript" src="skrypty.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 	<script type="text/javascript">
 		reloader("?id=7",20);
 	</script>

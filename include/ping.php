@@ -53,12 +53,12 @@ function ping2a($adres) {
 function ping2b($ping) {
 	$lag=100;	// powyzej ilu ma sie pojawiac "obciazone"
 	if ($ping==999) {
-		echo('<img src="img/red.gif" alt="red"> 999 ms');
+		echo('<img src="'.getUrl().'img/red.gif" alt="red"> 999 ms');
 	} else {
 		if ($ping<$lag) {
-			echo('<img src="img/green.gif" alt="green"> ');
+			echo('<img src="'.getUrl().'img/green.gif" alt="green"> ');
 		} else {
-			echo('<img src="img/yellow.gif" alt="yellow"> ');
+			echo('<img src="'.getUrl().'img/yellow.gif" alt="yellow"> ');
 		}
 		echo($ping);
 		echo(' ms');
@@ -69,12 +69,12 @@ function ping2b($ping) {
 function ping2bb($ping) {
 	$lag=100;	// powyzej ilu ma sie pojawiac "obciazone"
 	if ($ping==999) {
-			echo('<img src="img/red.gif" alt="red">');
+			echo('<img src="'.getUrl().'img/red.gif" alt="red">');
 	} else {
 		if ($ping<$lag) {
-			echo('<img src="img/green.gif" alt="green"> ');
+			echo('<img src="'.getUrl().'img/green.gif" alt="green"> ');
 		} else {
-			echo('<img src="img/yellow.gif" alt="yellow"> ');
+			echo('<img src="'.getUrl().'img/yellow.gif" alt="yellow"> ');
 		}
 	}
 	//return $temp;

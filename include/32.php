@@ -74,4 +74,4 @@ echo('</table>');
 	<input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
 	<input type="submit" value="OK">
 	</form>
-<center><img src="img/contract.png" alt="How to setup a contract" /></center>
+<center><img src="<?=getUrl()?>img/contract.png" alt="How to setup a contract" /></center>

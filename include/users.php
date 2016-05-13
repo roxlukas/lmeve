@@ -55,7 +55,7 @@ function showUsers($admini) {
 	    echo("<td$log>");
 	    echo('<a href="?id=4&id2=1&nr=new&adr=');
 	    echo($admin['userID']);
-	    echo('" title="Send message"><img src="img/msg.gif" alt="MSG"></a>');
+	    echo('" title="Send message"><img src="<?=getUrl()?>img/msg.gif" alt="MSG"></a>');
 	    echo('</td></tr>');
 	}?>
         </table>

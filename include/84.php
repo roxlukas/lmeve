@@ -162,7 +162,7 @@ $PANELNAME='PVE Statistics'; //Panel name (optional)
                             
                         </script>
     </div>
-<em><img src="ccp_icons/38_16_208.png" alt="(i)"/> In some circumstances, the following API endpoints can fail, and it is not an error: WalletJournal_10000, WalletTransactions_10000, FacWarStats.<br/>
+<em><img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(i)"/> In some circumstances, the following API endpoints can fail, and it is not an error: WalletJournal_10000, WalletTransactions_10000, FacWarStats.<br/>
 Failing ednpoints are locked out permanently after 10 unsuccessful attempts.</em>
 	<table class="lmframework">
 	<tr><th width="64">

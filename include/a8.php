@@ -24,8 +24,8 @@ if (!empty($marketGroupID)) {
 
 //BEGIN Clientside sorting:
 ?>
-  <script type="text/javascript" src="jquery-tablesorter/jquery.tablesorter.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="jquery-tablesorter/blue/style.css">
+  <script type="text/javascript" src="<?=getUrl()?>jquery-tablesorter/jquery.tablesorter.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="<?=getUrl()?>jquery-tablesorter/blue/style.css">
   <script type="text/javascript">
     $(document).ready(function() { 
         $("#items").tablesorter({ 
@@ -115,7 +115,7 @@ if (!empty($marketGroupID)) {
 		
 		?>
 			<tr><td>
-				<b><a href="?id=10&id2=8&marketGroupID=<?php echo($parentGroupID); ?>"><img src="ccp_icons/23_64_1.png" style="width: 32px; height: 32px;" title="Parent Group" /></a></b>
+				<b><a href="?id=10&id2=8&marketGroupID=<?php echo($parentGroupID); ?>"><img src="<?=getUrl()?>ccp_icons/23_64_1.png" style="width: 32px; height: 32px;" title="Parent Group" /></a></b>
 			</td><td>
 				<b><a href="?id=10&id2=8&marketGroupID=<?php echo($parentGroupID); ?>">..</a></b>
                         </td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -127,7 +127,7 @@ if (!empty($marketGroupID)) {
 				foreach($groups as $row) {
 					echo('<tr><td style="padding: 0px; width: 32px;">');
 						hrefedit_group($row['marketGroupID']);
-						echo("<img src=\"ccp_icons/22_32_29.png\" title=\"${row['marketGroupName']}\" />");
+						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"${row['marketGroupName']}\" />");
 						echo('</a>');
 					echo('</td><td>');
 						hrefedit_group($row['marketGroupID']);

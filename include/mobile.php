@@ -24,11 +24,11 @@ function mobile_template_main() {
 	?>
         <!--<link rel="stylesheet" href="jquery-ui/css/ui-darkness/jquery-ui-1.10.3.custom.min.css" />-->
 	<link rel="icon" href="favicon.ico" type="image/ico" />
-        <script type="text/javascript" src="jquery-ui/js/jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
-        <script type="text/javascript" src="chart.js/Chart.min.js"></script>
-        <script type="text/javascript" src="ajax.js"></script>
-        <script type="text/javascript" src="skrypty.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>chart.js/Chart.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 	<script type="text/javascript">
 		function logoff() {
 		logout=window.open("index.php?logoff=1","logoff_window","toolbar=0,location=0,scrollbars=0,resizable=0,height=64,width=64,top=100,left=100");
@@ -43,12 +43,12 @@ function mobile_template_main() {
 		<tr><td width="50%" align="left"><div class="top">Logged in as:<b> <?php
 			echo(getusername());
 		?></b><br/></div></td>
-		<td width="50%"><div class="top2"><a href="?id=5"><img src="img/settings.gif" alt="Settings" style="vertical-align: middle;"/></a><a href="index.php?logoff=1"><img src="img/log.gif" alt="Log off" style="vertical-align: middle;"/> <b>Log off</b></a>
+		<td width="50%"><div class="top2"><a href="?id=5"><img src="<?=getUrl()?>img/settings.gif" alt="Settings" style="vertical-align: middle;"/></a><a href="index.php?logoff=1"><img src="<?=getUrl()?>img/log.gif" alt="Log off" style="vertical-align: middle;"/> <b>Log off</b></a>
 		<br/></div></td></tr>
 		</table>
         </div>
 
-	<img src="img/LMeve.png" alt="Logo" />
+	<img src="<?=getUrl()?>img/LMeve.png" alt="Logo" />
 	<?php //draw messages notify
 	include("msgchk.php");
 	include("custom_notifications.php");
@@ -168,7 +168,7 @@ function mobile_template_login() {
 	<tr><td><div class="tcen">
 			<input name="logon" type="submit" value="Log in"><br/>
 			<?php if ($SSOENABLED) { ?> <hr style="opacity: 0.2;" />
-			<a href="ssologin.php"><img src="img/EVE_SSO_Login_Buttons_Small_White.png"></a>
+			<a href="ssologin.php"><img src="<?=getUrl()?>img/EVE_SSO_Login_Buttons_Small_White.png"></a>
 			<?php } ?>
 		 </div>
 	</td></tr>

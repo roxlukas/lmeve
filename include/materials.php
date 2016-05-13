@@ -827,7 +827,7 @@ function displayCosts($typeID) {
         <?php
         if ($mancost['portionSize']>1) {
             ?>
-        <tr><td colspan="3"><i><img src="ccp_icons/38_16_208.png" style="width: 16px; height: 16px; float: left;" /> Notice: minimum batch size: <?php echo($mancost['portionSize']); ?> items</i></td></tr>
+        <tr><td colspan="3"><i><img src="<?=getUrl()?>ccp_icons/38_16_208.png" style="width: 16px; height: 16px; float: left;" /> Notice: minimum batch size: <?php echo($mancost['portionSize']); ?> items</i></td></tr>
             <?php
         }
         ?>

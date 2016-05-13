@@ -134,7 +134,7 @@ if (strlen($date)==6) {
 
 			<a href="#down">Scroll down</a>
 		    </div>
-                        <em><img src="ccp_icons/38_16_208.png" alt="(i)"/> LMeve attempts to predict current month running cost, so to avoid counting previous month's wages and internal money transfers, <strong>refTypeID 37 (Corporation Account Withdrawal) is filtered out</strong>.<br/>
+                        <em><img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(i)"/> LMeve attempts to predict current month running cost, so to avoid counting previous month's wages and internal money transfers, <strong>refTypeID 37 (Corporation Account Withdrawal) is filtered out</strong>.<br/>
                         Instead, current month wages estimate is subtracted from the wallet totals. <strong>This behavior will be configurable in a future release of LMeve.</strong></em><br />
 		    <?php
 
@@ -390,15 +390,15 @@ ORDER BY art.refTypeName;";
 		    echo(number_format($wallet_summaries[$row['accountKey']]['balance'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
 		    $totals['balance']+=$wallet_summaries[$row['accountKey']]['balance'];
 		    echo('</td><td style="text-align: right; line-height: 16px;">');
-		    echo('<img src="ccp_icons/6_64_3.png" title="Market" style="float: left; width: 16px; height: 16px;"> ');
+		    echo('<img src="'.getUrl().'ccp_icons/6_64_3.png" title="Market" style="float: left; width: 16px; height: 16px;"> ');
 		    echo(number_format($wallet_summaries[$row['accountKey']]['buy'], 2, $DECIMAL_SEP, $THOUSAND_SEP).'<br/>');
-		    echo('<img src="ccp_icons/64_64_10.png" title="Contracts" style="float: left; width: 16px; height: 16px;"> ');
+		    echo('<img src="'.getUrl().'ccp_icons/64_64_10.png" title="Contracts" style="float: left; width: 16px; height: 16px;"> ');
 		    echo(number_format($wallet_summaries[$row['accountKey']]['cntrct_buy'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
 		    $totals['buy']+=$wallet_summaries[$row['accountKey']]['buy']+$wallet_summaries[$row['accountKey']]['cntrct_buy'];
 		    echo('</td><td style="text-align: right; line-height: 16px;">');
-		    echo('<img src="ccp_icons/6_64_3.png" title="Market" style="float: left; width: 16px; height: 16px;"> ');
+		    echo('<img src="'.getUrl().'ccp_icons/6_64_3.png" title="Market" style="float: left; width: 16px; height: 16px;"> ');
 		    echo(number_format($wallet_summaries[$row['accountKey']]['sell'], 2, $DECIMAL_SEP, $THOUSAND_SEP).'<br/>');
-		    echo('<img src="ccp_icons/64_64_10.png" title="Contracts" style="float: left; width: 16px; height: 16px;"> ');
+		    echo('<img src="'.getUrl().'ccp_icons/64_64_10.png" title="Contracts" style="float: left; width: 16px; height: 16px;"> ');
 		    echo(number_format($wallet_summaries[$row['accountKey']]['cntrct_sell'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
 		    $totals['sell']+=$wallet_summaries[$row['accountKey']]['sell']+$wallet_summaries[$row['accountKey']]['cntrct_sell'];
 		    echo('</td><td style="text-align: right;">');

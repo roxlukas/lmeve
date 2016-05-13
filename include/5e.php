@@ -24,7 +24,7 @@ function nbapihrefedit($nr) {
     <input type="submit" value="Create key" /><br/>
 </form>
 <div><br/>
-<img src="ccp_icons/38_16_208.png" alt="(!) "/> LMeve can provide information to other third party apps that support it, such as <a href="http://evernus.com/" target="_blank">Evernus</a> or <a href="http://caldariprimeponyclub.com/" target="_blank">Jeremy</a>.<br/>
+<img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(!) "/> LMeve can provide information to other third party apps that support it, such as <a href="http://evernus.com/" target="_blank">Evernus</a> or <a href="http://caldariprimeponyclub.com/" target="_blank">Jeremy</a>.<br/>
 <br/></div>
 <table class="lmframework">
     <tr><th>
@@ -64,7 +64,7 @@ function nbapihrefedit($nr) {
             echo($key['lastIP']);
             echo('</td><td>');
             nbapihrefedit($key['apiKeyID']);
-            echo('<img src="img/del.gif" alt="Delete key" />');
+            echo('<img src="'.getUrl().'img/del.gif" alt="Delete key" />');
             echo("</a>");
             echo('</td></tr>');
         }

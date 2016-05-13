@@ -15,7 +15,7 @@ if (!token_verify()) die("Invalid or expired token."); ?>
 <div class="tytul">
 <?php echo($PANELNAME);?>
 </div>
-<img src="ccp_icons/7_64_5.png"  alt="Corporation" style="float: left;"/>
+<img src="<?=getUrl()?>ccp_icons/7_64_5.png"  alt="Corporation" style="float: left;"/>
 	<form action="?id=5&id2=19" method="post">
         <?php token_generate(); ?>
             <table class="lmframework">

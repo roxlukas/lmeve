@@ -132,9 +132,9 @@ $(function() {
     <h2>Timesheet</h2>
     <?php                                
         if(!$aggregate) {
-            echo('<a href="?id=0&date='.sprintf("%04d", $year).sprintf("%02d", $month).'&aggregate=yes"><img src="img/minus.gif" alt="[-]"> Aggregate by user</a>');
+            echo('<a href="?id=0&date='.sprintf("%04d", $year).sprintf("%02d", $month).'&aggregate=yes"><img src="'.getUrl().'img/minus.gif" alt="[-]"> Aggregate by user</a>');
         } else {
-            echo('<a href="?id=0&date='.sprintf("%04d", $year).sprintf("%02d", $month).'&aggregate=no"><img src="img/plus.gif" alt="[+]"> Break down by character</a>');
+            echo('<a href="?id=0&date='.sprintf("%04d", $year).sprintf("%02d", $month).'&aggregate=no"><img src="'.getUrl().'img/plus.gif" alt="[+]"> Break down by character</a>');
         }
     //Timesheet				
         showTimesheet(getTimesheet($corp['corporationID'],$year,$month, $aggregate),$aggregate);

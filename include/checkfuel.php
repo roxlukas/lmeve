@@ -7,7 +7,7 @@
                 if ($fuel['timeLeft']<48 && $fuel['purpose']==1) {
                     ?>
                     <div class="newmsg">
-                        <img src="img/exc.gif" alt="Warning" />
+                        <img src="<?=getUrl()?>img/exc.gif" alt="Warning" />
                         Control tower '<?=$tower['towerName']?>' at <?=$tower['location']['moonName']?>
                         is low on <?=$fuel['fuelTypeName']?> (<?=$fuel['timeLeft']?> hours left)
                     </div>

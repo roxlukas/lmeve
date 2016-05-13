@@ -108,7 +108,7 @@ global $USERSTABLE;
 			<?php
 				foreach($rearrange as $row) {
 					echo('<tr><td class="tab"  style="text-align: center;">');
-                                        if ($row['active']==0) echo('<img src="ccp_icons/38_16_169.png" alt="[x]" style="vertical-align: middle;" />');
+                                        if ($row['active']==0) echo('<img src="'.getUrl().'ccp_icons/38_16_169.png" alt="[x]" style="vertical-align: middle;" />');
 					echo("<strong>${row['login']}</strong>");
 					echo('</td><td class="tab">');
 	

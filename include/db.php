@@ -41,13 +41,13 @@ function getTypeIDicon($typeID,$size=32) {
     if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=512)) $size=32;
     if ($size != 512) {
         if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
-            $icon="ccp_img/${typeID}_${size}.png";
+            $icon=getUrl()."ccp_img/${typeID}_${size}.png";
         } else {
             $icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
         }
     } else {
         if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
-            $icon="ccp_renders/${typeID}.png";
+            $icon=getUrl()."ccp_renders/${typeID}.png";
         } else {
             $icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
         }
@@ -313,7 +313,7 @@ function str2num($z) {
 
 //tworzy lini� <link href= do nag��wka HTML - s�u�y do obs�ugi sk�rek CSS
 function applycss($css) {
-	printf('<link type="text/css" href="%s" rel="stylesheet">',$css);
+	printf('<link type="text/css" href="%s" rel="stylesheet">',getUrl().$css);
 }
 
 function stripslashes_deep($value)
@@ -323,6 +323,23 @@ function stripslashes_deep($value)
                 stripslashes($value);
 
     return $value;
+}
+
+/**
+ * Function returns lmeve URL path
+ * Used to prevent RPO/PRSSI type of exploit
+ * @return type
+ */
+function getUrl(){
+  $a=parse_url(sprintf(
+    "%s://%s%s",
+    isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+    $_SERVER['SERVER_NAME'],
+    $_SERVER['REQUEST_URI']
+  ));
+  isset($a['port']) ? $port=":${a['port']}":$port='';
+  $path=preg_split('/[\w]+\.php/',$a['path']);
+  return $a['scheme'].'://'.$a['host'].$port.$path[0];
 }
 
 ?>
