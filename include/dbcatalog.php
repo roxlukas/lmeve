@@ -44,6 +44,7 @@ function recreateSdeCompatViews() {
         FROM `$LM_EVEDB`.`industryActivitySkills`;");
      
      if (!checkIfTableExists('invBlueprintTypes')) recreateLegacyTables();
+     if (!checkIfTableExists('ramTypeRequirements')) recreateLegacyTables();
      
      //graphics
      if (!checkIfTableExists('yamlGraphicIDs')) db_uquery("CREATE OR REPLACE VIEW `$LM_EVEDB`.`yamlGraphicIDs` AS SELECT
@@ -76,6 +77,7 @@ function recreateSdeCompatViews() {
      //updateYamlSkinLicenses(FALSE);
      //updateYamlSkinMaterials(FALSE);
      if (!checkIfTableExists('skinMaterialSets')) updateYamlSkinMaterialSets(TRUE,'../data/graphicMaterialSets.yaml');
+     if (!checkIfTableExists('skinMaterialsRGB')) createSkinMaterialsRGBview();
     return TRUE;
 }
 
