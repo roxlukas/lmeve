@@ -337,7 +337,11 @@ function getUrl(){
     $_SERVER['SERVER_NAME'],
     $_SERVER['REQUEST_URI']
   ));
-  isset($a['port']) ? $port=":${a['port']}":$port='';
+  if (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT']!=80 && $_SERVER['SERVER_PORT']!=443) {
+      $port=":${_SERVER['SERVER_PORT']}"; 
+  } else {
+      $port='';
+  }
   $path=preg_split('/[\w]+\.php/',$a['path']);
   return $a['scheme'].'://'.$a['host'].$port.$path[0];
 }
