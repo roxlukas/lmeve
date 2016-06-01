@@ -36,4 +36,5 @@
         include("checkapierrors.php");
         include("checkpoller.php");
         include("checkfuel.php");
+        include("checksilos.php");
 ?>

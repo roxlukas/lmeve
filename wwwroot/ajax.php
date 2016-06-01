@@ -275,7 +275,7 @@ if ($act=='') $act=0;
         case 'GET_REGIONS':
             $wspace=secureGETstr('wspace',5);
             if (strtolower($wspace)=='true') $whereWSpace='TRUE'; else $whereWSpace='`regionID` < 11000000';
-            $regions=db_asocquery("SELECT `regionID`,`regionName` FROM $LM_EVEDB.`mapRegions` WHERE $whereWSpace ORDER BY `regionName;");
+            $regions=db_asocquery("SELECT `regionID`,`regionName` FROM `$LM_EVEDB`.`mapRegions` WHERE $whereWSpace ORDER BY `regionName`;");
             //Add proper JSON MIME type in header
             header("Content-type: application/json");
             echo(json_encode($regions));
@@ -286,7 +286,7 @@ if ($act=='') $act=0;
                 echo("Error: regionID required");
                 break;
             }
-            $systems=db_asocquery("SELECT `solarSystemID`,`solarSystemName` FROM $LM_EVEDB.`mapSolarSystems` WHERE `regionID`=$regionID ORDER BY `solarSystemName;");
+            $systems=db_asocquery("SELECT `solarSystemID`,`solarSystemName` FROM `$LM_EVEDB`.`mapSolarSystems` WHERE `regionID`=$regionID ORDER BY `solarSystemName`;");
             //Add proper JSON MIME type in header
             header("Content-type: application/json");
             echo(json_encode($systems));

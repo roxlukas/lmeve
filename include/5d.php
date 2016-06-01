@@ -33,7 +33,7 @@ global $LM_EVEDB;
                 if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');
                 
                 if (in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
-		
+		if (secureGETnum('siloPercentage')>=0 && secureGETnum('siloPercentage')<=100) setConfigItem('siloPercentage', secureGETnum('siloPercentage'));
 		?>
 		<br>
                 <input type="button" value="OK" onclick="location.href='?id=5&id2=0';">

@@ -38,6 +38,102 @@ function invhrefedit($nr=0,$crpID=0) {
     echo("<a href=\"index.php?id=2&id2=8&nr=$nr&corporationID=$crpID\" title=\"Click to open\">");
 }
 
+function getSilos($corporationID=0) {
+    if ($corporationID==0) {
+        $whereSilo=TRUE;
+    } else {
+        $whereSilo="silos.`corporationID`=$corporationID";
+    }
+    global $LM_EVEDB;
+    $sql="SELECT silos.`itemID`,silotype.`typeID` AS `siloTypeID`,silotype.`typeName` AS `siloTypeName`,
+        silotype.`capacity`,contenttype.`typeID` AS `contentTypeID`,contenttype.`typeName` AS `contentTypeName`,
+        contents.`quantity`,contenttype.`volume`,contents.`quantity` * contenttype.`volume` AS `contentsVolume`,
+        100 * contents.`quantity` * contenttype.`volume` / silotype.`capacity` AS `filledPercent`,silos.`locationID`,
+        map.`itemName` AS `locationName`
+FROM `apiassets` silos
+JOIN `$LM_EVEDB`.`invTypes` silotype
+ON silos.`typeID`=silotype.`typeID`
+JOIN `apiassets` contents
+ON silos.`itemID`=contents.`parentItemID`
+JOIN `$LM_EVEDB`.`invTypes` contenttype
+ON contents.`typeID`=contenttype.`typeID`
+JOIN `$LM_EVEDB`.`mapDenormalize` map
+ON silos.`locationID`=map.`itemID`
+WHERE silotype.`groupID`=404
+AND $whereSilo ;";
+    return db_asocquery($sql);
+}
+
+function showSilos($silos) {   
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+        if (count($silos)>0) {
+            ?>
+            <table class="lmframework" style="" id="silos">
+		<tr>
+                <th style="width: 64px; padding: 0px;"></th>
+
+                <th style="">Type</th>
+                <th style="width: 150px;">Location</th>
+                <th style="width: 64px; padding: 0px;"></th>
+
+                <th style="width: 150px;">Contents</th>
+
+                <th style="width: 100px;">
+                    Volume [m3]
+                </th>
+                <th style="width: 100px;">
+                    Filled percent
+                </th>
+            </tr>	
+	    <?php
+			foreach ($silos as $row) {
+                            /*
+                            Array ( 
+                             * [itemID] => 1019271661332 
+                             * [siloTypeID] => 14343 
+                             * [siloTypeName] => Silo 
+                             * [capacity] => 20000 
+                             * [contentTypeID] => 16647 
+                             * [contentTypeName] => Caesium 
+                             * [quantity] => 2400 
+                             * [volume] => 0.8 
+                             * [contentsVolume] => 1920 
+                             * [filledPercent] => 9.6 ) 
+                             */
+            ?>
+            <tr>
+                <td style="width: 64px; padding: 0px;">
+                    <img src="<?php echo(getTypeIDicon($row['siloTypeID'],64)); ?>" title="<?=$row['siloTypeName']?>" />
+                </td>
+                <td>
+                    <?=$row['siloTypeName']?>
+                </td>
+                <td>
+                    <?=$row['locationName']?>
+                </td>
+                <td style="width: 64px; padding: 0px;">
+                    <img src="<?php echo(getTypeIDicon($row['contentTypeID'],64)); ?>" title="<?=$row['contentTypeName']?>" />
+                </td>
+                <td>
+                    <?=$row['contentTypeName']?>
+                </td>
+                <td>
+                    <?=number_format($row['contentsVolume'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?>
+                </td>
+                <td>
+                    <?php percentbar(round($row['filledPercent']),'Full'); ?>
+                </td>
+            </tr>
+            <?php
+            }
+            ?>
+	    </table>
+	    <?php
+        } else {
+		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t have any Silos</th</tr></table>');
+        }
+}
+
 function getInventory($parentItemID=0,$corporationID=0) {
     global $LM_EVEDB;
     if ($corporationID==0) $crp='TRUE'; else $crp="ast.`corporationID`=$corporationID";
@@ -700,7 +796,7 @@ function showControlTowers($controltowers) {
                                     echo('anchored');
                                     break;
                                 case 4:
-                                    echo('online');
+                                    echo('<span style="color: #080; font-weight: bold;">online</span>');
                                     break;
                                 default:
                                     echo('unknown');

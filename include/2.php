@@ -45,6 +45,13 @@
         <input type="submit" value="POCOs" />
         </form></td>
     <?php } ?> 
+    <?php if (checkrights("Administrator,ViewPOS")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="2" />
+        <input type="hidden" name="id2" value="9" />
+        <input type="submit" value="Silos" />
+        </form></td>
+    <?php } ?> 
     </tr>
     </table>
     <?php
@@ -72,6 +79,9 @@
             break;
         case 8:
             include("28.php");  //inventory explorer
+            break;
+        case 9:
+            include("29.php");  //inventory explorer
             break;
     }
 ?>

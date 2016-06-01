@@ -1609,7 +1609,7 @@ CREATE TABLE IF NOT EXISTS `apistarbasefuel` (
 
 CREATE TABLE IF NOT EXISTS `crestindustrysystems` (
   `solarSystemID` bigint(11) NOT NULL,
-  `costIndex` decimal(20,2) NOT NULL,
+  `costIndex` decimal(20,4) NOT NULL,
   `activityID` int(11) NOT NULL,
   PRIMARY KEY (`solarSystemID`,`activityID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -86,7 +86,7 @@ if ($new) {
 			$typeID,
 			$activityID,
 			$runs,
-			NOW(),
+			UTC_TIMESTAMP(),
 			$singleton,
                         $structureID
 			);";
@@ -138,7 +138,7 @@ if ($new) {
                                     ${typeName['blueprintTypeID']},
                                     8,
                                     $multipliedRuns,
-                                    NOW(),
+                                    UTC_TIMESTAMP(),
                                     $singleton,
                                     NULL
                                     );";
@@ -153,7 +153,7 @@ if ($new) {
                                     ${typeName['bpoT1TypeID']},
                                     5,
                                     $multipliedRuns,
-                                    NOW(),
+                                    UTC_TIMESTAMP(),
                                     $singleton,
                                     NULL
                                     );";
@@ -168,7 +168,7 @@ if ($new) {
                                     ${typeName['parentTypeID']},
                                     1,
                                     $runs,
-                                    NOW(),
+                                    UTC_TIMESTAMP(),
                                     $singleton,
                                     NULL
                                     );";
