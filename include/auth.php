@@ -4,7 +4,6 @@ include_once("ldap.php");
 include_once("db.php");
 include_once("log.php");
 include_once("auth.php");
-include_once("dbcatalog.php");
 
 function check_includes_for_auth_php() {
 	return TRUE;
@@ -270,7 +269,16 @@ function hashpass($pass) { //create a salted hash
 	return $hash;
 }
 
-//function updateUserstable() moved to dbcatalog.php
+function updateUserstable() {
+    global $USERSTABLE;
+    $table=db_asocquery("DESCRIBE $USERSTABLE;");
+    foreach ($table as $column) {
+        if ($column['Field']=='pass' && $column['Type']!='varchar(64)') {
+            db_uquery("ALTER TABLE  `$USERSTABLE` CHANGE  `pass` `pass` VARCHAR(64) NOT NULL DEFAULT  '';");
+        }
+    }
+    //var_dump($table);
+}
 
 function checkpass($pass) {
 	global $USERSTABLE;

@@ -894,7 +894,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, ids
 	//Cache Time (minutes)	 1440
 	//This feed REQUIRES a list of IDS, for example from Poco List
-	global $LM_EVEDB;
+	
 	$result=db_asocquery("SELECT DISTINCT `itemID` FROM `apipocolist`
                 WHERE `corporationID`=$corporationID
                 UNION
@@ -902,12 +902,7 @@ foreach ($api_keys as $api_key) {
                 WHERE `corporationID`=$corporationID
                 UNION
                 SELECT DISTINCT `itemID` FROM `apistarbaselist`
-                WHERE `corporationID`=$corporationID
-                UNION
-                SELECT DISTINCT `itemID` FROM `apiassets` apa
-                JOIN `$LM_EVEDB`.`invTypes` itp
-                ON apa.`typeID`=itp.`typeID`
-                WHERE `corporationID`=$corporationID AND itp.`groupID`=404;");
+                WHERE `corporationID`=$corporationID;");
 	$ids="";
 	foreach ($result as $row) {
 		$ids="${row['itemID']},$ids";
@@ -1389,62 +1384,6 @@ if (!apiCheckErrors(0,"CREST /industry/systems/")) {
 } else {
 	warning("CREST /industry/systems/",$FEED_BLOCKED);
 }
-
-/*
-{
-    "totalCount_str": "5913",
-    "items": [
-        {
-            "alliance": {
-                "id_str": "1988009451",
-                "href": "https://crest-tq.eveonline.com/alliances/1988009451/",
-                "id": 1988009451,
-                "name": "Curatores Veritatis Alliance"
-            },
-            "vulnerabilityOccupancyLevel": 4.1,
-            "structureID_str": "866802670",
-            "structureID": 866802670,
-            "vulnerableStartTime": "2016-05-19T17:48:18",
-            "solarSystem": {
-                "id_str": "30001235",
-                "href": "https://crest-tq.eveonline.com/solarsystems/30001235/",
-                "id": 30001235,
-                "name": "BR-N97"
-            },
-            "vulnerableEndTime": "2016-05-19T22:11:42",
-            "type": {
-                "id_str": "32226",
-                "href": "https://crest-tq.eveonline.com/types/32226/",
-                "id": 32226,
-                "name": "Territorial Claim Unit"
-            }
-        },
-        {
-            "alliance": {
-                "id_str": "1086308227",
-                "href": "https://crest-tq.eveonline.com/alliances/1086308227/",
-                "id": 1086308227,
-                "name": "Rebel Alliance of New Eden"
-            },
-            "vulnerabilityOccupancyLevel": 4.5,
-            "structureID_str": "867905377",
-            "structureID": 867905377,
-            "vulnerableStartTime": "2016-05-19T22:00:00",
-            "solarSystem": {
-                "id_str": "30000538",
-                "href": "https://crest-tq.eveonline.com/solarsystems/30000538/",
-                "id": 30000538,
-                "name": "J7-BDX"
-            },
-            "vulnerableEndTime": "2016-05-20T02:00:00",
-            "type": {
-                "id_str": "32226",
-                "href": "https://crest-tq.eveonline.com/types/32226/",
-                "id": 32226,
-                "name": "Territorial Claim Unit"
-            }
-        },
- */
 
 /******************** EVE-CENTRAL PUBLIC FEEDS **************************/
 

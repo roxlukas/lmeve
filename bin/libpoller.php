@@ -359,8 +359,8 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
             // 
             //To convert locationIDs greater than or equal to 67000000 and less than 68000000 to stationIDs from ConquerableStationList
             // subtract 6000000 from the locationID.
-            $r1=db_uquery("UPDATE `apiassets` SET `locationID`=`locationID`-6000001 WHERE `locationID` BETWEEN 66000000 AND 66014933 AND `corporationID`=$corporationID;");
-            $r2=db_uquery("UPDATE `apiassets` SET `locationID`=`locationID`-6000000 WHERE `locationID` BETWEEN 66014934 AND 68000000 AND `corporationID`=$corporationID;");
+            $r1=db_uquery("UPDATE `apiassets` SET `locationID`=`locationID`-6000001 WHERE `locationID` BETWEEN 66000000 AND 67000000 AND `corporationID`=$corporationID;");
+            $r2=db_uquery("UPDATE `apiassets` SET `locationID`=`locationID`-6000000 WHERE `locationID` BETWEEN 67000000 AND 68000000 AND `corporationID`=$corporationID;");
             return($r1 && $r2);
 	}
          

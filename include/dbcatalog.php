@@ -92,22 +92,3 @@ function checkIfTableExists($tab) {
     }
     return FALSE;
 }
-
-function updateUserstable() {
-    global $USERSTABLE;
-    $table=db_asocquery("DESCRIBE $USERSTABLE;");
-    foreach ($table as $column) {
-        if ($column['Field']=='pass' && $column['Type']!='varchar(64)') {
-            db_uquery("ALTER TABLE  `$USERSTABLE` CHANGE  `pass` `pass` VARCHAR(64) NOT NULL DEFAULT  '';");
-        }
-    }    
-}
-
-function updateCrestIndustrySystems() {
-    $table=db_asocquery("DESCRIBE `crestindustrysystems`;");
-    foreach ($table as $column) {
-        if ($column['Field']=='costIndex' && $column['Type']!='decimal(20,4)') {
-            db_uquery("ALTER TABLE  `crestindustrysystems` CHANGE  `costIndex` `costIndex` DECIMAL(20,4) NOT NULL;");
-        }
-    }
-}

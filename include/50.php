@@ -84,7 +84,7 @@ Settings
                             <td width="300">
                                 ISK per point:<br/>
                             </td>
-                            <td width="300">
+                            <td width="200">
                                     <input type="text" size="32" name="iskPerPoint" value="<?=getConfigItem('iskPerPoint','15000000')?>" />
                             </td>
                         </tr>
@@ -149,14 +149,6 @@ Settings
                             </td>
                             <td>
                                 <input type="text" size="6" name="buyCalcPriceModifier" value="<?=getConfigItem('buyCalcPriceModifier', 1.0);?>" />x
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Silo notification threshold:<br/>
-                            </td>
-                            <td>
-                                <input type="text" size="6" name="siloPercentage" value="<?=getConfigItem('siloPercentage', 90);?>" />%
                             </td>
                         </tr>
                         <tr>
