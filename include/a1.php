@@ -586,7 +586,7 @@ if ($model) {
                     <td>LMeve API <a href="api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?></a></td>
                 </tr>
                 <tr>
-                    <td>CREST <a href="<?=$CREST_BASEURL?>/types/<?=$nr?>/" target="_blank"><?=$CREST_BASEURL?>/types/<?=$nr?>/</a></td>
+                    <td>CREST <a href="<?=$CREST_BASEURL?>/inventory/types/<?=$nr?>/" target="_blank"><?=$CREST_BASEURL?>/inventory/types/<?=$nr?>/</a></td>
                 </tr>
             </table>
         <?php
