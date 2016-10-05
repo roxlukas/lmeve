@@ -70,8 +70,13 @@ function apiCheckErrors($keyID,$fileName) {
 }
 
 function apiSaveWarning($keyID,$error,$fileName) {
-	$attrs=$error->attributes();
-	$errorCode=$attrs->code;
+        if (method_exists($error,'attributes')) {
+            $attrs=$error->attributes(); 
+            $errorCode=$attrs->code;
+        } else {
+            $errorCode=999; //Unknown error occured, error is not an object
+            debug_print_backtrace();
+        }
 	$errorMessage=$error;
 	if (!apiCheckStatus($keyID,$fileName)) {
 		db_uquery("INSERT INTO `apistatus` VALUES (DEFAULT,'$keyID','$fileName',NOW(),$errorCode,1,'$errorMessage');");
