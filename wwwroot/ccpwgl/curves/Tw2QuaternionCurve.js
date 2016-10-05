@@ -1,5 +1,5 @@
 /**
- * Tw2QuaternionKey
+ * Tw2QuaternionKey2
  * @property {number} time
  * @property {quat4} value
  * @property {quat4} leftTangent
@@ -7,7 +7,7 @@
  * @property {number} interpolation
  * @constructor
  */
-function Tw2QuaternionKey()
+function Tw2QuaternionKey2()
 {
     this.time = 0;
     this.value = quat4.create();
@@ -50,6 +50,13 @@ function Tw2QuaternionCurve()
     this.interpolation = 1;
     this.keys = [];
 }
+
+
+Tw2QuaternionCurve.Interpolation = {
+    CONSTANT: 0,
+    SPHERICAL_LINEAR: 4
+};
+
 
 /**
  * Initializes the Curve
@@ -222,7 +229,7 @@ Tw2QuaternionCurve.prototype.Interpolate = function(time, lastKey, nextKey, valu
     }
     switch (interp)
     {
-        case 4:
+        case Tw2QuaternionCurve.Interpolation.SPHERICAL_LINEAR:
             if (lastKey && nextKey)
             {
                 startValue = lastKey.value;

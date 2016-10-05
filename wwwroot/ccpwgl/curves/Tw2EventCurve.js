@@ -14,7 +14,7 @@ function Tw2EventKey()
 /**
  * Tw2EventCurve
  * @property {string} name
- * @property value
+ * @property {string} value
  * @property {Array.<Tw2EventKey>} keys
  * @property {number} extrapolation
  * @property {number} _length
@@ -33,15 +33,19 @@ function Tw2EventCurve()
     this._currentKey = 0;
 }
 
+Tw2EventCurve.Extrapolation = {
+    NONE: 0,
+    CYCLE: 3
+};
+
 /**
  * Compares two curve keys' time properties
- * TODO: This function is called 'Compare' in other Tw2Curves, check to see if it can be refactored.
  * @param {Tw2EventKey} a
  * @param {Tw2EventKey} b
  * @returns {number}
  * @method
  */
-Tw2EventCurve.KeySort = function(a, b)
+Tw2EventCurve.Compare = function(a, b)
 {
     if (a.time < b.time)
     {
@@ -60,7 +64,7 @@ Tw2EventCurve.KeySort = function(a, b)
  */
 Tw2EventCurve.prototype.Initialize = function()
 {
-    this.keys.sort(Tw2EventCurve.KeySort);
+    this.keys.sort(Tw2EventCurve.Compare);
     this._length = 0;
     if (this.keys.length)
     {
@@ -95,7 +99,7 @@ Tw2EventCurve.prototype.UpdateValue = function(time)
     {
         this._currentKey = 0;
     }
-    if (this.extrapolation == 3)
+    if (this.extrapolation == Tw2EventCurve.Extrapolation.CYCLE)
     {
         var now = this._time % this._length;
         if (now < before)

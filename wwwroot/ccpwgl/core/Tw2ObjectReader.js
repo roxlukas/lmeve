@@ -1,20 +1,24 @@
 /**
  * Tw2ObjectReader
- * TODO: Identify if @property _inputStack @property _initializeObject and @property _ids should be defined here
  * @param xmlNode
  * @property xmlNode
+ * @property {null|Array} _inputStack
+ * @property {null|Array} _initializeObjects
+ * @property {null|Array} _ids
  * @constructor
  */
 function Tw2ObjectReader(xmlNode)
 {
     this.xmlNode = xmlNode;
+    this._inputStack = null;
+    this._initializeObjects = null;
+    this._ids = null;
 }
 
 /**
  * Construct
  * @param initialize
  * @returns {Function}
- * @prototype
  */
 Tw2ObjectReader.prototype.Construct = function(initialize)
 {
@@ -33,8 +37,7 @@ Tw2ObjectReader.prototype.Construct = function(initialize)
  * ConstructFromNode
  * @param initialize
  * @param async
- * @returns {boolean}
- * @prototype
+ * @returns {Boolean}
  */
 Tw2ObjectReader.prototype.ConstructFromNode = function(initialize, async)
 {
@@ -84,6 +87,15 @@ Tw2ObjectReader.prototype.ConstructFromNode = function(initialize, async)
                 }
                 catch (e)
                 {
+                    emitter.log('ResMan',
+                    {
+                        log: 'throw',
+                        src: ['Tw2ObjectReader', 'ConstructFromNode'],
+                        msg: 'Object with undefined type',
+                        type: 'xml.type',
+                        value: type.value
+                    });
+
                     throw new Error('YAML: object with undefined type \"' + type.value + '\"');
                 }
             }
@@ -99,7 +111,16 @@ Tw2ObjectReader.prototype.ConstructFromNode = function(initialize, async)
                 {
                     if (typeof(object[child.nodeName]) == 'undefined')
                     {
-                        console.warn('Tw2ObjectReader:', ' object \"', type.value, '\" does not have property \"', child.nodeName, '\"');
+                        emitter.log('ResMan',
+                        {
+                            log: 'warn',
+                            src: ['Tw2ObjectReader', 'ConstructFromNode'],
+                            msg: 'Object "' + type.value + '" missing property: ' + child.nodeName,
+                            value: child.nodeName,
+                            type: 'xml.property',
+                            value: child.nodeName
+                        });
+
                         continue;
                     }
                 }
@@ -166,6 +187,16 @@ Tw2ObjectReader.prototype.ConstructFromNode = function(initialize, async)
             }
             catch (e)
             {
+                emitter.log('ResMan',
+                {
+                    log: 'throw',
+                    src: ['Tw2ObjectReader', 'ConstructFromNode'],
+                    msg: 'Invalid JSON property',
+                    type: 'xml.json',
+                    value: value,
+                    data: e
+                });
+
                 throw new Error('YAML: property \"' + value + '\" is not a valid JSON property');
             }
             if (!xmlNode.attributes.getNamedItem('notnum'))

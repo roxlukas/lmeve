@@ -50,6 +50,12 @@ function Tw2Vector3Curve()
     this.keys = [];
 }
 
+Tw2Vector3Curve.Interpolation = {
+    CONSTANT: 0,
+    LINEAR: 1,
+    HERMITE: 2
+};
+
 /**
  * Initializes the Curve
  * @prototype
@@ -183,7 +189,7 @@ Tw2Vector3Curve.prototype.GetValueAt = function(time, value)
     {
         return this.Interpolate(time, this.keys[this.keys.length - 1], null, value);
     }
-    var endKey = this.keys[i + 1]; // <----------------------------------------- `i` is not yet initialized
+    var endKey;
     for (var i = 0; i + 1 < this.keys.length; ++i)
     {
         startKey = this.keys[i];
@@ -222,7 +228,7 @@ Tw2Vector3Curve.prototype.Interpolate = function(time, lastKey, nextKey, value)
     }
     switch (interp)
     {
-        case 1:
+        case Tw2Vector3Curve.Interpolation.LINEAR:
             if (lastKey && nextKey)
             {
                 startValue = lastKey.value;
@@ -243,7 +249,7 @@ Tw2Vector3Curve.prototype.Interpolate = function(time, lastKey, nextKey, value)
             value[1] = startValue[1] + (endValue[1] - startValue[1]) * (time / deltaTime);
             value[2] = startValue[2] + (endValue[2] - startValue[2]) * (time / deltaTime);
             return value;
-        case 2:
+        case Tw2Vector3Curve.Interpolation.HERMITE:
             var inTangent = this.startTangent;
             var outTangent = this.endTangent;
             if (lastKey && nextKey)

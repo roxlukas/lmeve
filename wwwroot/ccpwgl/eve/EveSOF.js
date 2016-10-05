@@ -1,6 +1,5 @@
 function EveSOF() {
     var data = null;
-    var spriteEffectSkinned = null;
     var spriteEffect = null;
 
     function _get(obj, property, defaultValue) {
@@ -98,12 +97,12 @@ function EveSOF() {
         }
     }
 
-    function FillMeshAreas(areas, areasName, hull, faction, race, commands) {
+    function FillMeshAreas(areas, areasName, hull, faction, race, commands, shaderOverride) {
         var hullAreas = _get(hull, areasName, []);
         for (var i = 0; i < hullAreas.length; ++i) {
             var area = hullAreas[i];
             var effect = new Tw2Effect();
-            effect.effectFilePath = data['generic']['areaShaderLocation'] + ModifyShaderPath(area.shader, hull['isSkinned']);
+            effect.effectFilePath = data['generic']['areaShaderLocation'] + ModifyShaderPath(shaderOverride ? shaderOverride : area.shader, hull['isSkinned']);
             var names = _get(_get(data['generic']['areaShaders'], area.shader, {}), 'parameters', []);
             for (var j = 0; j < names.length; ++j) {
                 var name = names[j];
@@ -194,7 +193,10 @@ function EveSOF() {
                 }
                 var factionTextures = _get(factionDecal, 'textures', {});
                 for (j in factionTextures) {
-                    effect.parameters[j] = new Tw2TextureParameter(j, factionTextures[j]);
+                    if (!(j in effect.parameters))
+                    {
+                        effect.parameters[j] = new Tw2TextureParameter(j, factionTextures[j]);
+                    }
                 }
             }
             effect.Initialize();
@@ -215,13 +217,32 @@ function EveSOF() {
         }
     }
 
+    function SetupInstancedMeshes(ship, hull, faction, race, commands)
+    {
+        var instancedMeshes = _get(hull, 'instancedMeshes', []);
+        for (var i = 0; i < instancedMeshes.length; ++i)
+        {
+            var him = instancedMeshes[i];
+            var mesh = new Tw2InstancedMesh();
+            mesh.instanceGeometryResPath = him.instanceGeometryResPath;
+            mesh.geometryResPath = him.geometryResPath;
+            mesh.Initialize();
+
+            FillMeshAreas(_get(mesh, 'opaqueAreas', []), 'opaqueAreas', hull, faction, race, commands, him.shader);
+
+            var child = new EveChildMesh();
+            child.mesh = mesh;
+            ship.effectChildren.push(child);
+        }
+    }
+
     function SetupSpriteSets(ship, hull, faction) {
         var hullSets = _get(hull, 'spriteSets', []);
         var factionSets = _get(faction, 'spriteSets', {});
         for (var i = 0; i < hullSets.length; ++i) {
-            var spriteSet = new EveSpriteSet();
+            var spriteSet = new EveSpriteSet(true, hull['isSkinned'] && hullSets[i]['skinned']);
             spriteSet.name = _get(hullSets[i], 'name', '');
-            spriteSet.effect = hullSets[i]['skinned'] ? spriteEffectSkinned : spriteEffect;
+            spriteSet.effect = spriteEffect;
             var hullData = _get(hullSets[i], 'items', []);
             for (var j = 0; j < hullData.length; ++j) {
                 if (!('group' + _get(hullData[j], 'groupIndex', -1) in factionSets)) {
@@ -348,6 +369,7 @@ function EveSOF() {
                 quat4.set(_get(hullData[j], 'layer2Transform', [0, 0, 0, 0]), item.layer2Transform);
                 _assignIfExists(item, hullData[j], 'layer2Scroll');
                 item.boneIndex = _get(hullData[j], 'boneIndex', -1);
+                item.maskAtlasID = _get(hullData[j], 'maskMapAtlasIndex', 0);
 
                 var factionSet = factionSets['group' + _get(hullData[j], 'groupIndex', -1)];
                 if (factionSet) {
@@ -374,7 +396,7 @@ function EveSOF() {
         _assignIfExists(booster, raceBooster, 'haloScaleX');
         _assignIfExists(booster, raceBooster, 'haloScaleY');
         _assignIfExists(booster, raceBooster, 'haloColor');
-        _assignIfExists(booster, raceBooster, 'warpHaloColor');
+        _assignIfExists(booster, raceBooster, 'warpHalpColor');
 
         booster.effect = new Tw2Effect();
         booster.effect.effectFilePath = 'res:/Graphics/Effect/Managed/Space/Booster/BoosterVolumetric.fx';
@@ -416,10 +438,11 @@ function EveSOF() {
 
         booster.effect.Initialize();
 
-        booster.glows = new EveSpriteSet();
+        booster.glows = new EveSpriteSet(true);
         booster.glows.effect = new Tw2Effect();
-        booster.glows.effect.effectFilePath = 'res:/Graphics/Effect/Managed/Space/Booster/BoosterGlow.fx';
+        booster.glows.effect.effectFilePath = 'res:/Graphics/Effect/Managed/Space/Booster/BoosterGlowAnimated.fx';
         booster.glows.effect.parameters['DiffuseMap'] = new Tw2TextureParameter('DiffuseMap', 'res:/Texture/Particle/whitesharp.dds.0.png');
+        booster.glows.effect.parameters['NoiseMap'] = new Tw2TextureParameter('NoiseMap', 'res:/Texture/global/noise.dds.0.png');
         booster.glows.effect.Initialize();
 
         var items = _get(hullBooster, 'items', []);
@@ -475,7 +498,14 @@ function EveSOF() {
     function SetupChildren(ship, hull, curveSet, curves) {
         function onChildLoaded(child) {
             return function (obj) {
-                ship.children.push(obj);
+                if (obj.isEffectChild)
+                {
+                    ship.effectChildren.push(obj);
+                }
+                else
+                {
+                    ship.children.push(obj);
+                }
                 _assignIfExists(obj, child, 'translation');
                 _assignIfExists(obj, child, 'rotation');
                 _assignIfExists(obj, child, 'scaling');
@@ -542,6 +572,7 @@ function EveSOF() {
         SetupLocators(ship, hull);
         var curves = SetupAnimations(ship, hull);
         SetupChildren(ship, hull, curves[0], curves[1]);
+        SetupInstancedMeshes(ship, hull, faction, race, commands);
 
         ship.Initialize();
         return ship;
@@ -554,16 +585,10 @@ function EveSOF() {
             }
             if (!dataLoading) {
                 spriteEffect = new Tw2Effect();
-                spriteEffect.effectFilePath = 'res:/graphics/effect/managed/space/spaceobject/fx/blinkinglights.fx';
+                spriteEffect.effectFilePath = 'res:/graphics/effect/managed/space/spaceobject/fx/blinkinglightspool.fx';
                 spriteEffect.parameters['MainIntensity'] = new Tw2FloatParameter('MainIntensity', 1);
                 spriteEffect.parameters['GradientMap'] = new Tw2TextureParameter('GradientMap', 'res:/texture/particle/whitesharp_gradient.dds.0.png');
                 spriteEffect.Initialize();
-
-                spriteEffectSkinned = new Tw2Effect();
-                spriteEffectSkinned.effectFilePath = 'res:/graphics/effect/managed/space/spaceobject/fx/skinned_blinkinglights.fx';
-                spriteEffectSkinned.parameters['MainIntensity'] = new Tw2FloatParameter('MainIntensity', 1);
-                spriteEffectSkinned.parameters['GradientMap'] = new Tw2TextureParameter('GradientMap', 'res:/texture/particle/whitesharp_gradient.dds.0.png');
-                spriteEffectSkinned.Initialize();
 
                 resMan.GetObject('res:/dx9/model/spaceobjectfactory/data.red', function (obj) {
                     data = obj;

@@ -5,7 +5,7 @@
  * @property {number} meshIndex
  * @property {number} index
  * @property {number} count
- * @property {boolean} debugIsHidden
+ * @property {boolean} display
  * @constructor
  */
 function Tw2MeshArea()
@@ -15,7 +15,7 @@ function Tw2MeshArea()
     this.meshIndex = 0;
     this.index = 0;
     this.count = 1;
-    this.debugIsHidden = false;
+    this.display = true;
 }
 
 /**
@@ -33,7 +33,7 @@ Tw2MeshArea.batchType = Tw2GeometryBatch;
  * @property {number} meshIndex
  * @property {number} index
  * @property {number} count
- * @property {boolean} debugIsHidden
+ * @property {Boolean} display
  * @constructor
  */
 function Tw2MeshLineArea()
@@ -43,7 +43,7 @@ function Tw2MeshLineArea()
     this.meshIndex = 0;
     this.index = 0;
     this.count = 1;
-    this.debugIsHidden = false;
+    this.display = true;
 }
 
 /**
@@ -66,8 +66,15 @@ Tw2MeshLineArea.batchType = Tw2GeometryLineBatch;
  * @property {Array.<Tw2MeshArea>} additiveAreas
  * @property {Array.<Tw2MeshArea>} pickableAreas
  * @property {Array.<Tw2MeshArea>} decalAreas
- * @property {Array.<Tw2MeshArea>} depthAreas
- * @property {boolean} debugIsHidden
+ * @property {Array.<Tw2MeshArea>} depthAreas       - Not supported
+ * @property {boolean} display                      - Enables/ disables all mesh batch accumulations
+ * @parameter {{}} visible                          - Batch accumulation options for the mesh's elements
+ * @property {boolean} visible.opaqueAreas          - Enables/ disables opaque area batch accumulation
+ * @property {boolean} visible.transparentAreas     - Enables/ disables transparent area batch accumulation
+ * @property {boolean} visible.additiveAreas        - Enables/ disables additive area batch accumulation
+ * @property {boolean} visible.pickableAreas        - Enables/ disables pickable area batch accumulation
+ * @property {boolean} visible.decalAreas           - Enables/ disables decal area batch accumulation
+ * @property {boolean} visible.depthAreas           - Not supported
  * @constructor
  */
 function Tw2Mesh()
@@ -77,13 +84,22 @@ function Tw2Mesh()
     this.geometryResPath = '';
     this.lowDetailGeometryResPath = '';
     this.geometryResource = null;
+
     this.opaqueAreas = [];
     this.transparentAreas = [];
     this.additiveAreas = [];
     this.pickableAreas = [];
     this.decalAreas = [];
     this.depthAreas = [];
-    this.debugIsHidden = false;
+
+    this.display = true;
+    this.visible = {};
+    this.visible.opaqueAreas = true;
+    this.visible.transparentAreas = true;
+    this.visible.additiveAreas = true;
+    this.visible.pickableAreas = true;
+    this.visible.decalAreas = true;
+    this.visible.depthAreas = true;
 }
 
 /**
@@ -99,6 +115,37 @@ Tw2Mesh.prototype.Initialize = function()
 };
 
 /**
+ * Gets Mesh res Objects
+ * @param {Array} [out=[]] - Optional receiving array
+ * @returns {Array.<Tw2EffectRes|Tw2TextureRes|Tw2GeometryRes>} [out]
+ */
+Tw2Mesh.prototype.GetResources = function(out)
+{
+    if (out === undefined)
+    {
+        out = [];
+    }
+
+    if (out.indexOf(this.geometryResource) === -1)
+    {
+        out.push(this.geometryResource);
+    }
+
+    for (var type in this.visible)
+    {
+        if (this.visible.hasOwnProperty(type) && this[type].length)
+        {
+            for (var i = 0; i < this[type].length; i++)
+            {
+                this[type][i].effect.GetResources(out);
+            }
+        }
+    }
+
+    return out;
+};
+
+/**
  * Gets render batches from a mesh area array and commits them to an accumulator
  * @param {Array.<Tw2MeshArea>} areas
  * @param {RenderMode} mode
@@ -111,7 +158,7 @@ Tw2Mesh.prototype._GetAreaBatches = function(areas, mode, accumulator, perObject
     for (var i = 0; i < areas.length; ++i)
     {
         var area = areas[i];
-        if (area.effect == null || area.debugIsHidden)
+        if (area.effect == null || !area.display)
         {
             continue;
         }
@@ -137,25 +184,35 @@ Tw2Mesh.prototype._GetAreaBatches = function(areas, mode, accumulator, perObject
  */
 Tw2Mesh.prototype.GetBatches = function(mode, accumulator, perObjectData)
 {
-    if (this.geometryResource == null || this.debugIsHidden)
+    if (this.geometryResource == null)
     {
         return false;
     }
-    if (mode == device.RM_OPAQUE)
+
+    if (this.display)
     {
-        this._GetAreaBatches(this.opaqueAreas, mode, accumulator, perObjectData);
+
+        if (mode == device.RM_OPAQUE && this.visible.opaqueAreas)
+        {
+            this._GetAreaBatches(this.opaqueAreas, mode, accumulator, perObjectData);
+        }
+        else if (mode == device.RM_DECAL && this.visible.decalAreas)
+        {
+            this._GetAreaBatches(this.decalAreas, mode, accumulator, perObjectData);
+        }
+        else if (mode == device.RM_TRANSPARENT && this.visible.transparentAreas)
+        {
+            this._GetAreaBatches(this.transparentAreas, mode, accumulator, perObjectData);
+        }
+        else if (mode == device.RM_ADDITIVE && this.visible.additiveAreas)
+        {
+            this._GetAreaBatches(this.additiveAreas, mode, accumulator, perObjectData);
+        }
+        else if (mode == device.RM_PICKABLE && this.visible.pickableAreas)
+        {
+            this._GetAreaBatches(this.pickableAreas, mode, accumulator, perObjectData);
+        }
     }
-    else if (mode == device.RM_DECAL)
-    {
-        this._GetAreaBatches(this.decalAreas, mode, accumulator, perObjectData);
-    }
-    else if (mode == device.RM_TRANSPARENT)
-    {
-        this._GetAreaBatches(this.transparentAreas, mode, accumulator, perObjectData);
-    }
-    else if (mode == device.RM_ADDITIVE)
-    {
-        this._GetAreaBatches(this.additiveAreas, mode, accumulator, perObjectData);
-    }
+
     return true;
 };

@@ -1,3 +1,8 @@
+/**
+ * RenderMode
+ * @typedef {(device.RM_ANY|device.RM_OPAQUE|device.RM_DECAL|device.RM_TRANSPARENT|device.RM_ADDITIVE|device.RM_DEPTH|device.RM_FULLSCREEN)} RenderMode
+ */
+
 window.requestAnimFrame = (function()
 {
     return window.requestAnimationFrame ||
@@ -27,6 +32,7 @@ function Tw2Device()
     this.RM_ADDITIVE = 3;
     this.RM_DEPTH = 4;
     this.RM_FULLSCREEN = 5;
+    this.RM_PICKABLE = 6;
 
     this.RS_ZENABLE = 7;                    /* D3DZBUFFERTYPE (or TRUE/FALSE for legacy) */
     this.RS_FILLMODE = 8;                   /* D3DFILLMODE */
@@ -145,6 +151,13 @@ function Tw2Device()
     this.BLEND_BOTHINVSRCALPHA = 13;
     this.BLEND_BLENDFACTOR = 14;
     this.BLEND_INVBLENDFACTOR = 15;
+    
+    // RS_BLENDOP & RS_BLENDOPALPHA ENUMS
+    this.BLENDOP_ADD = 1; 
+    this.BLENDOP_SUBTRACT = 2; 
+    this.BLENDOP_REVSUBTRACT = 3; 
+    // this.BLENDOP_MIN = 4; 
+    // this.BLENDOP_MAX = 5;
 
     this.gl = null;
     this.debugMode = false;
@@ -188,22 +201,31 @@ function Tw2Device()
      * Creates gl Device
      * @param {canvas} canvas
      * @param {Object} params
-     * @method
      */
     this.CreateDevice = function(canvas, params)
     {
         this.gl = null;
+        var err = null;
 
         try
         {
             this.gl = canvas.getContext("webgl", params) || canvas.getContext("experimental-webgl", params);
         }
         catch (e)
-        {}
+        {
+            err = e.toString();
+        }
 
         if (!this.gl)
         {
-            console.error("Could not initialise WebGL");
+            emitter.log('WebGL',
+                {
+                    log: 'error',
+                    msg: 'Could not initialise WebGL',
+                    src: ['Tw2Device', 'CreateDevice'],
+                    type: 'context',
+                    data: err
+                });
             return false;
         }
         else
@@ -297,23 +319,22 @@ function Tw2Device()
         this.depthOffsetState.states[this.RS_DEPTHBIAS] = 0;
         this.depthOffsetState.dirty = false;
 
-        this._blendTable = [
-            -1,                                 // --
-            this.gl.ZERO,                       // D3DBLEND_ZERO
-            this.gl.ONE,                        // D3DBLEND_ONE
-            this.gl.SRC_COLOR,                  // D3DBLEND_SRCCOLOR
-            this.gl.ONE_MINUS_SRC_COLOR,        // D3DBLEND_INVSRCCOLOR
-            this.gl.SRC_ALPHA,                  // D3DBLEND_SRCALPHA
-            this.gl.ONE_MINUS_SRC_ALPHA,        // D3DBLEND_INVSRCALPHA
-            this.gl.DST_ALPHA,                  // D3DBLEND_DESTALPHA
-            this.gl.ONE_MINUS_DST_ALPHA,        // D3DBLEND_INVDESTALPHA
-            this.gl.DST_COLOR,                  // D3DBLEND_DESTCOLOR
-            this.gl.ONE_MINUS_DST_COLOR,        // D3DBLEND_INVDESTCOLOR
-            this.gl.SRC_ALPHA_SATURATE,         // D3DBLEND_SRCALPHASAT
-            -1,                                 // D3DBLEND_BOTHSRCALPHA
-            -1,                                 // D3DBLEND_BOTHINVSRCALPHA
-            this.gl.CONSTANT_COLOR,             // D3DBLEND_BLENDFACTOR
-            this.gl.ONE_MINUS_CONSTANT_COLOR    // D3DBLEND_INVBLENDFACTOR
+        this._blendTable = [-1,                 // --
+                            this.gl.ZERO,                       // D3DBLEND_ZERO
+                            this.gl.ONE,                        // D3DBLEND_ONE
+                            this.gl.SRC_COLOR,                  // D3DBLEND_SRCCOLOR
+                            this.gl.ONE_MINUS_SRC_COLOR,        // D3DBLEND_INVSRCCOLOR
+                            this.gl.SRC_ALPHA,                  // D3DBLEND_SRCALPHA
+                            this.gl.ONE_MINUS_SRC_ALPHA,        // D3DBLEND_INVSRCALPHA
+                            this.gl.DST_ALPHA,                  // D3DBLEND_DESTALPHA
+                            this.gl.ONE_MINUS_DST_ALPHA,        // D3DBLEND_INVDESTALPHA
+                            this.gl.DST_COLOR,                  // D3DBLEND_DESTCOLOR
+                            this.gl.ONE_MINUS_DST_COLOR,        // D3DBLEND_INVDESTCOLOR
+                            this.gl.SRC_ALPHA_SATURATE,         // D3DBLEND_SRCALPHASAT
+                            -1,                                 // D3DBLEND_BOTHSRCALPHA
+                            -1,                                 // D3DBLEND_BOTHINVSRCALPHA
+                            this.gl.CONSTANT_COLOR,             // D3DBLEND_BLENDFACTOR
+                            this.gl.ONE_MINUS_CONSTANT_COLOR    // D3DBLEND_INVBLENDFACTOR
         ];
 
         this._shadowStateBuffer = new Float32Array(24);
@@ -325,6 +346,7 @@ function Tw2Device()
             requestAnimFrame(tick);
             self.Tick();
         }
+
         requestAnimFrame(tick);
         return true;
     };
@@ -332,7 +354,6 @@ function Tw2Device()
     /**
      * Schedule
      * @param render
-     * @method
      */
     this.Schedule = function(render)
     {
@@ -341,7 +362,6 @@ function Tw2Device()
 
     /**
      * Tick
-     * @method
      */
     this.Tick = function()
     {
@@ -388,7 +408,6 @@ function Tw2Device()
     /**
      * Sets World transform matrix
      * @param {mat4} matrix
-     * @method
      */
     this.SetWorld = function(matrix)
     {
@@ -398,7 +417,6 @@ function Tw2Device()
     /**
      * Sets view matrix
      * @param {mat4} matrix
-     * @method
      */
     this.SetView = function(matrix)
     {
@@ -411,7 +429,6 @@ function Tw2Device()
     /**
      * Sets projection matrix
      * @param {mat4} matrix
-     * @method
      */
     this.SetProjection = function(matrix)
     {
@@ -421,8 +438,7 @@ function Tw2Device()
 
     /**
      * GetEyePosition
-     * @return {?}
-     * @method
+     * @return {vec3}
      */
     this.GetEyePosition = function()
     {
@@ -432,7 +448,6 @@ function Tw2Device()
     /**
      * RenderFullScreenQuad
      * @param {Tw2Effect} effect
-     * @method
      */
     this.RenderFullScreenQuad = function(effect)
     {
@@ -445,7 +460,7 @@ function Tw2Device()
         {
             return;
         }
-        device.gl.bindBuffer(device.gl.ARRAY_BUFFER, this._quadBuffer);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._quadBuffer);
 
         for (var pass = 0; pass < effect.GetPassCount(); ++pass)
         {
@@ -455,14 +470,13 @@ function Tw2Device()
                 return false;
             }
             this.ApplyShadowState();
-            device.gl.drawArrays(device.gl.TRIANGLE_STRIP, 0, 4);
+            this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
         }
     };
 
     /**
      * Renders a Texture to the screen
      * @param texture
-     * @method
      */
     this.RenderTexture = function(texture)
     {
@@ -482,7 +496,6 @@ function Tw2Device()
     /**
      * RenderCameraSpaceQuad
      * @param {Tw2Effect} effect
-     * @method
      */
     this.RenderCameraSpaceQuad = function(effect)
     {
@@ -510,7 +523,7 @@ function Tw2Device()
             vec[3] = 1;
         }
 
-        this.gl.bindBuffer(device.gl.ARRAY_BUFFER, this._cameraQuadBuffer);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._cameraQuadBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
 
         for (var pass = 0; pass < effect.GetPassCount(); ++pass)
@@ -521,15 +534,14 @@ function Tw2Device()
                 return false;
             }
             this.ApplyShadowState();
-            device.gl.drawArrays(device.gl.TRIANGLE_STRIP, 0, 4);
+            this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
         }
     };
 
     /**
      * Converts a Dword to Float
      * @param value
-     * @return {number}
-     * @method
+     * @return {Number}
      */
     this._DwordToFloat = function(value)
     {
@@ -547,8 +559,7 @@ function Tw2Device()
 
     /**
      * Returns whether or not Alpha Test is enabled
-     * return {boolean}
-     * @method
+     * return {Boolean}
      */
     this.IsAlphaTestEnabled = function()
     {
@@ -559,7 +570,6 @@ function Tw2Device()
      * Set a render state
      * @param state
      * @param value
-     * @method
      */
     this.SetRenderState = function(state, value)
     {
@@ -577,9 +587,11 @@ function Tw2Device()
                     gl.disable(gl.DEPTH_TEST);
                 }
                 return;
+
             case this.RS_ZWRITEENABLE:
                 gl.depthMask(value ? true : false);
                 return;
+
             case this.RS_ALPHATESTENABLE:
             case this.RS_ALPHAREF:
             case this.RS_ALPHAFUNC:
@@ -591,6 +603,7 @@ function Tw2Device()
                     this.alphaTestState.dirty = true;
                 }
                 return;
+
             case this.RS_SRCBLEND:
             case this.RS_DESTBLEND:
             case this.RS_BLENDOP:
@@ -604,6 +617,7 @@ function Tw2Device()
                     this.alphaBlendState.dirty = true;
                 }
                 return;
+
             case this.RS_CULLMODE:
                 switch (value)
                 {
@@ -620,9 +634,11 @@ function Tw2Device()
                         return;
                 }
                 return;
+
             case this.RS_ZFUNC:
                 gl.depthFunc(0x0200 + value - 1);
                 return;
+
             case this.RS_ALPHABLENDENABLE:
                 if (value)
                 {
@@ -633,10 +649,12 @@ function Tw2Device()
                     gl.disable(gl.BLEND);
                 }
                 return;
+
             case this.RS_COLORWRITEENABLE:
                 gl.colorMask(
                     (value & 1) != 0, (value & 2) != 0, (value & 4) != 0, (value & 8) != 0);
                 return;
+
             case this.RS_SCISSORTESTENABLE:
                 if (value)
                 {
@@ -647,6 +665,7 @@ function Tw2Device()
                     gl.disable(gl.SCISSOR_TEST);
                 }
                 return;
+
             case this.RS_SLOPESCALEDEPTHBIAS:
             case this.RS_DEPTHBIAS:
                 value = this._DwordToFloat(value);
@@ -663,19 +682,17 @@ function Tw2Device()
 
     /**
      * ApplyShadowState
-     * TODO: Fix commented out code
-     * @method
      */
     this.ApplyShadowState = function()
     {
         if (this.alphaBlendState.dirty)
         {
             var blendOp = this.gl.FUNC_ADD;
-            if (this.alphaBlendState.states[this.RS_BLENDOP] == 2)
+            if (this.alphaBlendState.states[this.RS_BLENDOP] == this.BLENDOP_SUBTRACT)
             {
                 blendOp = this.gl.FUNC_SUBTRACT;
             }
-            else if (this.alphaBlendState.states[this.RS_BLENDOP] == 3)
+            else if (this.alphaBlendState.states[this.RS_BLENDOP] == this.BLENDOP_REVSUBTRACT)
             {
                 blendOp = this.gl.FUNC_REVERSE_SUBTRACT;
             }
@@ -685,11 +702,11 @@ function Tw2Device()
             if (this.alphaBlendState.states[this.RS_SEPARATEALPHABLENDENABLE])
             {
                 var blendOpAlpha = this.gl.FUNC_ADD;
-                if (this.alphaBlendState.states[this.RS_BLENDOP] == 2)
+                if (this.alphaBlendState.states[this.RS_BLENDOP] == this.BLENDOP_SUBTRACT)
                 {
                     blendOpAlpha = this.gl.FUNC_SUBTRACT;
                 }
-                else if (this.alphaBlendState.states[this.RS_BLENDOP] == 3)
+                else if (this.alphaBlendState.states[this.RS_BLENDOP] == this.BLENDOP_REVSUBTRACT)
                 {
                     blendOpAlpha = this.gl.FUNC_REVERSE_SUBTRACT;
                 }
@@ -697,9 +714,9 @@ function Tw2Device()
                 var destBlendAlpha = this._blendTable[this.alphaBlendState.states[this.RS_DESTBLENDALPHA]];
                 this.gl.blendEquationSeparate(blendOp, blendOpAlpha);
                 this.gl.blendFuncSeparate(srcBlend,
-                    destBlend,
-                    srcBlendAlpha,
-                    destBlendAlpha);
+                                          destBlend,
+                                          srcBlendAlpha,
+                                          destBlendAlpha);
             }
             else
             {
@@ -725,44 +742,52 @@ function Tw2Device()
                     var invertedAlphaTest = 1;
                     var alphaTestRef = -256;
                     break;
+
                 case this.CMP_LESS:
                     var alphaTestFunc = 0;
                     var invertedAlphaTest = -1;
                     var alphaTestRef = this.alphaTestState.states[this.RS_ALPHAREF] - 1;
                     break;
+
                 case this.CMP_EQUAL:
                     var alphaTestFunc = 1;
                     var invertedAlphaTest = 0;
                     var alphaTestRef = this.alphaTestState.states[this.RS_ALPHAREF];
                     break;
+
                 case this.CMP_LEQUAL:
                     var alphaTestFunc = 0;
                     var invertedAlphaTest = -1;
                     var alphaTestRef = this.alphaTestState.states[this.RS_ALPHAREF];
                     break;
+
                 case this.CMP_GREATER:
                     var alphaTestFunc = 0;
                     var invertedAlphaTest = 1;
                     var alphaTestRef = -this.alphaTestState.states[this.RS_ALPHAREF] - 1;
                     break;
+
                 /*case this.CMP_NOTEQUAL:
                  var alphaTestFunc = 1;
                  var invertedAlphaTest = 1;
                  var alphaTestRef = this.alphaTestState.states[this.RS_ALPHAREF];
                  break;*/
+
                 case this.CMP_GREATEREQUAL:
                     var alphaTestFunc = 0;
                     var invertedAlphaTest = 1;
                     var alphaTestRef = -this.alphaTestState.states[this.RS_ALPHAREF];
                     break;
+
                 default:
                     var alphaTestFunc = 0;
                     var invertedAlphaTest = 0;
                     var alphaTestRef = 1;
                     break;
             }
+
             var clipPlaneEnable = 0;
-            device.gl.uniform4f(
+            this.gl.uniform4f(
                 this.shadowHandles.shadowStateInt,
                 invertedAlphaTest,
                 alphaTestRef,
@@ -787,6 +812,7 @@ function Tw2Device()
         switch (renderMode)
         {
             case this.RM_OPAQUE:
+            case this.RM_PICKABLE:
                 this.SetRenderState(this.RS_ZENABLE, true);
                 this.SetRenderState(this.RS_ZWRITEENABLE, true);
                 this.SetRenderState(this.RS_ZFUNC, this.CMP_LEQUAL);
@@ -798,6 +824,7 @@ function Tw2Device()
                 this.SetRenderState(this.RS_DEPTHBIAS, 0);
                 this.SetRenderState(this.RS_COLORWRITEENABLE, 0xf);
                 break;
+
             case this.RM_DECAL:
                 this.SetRenderState(this.RS_ALPHABLENDENABLE, false);
                 this.SetRenderState(this.RS_ALPHATESTENABLE, true);
@@ -813,6 +840,7 @@ function Tw2Device()
                 this.SetRenderState(this.RS_SEPARATEALPHABLENDENABLE, false);
                 this.SetRenderState(this.RS_COLORWRITEENABLE, 0xf);
                 break;
+
             case this.RM_TRANSPARENT:
                 this.SetRenderState(this.RS_CULLMODE, this.CULL_CW);
                 this.SetRenderState(this.RS_ALPHABLENDENABLE, true);
@@ -828,6 +856,7 @@ function Tw2Device()
                 this.SetRenderState(this.RS_SEPARATEALPHABLENDENABLE, false);
                 this.SetRenderState(this.RS_COLORWRITEENABLE, 0xf);
                 break;
+
             case this.RM_ADDITIVE:
                 this.SetRenderState(this.RS_CULLMODE, this.CULL_NONE);
                 this.SetRenderState(this.RS_ALPHABLENDENABLE, true);
@@ -843,6 +872,7 @@ function Tw2Device()
                 this.SetRenderState(this.RS_SEPARATEALPHABLENDENABLE, false);
                 this.SetRenderState(this.RS_COLORWRITEENABLE, 0xf);
                 break;
+
             case this.RM_FULLSCREEN:
                 this.SetRenderState(this.RS_ALPHABLENDENABLE, false);
                 this.SetRenderState(this.RS_ALPHATESTENABLE, false);
@@ -855,6 +885,7 @@ function Tw2Device()
                 this.SetRenderState(this.RS_SEPARATEALPHABLENDENABLE, false);
                 this.SetRenderState(this.RS_COLORWRITEENABLE, 0xf);
                 break;
+
             default:
                 return;
         }
@@ -863,49 +894,45 @@ function Tw2Device()
 
     /**
      * Gets a fallback texture
-     * TODO: Fix commented out code
-     * @returns {?}
-     * @method
+     * @returns {*}
      */
     this.GetFallbackTexture = function()
     {
         if (this._whiteTexture == null)
         {
-            this._whiteTexture = device.gl.createTexture();
-            device.gl.bindTexture(device.gl.TEXTURE_2D, this._whiteTexture);
-            device.gl.texImage2D(device.gl.TEXTURE_2D, 0, device.gl.RGBA, 1, 1, 0, device.gl.RGBA, device.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-            device.gl.texParameteri(device.gl.TEXTURE_2D, device.gl.TEXTURE_WRAP_S, device.gl.CLAMP_TO_EDGE);
-            device.gl.texParameteri(device.gl.TEXTURE_2D, device.gl.TEXTURE_WRAP_T, device.gl.CLAMP_TO_EDGE);
-            device.gl.texParameteri(device.gl.TEXTURE_2D, device.gl.TEXTURE_MAG_FILTER, device.gl.NEAREST);
-            device.gl.texParameteri(device.gl.TEXTURE_2D, device.gl.TEXTURE_MIN_FILTER, device.gl.NEAREST);
-            //device.gl.generateMipmap(device.gl.TEXTURE_2D);
-            device.gl.bindTexture(device.gl.TEXTURE_2D, null);
+            this._whiteTexture = this.gl.createTexture();
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this._whiteTexture);
+            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+            //this.gl.generateMipmap(this.gl.TEXTURE_2D);
+            this.gl.bindTexture(this.gl.TEXTURE_2D, null);
         }
         return this._whiteTexture;
     };
 
     /**
      * Gets a fallback cube map
-     * TODO: Fix commented out code
-     * @returns {?}
-     * @method
+     * @returns {*}
      */
     this.GetFallbackCubeMap = function()
     {
         if (this._whiteCube == null)
         {
-            this._whiteCube = device.gl.createTexture();
-            device.gl.bindTexture(device.gl.TEXTURE_CUBE_MAP, this._whiteCube);
+            this._whiteCube = this.gl.createTexture();
+            this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this._whiteCube);
             for (var j = 0; j < 6; ++j)
             {
-                device.gl.texImage2D(device.gl.TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, device.gl.RGBA, 1, 1, 0, device.gl.RGBA, device.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+                this.gl.texImage2D(this.gl.TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
             }
-            device.gl.texParameteri(device.gl.TEXTURE_CUBE_MAP, device.gl.TEXTURE_WRAP_S, device.gl.CLAMP_TO_EDGE);
-            device.gl.texParameteri(device.gl.TEXTURE_CUBE_MAP, device.gl.TEXTURE_WRAP_T, device.gl.CLAMP_TO_EDGE);
-            device.gl.texParameteri(device.gl.TEXTURE_CUBE_MAP, device.gl.TEXTURE_MAG_FILTER, device.gl.NEAREST);
-            device.gl.texParameteri(device.gl.TEXTURE_CUBE_MAP, device.gl.TEXTURE_MIN_FILTER, device.gl.NEAREST);
-            //device.gl.generateMipmap(device.gl.TEXTURE_CUBE_MAP);
-            device.gl.bindTexture(device.gl.TEXTURE_CUBE_MAP, null);
+            this.gl.texParameteri(this.gl.TEXTURE_CUBE_MAP, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+            this.gl.texParameteri(this.gl.TEXTURE_CUBE_MAP, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+            this.gl.texParameteri(this.gl.TEXTURE_CUBE_MAP, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+            this.gl.texParameteri(this.gl.TEXTURE_CUBE_MAP, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+            //this.gl.generateMipmap(this.gl.TEXTURE_CUBE_MAP);
+            this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, null);
         }
         return this._whiteCube;
     };
