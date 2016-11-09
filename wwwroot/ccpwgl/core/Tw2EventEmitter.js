@@ -192,7 +192,7 @@ Tw2EventEmitter.prototype.off = function(eventName, listener)
  */
 Tw2EventEmitter.prototype.del = function(listener)
 {
-    const self = this;
+    var self = this;
     for (var eventName in this.events)
     {
         if (this.events.hasOwnProperty(eventName))
