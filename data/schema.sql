@@ -917,7 +917,7 @@ CREATE TABLE IF NOT EXISTS `ccpwglmapping` (
 --
 
 CREATE TABLE IF NOT EXISTS `cfgapikeys` (
-  `apiKeyID` int(11) NOT NULL DEFAULT '0',
+  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
   `keyID` varchar(255) NOT NULL,
   `vCode` varchar(255) NOT NULL,
   PRIMARY KEY (`apiKeyID`),

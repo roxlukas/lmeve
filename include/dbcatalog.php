@@ -111,3 +111,9 @@ function updateCrestIndustrySystems() {
         }
     }
 }
+
+function updateCfgApiKeys() {
+	$table=db_asocquery("DESCRIBE `cfgapikeys`;");
+	//bugfix for multiple corps
+	//ALTER TABLE `cfgapikeys` CHANGE `apiKeyID` `apiKEyID` INT( 11 ) NOT NULL AUTO_INCREMENT
+}
