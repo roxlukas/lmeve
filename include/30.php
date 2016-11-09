@@ -35,9 +35,9 @@ if (checkrights("Administrator,ViewMarket")) {
 	foreach ($corps as $corp) { //begin corps loop
             echo("<h3><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_32.png\" style=\"vertical-align: middle;\" /> ${corp['corporationName']}</h3>");
             $marketdata=getMarketOrders("WHERE amo.bid=0 AND amo.orderState=0 AND amo.volRemaining>0 AND amo.corporationID=${corp['corporationID']}");
-            showMarketOrders($marketdata,'Sell orders');
+            showMarketOrders($marketdata,'Sell orders',TRUE);
             $buyorddata=getMarketOrders("WHERE amo.bid=1 AND amo.orderState=0 AND amo.volRemaining>0 AND amo.corporationID=${corp['corporationID']}");
-            showMarketOrders($buyorddata,'Buy orders');
+            showMarketOrders($buyorddata,'Buy orders',FALSE);
         }
 }
 if (checkrights("Administrator,ViewContracts")) { 

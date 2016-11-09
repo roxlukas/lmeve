@@ -262,7 +262,7 @@ function getMarketOrders($where) {
         ORDER BY `typeName`;");
 }
 
-function showMarketOrders($orderlist,$label=null) {
+function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
 	global $DECIMAL_SEP, $THOUSAND_SEP;
         $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
         
@@ -292,7 +292,7 @@ function showMarketOrders($orderlist,$label=null) {
 	</th><th>
 		Price
 	</th><th colspan="2">
-		Volume sold
+		<?php if ( $sell === TRUE ) echo('Volume sold'); else echo('Volume bought'); ?>
 	</th>
 	</tr>
 	<?php
