@@ -1177,7 +1177,8 @@ INSERT INTO `lmrights` (`rightID`, `rightName`) VALUES
 (34, 'EditWiki'),
 (35, 'ViewPOS'),
 (36, 'EditPOS'),
-(37, 'ViewActivity');
+(37, 'ViewActivity'),
+(38, 'ViewKillboard');
 
 -- --------------------------------------------------------
 
