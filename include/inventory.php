@@ -730,7 +730,7 @@ function showLabsAndTasks($towers) {
         //if (count($tower['labs'])>0) { 
         if (true) { 
         ?>
-        <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
+        <table class="lmframework" style="width: 80%; min-width: 700px;" id="">
             <tr><th colspan="7" style="text-align: center;">
                 <h3><?php echo($tower['location']['moonName'].' ("'.$tower['towerName'].'")'); ?></h3>
             </th>
@@ -798,7 +798,7 @@ function showLabsAndTasks($towers) {
         <?php
         }
     } else {
-        echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Starbase Control Towers</th</tr></table>');
+        echo('<table class="lmframework" style="width: 80%; min-width: 700px;"><tr><th style="text-align: center;">Corporation doesn\'t own any Starbase Control Towers</th</tr></table>');
     }
 }
 
@@ -807,7 +807,7 @@ function showECAndTasks($ecs) {
     $rights_editpos=checkrights("Administrator,EditPOS");
     if (count($ecs)>0) foreach($ecs as $ec) {
         ?>
-        <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
+        <table class="lmframework" style="width: 80%; min-width: 700px;" id="">
             <tr><th colspan="7" style="text-align: center;">
                 <h3><?php echo( $ec['itemName'] . ' in ' . $ec['solarSystemName'] . ' (' . $ec['typeName'] . ')'); ?></h3>
             </th>
@@ -861,7 +861,7 @@ function showECAndTasks($ecs) {
                  ?> 
             </td><td>
                 <?php 
-                 invhrefedit($ec['facilityID']); echo("<img src=\"ccp_icons/26_64_11.png\" style=\"width: 24px; height: 24px;\" title=\"Open Inventory\"/></span>"); echo('</a>');
+                 invhrefedit($ec['facilityID'],$ec['corporationID']); echo("<img src=\"ccp_icons/26_64_11.png\" style=\"width: 24px; height: 24px;\" title=\"Open Inventory\"/></span>"); echo('</a>');
                  ?> 
             </td>
             </tr>
@@ -873,7 +873,7 @@ function showECAndTasks($ecs) {
         <?php
         
     } else {
-        echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Engineering Complexes</th</tr></table>');
+        echo('<table class="lmframework" style="width: 80%; min-width: 700px;"><tr><th style="text-align: center;">Corporation doesn\'t own any Engineering Complexes</th</tr></table>');
     }
 }
 
