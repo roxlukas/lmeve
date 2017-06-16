@@ -682,6 +682,44 @@ function getLabsAndTasks($corporationID) {
     return $towers;
 }
 
+function getECAndTasks($corporationID) {
+    global $LM_EVEDB;
+    
+    $ec = array();
+    
+    $sql ="SELECT apf.*,apl.`itemName`
+    FROM `apifacilities` apf
+    JOIN `$LM_EVEDB`.`invTypes` itp
+        ON apf.`typeID` = itp.`typeID`
+    JOIN `apilocations` apl
+        ON apf.`facilityID` = apl.`itemID`
+    WHERE itp.`groupID` = 1404
+    AND apf.`corporationID` = $corporationID;";
+    
+    $ec_raw = db_asocquery($sql);
+
+    if (count($ec_raw)>0) {
+        $raw_tasks=getSimpleTasks();
+        //build data structure. First branch is Engineering Complexes.
+        foreach($ec_raw as $row) {
+            $ecID=$row['facilityID'];
+            $ec[$ecID]=$row;
+            $ec[$ecID]['tasks']=array();
+        }
+        //build data structure. Add tasks under Engineering Complexes.
+        foreach($raw_tasks as $task) {
+            if (!is_null($task['structureID']) && array_key_exists($task['structureID'], $ec)) {
+                $ec[$task['structureID']]['users'][$task['characterID']]=$task['characterName'];
+                $ec[$task['structureID']]['products'][$task['typeID']]=$task['typeName'];
+            }
+        }
+    }
+    
+    //echo('<pre>DEBUG: ' . print_r($ec, TRUE) . '</pre>');
+    
+    return $ec;
+}
+
 function showLabsAndTasks($towers) {
     $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
     $rights_editpos=checkrights("Administrator,EditPOS");
@@ -757,7 +795,82 @@ function showLabsAndTasks($towers) {
         <?php
         }
     } else {
-        echo("<h3>Corporation does not have any Control Towers.</h3>");
+        echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Starbase Control Towers</th</tr></table>');
+    }
+}
+
+function showECAndTasks($ecs) {
+    $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
+    $rights_editpos=checkrights("Administrator,EditPOS");
+    if (count($ecs)>0) foreach($ecs as $ec) {
+        ?>
+        <table class="lmframework" style="width: 70%; min-width: 608px;" id="">
+            <tr><th colspan="7" style="text-align: center;">
+                <h3><?php echo( $ec['itemName'] . ' in ' . $ec['solarSystemName'] . ' (' . $ec['typeName'] . ')'); ?></h3>
+            </th>
+            </tr>
+            <tr><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
+                Icon
+            </th><th style="width: 10%; min-width: 160px;">
+                Name
+            </th><th style="width: 10%; min-width: 160px;">
+                Structure Type
+            </th><th style="width: 40%; min-width: 128px;">
+                Users
+            </th><th style="width: 40%; min-width: 128px;">
+                Products
+            </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
+                Kit
+            </th><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;" title="Inventory">
+                Inv
+            </th>
+            </tr>
+            
+            <tr><td width="32" style="padding: 0px; text-align: center;">
+                <?php dbhrefedit($ec['typeID']); echo("<img src=\"".getTypeIDicon($ec['typeID'])."\" title=\"${ec['typeName']}\" />"); echo('</a>'); ?>
+            </td><td style="">
+                <?php
+                labshrefedit($ec['facilityID']); echo(stripslashes($ec['itemName']));  echo('</a>');
+                 ?>
+            </td><td style="">
+                <?php
+                dbhrefedit($ec['typeID']); echo(stripslashes($ec['typeName']));  echo('</a>');
+                 ?>
+            </td><td style="">
+                <?php 
+                if (count($ec['users'])>0) foreach ($ec['users'] as $user => $name) {
+                    if ($rights_viewallchars) toonhrefedit($user);
+                    echo("<img src=\"https://imageserver.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
+                    if ($rights_viewallchars) echo('</a>');
+                }
+                ?>
+            </td><td>
+                <?php 
+                if (count($ec['products'])>0) foreach ($ec['products'] as $product => $name) {
+                    dbhrefedit($product);
+                    echo("<img src=\"".getTypeIDicon($product)."\" title=\"$name\">");
+                    echo('</a>');
+                }
+                ?> 
+            </td><td>
+                <?php 
+                labshrefedit($ec['facilityID']); echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" title=\"Show Kit\" /></span>"); echo('</a>');
+                 ?> 
+            </td><td>
+                <?php 
+                 invhrefedit($ec['facilityID']); echo("<img src=\"ccp_icons/26_64_11.png\" style=\"width: 24px; height: 24px;\" title=\"Open Inventory\"/></span>"); echo('</a>');
+                 ?> 
+            </td>
+            </tr>
+            <?php
+            
+            ?>
+                
+            </table><br/>
+        <?php
+        
+    } else {
+        echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Engineering Complexes</th</tr></table>');
     }
 }
 
@@ -896,7 +1009,7 @@ function showControlTowers($controltowers) {
 	    </table>
 	    <?php
         } else {
-		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t have any POSes</th</tr></table>');
+		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Starbase Control Towers</th</tr></table>');
         }
 }
 

@@ -231,6 +231,7 @@ foreach ($api_keys as $api_key) {
 				");";
 				db_uquery($sql);
 			}
+                        copyECfromAssetsToFacilities();
 			apiSaveOK($keyid,"Facilities.xml");
 		}
 	} else {

@@ -320,43 +320,71 @@ function load_apikeys_from_db() {
 }
 
 function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=0 - root node
-		foreach ($rowset as $row) {
-			$attrs=$row->attributes();
+    global $LM_EVEDB;
+    foreach ($rowset as $row) {
+        $attrs=$row->attributes();
 
-			if ($parentID==0)	{ 				//if root node
-				$locID=$attrs->locationID;  //then take locationID of the row
-				$parID=0;					//set parentID=0
-			} else {
-				$locID=$locationID; 		//otherwise take locationID of the parent
-				$parID=$parentID;			//and set parentID as ID of the parent
-			}
-			
-			if (isset($attrs->rawQuantity)) {
-				$rawQuantity=$attrs->rawQuantity;
-			} else {
-				$rawQuantity='NULL';
-			}
-			
-			$sql="INSERT INTO `apiassets` VALUES(".
-			$attrs->itemID.",".
-			$parID.",".
-			$locID.",".
-			$attrs->typeID.",".
-			$attrs->quantity.",".
-			$attrs->flag.",".
-			$attrs->singleton.",".
-			$rawQuantity.",".
-			$corporationID.
-			");";
-			db_uquery($sql);
-			//echo($attrs->itemID.",".$locID."\r\n");
-			if (isset($row->rowset)) {
-				//echo("HAS CONTENTS!\r\n");
-				insertAssets($row->rowset->row,$attrs->itemID,$locID,$corporationID);
-			}
-		}
-	}
+        if ($parentID==0)	{ 				//if root node
+                $locID=$attrs->locationID;  //then take locationID of the row
+                $parID=0;					//set parentID=0
+        } else {
+                $locID=$locationID; 		//otherwise take locationID of the parent
+                $parID=$parentID;			//and set parentID as ID of the parent
+        }
+
+        if (isset($attrs->rawQuantity)) {
+                $rawQuantity=$attrs->rawQuantity;
+        } else {
+                $rawQuantity='NULL';
+        }
+
+        $sql="INSERT INTO `apiassets` VALUES(".
+        $attrs->itemID.",".
+        $parID.",".
+        $locID.",".
+        $attrs->typeID.",".
+        $attrs->quantity.",".
+        $attrs->flag.",".
+        $attrs->singleton.",".
+        $rawQuantity.",".
+        $corporationID.
+        ");";
+        db_uquery($sql);
+        //echo($attrs->itemID.",".$locID."\r\n");
+        if (isset($row->rowset)) {
+                //echo("HAS CONTENTS!\r\n");
+                insertAssets($row->rowset->row,$attrs->itemID,$locID,$corporationID);
+        }
+    }
+    copyECfromAssetsToFacilities();
+}
         
+function copyECfromAssetsToFacilities() {
+    //copy Engineering complexes to Facilities
+    $sql = "INSERT IGNORE INTO `apifacilities` SELECT 
+	apa.`itemID` AS facilityID,
+	itp.`typeID`,
+	itp.`typeName`,
+	apa.`locationID` AS `solarSystemID`,
+	map.`itemName` AS `solarSystemName`,
+	map.`regionID`,
+	reg.`regionName`,
+	0.0 AS `starbaseModifier`,
+	0.0 AS `tax`,
+	apa.`corporationID`
+
+FROM `apiassets` apa
+JOIN `$LM_EVEDB`.`invTypes` itp
+ON apa.`typeID` = itp.`typeID`
+JOIN `$LM_EVEDB`.`mapDenormalize` map
+ON apa.`locationID` = map.`itemID`
+JOIN `$LM_EVEDB`.`mapRegions` reg
+ON map.`regionID` = reg.`regionID`
+WHERE itp.`groupID`=1404;";
+    //Insert Engineering complexes from Assets into Facilities!
+    return db_uquery($sql);
+}
+
         function updateOfficeID($corporationID) {
             // officeID to stationID conversion
             //To convert locationIDs greater than or equal to 66000000 and less than 67000000 to stationIDs from staStations
