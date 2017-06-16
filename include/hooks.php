@@ -6,6 +6,7 @@ function login_hook() {
     updateUserstable();
     recreateSdeCompatViews();
     updateCrestIndustrySystems();
+    createCitadelsView();
 }
 
 ?>

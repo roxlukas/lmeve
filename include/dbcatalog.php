@@ -144,3 +144,17 @@ function copyECfromAssetsToFacilities() {
     //Insert Engineering complexes from Assets into Facilities!
     return db_uquery($sql);
 }
+
+
+function createCitadelsView() {
+    global $LM_EVEDB;
+
+    $sql = "CREATE OR REPLACE VIEW `apicitadels` AS SELECT ass.*,itp.`typeName`,itp.`groupID`
+    FROM `apiassets` ass
+    JOIN `$LM_EVEDB`.`invTypes` itp
+    ON ass.`typeID` = itp.`typeID`
+    WHERE itp.`groupID` IN (1404, 1657);";
+
+    return db_uquery($sql);
+    //Citadel services - flag 127 in Assets API
+}

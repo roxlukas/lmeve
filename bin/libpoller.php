@@ -13,6 +13,7 @@ include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
 include_once("$mypath/../include/configuration.php");
 include_once("$mypath/../include/killboard.php");
+include_once("$mypath/../include/dbcatalog.php");
 
 function microtime_float()
 {
@@ -357,36 +358,10 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
         }
     }
     copyECfromAssetsToFacilities();
+    createCitadelsView();
 }
         
-function copyECfromAssetsToFacilities() {
-    global $LM_EVEDB;
-    //copy Engineering complexes to Facilities
-    $sql = "INSERT IGNORE INTO `apifacilities` SELECT 
-	apa.`itemID` AS facilityID,
-	itp.`typeID`,
-	itp.`typeName`,
-	apa.`locationID` AS `solarSystemID`,
-	map.`itemName` AS `solarSystemName`,
-	map.`regionID`,
-	reg.`regionName`,
-	0.0 AS `starbaseModifier`,
-	0.0 AS `tax`,
-	apa.`corporationID`
-
-FROM `apiassets` apa
-JOIN `$LM_EVEDB`.`invTypes` itp
-ON apa.`typeID` = itp.`typeID`
-JOIN `$LM_EVEDB`.`mapDenormalize` map
-ON apa.`locationID` = map.`itemID`
-JOIN `$LM_EVEDB`.`mapRegions` reg
-ON map.`regionID` = reg.`regionID`
-WHERE itp.`groupID`=1404;";
-    //Insert Engineering complexes from Assets into Facilities!
-    return db_uquery($sql);
-}
-
-        function updateOfficeID($corporationID) {
+function updateOfficeID($corporationID) {
             // officeID to stationID conversion
             //To convert locationIDs greater than or equal to 66000000 and less than 67000000 to stationIDs from staStations
             // subtract 6000001 from the locationID.

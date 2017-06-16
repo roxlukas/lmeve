@@ -1327,8 +1327,7 @@ function showPocos($pocos, $income=null) {
                     
                 </td>
                     <?php
-
-                      $perc=round(100*$row['planetIncome']/$maxIncome);
+                      if ($maxIncome > 0) $perc=round(100*$row['planetIncome']/$maxIncome); else $perc=0;
                       $good=array(0,192,0,0.5);
                       $bad=array(192,0,0,0.5);
                       for ($i=0; $i<4; $i++) {

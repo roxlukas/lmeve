@@ -905,6 +905,9 @@ foreach ($api_keys as $api_key) {
                 SELECT DISTINCT `itemID` FROM `apistarbaselist`
                 WHERE `corporationID`=$corporationID
                 UNION
+                SELECT DISTINCT `itemID` FROM `apicitadels`
+                WHERE `corporationID`=$corporationID
+                UNION
                 SELECT DISTINCT `itemID` FROM `apiassets` apa
                 JOIN `$LM_EVEDB`.`invTypes` itp
                 ON apa.`typeID`=itp.`typeID`
