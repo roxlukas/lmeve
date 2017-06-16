@@ -117,3 +117,30 @@ function updateCfgApiKeys() {
 	//bugfix for multiple corps
 	//ALTER TABLE `cfgapikeys` CHANGE `apiKeyID` `apiKEyID` INT( 11 ) NOT NULL AUTO_INCREMENT
 }
+
+function copyECfromAssetsToFacilities() {
+    global $LM_EVEDB;
+    //copy Engineering complexes to Facilities
+    $sql = "INSERT IGNORE INTO `apifacilities` SELECT 
+	apa.`itemID` AS facilityID,
+	itp.`typeID`,
+	itp.`typeName`,
+	apa.`locationID` AS `solarSystemID`,
+	map.`itemName` AS `solarSystemName`,
+	map.`regionID`,
+	reg.`regionName`,
+	0.0 AS `starbaseModifier`,
+	0.0 AS `tax`,
+	apa.`corporationID`
+
+        FROM `apiassets` apa
+        JOIN `$LM_EVEDB`.`invTypes` itp
+        ON apa.`typeID` = itp.`typeID`
+        JOIN `$LM_EVEDB`.`mapDenormalize` map
+        ON apa.`locationID` = map.`itemID`
+        JOIN `$LM_EVEDB`.`mapRegions` reg
+        ON map.`regionID` = reg.`regionID`
+        WHERE itp.`groupID`=1404;";
+    //Insert Engineering complexes from Assets into Facilities!
+    return db_uquery($sql);
+}

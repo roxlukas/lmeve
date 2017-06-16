@@ -21,7 +21,7 @@ include_once 'inventory.php';
 <?php
     $corps=db_asocquery("SELECT * FROM apicorps;");
     foreach ($corps as $corp) { //begin corps loop
-        echo("<h3><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_32.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
+        echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
         showECAndTasks(getECAndTasks($corp['corporationID']));
         showLabsAndTasks(getLabsAndTasks($corp['corporationID']));
     }//end corps loop

@@ -1,9 +1,10 @@
 <?php
 
-include_once('materials.php');
-include_once('yaml_graphics.php');
-include_once('skins.php');
+include_once("materials.php");
+include_once("yaml_graphics.php");
+include_once("skins.php");
 include_once("percentage.php");
+include_once("dbcatalog.php");
 
 function dbhrefedit($nr) {
     echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"Click to open database\">");
@@ -130,7 +131,7 @@ function showSilos($silos) {
 	    </table>
 	    <?php
         } else {
-		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t have any Silos</th</tr></table>');
+		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Silos</th</tr></table>');
         }
 }
 
@@ -685,6 +686,8 @@ function getLabsAndTasks($corporationID) {
 function getECAndTasks($corporationID) {
     global $LM_EVEDB;
     
+    copyECfromAssetsToFacilities();
+    
     $ec = array();
     
     $sql ="SELECT apf.*,apl.`itemName`
@@ -809,7 +812,7 @@ function showECAndTasks($ecs) {
                 <h3><?php echo( $ec['itemName'] . ' in ' . $ec['solarSystemName'] . ' (' . $ec['typeName'] . ')'); ?></h3>
             </th>
             </tr>
-            <tr><th style="width: 32px; min-width: 32px; padding: 0px; text-align: center;">
+            <tr><th style="width: 64px; min-width: 64px; padding: 0px; text-align: center;">
                 Icon
             </th><th style="width: 10%; min-width: 160px;">
                 Name
@@ -826,8 +829,8 @@ function showECAndTasks($ecs) {
             </th>
             </tr>
             
-            <tr><td width="32" style="padding: 0px; text-align: center;">
-                <?php dbhrefedit($ec['typeID']); echo("<img src=\"".getTypeIDicon($ec['typeID'])."\" title=\"${ec['typeName']}\" />"); echo('</a>'); ?>
+            <tr><td width="64" style="padding: 0px; text-align: center;">
+                <?php dbhrefedit($ec['typeID']); echo("<img src=\"".getTypeIDicon($ec['typeID'],64)."\" title=\"${ec['typeName']}\" />"); echo('</a>'); ?>
             </td><td style="">
                 <?php
                 labshrefedit($ec['facilityID']); echo(stripslashes($ec['itemName']));  echo('</a>');
@@ -1376,7 +1379,7 @@ function showPocos($pocos, $income=null) {
 			<?php
             if (!is_null($income)) showPocoIncome($income);
         } else {
-		echo('<table class="lmframework" style="width: '.$TABWIDTH.';"><tr><th style="text-align: center;">Corporation doesn\'t have any POCOs</th</tr></table>');
+		echo('<table class="lmframework" style="width: '.$TABWIDTH.';"><tr><th style="text-align: center;">Corporation doesn\'t own any POCOs</th</tr></table>');
         }
         
     

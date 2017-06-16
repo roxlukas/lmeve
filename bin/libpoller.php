@@ -360,6 +360,7 @@ function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=
 }
         
 function copyECfromAssetsToFacilities() {
+    global $LM_EVEDB;
     //copy Engineering complexes to Facilities
     $sql = "INSERT IGNORE INTO `apifacilities` SELECT 
 	apa.`itemID` AS facilityID,
