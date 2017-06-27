@@ -669,7 +669,8 @@ function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
 	ORDER BY `name`,`activityName`) AS wages;";
     } else {
         $sql_all="SELECT *,ROUND((points*$ONEPOINT),2) as wage FROM (
-	SELECT lmc.`userID` AS `characterID`,lmu.`login` AS `name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points
+	SELECT lmc.`userID` AS `characterID`,lmu.`login` AS `name`,`activityName`,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600)/hrsPerPoint AS points,
+        COUNT(DISTINCT acm.`characterID`) AS count
 	FROM `apiindustryjobs` aij
 	JOIN $LM_EVEDB.`ramActivities` rac
 	ON aij.`activityID`=rac.`activityID`
@@ -702,6 +703,13 @@ function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
             $rearrange[$row['characterID']]['wage']+=stripslashes($row['wage']);
             $rearrange[$row['characterID']]['name']=stripslashes($row['name']);
             $rearrange[$row['characterID']]['characterID']=$row['characterID'];
+            if ($aggregate) {
+                //this is per activityType table, so we must find maximum number of toons
+                //someone can have 6 toons doing invention but only 2 doing manufacturing. Then we must put 6 here
+                if ( !isset($rearrange[$row['characterID']]['count']) || $row['count'] > $rearrange[$row['characterID']]['count'] ) {
+                    $rearrange[$row['characterID']]['count'] = $row['count'];
+                }
+            }
     }  
     return $rearrange;
 }
@@ -750,10 +758,20 @@ function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE,$aggregate=FALS
     echo('<tr><td style="padding: 0px;">');
         if (!$aggregate) {
             if ($rights_viewallchars) charhrefedit($row['characterID']);
-                    echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+                ?>
+                   <img src="https://imageserver.eveonline.com/character/<?=$row['characterID']?>_32.jpg" title="<?=$row['name']?>" />
+                <?php
             if ($rights_viewallchars) echo('</a>');
         } else {
-                    echo("<img src=\"https://imageserver.eveonline.com/character/0_32.jpg\" title=\"${row['name']}\" />");
+                if ($row['count'] > 1) $s='s'; else $s='';
+                ?>
+                    <div style="width: 32px; height: 32px;" title="<?=$row['count']?> character<?=$s?> owned by <?=$row['name']?>">
+                        <div style="position: absolute;">
+                            <img src="https://imageserver.eveonline.com/character/0_32.jpg" />
+                            <div style="width: 32px; text-align: center; top: 5px; position: absolute; font-weight: bold;"><?=$row['count']?></div>
+                        </div>
+                    </div>
+                <?php
         }
     echo('</td><td>');
             if ($rights_viewallchars && !$aggregate) charhrefedit($row['characterID']);
