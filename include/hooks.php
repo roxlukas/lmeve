@@ -7,6 +7,7 @@ function login_hook() {
     recreateSdeCompatViews();
     updateCrestIndustrySystems();
     createCitadelsView();
+    esiUpdateAll();
 }
 
 ?>

@@ -7,39 +7,44 @@ if (!checkrights("Administrator")) { //"Administrator,ViewOverview"
 	return;
 }
 $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='EVE Corp API keys'; //Panel name (optional)
+$PANELNAME='ESI API Tokens'; //Panel name (optional)
 //standard header ends here
 global $LM_EVEDB;
 
-function apikeyhrefedit($nr) {
-    echo("<a href=\"index.php?id=5&id2=20&nr=$nr\" title=\"Click to delete this key\">");
+include_once('ssofunctions.php');
+
+function esihrefedit($nr) {
+    echo("<a href=\"index.php?id=5&id2=24&nr=$nr\" title=\"Click to delete this token\">");
 }
 
 ?>
 <div class="tytul">
 <?php echo($PANELNAME); ?>
 </div>
+
+<div style="float: left; min-width: 420px;">
 <img src="<?=getUrl()?>ccp_icons/7_64_5.png"  alt="Corporation" style="float: left;"/>
 <table><tr><td>
-    <form method="post" action="?id=5&id2=18">
+    <form method="post" action="?id=5&id2=22">
         <?php token_generate(); ?>
-        <input type="submit" value="Add new API Key" /><br/>
+        <input type="submit" value="New ESI Token" /><br/>
     </form>
 </td><td>
     <form method="post" action="?id=8&id2=4">
         <?php token_generate(); ?>
-        <input type="submit" value="Check API Statistics" /><br/>
+        <input type="submit" value="Check ESI Statistics" /><br/>
     </form>            
 </td></tr></table>
-<div><br/>
-<img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(!) "/> LMeve <u>only</u> works with Corporation level API Keys.<br/>
-<img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(!) "/> XML API will soon be deprecated. Please consider switching to using ESI<br/>
-<br/></div>
+<br/>
+
+
+<img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(!) "/> LMeve <u>requires</u> Director level access to be able to use all ESI data.<br/>
+<br/>
 <table class="lmframework">
     <tr><th>
-        Key ID
+        Token ID
     </th><th>
-        Verification
+        Refresh Token
     </th><th>		
         Corporation
     </th><th>		
@@ -50,30 +55,36 @@ function apikeyhrefedit($nr) {
     </tr>
     <?php
     
-    $keys=db_asocquery("SELECT cak.*,aps.date,apc.`corporationName`
-            FROM `cfgapikeys` cak 
-            LEFT JOIN (SELECT `keyID`,MAX(`date`) AS `date` FROM `apistatus` GROUP BY `keyID`) aps
-            ON cak.`keyID`=aps.`keyID`
+    $keys=db_asocquery("SELECT cet.*,aps.date,apc.`corporationName`
+            FROM `cfgesitoken` cet 
+            LEFT JOIN (SELECT `tokenID`,MAX(`date`) AS `date` FROM `esistatus` GROUP BY `tokenID`) aps
+            ON cet.`tokenID`=aps.`tokenID`
             LEFT JOIN `apicorps` apc
-            ON cak.`keyID`=apc.`keyID`
-            GROUP BY cak.keyID;");
+            ON cet.`tokenID`=apc.`tokenID`
+            GROUP BY cet.`tokenID`;");
     
     if (count($keys)>0) {
         foreach($keys as $key) {
             echo('<tr><td>');
-            echo($key['keyID']);
+            echo($key['tokenID']);
             echo('</td><td>');
-            echo(substr($key['vCode'],0,6).'*********************');
+            echo(substr($key['token'],0,6).'*********************');
             echo('</td><td>');
             echo($key['corporationName']);
             echo('</td><td>');
             echo($key['date']);
             echo('</td><td>');
-            apikeyhrefedit($key['apiKeyID']);
+            esihrefedit($key['tokenID']);
             echo('<img src="'.getUrl().'img/del.gif" alt="Delete key" />');
             echo("</a>");
             echo('</td></tr>');
         }
     }
     echo('</table>');
+    
+    
 ?>
+</div>
+<div style="float: right; min-width: 300px;"><h3><img src="<?=getUrl()?>ccp_icons/38_16_208.png" alt="(!) "/> Required Scopes</h3>
+    <?php showScopes(getLMeveCorpScopes()); ?>
+</div>

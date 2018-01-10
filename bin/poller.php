@@ -85,7 +85,8 @@ foreach ($api_keys as $api_key) {
 			ins_string($row->corporationName).",".
 			$row->characterID.",".
 			ins_string($row->characterName).",".
-			$keyid.
+			$keyid.",".
+                        "NULL".    
 			");";
 			db_uquery($sql);
 			$corporationID=$row->corporationID;

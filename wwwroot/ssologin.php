@@ -12,6 +12,7 @@ include_once("template.php");  //templates
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('hooks.php'); //hooks - login hook
+include_once("ssofunctions.php"); //SSO functions
 
 if (!is_file('../config/config.php')) die('Config file not found.');
  
@@ -39,86 +40,8 @@ if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
 }
 
 //SSO FUNCTIONS
+//moved to "ssofunctions.php"
 
-function redirect_to_sso() {
-    global $SSO_AUTH_SERVER, $SSO_CLIENT_ID,$SSO_REDIRECT_URL;
-    $SSO_NONCE=token_generate(TRUE);
-    header("Location: https://$SSO_AUTH_SERVER/oauth/authorize/?response_type=code&redirect_uri=$SSO_REDIRECT_URL&client_id=$SSO_CLIENT_ID&scope=&state=$SSO_NONCE");
-}
-
-function get_sso_state() {
-    return str_replace(' ','+',$_GET['state']);
-}
-
-function get_login_token($code) {
-    global $SSO_AUTH_SERVER, $SSO_CLIENT_ID,$SSO_CLIENT_SECRET;
-    $AUTH=base64_encode("$SSO_CLIENT_ID:$SSO_CLIENT_SECRET");
-        $postdata = http_build_query(
-            array(
-                'grant_type' => 'authorization_code',
-                'code' => $code
-            )
-        );
-        $CTX_TOKEN = stream_context_create(array(
-                'http' => array (
-                    'ignore_errors' => TRUE,
-                    'method'=>"POST",
-                    'header'=>"User-Agent: LMeve/1.0 SSO Client Version/1\r\n".
-                        "Authorization: Basic $AUTH\r\n".
-                        "Content-Type: application/x-www-form-urlencoded\r\n".
-                        "Host: $SSO_AUTH_SERVER",
-                    'content' => $postdata
-                 )
-            ));
-        $json_token=file_get_contents("https://$SSO_AUTH_SERVER/oauth/token", FALSE, $CTX_TOKEN);
-        $token=json_decode($json_token);
-        return $token;
-}
-
-function verify_token($login_token) {
-    global $SSO_AUTH_SERVER;
-    $TOKEN=$login_token->access_token;
-        $CTX_VERIFY = stream_context_create(array(
-                'http' => array (
-                    'ignore_errors' => TRUE,
-                    'method'=>"GET",
-                    'header'=>"User-Agent: LMeve/1.0 SSO Client Version/1\r\n".
-                        "Authorization: Bearer $TOKEN\r\n".
-                        "Host: $SSO_AUTH_SERVER"
-                 )
-            ));
-        $json_verify=file_get_contents("https://$SSO_AUTH_SERVER/oauth/verify", FALSE, $CTX_VERIFY);
-        $verify=json_decode($json_verify);
-        return $verify;
-}
-
-function checkOwnerHash($charID,$ownerHash) {
-    //when the character logs in for the first time, save the ownerHash and return true
-    //when ownerHash exists for the character, compare it. If it's the same, return true, if it's different, return false
-    $hash=db_asocquery("SELECT * FROM `lmownerhash` WHERE `characterID`=$charID;");
-    if (count($hash)==0) {
-        db_uquery("INSERT INTO `lmownerhash` VALUES ($charID,'$ownerHash');");
-        return TRUE;
-    } else {
-        if ($hash[0]['ownerHash']==$ownerHash) return TRUE; else return FALSE;
-    }
-}
-
-function get_userID($charID) {
-    //we ignore ownerHash at the moment, tbd later
-    global $USERSTABLE;
-        $sql="SELECT lmu.`userID`
-                FROM `lmchars` lmc
-                JOIN `apicorpmembers` acm
-                ON lmc.`charID`=acm.`characterID`
-                JOIN `$USERSTABLE` lmu
-                ON lmc.`userID`=lmu.`userID`
-                WHERE lmc.`charID`=$charID AND lmu.`act`=1;";
-        $char=db_query($sql);
-        if (count($char)==1) {
-            return $char[0][0];
-        } else return false;
-}
 
 //SSO ALGORITHM
 
@@ -178,7 +101,52 @@ if (!$SSOENABLED) { //if sso is not enabled, exit immediately
         updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
         header("Location: index.php");
     }
-} else if ($_SESSION['status']==1) { //LOGGED ON
+} else if ($_SESSION['status']==1 && $_SESSION['ssomode'] == "addkey") { //Add ESI token
+    $code=$_GET['code'];
+    if (!isset($code)) {
+        //first redirect the user to SSO website + set required ESI scopes!
+        redirect_to_sso(getLMeveCorpScopes());
+    } else {
+        //secondly, receive callback from SSO AUTH SERVER
+        $state=get_sso_state();
+        if (!token_verify($state)) {
+            //error occured, bail
+            template_locked("Invalid incoming redirect from SSO login site.");
+            die();
+        }
+        //echo("DEBUG: token_verify()<br/>");
+        //we have the code now, lets get the login token
+        $token=get_login_token($code);
+        //check if we got a valid Bearer token
+        if (!(isset($token->access_token) && isset($token->token_type) && isset($token->expires_in) && $token->token_type=='Bearer' && $token->expires_in>0)) {
+            //problem with token, bail!
+            template_locked("Invalid Bearer token received from SSO login site.");
+            die();
+        }
+        //we've got a valid token, let's fetch the characterID 
+        $verify=verify_token($token);
+        //check if required fileds are set
+        if (!(isset($verify->CharacterID) && isset($verify->CharacterName) && isset($verify->TokenType))) {
+            //problem with verify, bail!
+            template_locked("Invalid Verify response received from SSO login site.");
+            die();
+        }
+        //check if the Scopes are correct for LMeve
+        if (!compareScopes($verify->Scopes, getLMeveCorpScopes())) {
+            template_locked("Available Scopes do not match required Scopes.<br/>Make sure to generate Application with correct Scopes on https://developers.eveonline.com/applications.");
+            die();
+        }
+        //save refresh_token in LMeve database, so we can get Authorization token in poller later
+        $sql="INSERT INTO `cfgesitoken` VALUES (DEFAULT, '$token->refresh_token');";
+        
+        db_uquery($sql);
+        
+        template_locked("Saving ESI token in LMeve database...");
+        //unset ssomode to default
+        unset($_SESSION['ssomode']);
+        ?><script type="text/javascript">location.href="index.php?id=5&id2=21";</script><?php
+    }
+}else if ($_SESSION['status']==1) { //LOGGED ON
     header("Location: index.php");
 }
     

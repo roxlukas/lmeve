@@ -98,20 +98,21 @@ Settings
                         </tr>
                         <tr>
                             <td>
+                                Enable ESI Poller:<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('useESI','disabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Enable public Killboard:<br/>
                             </td>
                             <td>
                                 <input type="checkbox" size="32" name="publicKillboard" <?php if (getConfigItem('publicKillboard','disabled')=='enabled') echo('checked'); ?> />
                             </td>
                         </tr>
-                        <tr>
-                            <td>
-                                Use hybrid XML API / CREST killmail fetching:<br/>
-                            </td>
-                            <td>
-                                <input type="checkbox" size="32" name="useCRESTkillmails" <?php if (getConfigItem('useCRESTkillmails','enabled')=='enabled') echo('checked'); ?> />
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <td>
                                 Use CCP WebGL in Killboard and Inventory<br/>
@@ -151,14 +152,7 @@ Settings
                                 <input type="text" size="6" name="buyCalcPriceModifier" value="<?=getConfigItem('buyCalcPriceModifier', 1.0);?>" />x
                             </td>
                         </tr>
-                        <tr>
-                            <td>
-                                Silo notification threshold:<br/>
-                            </td>
-                            <td>
-                                <input type="text" size="6" name="siloPercentage" value="<?=getConfigItem('siloPercentage', 90);?>" />%
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <td>
                                 Get market prices from:<br/>
@@ -195,6 +189,22 @@ Settings
                                 <script type="text/javascript">
                                     regionSelect('indexRegion');
                                 </script>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <em>Use hybrid XML API / CREST killmail fetching (DEPRECATED):</em><br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="useCRESTkillmails" <?php if (getConfigItem('useCRESTkillmails','enabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <em>Silo notification threshold (DEPRECATED):</em><br/>
+                            </td>
+                            <td>
+                                <input type="text" size="6" name="siloPercentage" value="<?=getConfigItem('siloPercentage', 90);?>" />%
                             </td>
                         </tr>
                     </table>

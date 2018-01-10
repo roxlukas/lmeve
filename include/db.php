@@ -62,8 +62,7 @@ function printerr($text) {
 
 function secureGETnum($field) {
 	$what=$_REQUEST[$field];
-	if (!empty($what)&&!ctype_digit($what)) {
-		if(($what{0}=='-')&&(ctype_digit(substr($what,1)))) return '-'.substr($what,1);
+	if (!empty($what) && !preg_match('/^(\-){0,1}([\d]+)(\.\d+){0,1}$/',$what)) {
 		printerr("Niepoprawny parametr $field.");
 		die('');
 	}

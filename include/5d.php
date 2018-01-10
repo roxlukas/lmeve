@@ -28,6 +28,7 @@ global $LM_EVEDB;
                 if (!empty($indexSystemID)) setConfigItem('indexSystemID', $indexSystemID);
                 
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
+                if (secureGETstr('useESI')=='on') setConfigItem('useESI','enabled'); else setConfigItem('useESI','disabled');
                 if (secureGETstr('publicKillboard')=='on') setConfigItem('publicKillboard','enabled'); else setConfigItem('publicKillboard','disabled');
                 if (secureGETstr('useCRESTkillmails')=='on') setConfigItem('useCRESTkillmails','enabled'); else setConfigItem('useCRESTkillmails','disabled');
                 if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');

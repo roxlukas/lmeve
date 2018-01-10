@@ -158,3 +158,64 @@ function createCitadelsView() {
     return db_uquery($sql);
     //Citadel services - flag 127 in Assets API
 }
+
+//ESI updates
+/**
+ * Function updates all tables necessary for ESI support
+ * 
+ * @return type
+ */
+function esiUpdateAll() {
+    $a = esiUpdateApicorps();
+    $b = esiCreateCfgesitoken();
+    $c = esiCreateEsistatus();
+    return $a && $b && $c;
+}
+
+/**
+ * Function checks if the table apicorps has the necessary columns for ESI support
+ * 
+ * @return boolean returns TRUE if table was correctly updated or if the update was already performed. Returns FALSE if update was not possible.
+ */
+function esiUpdateApicorps() {
+    $table = db_asocquery("DESCRIBE `apicorps`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='tokenID' && $column['Type']=='int(11)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === FALSE) {
+        return db_uquery("ALTER TABLE `apicorps` ADD COLUMN `tokenID` int(11) NULL DEFAULT  NULL;") &&
+        db_uquery("ALTER TABLE `apicorps` CHANGE COLUMN `keyID` `keyID` VARCHAR(255) NULL DEFAULT NULL;");
+    }
+    return TRUE;
+}
+
+function esiCreateCfgesitoken() {
+    if (!checkIfTableExists('cfgesitoken')) {
+        return db_uquery("CREATE TABLE IF NOT EXISTS `cfgesitoken` (
+            `tokenID` int(11) NOT NULL AUTO_INCREMENT,
+            `token` varchar(255) NOT NULL,
+            PRIMARY KEY (`tokenID`),
+            UNIQUE KEY `keyID` (`token`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
+    }
+    return TRUE;
+}
+
+function esiCreateEsistatus() {
+    if (!checkIfTableExists('esistatus')) {
+        return db_uquery("CREATE TABLE IF NOT EXISTS `esistatus` (
+        `errorID` int(11) NOT NULL AUTO_INCREMENT,
+        `tokenID` varchar(255) NOT NULL,
+        `route` varchar(255) NOT NULL,
+        `date` datetime NOT NULL,
+        `errorCode` int(11) NOT NULL,
+        `errorCount` int(11) NOT NULL DEFAULT '0',
+        `errorMessage` varchar(1024) NOT NULL,
+        PRIMARY KEY (`errorID`)
+      ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
+    }
+    return TRUE;
+}

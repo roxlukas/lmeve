@@ -236,7 +236,8 @@ CREATE TABLE IF NOT EXISTS `apicorps` (
   `corporationName` varchar(255) NOT NULL,
   `characterID` int(11) NOT NULL,
   `characterName` varchar(255) NOT NULL,
-  `keyID` varchar(255) NOT NULL,
+  `keyID` varchar(255) DEFAULT NULL,
+  `tokenID` int(11) DEFAULT NULL,
   PRIMARY KEY (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1680,3 +1681,21 @@ CREATE TABLE IF NOT EXISTS `apikillitems` (
   KEY `apikillitems_IX_killID` (`killID`),
   KEY `apikillitems_IX_typeID` (`typeID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cfgesitoken` (
+    `tokenID` int(11) NOT NULL AUTO_INCREMENT,
+    `token` varchar(255) NOT NULL,
+    PRIMARY KEY (`tokenID`),
+    UNIQUE KEY `keyID` (`token`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `esistatus` (
+    `errorID` int(11) NOT NULL AUTO_INCREMENT,
+    `tokenID` varchar(255) NOT NULL,
+    `route` varchar(255) NOT NULL,
+    `date` datetime NOT NULL,
+    `errorCode` int(11) NOT NULL,
+    `errorCount` int(11) NOT NULL DEFAULT '0',
+    `errorMessage` varchar(1024) NOT NULL,
+    PRIMARY KEY (`errorID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;

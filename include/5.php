@@ -28,12 +28,12 @@
     <?php } ?>
     </tr></table>
     <?php if (checkrights("Administrator")) { ?>
-    <input type="button" value="EVE API Keys" onclick="location.href='?id=5&id2=17';"/>
-    <?php }
-    if (checkrights("Administrator,UseNorthboundApi")) { ?>
+    <input type="button" value="ESI API Tokens" onclick="location.href='?id=5&id2=21';"/>
+    <?php } if (checkrights("Administrator")) { ?>
+    <input type="button" value="EVE API Keys (DEPRECATED)" onclick="location.href='?id=5&id2=17';"/>
+    <?php } if (checkrights("Administrator,UseNorthboundApi")) { ?>
     <input type="button" value="LMeve Northbound API" onclick="location.href='?id=5&id2=14';"/>
-    <?php
-    }
+    <?php } 
 //end submenu
 
 //controller
@@ -100,6 +100,18 @@
                 break;
             case 20:
                 include("5k.php"); //corp API keys - delete
+                break;
+            case 21:
+                include("5l.php"); //corp ESI tokens - list
+                break;
+            case 22:
+                include("5m.php"); //corp ESI tokens - add new
+                break;
+            /*case 23:
+                include("5n.php"); //corp ESI tokens - save
+                break;*/
+            case 24:
+                include("5o.php"); //corp ESI tokens - delete
                 break;
 	    }
 ?>
