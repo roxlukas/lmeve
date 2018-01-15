@@ -42,6 +42,40 @@ function get_login_token($code) {
         return $token;
 }
 
+function get_access_token($refresh_token) {
+   global $SSO_AUTH_SERVER, $SSO_CLIENT_ID,$SSO_CLIENT_SECRET;
+    $AUTH=base64_encode("$SSO_CLIENT_ID:$SSO_CLIENT_SECRET");
+        $postdata = http_build_query(
+            array(
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refresh_token
+            )
+        );
+        $CTX_TOKEN = stream_context_create(array(
+                'http' => array (
+                    'ignore_errors' => TRUE,
+                    'method'=>"POST",
+                    'header'=>"User-Agent: LMeve/1.0 SSO Client Version/1\r\n".
+                        "Authorization: Basic $AUTH\r\n".
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+                        "Host: $SSO_AUTH_SERVER",
+                    'content' => $postdata
+                 )
+            ));
+        $json_token = file_get_contents("https://$SSO_AUTH_SERVER/oauth/token", FALSE, $CTX_TOKEN);
+        $token=json_decode($json_token);
+        
+        if (property_exists($token,'refresh_token')) {
+            db_uquery("UPDATE `cfgesitoken` SET `token`='$token->refresh_token' WHERE `token` = '$refresh_token';");
+        }
+        return $token;
+        /*
+        if (property_exists($token,'access_token')) {
+            return $token->refresh_token;
+        }
+        return FALSE; */
+}
+
 function verify_token($login_token) {
     global $SSO_AUTH_SERVER;
     $TOKEN=$login_token->access_token;

@@ -347,3 +347,7 @@ function sub(editbox) {
             //console.log("evetime="+evetime);
             evetimeDiv.innerHTML=evetime;
         }
+        
+        function jsRedirect(destination) {
+            setTimeout(function(){ location.href = destination; }, 100);
+        }

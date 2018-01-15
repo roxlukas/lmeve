@@ -216,6 +216,10 @@ CREATE TABLE IF NOT EXISTS `apicorpmembers` (
   `base` varchar(1024) DEFAULT NULL,
   `title` varchar(1024) DEFAULT NULL,
   `corporationID` bigint(11) DEFAULT NULL,
+  `logonDateTime` datetime DEFAULT NULL,
+  `logoffDateTime` datetime DEFAULT NULL,
+  `solarSystemID` bigint(11) DEFAULT NULL,
+  `shipID` int(11) DEFAULT NULL,
   PRIMARY KEY (`characterID`),
   KEY `corporationID` (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

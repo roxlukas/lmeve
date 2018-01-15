@@ -320,6 +320,11 @@ function load_apikeys_from_db() {
 	return $api_keys;
 }
 
+function load_esitokens_from_db() {
+	$api_keys=db_asocquery("SELECT * FROM cfgesitoken;");
+	return $api_keys;
+}
+
 function insertAssets($rowset,$parentID,$locationID,$corporationID) { //$parent=0 - root node
     global $LM_EVEDB;
     foreach ($rowset as $row) {
@@ -508,4 +513,115 @@ function updateOfficeID($corporationID) {
 				db_uquery($sql2);
        }
 
+function esiCheckErrors($tokenID,$route) {
+    //checks if there are UNRECOVERABLE ERROR entries in esistatus table
+        global $MAX_ERRORS;
+    if (db_count("SELECT * FROM `esistatus` WHERE errorCode>0 AND errorCode<500 AND errorCount >= $MAX_ERRORS AND tokenID='$tokenID' AND route='$route';")>0) {
+            return true;  //returns true when there are unrecoverable errors
+    } else {
+            return false; //returns false if there have been no unrecoverable errors
+    }
+}
+
+function esiCheckStatus($tokenID,$route) {
+    //checks if there are ANY entries in esistatus table
+    if (db_count("SELECT * FROM `esistatus` WHERE tokenID='$tokenID' AND route='$route';")>0) {
+            return true;  //returns true when there are enes
+    } else {
+            return false; //returns false if there have been no entries
+    }
+}
+       
+function esiSaveWarning($tokenID,$response,$route) {
+    global $http_response_header;
+    $errorCode = 400;
+        if (property_exists($response, 'error')) {
+            $errorMessage = addslashes($response->error);
+            if (isset($http_response_header) && is_array($http_response_header)) {
+                preg_match('/(HTTP)\/(\d\.\d)\s+(\d+)\s+(.+)/', $http_response_header[0], $m);
+                $errorCode = $m[3];
+            }
+        } else {
+            $errorCode=999; //Unknown error occured, error is not an object
+            debug_print_backtrace();
+        }
+	
+	if (!esiCheckStatus($tokenID,$route)) {
+		db_uquery("INSERT INTO `esistatus` VALUES (DEFAULT,'$tokenID','$route',NOW(),$errorCode,1,'$errorMessage');");
+	} else {
+                if ($errorCode > 0) {
+                    $errcount='errorCount+1';
+                } else {
+                    $errcount='0';
+                }
+                if (!(strtolower($errorMessage)==='cached')) {
+                    $setdate='date=NOW(),';
+                } else {
+                    $setdate='';
+                }
+		db_uquery("UPDATE `esistatus` SET $setdate errorCode=$errorCode, errorCount=$errcount, errorMessage='$errorMessage' WHERE tokenID='$tokenID' AND route='$route';");
+	}
+	if ($errorCode > 200) warning($route,"ERROR $errorCode: $errorMessage");
+}
+
+function esiSaveOK($tokenID,$route) {
+	if (!esiCheckStatus($tokenID,$route)) {
+		db_uquery("INSERT INTO `esistatus` VALUES (DEFAULT,'$tokenID','$route',NOW(),0,0,'OK');");
+	} else {
+		db_uquery("UPDATE `esistatus` SET date=NOW(), errorCode=0, errorCount=0, errorMessage='OK' WHERE tokenID='$tokenID' AND route='$route';");
+	}
+}
+
+function get_esi_contents($url, $cache, $interval, $type='GET', $postdata = null) {
+        $CREST_RATE_LIMIT=30;
+	//if a file got polled @ 12:00:20 and next poller time is 12:15:01, a 15 minute cache timer will not be satisfied
+	//thus we cut 20 seconds
+	if ($interval>20) $interval=$interval-20;
+	global $httplog,$USER_AGENT;
+	if (file_exists($cache) && (filemtime($cache)>(time() - $interval ))) {
+   		$data = file_get_contents($cache);
+                $ret=new crestError(0,'Cached');
+                return $ret;
+	} else {
+            $options = array(
+                        'http' => array (
+                            'ignore_errors' => TRUE,
+                            'method'=>"GET",
+                            'header'=>"User-Agent: $USER_AGENT\r\naccept: application/json\r\nContent-Type: application/json"
+                         )
+                    );
+            if ($type == "POST") {
+                $options['http']['method'] = "POST";
+                $options['http']['content'] = $postdata;
+            }
+            $ctx = stream_context_create($options);
+            $data=file_get_contents($url, FALSE, $ctx); 
+            //var_dump($http_response_header);
+            //$data = file_get_contents($url);
+            //if ($data === false) {
+            if (!empty($http_response_header)) {
+                $http_parse=explode(' ',$http_response_header[0]);
+                $http_code=$http_parse[1];
+                if ($http_code!=200) {
+                        //http errors
+                        if (empty($http_code)) {
+                            $ret=new crestError($http_code,'HTTP Errors');
+                            return $ret;
+                        }
+                        //additional logging!!
+                        loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
+                } else {
+                        file_put_contents($cache, $data, LOCK_EX);
+                }
+            } else {
+                //network problem?
+                loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nNETWORK PROBLEM!\r\n");
+                $ret=new crestError(500,'Network problems');
+                return $ret;
+            }
+   	}
+	$json_data = json_decode($data);
+        if ($interval==0) usleep(1000000/$CREST_RATE_LIMIT); //if interval == 0, make sure to respect rate limits
+        return $json_data;
+}
 ?>

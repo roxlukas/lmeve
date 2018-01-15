@@ -112,6 +112,15 @@ function updateCrestIndustrySystems() {
     }
 }
 
+function updateApiAssets() {
+    $table=db_asocquery("DESCRIBE `apiassets`;");
+    foreach ($table as $column) {
+        if ($column['Field']=='flag' && $column['Type']!='int(11)') {
+            db_uquery("ALTER TABLE `apiassets` CHANGE  `flag` `flag` int(11) NOT NULL;");
+        }
+    }
+}
+
 function updateCfgApiKeys() {
 	$table=db_asocquery("DESCRIBE `cfgapikeys`;");
 	//bugfix for multiple corps
@@ -169,7 +178,8 @@ function esiUpdateAll() {
     $a = esiUpdateApicorps();
     $b = esiCreateCfgesitoken();
     $c = esiCreateEsistatus();
-    return $a && $b && $c;
+    $d = esiUpdateApiCorpMembers();
+    return $a && $b && $c && $d;
 }
 
 /**
@@ -218,4 +228,26 @@ function esiCreateEsistatus() {
       ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
     }
     return TRUE;
+}
+
+function esiUpdateApiCorpMembers() {
+    $table = db_asocquery("DESCRIBE `apicorpmembers`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if (
+                ($column['Field']=='logonDateTime' && $column['Type']=='datetime')
+                || ($column['Field']=='logoffDateTime' && $column['Type']=='datetime') 
+                || ($column['Field']=='solarSystemID' && $column['Type']=='bigint(11)') 
+                || ($column['Field']=='shipID' && $column['Type']=='int(11)') 
+           ) {
+                $found = TRUE;
+        }
+    }    
+    if ($found === FALSE) {
+        $a = db_uquery("ALTER TABLE `apicorpmembers` ADD COLUMN `logonDateTime` datetime NULL DEFAULT NULL;");
+        $b = db_uquery("ALTER TABLE `apicorpmembers` ADD COLUMN `logoffDateTime` datetime NULL DEFAULT NULL;");
+        $c = db_uquery("ALTER TABLE `apicorpmembers` ADD COLUMN `solarSystemID` bigint(11) NULL DEFAULT NULL;");
+        $d = db_uquery("ALTER TABLE `apicorpmembers` ADD COLUMN `shipID` int(11) NULL DEFAULT NULL;");
+    }
+    return $a && $b && $c && $d;
 }

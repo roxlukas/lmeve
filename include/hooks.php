@@ -8,6 +8,7 @@ function login_hook() {
     updateCrestIndustrySystems();
     createCitadelsView();
     esiUpdateAll();
+    updateApiAssets();
 }
 
 ?>

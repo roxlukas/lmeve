@@ -20,5 +20,7 @@ $_SESSION['ssomode'] = "addkey";
 Redirecting to EVE Online SSO...<br/>
 <br/>
 Click the button if it didn't happen automatically:
-<script type="text/javascript">location.href="ssologin.php";</script>
+<script type="text/javascript">
+    jsRedirect("ssologin.php");
+</script>
 <input type="button" value="OK" onclick="location.href='ssologin.php';"/>

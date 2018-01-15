@@ -101,7 +101,7 @@ Settings
                                 Enable ESI Poller:<br/>
                             </td>
                             <td>
-                                <input type="checkbox" size="32" name="northboundApi" <?php if (getConfigItem('useESI','disabled')=='enabled') echo('checked'); ?> />
+                                <input type="checkbox" size="32" name="useESI" <?php if (getConfigItem('useESI','enabled')=='enabled') echo('checked'); ?> />
                             </td>
                         </tr>
                         <tr>

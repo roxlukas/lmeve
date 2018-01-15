@@ -38,4 +38,4 @@ global $LM_EVEDB;
 		?>
 		<br>
                 <input type="button" value="OK" onclick="location.href='?id=5&id2=0';">
-		<script type="text/javascript">location.href="index.php?id=5&id2=0";</script>
+		<script type="text/javascript">jsRedirect("index.php?id=5&id2=0");</script>
