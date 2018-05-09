@@ -2,10 +2,11 @@
 $mypath = str_replace('\\', '/', dirname(__FILE__));
 include_once("$mypath/../config/config.php"); //API URLs are now in config.php
 //set_include_path("$mypath/../include");
+include_once("$mypath/libpoller.php");
 include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
 include_once("$mypath/../include/configuration.php");
-include_once("$mypath/../include/killboard.php");
+//include_once("$mypath/../include/killboard.php");
 include_once("$mypath/../include/ssofunctions.php");
 //ESI Routes:
 require_once('CorporationInformation.class.php');
@@ -30,8 +31,8 @@ class ESI {
     private $corporationID;
     private $ESI_BASEURL;
     private $DEBUG = FALSE;
-    
-    /**
+
+     /**
      * CorporationInformation route instance
      * @var CorporationInformation 
      */
@@ -68,8 +69,6 @@ class ESI {
         $this->mytmp = $this->mypath."/../tmp";
         $this->USER_AGENT = "LMeve/2.0 ESI Poller Version/" . ESI::$VERSION;
         
-        $this->tokenID = $tokenID;
-        
         //set up ESI URL
         if (!isset($ESI_BASEURL)) {
             warning('ESI','$ESI_BASEURL isn\'t set in config.php. Using default ESI API URL https://esi.tech.ccp.is');
@@ -77,7 +76,18 @@ class ESI {
         }  else {
             $this->ESI_BASEURL = $ESI_BASEURL;
         }
-        //Instantiate routes here
+        
+        $this->tokenID = $tokenID;
+        
+        if (!is_null($tokenID)) {
+            //Instantiate routes here
+            $this->getAccessToken();
+            $this->instantiateAll();
+        }
+    }
+    
+    PUBLIC function setRefreshToken($refresh_token) {
+        $this->refresh_token = $refresh_token;
         $this->getAccessToken();
         $this->instantiateAll();
     }
@@ -98,7 +108,7 @@ class ESI {
         if (!empty($this->refresh_token)) {
             return $this->refresh_token;
         } else {
-            $api_keys=db_asocquery("SELECT * FROM cfgesitoken WHERE `tokenID` = $this->tokenID;");
+            $api_keys=db_asocquery("SELECT * FROM cfgesitoken WHERE `tokenID` = '$this->tokenID';");
             if (count($api_keys) == 1) {
                 if (isset($api_keys[0]['token'])) {
                     $this->refresh_token = $api_keys[0]['token'];

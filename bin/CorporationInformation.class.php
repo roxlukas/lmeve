@@ -10,6 +10,14 @@ class CorporationInformation extends Route {
         $this->setCacheInterval(3600);
     }
     
+    public function getCorporation($corporationID) {
+        //secondly, get the corporation information
+        $corp = $this->get( $corporationID . '/');
+        if ($this->ESI->getDEBUG()) var_dump($corp);
+        if (is_object($corp)) return $corp;
+        return FALSE;
+    }
+    
     public function update() {
         inform(get_class(), 'Updating CorporationInformation...');
     //first, get corporation_id based on character_id who owns the ESI Token

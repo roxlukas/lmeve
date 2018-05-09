@@ -32,7 +32,8 @@
 **********************************************************************************/
 
 
-function loguj($npliku,$data) {
+function loguj($npliku=NULL,$data) {
+    if(is_null($npliku)) $npliku = str_replace('\\','/',dirname(__FILE__)) . "/../var/errors.txt";
     $uchwyt = fopen($npliku, "a");
     $tmpd=date('d.m.Y G:i:s');
     if (isset($_SERVER['REMOTE_ADDR'])) {
