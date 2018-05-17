@@ -201,24 +201,25 @@ function template_login() {
 	<br>
 	<form name="loginform" id="loginform" method="post" action="">
 	
-	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
+	<table border="0" cellspacing="0" cellpadding="0" width="375" class="login">
 	
 	
 	<tr><td align="left">&nbsp;<!--<br><label for="user_login">User:</label>--></td></tr>
 	<tr><td><div class="tcen">
-			<input name="login" placeholder="Login" id="user_login" size=20 type="text" value="" style="width: 140px" autocapitalize="off">
+			<input name="login" placeholder="Login" id="user_login" size=40 type="text" value="" style="width: 200px" autocapitalize="off">
 		</div>
 	</td></tr>
 	<tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
-                        <input name="password" placeholder="Password" id="user_pass" size="20" type="password" style="width: 140px" autocapitalize="off">
+                        <input name="password" placeholder="Password" id="user_pass" size="40" type="password" style="width: 200px" autocapitalize="off">
 		</div>
 	</td></tr>
         <tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
 			<input name="logon" type="submit" value="Log in"><br/>
 			<?php if ($SSOENABLED) { ?> <hr style="opacity: 0.2;" />
-			<a href="ssologin.php"><img src="<?=getUrl()?>img/EVE_SSO_Login_Buttons_Small_White.png"></a>
+			<a href="ssologin.php"><img src="<?=getUrl()?>img/EVE_SSO_Login_Buttons_Small_White.png"></a><hr style="opacity: 0.2;" />
+                        <em>By using this service you agree that your EVE Online character's information will be processed by the administrator of this service. Information will be processed as long as your character(s) remain a member of the EVE Online Corporation which is using this service.</em>
 			<?php } ?>
 		 </div>
 	</td></tr>
