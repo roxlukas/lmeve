@@ -10,7 +10,7 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Item Database'; //Panel name (optional)
 //standard header ends here
 
-global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE, $USERSTABLE, $CREST_BASEURL;
+global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE, $USERSTABLE, $ESI_BASEURL;
 include_once('materials.php');
 include_once('yaml_graphics.php');
 include_once('skins.php');
@@ -585,8 +585,11 @@ if ($model) {
                     ?>
                     <td>LMeve API <a href="api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?></a></td>
                 </tr>
-                <tr>
+                <?php /*<tr>
                     <td>CREST <a href="<?=$CREST_BASEURL?>/inventory/types/<?=$nr?>/" target="_blank"><?=$CREST_BASEURL?>/inventory/types/<?=$nr?>/</a></td>
+                </tr> */ ?>
+                <tr>
+                    <td>ESI <a href="<?=$ESI_BASEURL?>/latest/universe/types/<?=$nr?>/" target="_blank"><?=$ESI_BASEURL?>/inventory/types/<?=$nr?>/</a></td>
                 </tr>
             </table>
         <?php

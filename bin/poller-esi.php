@@ -14,8 +14,8 @@ $MAX_ERRORS=10; //ignore first x errors
 include_once("$mypath/../config/config.php"); //API URLs are now in config.php
 
 if (!isset($ESI_BASEURL)) {
-    echo('WARNING: $ESI_BASEURL isn\'t set in config.php. Using default ESI API URL https://esi.tech.ccp.is');
-    $ESI_BASEURL="https://esi.tech.ccp.is"; 
+    echo('WARNING: $ESI_BASEURL isn\'t set in config.php. Using default ESI API URL https://esi.evetech.net');
+    $ESI_BASEURL="https://esi.evetech.net"; 
 } 
     
 $USER_AGENT="LMeve/1.0 API Poller Version/$POLLER_VERSION";

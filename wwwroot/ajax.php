@@ -308,6 +308,23 @@ if ($act=='') $act=0;
             header("Content-type: application/json");
             echo(json_encode($message));
             break;    
+        case 'GET_POLLERESIMESSAGE':
+            if (!checkrights("Administrator,ViewAPIStats")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            $sql="SELECT *
+            FROM `esistatus`
+            ORDER BY date DESC
+            LIMIT 0,1;";
+            $errors = db_asocquery($sql);
+            $LOCKFILE="../var/poller.lock";
+            $message=$errors[0];
+            if (file_exists($LOCKFILE)) $message['pollerActive']=TRUE; else $message['pollerActive']=FALSE;
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($message));
+            break; 
 	default:
             echo('Error in AJAX call.');
     }

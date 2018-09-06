@@ -100,8 +100,15 @@
     <?php if (checkrights("Administrator,ViewAPIStats")) { ?>
         <td><form action="" method="get">
         <input type="hidden" name="id" value="<?php echo ($id); ?>" />
+        <input type="hidden" name="id2" value="7" />
+        <input type="submit" value="ESI Statistics" />
+        </form></td>
+    <?php } ?>
+    <?php if (checkrights("Administrator,ViewAPIStats")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="<?php echo ($id); ?>" />
         <input type="hidden" name="id2" value="4" />
-        <input type="submit" value="EVE API Statistics" />
+        <input type="submit" value="EVE API Statistics (deprecated)" />
         </form></td>
     <?php } ?>
         <?php if (checkrights("Administrator,ViewCDNStats")) { ?>
@@ -139,6 +146,9 @@
             break;
         case 6:
             include("86.php");  //activity - pvp
+            break;
+        case 7:
+            include("87.php");  //ESI Statistics
             break;
     }
 ?>

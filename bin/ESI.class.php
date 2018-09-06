@@ -13,6 +13,9 @@ require_once('CorporationInformation.class.php');
 require_once('Characters.class.php');
 require_once('Stations.class.php');
 require_once('MemberTracking.class.php');
+require_once('IndustryJobs.php');
+require_once('Facilities.php');
+require_once('Universe.php');
 
 class ESI {
     public static $VERSION = 1;
@@ -30,7 +33,10 @@ class ESI {
     private $characterID;
     private $corporationID;
     private $ESI_BASEURL;
-    private $DEBUG = FALSE;
+    private $DEBUG = TRUE;
+    
+    private $EsiErrorLimitRemain = 0;
+    private $EsiErrorLimitReset = 0;
 
      /**
      * CorporationInformation route instance
@@ -57,6 +63,24 @@ class ESI {
     public $Stations;
     
     /**
+     * IndustryJobs route instance
+     * @var IndustryJobs
+     */
+    public $IndustryJobs;
+    
+    /**
+     * Facilities route instance
+     * @var Facilities
+     */
+    public $Facilities;
+    
+    /**
+     * Universe route instance
+     * @var Universe
+     */
+    public $Universe;
+    
+    /**
      * $tokenID int - which refresh_token from cfgesitoken to use for this instance
      */
     public function __construct($tokenID) {
@@ -71,8 +95,8 @@ class ESI {
         
         //set up ESI URL
         if (!isset($ESI_BASEURL)) {
-            warning('ESI','$ESI_BASEURL isn\'t set in config.php. Using default ESI API URL https://esi.tech.ccp.is');
-            $this->ESI_BASEURL = "https://esi.tech.ccp.is";
+            warning('ESI','$ESI_BASEURL isn\'t set in config.php. Using default ESI API URL https://esi.evetech.net');
+            $this->ESI_BASEURL = "https://esi.evetech.net";
         }  else {
             $this->ESI_BASEURL = $ESI_BASEURL;
         }
@@ -82,8 +106,8 @@ class ESI {
         if (!is_null($tokenID)) {
             //Instantiate routes here
             $this->getAccessToken();
-            $this->instantiateAll();
         }
+        $this->instantiateAll();
     }
     
     PUBLIC function setRefreshToken($refresh_token) {
@@ -97,11 +121,16 @@ class ESI {
         $this->MemberTracking = new MemberTracking($this);
         $this->Characters = new Characters($this);
         $this->Stations = new Stations($this);
+        $this->Facilities = new Facilities($this);
+        $this->IndustryJobs = new IndustryJobs($this);
+        $this->Universe = new Universe($this);
     }
     
     public function updateAll() {
         $this->CorporationInformation->update();
         $this->MemberTracking->update();
+        $this->Facilities->update();
+        $this->IndustryJobs->update();
     }
     
     private function getRefreshToken() {
@@ -194,5 +223,16 @@ class ESI {
         return $this->USER_AGENT;
     }
 
+    public function getEsiErrorLimitRemain() {
+        return $this->EsiErrorLimitRemain;
+    }
+
+    public function setXEsiErrorLimitRemain($EsiErrorLimitRemain) {
+        $this->EsiErrorLimitRemain = $EsiErrorLimitRemain;
+    }
+
+    public function setXEsiErrorLimitReset($EsiErrorLimitReset) {
+        $this->EsiErrorLimitReset = $EsiErrorLimitReset;
+    }
 
 }

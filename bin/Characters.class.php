@@ -4,6 +4,8 @@ require_once('Route.class.php');
 
 class Characters extends Route {
     
+    private $characterNameCache = array();
+    
     public function __construct($esi) {
         parent::__construct($esi);
         $this->setRoute('/v4/characters/');
@@ -24,6 +26,35 @@ class Characters extends Route {
             throw new Exception($msg);
         }
         return FALSE;
+    }
+    
+    private function getCharacterFromDb($characterID) {
+        $data = db_asocquery("SELECT * FROM `apicorpmembers` WHERE `characterID`=$characterID;");
+        if (count($data) > 0) return($data[0]); else return FALSE;
+    }
+    
+    public function getCharacterName($characterID) {
+        if (isset($this->characterNameCache[$characterID])) {
+            if ($this->ESI->getDEBUG()) inform(get_class(), "getCharacterName($characterID) found character name in cache.");
+            return $this->characterNameCache[$characterID];
+        } else {
+            $c = $this->getCharacterFromDb($characterID);
+            if ($c != FALSE) {
+                if ($this->ESI->getDEBUG()) inform(get_class(), "getCharacterName($characterID) found character name in LMeve database.");
+                $this->characterNameCache[$characterID] = $c['name'];
+                return $c['name'];
+            } else {
+                $d = $this->getCharacter($characterID);
+                if (property_exists($d, 'name')) {
+                    if ($this->ESI->getDEBUG()) inform(get_class(), "getCharacterName($characterID) found character name using ESI.");
+                    $this->characterNameCache[$characterID] = $d->name;
+                    return $d->name; 
+                } else {
+                    warning(get_class(), "getCharacterName($characterID) character name could not be found.");
+                    return FALSE;
+                }
+            }
+        }
     }
     
     public function getAggregateStats($characterID) {

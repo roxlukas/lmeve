@@ -159,3 +159,20 @@ function pollerRealTime(idDate,idFile,idMessage,idActive) {
     }
     });
 }
+
+function pollerEsiRealTime(idDate,idFile,idMessage,idActive) {
+    var tmpkey='';
+    $.ajax({
+    url:'ajax.php?act=GET_POLLERESIMESSAGE',
+    type:'GET',
+    success: function( json ) {
+        //{"errorID":146,"keyID":"0","fileName":"CREST \/industry\/systems\/","date":"2015-03-23 20:25:20","errorCode":0,"errorCount":0,"errorMessage":"OK"}
+        if (json.tokenID!=0) tmpkey='[tokenID:'+json.tokenID+'] ';
+        $('#'+idDate).html(json.date);
+        $('#'+idFile).html(tmpkey+json.route);
+        $('#'+idMessage).html(json.errorMessage);
+        if (json.pollerActive==true) $('#'+idActive).html('<span style="color: #00A000; font-weight:bold;">YES</span>');
+        if (json.pollerActive!=true) $('#'+idActive).html('<span style="color: #808080;">NO</span>');
+    }
+    });
+}

@@ -201,17 +201,17 @@ function template_login() {
 	<br>
 	<form name="loginform" id="loginform" method="post" action="">
 	
-	<table border="0" cellspacing="0" cellpadding="0" width="375" class="login">
+	<table border="0" cellspacing="0" cellpadding="0" width="300" class="login">
 	
 	
 	<tr><td align="left">&nbsp;<!--<br><label for="user_login">User:</label>--></td></tr>
 	<tr><td><div class="tcen">
-			<input name="login" placeholder="Login" id="user_login" size=40 type="text" value="" style="width: 200px" autocapitalize="off">
+			<input name="login" placeholder="Login" id="user_login" size=40 type="text" value="" style="width: 190px" autocapitalize="off">
 		</div>
 	</td></tr>
 	<tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
-                        <input name="password" placeholder="Password" id="user_pass" size="40" type="password" style="width: 200px" autocapitalize="off">
+                        <input name="password" placeholder="Password" id="user_pass" size="40" type="password" style="width: 190px" autocapitalize="off">
 		</div>
 	</td></tr>
         <tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>

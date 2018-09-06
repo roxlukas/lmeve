@@ -33,7 +33,7 @@ abstract class Route {
     }
     
     protected function constructCacheFilename() {
-        return $this->ESI->getMycache() . '/' . $this->ESI->getTokenID() . '_' . md5($this->ESI->getTokenID . $this->constructURL()).'.json';
+        return $this->ESI->getMycache() . '/' . $this->ESI->getTokenID() . '_' . md5($this->ESI->getTokenID() . $this->constructURL()).'.json';
     }
     
     protected function checkErrors() {
@@ -80,7 +80,21 @@ abstract class Route {
     }
     
     protected function saveOK() {
-        $this->saveStatus(0,'OK');
+        $this->saveStatus(200,'OK');
+    }
+    
+    /**
+     * Get property or provide default value
+     * @param type $class - object to get property from
+     * @param type $property - property to get
+     * @param type $default - default value in case property is not set
+     * @return type
+     */
+    protected function v($class, $property, $default='') {
+        if (property_exists($class, $property))
+            return $class->$property;
+        else
+            return $default;
     }
 
     private function saveStatus($errorCode, $errorMessage, $increaseErrorCount = FALSE) {
@@ -170,6 +184,7 @@ abstract class Route {
         
 	$json_data = json_decode($data);
         //if ($interval==0) usleep(1000000/$CREST_RATE_LIMIT); //if interval == 0, make sure to respect rate limits
+        $this->saveOK();
         return $json_data;
     }
     
@@ -242,9 +257,9 @@ abstract class Route {
             foreach ($http_response_header as $header) {
                 if (preg_match('/(X-pages): (\d+)/', $header, $m)) {
                     $this->setXpages($m[2]);
-                } else if (preg_match('/(X-Esi-Error-Limit-Remain): (\d+)/', $subject, $m)) {
+                } else if (preg_match('/(X-Esi-Error-Limit-Remain): (\d+)/', $header, $m)) {
                     $this->ESI->setXEsiErrorLimitRemain($m[2]);
-                } else if (preg_match('/(X-Esi-Error-Limit-Reset): (\d+)/', $subject, $m)) {
+                } else if (preg_match('/(X-Esi-Error-Limit-Reset): (\d+)/', $header, $m)) {
                     $this->ESI->setXEsiErrorLimitReset($m[2]);
                 }
             }

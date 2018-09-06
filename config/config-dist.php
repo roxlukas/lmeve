@@ -43,6 +43,7 @@ $SSO_CLIENT_SECRET='sso_client_secret';
 $SSO_AUTH_SERVER='sisilogin.testeveonline.com';
 $API_BASEURL="https://api.eveonline.com"; 
 $CREST_BASEURL="https://crest-tq.eveonline.com";
+$ESI_BASEURL = "https://esi.evetech.net";
 //CSRF token expiry time (in seconds)
 $LM_SECUREFORMSEXPIRY=300;
 //Buy calculator can show colored hints green - we buy, yellow - we have enough, red - we have way more than enough - we dont buy

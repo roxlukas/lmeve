@@ -179,7 +179,8 @@ function esiUpdateAll() {
     $b = esiCreateCfgesitoken();
     $c = esiCreateEsistatus();
     $d = esiUpdateApiCorpMembers();
-    return $a && $b && $c && $d;
+    $e = esiUpdateApiIndustryJobsCrius();
+    return $a && $b && $c && $d && $e;
 }
 
 /**
@@ -198,6 +199,25 @@ function esiUpdateApicorps() {
     if ($found === FALSE) {
         return db_uquery("ALTER TABLE `apicorps` ADD COLUMN `tokenID` int(11) NULL DEFAULT  NULL;") &&
         db_uquery("ALTER TABLE `apicorps` CHANGE COLUMN `keyID` `keyID` VARCHAR(255) NULL DEFAULT NULL;");
+    }
+    return TRUE;
+}
+
+/**
+ * Function checks if the table apiindustryjobscrius has the necessary columns for ESI support
+ * 
+ * @return boolean returns TRUE if table was correctly updated or if the update was already performed. Returns FALSE if update was not possible.
+ */
+function esiUpdateApiIndustryJobsCrius() {
+    $table = db_asocquery("DESCRIBE `apiindustryjobscrius`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='status' && $column['Type']=='int(11)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === TRUE) {
+        return db_uquery("ALTER TABLE `apiindustryjobscrius` CHANGE COLUMN `status` `status` VARCHAR(255) NULL DEFAULT NULL;");
     }
     return TRUE;
 }
