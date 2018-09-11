@@ -116,15 +116,18 @@ function ajax_save(URL, itemID, itemlabelID) {
 	return;
 }
 
-function regionSelect(id) {
+function regionSelect(id, defaultId) {
     $.ajax({
     url:'ajax.php?act=GET_REGIONS',
     type:'GET',
     //data: 'act=GET_REGIONS',
     //dataType: 'json',
     success: function( json ) {
+        var selected = false;
         $.each(json, function(i, value) {
-            $('#'+id).append($('<option>').text(value.regionName).attr('value', value.regionID));
+            //console.log('value.regionID=' + value.regionID + ' defaultId=' + defaultId);
+            if (value.regionID == defaultId) selected = true; else selected = false;
+            $('#'+id).append($('<option>').text(value.regionName).attr('value', value.regionID).attr('selected', selected));
         });
     }
 });

@@ -29,6 +29,13 @@ abstract class Route {
     }
     
     protected function constructURL() {
+        if (!preg_match('/\/\?datasource/', $this->params)) {
+            if (preg_match('/\/\?/', $this->params)) {
+                $this->params = str_replace('?', '?datasource=' . $this->ESI->getDatasource() . '&', $this->params);
+            } else {
+                $this->params = $this->params . '?datasource=' . $this->ESI->getDatasource();
+            }
+        }
         return $this->ESI->getESI_BASEURL() . $this->route . $this->params;
     }
     

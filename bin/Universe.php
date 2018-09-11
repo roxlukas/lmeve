@@ -54,7 +54,7 @@ class Universe extends Route {
             if ($this->ESI->getDEBUG()) inform(get_class(), "getStationSolarSystemId($stationID) found system ID in cache.");
             return $this->solarSystemIDCache[$stationID];
         } else {
-            $data = db_asocquery("SELECT * FROM `$LM_EVEDB`.`stastations` WHERE `stationID`=$stationID;");
+            $data = db_asocquery("SELECT * FROM `$LM_EVEDB`.`staStations` WHERE `stationID`=$stationID;");
             if (count($data) > 0) {
                 if ($this->ESI->getDEBUG()) inform(get_class(), "getStationSolarSystemId($stationID) found system ID in database.");
                 $this->solarSystemIDCache[$stationID] = $data[0]['solarSystemID'];

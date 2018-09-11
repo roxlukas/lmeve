@@ -106,6 +106,28 @@ Settings
                         </tr>
                         <tr>
                             <td>
+                                ESI verbose/debug logging:<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="ESIdebug" <?php if (getConfigItem('ESIdebug','enabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                ESI datasource:<br/>
+                            </td><td>
+                                <select name="ESIdatasource"> <?php
+                                $relics=array("tranquility","singularity");
+                                $currentSource=getConfigItem('ESIdatasource','tranquility');
+                                foreach($relics as $row) {
+                                            if ($row==$currentSource) $select='selected'; else $select='';
+                                            echo("<option value=\"$row\" $select>$row</option>");
+                                }
+                                ?></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Enable public Killboard:<br/>
                             </td>
                             <td>
@@ -158,7 +180,7 @@ Settings
                                 Get market prices from:<br/>
                             </td>
                             <td>
-                                <select name="marketRegion" id="marketRegion" onchange="systemSelect('marketSystemID',this.value);"></select>
+                                <select name="marketRegionID" id="marketRegionID" onchange="systemSelect('marketSystemID',this.value);"></select>
                                 <select name="marketSystemID" id="marketSystemID">
                                     <?php
                                         $currentSystem=getConfigItem('marketSystemID', '30000142');
@@ -168,7 +190,7 @@ Settings
                                     ?>
                                 </select>
                                 <script type="text/javascript">
-                                    regionSelect('marketRegion');
+                                    regionSelect('marketRegionID',<?=getConfigItem('marketRegionID','10000002')?>);
                                 </script>
                             </td>
                         </tr>
@@ -177,7 +199,7 @@ Settings
                                 Get industry indices from:<br/>
                             </td>
                             <td>
-                                <select name="indexRegion" id="indexRegion" onchange="systemSelect('indexSystemID',this.value);"></select>
+                                <select name="indexRegionID" id="indexRegionID" onchange="systemSelect('indexSystemID',this.value);"></select>
                                 <select name="indexSystemID" id="indexSystemID">
                                     <?php
                                         $currentSystem=getConfigItem('indexSystemID', '30000142');
@@ -187,10 +209,11 @@ Settings
                                     ?>
                                 </select>
                                 <script type="text/javascript">
-                                    regionSelect('indexRegion');
+                                    regionSelect('indexRegionID',<?=getConfigItem('indexRegionID','10000002')?>);
                                 </script>
                             </td>
                         </tr>
+                        <!--
                         <tr>
                             <td>
                                 <em>Use hybrid XML API / CREST killmail fetching (DEPRECATED):</em><br/>
@@ -206,7 +229,7 @@ Settings
                             <td>
                                 <input type="text" size="6" name="siloPercentage" value="<?=getConfigItem('siloPercentage', 90);?>" />%
                             </td>
-                        </tr>
+                        </tr> -->
                     </table>
                 <br/>
                 <input type="submit" value="Save configuration"/><br/>

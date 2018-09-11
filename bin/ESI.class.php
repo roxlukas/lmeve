@@ -15,6 +15,7 @@ require_once('Stations.class.php');
 require_once('MemberTracking.class.php');
 require_once('IndustryJobs.php');
 require_once('Facilities.php');
+require_once('Markets.php');
 require_once('Universe.php');
 
 class ESI {
@@ -34,6 +35,7 @@ class ESI {
     private $corporationID;
     private $ESI_BASEURL;
     private $DEBUG = TRUE;
+    private $DATASOURCE = 'tranquility';
     
     private $EsiErrorLimitRemain = 0;
     private $EsiErrorLimitReset = 0;
@@ -75,6 +77,12 @@ class ESI {
     public $Facilities;
     
     /**
+     * Markets route instance
+     * @var Markets
+     */
+    public $Markets;
+    
+    /**
      * Universe route instance
      * @var Universe
      */
@@ -92,6 +100,9 @@ class ESI {
         $this->mycache = $this->mypath."/../var";
         $this->mytmp = $this->mypath."/../tmp";
         $this->USER_AGENT = "LMeve/2.0 ESI Poller Version/" . ESI::$VERSION;
+        $this->DATASOURCE = getConfigItem('ESIdatasource', 'tranquility');
+        $this->DEBUG = getConfigItem('ESIdebug', 'enabled') == 'enabled' ? TRUE : FALSE;
+        
         
         //set up ESI URL
         if (!isset($ESI_BASEURL)) {
@@ -123,6 +134,7 @@ class ESI {
         $this->Stations = new Stations($this);
         $this->Facilities = new Facilities($this);
         $this->IndustryJobs = new IndustryJobs($this);
+        $this->Markets = new Markets($this);
         $this->Universe = new Universe($this);
     }
     
@@ -131,6 +143,7 @@ class ESI {
         $this->MemberTracking->update();
         $this->Facilities->update();
         $this->IndustryJobs->update();
+        $this->Markets->update();
     }
     
     private function getRefreshToken() {
@@ -234,5 +247,11 @@ class ESI {
     public function setXEsiErrorLimitReset($EsiErrorLimitReset) {
         $this->EsiErrorLimitReset = $EsiErrorLimitReset;
     }
+    
+    public function getDatasource() {
+        return $this->DATASOURCE;
+    }
+
+
 
 }

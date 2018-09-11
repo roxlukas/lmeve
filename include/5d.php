@@ -24,11 +24,17 @@ global $LM_EVEDB;
                 if (!is_numeric($buyCalcPriceModifier)) die('Wrong parameter value buyCalcPriceModifier: must be numeric'); else setConfigItem('buyCalcPriceModifier', $buyCalcPriceModifier);
                 $marketSystemID=secureGETnum('marketSystemID');
                 if (!empty($marketSystemID)) setConfigItem('marketSystemID', $marketSystemID);
+                $marketRegionID=secureGETnum('marketRegionID');
+                if (!empty($marketRegionID)) setConfigItem('marketRegionID', $marketRegionID);
                 $indexSystemID=secureGETnum('indexSystemID');
                 if (!empty($indexSystemID)) setConfigItem('indexSystemID', $indexSystemID);
+                $indexRegionID=secureGETnum('indexRegionID');
+                if (!empty($indexRegionID)) setConfigItem('indexRegionID', $indexRegionID);
                 
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
                 if (secureGETstr('useESI')=='on') setConfigItem('useESI','enabled'); else setConfigItem('useESI','disabled');
+                if (secureGETstr('ESIdebug')=='on') setConfigItem('ESIdebug','enabled'); else setConfigItem('ESIdebug','disabled');
+                if (in_array(secureGETstr('ESIdatasource'),array("tranquility","singularity"))) setConfigItem('ESIdatasource', secureGETstr('ESIdatasource'));
                 if (secureGETstr('publicKillboard')=='on') setConfigItem('publicKillboard','enabled'); else setConfigItem('publicKillboard','disabled');
                 if (secureGETstr('useCRESTkillmails')=='on') setConfigItem('useCRESTkillmails','enabled'); else setConfigItem('useCRESTkillmails','disabled');
                 if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');
