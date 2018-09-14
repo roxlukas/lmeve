@@ -29,18 +29,25 @@ abstract class Route {
     }
     
     protected function constructURL() {
-        if (!preg_match('/\/\?datasource/', $this->params)) {
-            if (preg_match('/\/\?/', $this->params)) {
+        //inform('constructURL()', "before this->params=" . $this->params . "\r\n");
+        if (!preg_match('/\?datasource/', $this->params)) {
+            //inform('constructURL()', "preg_match('/\?datasource/', this->params) didn't match \r\n");
+            if (preg_match('/\?/', $this->params)) {
+                //inform('constructURL()', "preg_match('/\?/', this->params) did match \r\n");
                 $this->params = str_replace('?', '?datasource=' . $this->ESI->getDatasource() . '&', $this->params);
+                //inform('constructURL()', "new this->params=" . $this->params . "\r\n");
             } else {
                 $this->params = $this->params . '?datasource=' . $this->ESI->getDatasource();
+                //inform('constructURL()', "new this->params=" . $this->params . "\r\n");
             }
         }
+        //inform('constructURL()', "returning\r\n");
         return $this->ESI->getESI_BASEURL() . $this->route . $this->params;
     }
     
     protected function constructCacheFilename() {
-        return $this->ESI->getMycache() . '/' . $this->ESI->getTokenID() . '_' . md5($this->ESI->getTokenID() . $this->constructURL()).'.json';
+        if (!is_null($this->ESI->getTokenID())) $t = $this->ESI->getTokenID(); else $t='0';
+        return $this->ESI->getMycache() . '/' . $t . '_' . md5($this->ESI->getTokenID() . $this->constructURL()).'.json';
     }
     
     protected function checkErrors() {
@@ -192,10 +199,11 @@ abstract class Route {
 	$json_data = json_decode($data);
         //if ($interval==0) usleep(1000000/$CREST_RATE_LIMIT); //if interval == 0, make sure to respect rate limits
         $this->saveOK();
+        if ($this->ESI->getDEBUG()) echo("\r\n");
         return $json_data;
     }
     
-    public function get($params) {
+    public function get($params = '') {
         $this->params = $params;
         return $this->request();
     }

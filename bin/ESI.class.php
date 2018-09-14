@@ -143,7 +143,7 @@ class ESI {
         $this->MemberTracking->update();
         $this->Facilities->update();
         $this->IndustryJobs->update();
-        $this->Markets->update();
+        //$this->Markets->update();
     }
     
     private function getRefreshToken() {
@@ -162,6 +162,7 @@ class ESI {
     }
     
     public function getAccessToken() {
+        if (is_null($this->tokenID) || empty($this->tokenID)) return FALSE;
         if (!empty($this->access_token) && ($this->access_token_expire > time())) {
             return $this->access_token;
         } else {

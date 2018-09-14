@@ -60,89 +60,18 @@ foreach ($api_keys as $api_key) {
         } catch (Exception $e) {
             warning("Main","Exception occured in ESI(tokenID=$tokenID): " . $e->getMessage());
         }
-        /*
-        $cacheFileName="${mycache}/esi_${tokenID}_characters_${characterID}.json";
-        $cacheTime = 3600;
-        $route = 'v4/characters';
-        if (!esiCheckErrors($tokenID,$route)) {
-            $ret = get_esi_contents("$ESI_BASEURL/$route/$characterID/", $cacheFileName, $cacheTime);
-            if (isset($ret->error)) {
-                    esiSaveWarning($keyid,$ret,$route);
-                    continue;
-            } else {
-                $corporationID = null;
-                if (isset($ret->corporation_id)) {
-                    $corporationID = $ret->corporation_id;
-                } else {
-                    warning("ESI","Cannot get corporationID affiliation for characterID=$characterID.");
-                    continue;
-                }
-            }
-        }
-        var_dump($corporationID);
-         */
+        
 }
 
-/******************** EVE-CENTRAL PUBLIC FEEDS **************************/
-
-inform("Main","Polling eve-central.com feeds...");
-
-//Base URL	http://api.eve-central.com/api/marketstat
-//Parameters	 typeID, usesystem=30000142
-//Cache Time (minutes)	 60
-$MAXTYPES=30;
-$useSystem=getConfigItem('marketSystemID', '30000142');
-$amountTypes=db_query("SELECT COUNT(*) FROM cfgmarket;");
-$amountTypes=$amountTypes[0][0];
-for ($i=0; $i < ceil($amountTypes / $MAXTYPES); $i++) {
-	//inform("Main","Getting data for TypeIDs... ".$i*$MAXTYPES." of $amountTypes");
-	$TYPES='';
-	$configuredTypes=db_asocquery("SELECT * FROM cfgmarket LIMIT ".$i*$MAXTYPES.",${MAXTYPES};");
-	foreach ($configuredTypes as $type) {
-		$TYPES=$TYPES."&typeid=".$type['typeID'];
-	}
-	//echo("DEBUG: ".$TYPES."\r\n");
-	if (!apiCheckErrors(0,"eve-central.com")) {
-		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem=${useSystem}${TYPES}","${mycache}/marketstat_$i.xml",60*60);
-		if (isset($dat->error)) {
-			apiSaveWarning(0,$dat->error,"eve-central.com/marketstat.xml");
-		} else {
-			$rows=$dat->marketstat->type;
-			if (count($rows)>0) foreach ($rows as $row) {
-				$attrs=$row->attributes();
-				db_uquery("DELETE FROM apiprices WHERE typeID=".$attrs->id.";");
-				//echo("DEBUG: typeID=".$attrs->id."\r\n");
-				$buy="INSERT INTO apiprices VALUES(".
-				$attrs->id.",".
-				$row->buy->volume.",".
-				$row->buy->avg.",".
-				$row->buy->max.",".
-				$row->buy->min.",".
-				$row->buy->stddev.",".
-				$row->buy->median.",".
-				$row->buy->percentile.
-				",'buy');";
-				$sell="INSERT INTO apiprices VALUES(".
-				$attrs->id.",".
-				$row->sell->volume.",".
-				$row->sell->avg.",".
-				$row->sell->max.",".
-				$row->sell->min.",".
-				$row->sell->stddev.",".
-				$row->sell->median.",".
-				$row->sell->percentile.
-				",'sell');";
-				db_uquery($buy);
-				db_uquery($sell);
-			}
-			apiSaveOK(0,"eve-central.com/marketstat.xml");
-			//be gentle to eve-central.com, wait before asking for another batch.
-			sleep(2);
-		}
-	} else {
-		warning("eve-central.com/marketstat.xml",$FEED_BLOCKED);
-	}
+try {
+    inform("Main","Updating public routes...");
+    if (!isset($ESI)) $ESI = new ESI(null);
+    inform("Main","ESI->Markets>update()...");
+    $ESI->Markets->update();
+} catch (Exception $e) {
+    warning("Main","Exception occured in ESI(tokenID=$tokenID): " . $e->getMessage());
 }
+
 
 //REMOVE LOCK FILE
 lock_unset($mylock);

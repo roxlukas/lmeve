@@ -37,9 +37,26 @@ include_once('ESI.class.php');
 /*************************************************************************************************/
 
 $ESI = new ESI(null);
+/*
+//get Lukas Rox from LMeve database, subsequent request should use cache
+echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
+echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
+//get Rixx Javix from ESI (it does not exist in database). Subsequent request should use cache
+echo($ESI->Characters->getCharacterName(245073304) . "\r\n");
+echo($ESI->Characters->getCharacterName(245073304) . "\r\n");
 
-echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
-echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
-echo($ESI->Characters->getCharacterName(245073304) . "\r\n");
-echo($ESI->Characters->getCharacterName(245073304) . "\r\n");
+//get market history for Cruor in The Forge
+var_dump($ESI->Markets->getHistory(17926,10000002));
+
+//get market orders for Cruor in The Forge
+var_dump($ESI->Markets->getMarketOrders(17926,10000002,30000140));
+
+//get market orders for Tritanium in The Forge
+var_dump($ESI->Markets->getMarketOrders(34,10000002,30000140));
+*/
+//update Trit price
+$ESI->Markets->updateMinMax(34);
+//test game calculated avg/adjusted prices
+$d = $ESI->Markets->getPrices();
+
 ?>
