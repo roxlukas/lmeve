@@ -10,12 +10,22 @@ class Markets extends Route {
         $this->setCacheInterval(3600);
     }
 
-    public function update() {
+    /**
+     * Update public market data, common for all corporations in LMeve
+     */
+    public function updatePublic() {
         $typeids = db_asocquery("SELECT `typeID` FROM `cfgmarket`;");
         if (count($typeids) > 0) {
             foreach ($typeids as $typeid) $this->updateMinMax ($typeid['typeID']);
         }
         $this->updatePrices();
+    }
+    
+    /**
+     * Update private corporation market data - Market Orders
+     */
+    public function update() {
+        $this->updateCorporationMarketOrders();
     }
     
     /**
@@ -30,6 +40,48 @@ class Markets extends Route {
         $this->setCacheInterval(86400);
         if (is_null($regionID)) $regionID = getConfigItem ('marketRegionID', 10000002);
         return $this->get( $regionID . '/history/?type_id=' . $typeID);
+    }
+    
+    public function getCorporationMarketOrders() {
+        $this->setRoute('/v3/corporations/');
+        $this->setCacheInterval(1200);
+        return $this->get( $this->ESI->getCorporationID() . '/orders/');
+    }
+    
+    public function updateCorporationMarketOrders() {
+        $orders = $this->getCorporationMarketOrders();
+        if ($this->ESI->getDEBUG) var_dump($orders);
+        if ($this->getStatus()=='fresh') {
+            if (count($orders) > 0) {
+                db_uquery("DELETE FROM `apimarketorders` WHERE `corporationID` = " . $this->ESI->getCorporationID());
+                foreach ($orders as $o) {
+                    if ($this->v($o,'is_buy_order',false) === true) $bid = 1; else $bid = 0;
+                    $sql="INSERT INTO `apimarketorders` VALUES (".
+                            $this->v($o,'order_id',$i++) . ',' .
+                            $this->v($o,'issued_by',0) . ',' .
+                            $this->v($o,'location_id',0) . ',' .
+                            $this->v($o,'volume_total',0) . ',' .
+                            $this->v($o,'volume_remain',0) . ',' .
+                            $this->v($o,'min_volume',1) . ',' .
+                            "0," .
+                            $this->v($o,'type_id',0) . ',' .
+                            $this->s($this->v($o,'range',0)) . ',' .
+                            $this->v($o,'wallet_division',0) . ',' .
+                            $this->v($o,'duration',0) . ',' .
+                            $this->v($o,'escrow',0) . ',' .
+                            $this->v($o,'price',0) . ',' .
+                            $bid . ',' .
+                            $this->s($this->v($o,'issued','')) . ',' .
+                            $this->ESI->getCorporationID() .
+                        ")" .
+                    ";";
+                    db_uquery($sql);
+                }
+            }
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
+        }
     }
     
     /**
@@ -214,27 +266,30 @@ class Markets extends Route {
         $systemID = getConfigItem ('marketSystemID', 30000142);
         $orders = $this->getMarketOrders($typeID, $regionID, $systemID);
 
-       
-        if (count($orders) > 0) {
-            
-            $t = $this->statAnalyze($orders);
-            
-            if ($t === FALSE) return FALSE;
-            
-            $orders = $this->clearOutliers($orders, $t['buy']['median'], $t['buy']['stddev'], $t['sell']['median'], $t['sell']['stddev']);
-            
+        if ($this->getStatus()=='fresh') {
             if (count($orders) > 0) {
-                $r = $this->statAnalyze($orders);  
-                if ($r === FALSE) {
-                    return $this->insertApiprices($typeID, $t);
+
+                $t = $this->statAnalyze($orders);
+
+                if ($t === FALSE) return FALSE;
+
+                $orders = $this->clearOutliers($orders, $t['buy']['median'], $t['buy']['stddev'], $t['sell']['median'], $t['sell']['stddev']);
+
+                if (count($orders) > 0) {
+                    $r = $this->statAnalyze($orders);  
+                    if ($r === FALSE) {
+                        return $this->insertApiprices($typeID, $t);
+                    } else {
+                        return $this->insertApiprices($typeID, $r);
+                    }
                 } else {
-                    return $this->insertApiprices($typeID, $r);
+                    return $this->insertApiprices($typeID, $t);
                 }
-            } else {
-                return $this->insertApiprices($typeID, $t);
+
             }
-            
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
         }
-        return FALSE;
     }
 }

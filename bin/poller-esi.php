@@ -66,8 +66,8 @@ foreach ($api_keys as $api_key) {
 try {
     inform("Main","Updating public routes...");
     if (!isset($ESI)) $ESI = new ESI(null);
-    inform("Main","ESI->Markets>update()...");
-    $ESI->Markets->update();
+    inform("Main","ESI->updatePublic()...");
+    $ESI->updatePublic();
 } catch (Exception $e) {
     warning("Main","Exception occured in ESI(tokenID=$tokenID): " . $e->getMessage());
 }

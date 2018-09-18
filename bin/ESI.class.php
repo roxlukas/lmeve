@@ -31,8 +31,8 @@ class ESI {
     private $refresh_token;
     private $access_token;
     private $access_token_expire;
-    private $characterID;
-    private $corporationID;
+    private $characterID = null;
+    private $corporationID = null;
     private $ESI_BASEURL;
     private $DEBUG = TRUE;
     private $DATASOURCE = 'tranquility';
@@ -127,6 +127,9 @@ class ESI {
         $this->instantiateAll();
     }
     
+    /**
+     * Initialize instances for all routes
+     */
     private function instantiateAll() {
         $this->CorporationInformation = new CorporationInformation($this);
         $this->MemberTracking = new MemberTracking($this);
@@ -138,14 +141,29 @@ class ESI {
         $this->Universe = new Universe($this);
     }
     
+    /**
+     * Update private corporation data for all routes
+     */
     public function updateAll() {
         $this->CorporationInformation->update();
         $this->MemberTracking->update();
         $this->Facilities->update();
         $this->IndustryJobs->update();
-        //$this->Markets->update();
+        $this->Markets->update();
     }
     
+    /**
+     * Update all public information
+     */
+    public function updatePublic() {
+        $this->Markets->updatePublic();
+    }
+    
+    /**
+     * Get the ESI refresh token
+     * 
+     * @return mixed returns refresh token string or boolean FALSE
+     */
     private function getRefreshToken() {
         if (!empty($this->refresh_token)) {
             return $this->refresh_token;
@@ -161,6 +179,11 @@ class ESI {
 	return FALSE;
     }
     
+    /**
+     * Get an ESI access token
+     * 
+     * @return mixed returns a valid access token string or boolean FALS
+     */
     public function getAccessToken() {
         if (is_null($this->tokenID) || empty($this->tokenID)) return FALSE;
         if (!empty($this->access_token) && ($this->access_token_expire > time())) {
@@ -198,6 +221,7 @@ class ESI {
     }
 
     public function getCorporationID() {
+        if (is_null($this->corporationID)) $this->CorporationInformation->update();
         return $this->corporationID;
     }
 

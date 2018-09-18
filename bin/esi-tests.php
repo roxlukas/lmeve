@@ -36,7 +36,7 @@ include_once('ESI.class.php');
 
 /*************************************************************************************************/
 
-$ESI = new ESI(null);
+$ESI = new ESI(5);
 /*
 //get Lukas Rox from LMeve database, subsequent request should use cache
 echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
@@ -55,8 +55,10 @@ var_dump($ESI->Markets->getMarketOrders(17926,10000002,30000140));
 var_dump($ESI->Markets->getMarketOrders(34,10000002,30000140));
 */
 //update Trit price
-$ESI->Markets->updateMinMax(34);
+//$ESI->Markets->updateMinMax(34);
 //test game calculated avg/adjusted prices
-$d = $ESI->Markets->getPrices();
+//$d = $ESI->Markets->getPrices();
+
+$o = $ESI->Markets->updateCorporationMarketOrders();
 
 ?>

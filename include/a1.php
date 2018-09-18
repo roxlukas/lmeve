@@ -368,11 +368,11 @@ if ($model) {
         $crestPriceData=db_asocquery("SELECT * FROM `crestmarketprices` WHERE `typeID`=$nr;");
 	
 	if (count($priceData) > 0) {
-		$when=db_asocquery("SELECT `date` FROM `apistatus` WHERE `fileName`='eve-central.com/marketstat.xml';");
+		$when=db_asocquery("SELECT `date` FROM `esistatus` WHERE `route`='/v1/markets/';");
 		$when=$when[0]['date'];	
 		?>
 		<table class="lmframework" style="width:100%;">
-                    <tr><th colspan="5">eve-central.com prices (updated: <?php echo($when); ?>)</th></tr>
+                    <tr><th colspan="5">ESI order prices (updated: <?php echo($when); ?>)</th></tr>
 		<tr><th>
 		Type
 		</th><th>
@@ -405,11 +405,11 @@ if ($model) {
         ?> </table> <?php
 	} 
         if (count($crestPriceData) > 0) {
-		$when=db_asocquery("SELECT `date` FROM `apistatus` WHERE `fileName`='CREST /market/prices/';");
+		$when=db_asocquery("SELECT `date` FROM `esistatus` WHERE `route`='/v1/markets/prices/';");
 		$when=$when[0]['date'];	
 		?>
 		<table class="lmframework" style="width:100%;">
-                    <tr><th colspan="2">CREST price data (updated: <?php echo($when); ?>)</th></tr>
+                    <tr><th colspan="2">ESI average price data (updated: <?php echo($when); ?>)</th></tr>
 		<tr><th>
 		Adjusted Price
 		</th><th>

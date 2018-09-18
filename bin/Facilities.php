@@ -25,11 +25,11 @@ af.`regionName` = mrs.`regionName`;
 ");
     }
     
-    public function update_public() {
+    public function updatePublic() {
         inform(get_class(), 'Updating public Facilities...');
         $this->setRoute('/v1/industry/');
         $facs = $this->get('facilities/');
-        var_dump($facs);
+        
         if ($this->getStatus()=='fresh') {
             if (count($facs) > 0) {
                 foreach ($facs as $fac) {
@@ -57,11 +57,11 @@ af.`regionName` = mrs.`regionName`;
         return TRUE;
     }
     
-    public function update_corpo() {
+    public function updateCorp() {
         inform(get_class(), 'Updating corporation private Facilities...');
         $this->setRoute('/v1/corporations/');
         $facs = $this->get( $this->ESI->getCorporationID() . '/facilities/');
-        var_dump($facs);
+        
         if ($this->getStatus()=='fresh') {
             if (count($facs) > 0) {
                 foreach ($facs as $fac) {
@@ -90,8 +90,8 @@ af.`regionName` = mrs.`regionName`;
     }
     
     public function update() {
-        $this->update_public();
-        $this->update_corpo();
+        $this->updatePublic();
+        $this->updateCorp();
     }
     
   
