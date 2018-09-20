@@ -181,7 +181,8 @@ function esiUpdateAll() {
     $d = esiUpdateApiCorpMembers();
     $e = esiUpdateApiIndustryJobsCrius();
     $f = esiUpdateApimarketorders();
-    return $a && $b && $c && $d && $e;
+    $g = esiUpdateApiContractItems();
+    return $a && $b && $c && $d && $e && $f && $g;
 }
 
 /**
@@ -219,6 +220,25 @@ function esiUpdateApimarketorders() {
     }    
     if ($found === TRUE) {
         return db_uquery("ALTER TABLE `apimarketorders` CHANGE COLUMN `range` `range` VARCHAR(12) NULL DEFAULT NULL;");
+    }
+    return TRUE;
+}
+
+/**
+ * Function checks if the table apicontractitems has the necessary columns for ESI support
+ * 
+ * @return boolean returns TRUE if table was correctly updated or if the update was already performed. Returns FALSE if update was not possible.
+ */
+function esiUpdateApiContractItems() {
+    $table = db_asocquery("DESCRIBE `apicontractitems`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='rawQuantity' && $column['Type']=='int(11)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === FALSE) {
+        return db_uquery("ALTER TABLE `apicontractitems` ADD COLUMN `rawQuantity` int(11) NULL DEFAULT  NULL AFTER `quantity`;");
     }
     return TRUE;
 }

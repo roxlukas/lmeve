@@ -118,16 +118,7 @@ function showBuyback($buybacklist) {
 					$contractprice=$row['price'];
 					$orderprice=$value;
 					if (abs($contractprice-$orderprice)<1) {
-						switch ($row['status']) {
-							case 'Outstanding':
-							echo(RDYIMG()." READY<br />");
-							break;
-							case 'Completed':
-							echo(OKIMG()." Completed<br />");
-							break;
-							default:
-							echo(NOKIMG()." Wrong status<br />");
-						}
+						showContractStatus($row['status']);
 					} else {
 						echo(NOKIMG()." Wrong price in game: ");
 						echo(number_format($contractprice, 2, $DECIMAL_SEP, $THOUSAND_SEP));
@@ -144,6 +135,27 @@ function showBuyback($buybacklist) {
 		echo('</table>');
 	}
 	return;
+}
+
+function showContractStatus($status) {
+    switch ($status) {
+        //for XML API
+            case 'Outstanding':
+            echo(RDYIMG()." READY<br />");
+            break;
+            case 'Completed':
+            echo(OKIMG()." Completed<br />");
+            break;
+        //for ESI statusis different
+            case 'outstanding':
+            echo(RDYIMG()." READY<br />");
+            break;
+            case 'finished':
+            echo(OKIMG()." Completed<br />");
+            break;
+            default:
+            echo(NOKIMG()." Wrong status<br />");
+    }
 }
 
 function showBuybackOrder($row) {
@@ -187,16 +199,7 @@ function showBuybackOrder($row) {
 			$contractprice=$row['price'];
 			$orderprice=$value;
 			if (abs($contractprice-$orderprice)<1) {
-				switch ($row['status']) {
-					case 'Outstanding':
-					echo(RDYIMG()." READY<br />");
-					break;
-					case 'Completed':
-					echo(OKIMG()." Completed<br />");
-					break;
-					default:
-					echo(NOKIMG()." Wrong status<br />");
-				}
+				showContractStatus($row['status']);
 			} else {
 				echo(NOKIMG()." Wrong price in game: ");
 				echo(number_format($contractprice, 2, $DECIMAL_SEP, $THOUSAND_SEP));

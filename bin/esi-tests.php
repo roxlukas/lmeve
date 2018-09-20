@@ -59,6 +59,8 @@ var_dump($ESI->Markets->getMarketOrders(34,10000002,30000140));
 //test game calculated avg/adjusted prices
 //$d = $ESI->Markets->getPrices();
 
-$o = $ESI->Markets->updateCorporationMarketOrders();
+//$o = $ESI->Markets->updateCorporationMarketOrders();
+
+$ESI->Contracts->updateCorporationContractItems(136961765);
 
 ?>
