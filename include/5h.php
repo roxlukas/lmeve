@@ -23,7 +23,7 @@ function apikeyhrefedit($nr) {
 <table><tr><td>
     <form method="post" action="?id=5&id2=18">
         <?php token_generate(); ?>
-        <input type="submit" value="Add new API Key" /><br/>
+        <input type="submit" value="Add new API Key (deprecated)" disabled /><br/>
     </form>
 </td><td>
     <form method="post" action="?id=8&id2=4">

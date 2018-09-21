@@ -16,13 +16,6 @@ global $USERSTABLE;
 
 <table cellpadding="0" cellspacing="2">
 	    <tr>
-               
-	    <td><form action="" method="get">
-		<input type="hidden" name="id" value="9">
-		<input type="hidden" name="id2" value="4">
-		<input type="submit" value="Link characters using API KEY">
-		</form></td>
-           
 	    <?php if (checkrights("Administrator,EditCharacters")) { ?>
 	    <td><form action="" method="get">
 		<input type="hidden" name="id" value="9">
@@ -31,6 +24,11 @@ global $USERSTABLE;
 		<input type="submit" value="Link characters manually">
 		</form></td>
 		<?php } ?>
+                <td><form action="" method="get">
+		<input type="hidden" name="id" value="9">
+		<input type="hidden" name="id2" value="4">
+		<input type="submit" value="Link characters using API KEY (deprecated)" disabled>
+		</form></td>
 		</tr></table>
 
 <div class="tytul">

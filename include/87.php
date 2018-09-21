@@ -181,7 +181,7 @@ $PANELNAME='ESI Statistics'; //Panel name (optional)
 	<?php
 	
 	function hrefedit($nr) {
-				echo('<a href="index.php?id=5&id2=8&nr=');
+				echo('<a href="index.php?id=5&id2=25&nr=');
 				echo($nr);
 				echo('" title="Click to reset this API feed status (it will be polled in the next cycle)">');
 	}

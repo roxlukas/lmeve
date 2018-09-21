@@ -113,5 +113,8 @@
             case 24:
                 include("5o.php"); //corp ESI tokens - delete
                 break;
+            case 25:
+		include("5p.php");  //reset one ESI feed
+		break;
 	    }
 ?>

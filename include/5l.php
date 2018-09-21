@@ -30,7 +30,7 @@ function esihrefedit($nr) {
         <input type="submit" value="New ESI Token" /><br/>
     </form>
 </td><td>
-    <form method="post" action="?id=8&id2=4">
+    <form method="post" action="?id=8&id2=7">
         <?php token_generate(); ?>
         <input type="submit" value="Check ESI Statistics" /><br/>
     </form>            
