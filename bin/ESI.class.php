@@ -18,6 +18,7 @@ require_once('Facilities.php');
 require_once('Markets.php');
 require_once('Universe.php');
 require_once('Contracts.php');
+require_once('Wallet.php');
 
 class ESI {
     public static $VERSION = 1;
@@ -90,10 +91,16 @@ class ESI {
     public $Universe;
     
     /**
-     * Universe route instance
+     * Contracts route instance
      * @var Contracts
      */
     public $Contracts;
+    
+    /**
+     * Wallet route instance
+     * @var Wallet
+     */
+    public $Wallet;
     
     /**
      * $tokenID int - which refresh_token from cfgesitoken to use for this instance
@@ -147,6 +154,7 @@ class ESI {
         $this->Markets = new Markets($this);
         $this->Universe = new Universe($this);
         $this->Contracts = new Contracts($this);
+        $this->Wallet = new Wallet($this);
     }
     
     /**
@@ -159,6 +167,7 @@ class ESI {
         $this->IndustryJobs->update();
         $this->Markets->update();
         $this->Contracts->update();
+        $this->Wallet->update();
     }
     
     /**

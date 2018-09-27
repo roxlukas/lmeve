@@ -139,10 +139,12 @@ class Markets extends Route {
         }
         if (!is_null($systemID)) {
             $b = array();
-            foreach($a as $k => $r) {
-                if ($r->system_id == $systemID) $b[$k] = $r;
+            if (count($a) > 0) {
+                foreach($a as $k => $r) {
+                    if ($r->system_id == $systemID) $b[$k] = $r;
+                }
+                $a = $b;
             }
-            $a = $b;
         }
         return $a;
     }
@@ -245,8 +247,8 @@ class Markets extends Route {
     }
     
     private function insertApiprices($typeID, $r) {
-        if ($this->ESI->getDEBUG()) echo($typeID . " buy " . $r['buy']['volume'] . ", " . $r['buy']['avg'] . ", " . $r['buy']['max'] . ", " . $r['buy']['min'] . ", " . $r['buy']['stddev'] . ", " . $r['buy']['median'] . ", 0.0)\r\n");
-        if ($this->ESI->getDEBUG()) echo($typeID . " sell " . $r['sell']['volume'] . ", " . $r['sell']['avg'] . ", " . $r['sell']['max'] . ", " . $r['sell']['min'] . ", " . $r['sell']['stddev'] . ", " . $r['sell']['median'] . ", 0.0)\r\n");
+        if ($this->ESI->getDEBUG()) inform(get_class (), $typeID . " buy " . $r['buy']['volume'] . ", " . $r['buy']['avg'] . ", " . $r['buy']['max'] . ", " . $r['buy']['min'] . ", " . $r['buy']['stddev'] . ", " . $r['buy']['median'] . ", 0.0)\r\n");
+        if ($this->ESI->getDEBUG()) inform(get_class (), $typeID . " sell " . $r['sell']['volume'] . ", " . $r['sell']['avg'] . ", " . $r['sell']['max'] . ", " . $r['sell']['min'] . ", " . $r['sell']['stddev'] . ", " . $r['sell']['median'] . ", 0.0)\r\n");
         $a = db_uquery("DELETE FROM `apiprices` WHERE `typeID` = $typeID");
         $b = db_uquery("INSERT INTO `apiprices` VALUES ($typeID, " . $r['buy']['volume'] . ", " . $r['buy']['avg'] . ", " . $r['buy']['max'] . ", " . $r['buy']['min'] . ", " . $r['buy']['stddev'] . ", " . $r['buy']['median'] . ", 0.0, 'buy')");
         $c = db_uquery("INSERT INTO `apiprices` VALUES ($typeID, " . $r['sell']['volume'] . ", " . $r['sell']['avg'] . ", " . $r['sell']['max'] . ", " . $r['sell']['min'] . ", " . $r['sell']['stddev'] . ", " . $r['sell']['median'] . ", 0.0, 'sell')");

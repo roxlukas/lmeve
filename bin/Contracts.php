@@ -63,7 +63,7 @@ class Contracts extends Route {
         if ($this->getStatus()=='fresh') {
             if (count($contracts) > 0) {
                 foreach ($contracts as $c) {
-                    if ($this->v($o,'for_corporation',false) === true) $for_corporation = 1; else $for_corporation = 0;
+                    if ($this->v($c,'for_corporation',false) === true) $for_corporation = 1; else $for_corporation = 0;
                     $sql="INSERT INTO `apicontracts` VALUES (".
                             $this->v($c,'contract_id',$i++) .",".
                             $this->v($c,'issuer_id',0) .",".

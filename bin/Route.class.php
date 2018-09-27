@@ -172,6 +172,12 @@ abstract class Route {
                                 //handle error
                                 $this->saveError($http_code, $data);
                             }
+                            //Stop poller in case of 504 - Tranquility is down, stop barraging the ESI API!
+                            if ($http_code == 504) {
+                                $msg = "Game server is down, shutting down ESI client. Reason: " . $data;
+                                warning(get_class(), $msg);
+                                throw new Exception($msg);
+                            }
                             //additional logging!!
                             loguj($this->ESI->getHttplog(),"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
                             $this->status='error';

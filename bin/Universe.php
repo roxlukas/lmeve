@@ -48,6 +48,36 @@ class Universe extends Route {
         }
     }
     
+    public function getNamesForIds($id_list) {
+        // filter input data
+        $tmp = array();
+        $names = FALSE;
+        foreach($id_list as $id) {
+            if (is_numeric($id) && $id > 1000000 && $id < 100000000) {
+                array_push($tmp, $id);
+            }
+        }
+        if ($this->ESI->getDEBUG()) inform(get_class(), json_encode($tmp));
+        // contact ESI
+        if (count($tmp) > 0) {
+            $this->setRoute('/v2/universe/names/');
+            $this->setCacheInterval(0);
+            $names = $this->post('',json_encode($tmp));
+        }
+        return $names;
+    }
+    
+    public function getNamesForIdsMap($id_list) {
+        $d = $this->getNamesForIds($id_list);
+        $r = FALSE;
+        if (count($d) > 0) {
+            foreach ($d as $i) {
+                $r[$i->id] = $i->name;
+            }
+        }
+        return $r;
+    }
+    
     public function getStationSolarSystemId($stationID) {
         global $LM_EVEDB;
         if (isset($this->solarSystemIDCache[$stationID])) {

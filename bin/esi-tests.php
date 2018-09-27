@@ -61,6 +61,18 @@ var_dump($ESI->Markets->getMarketOrders(34,10000002,30000140));
 
 //$o = $ESI->Markets->updateCorporationMarketOrders();
 
-$ESI->Contracts->updateCorporationContractItems(136961765);
+//$ESI->Contracts->updateCorporationContractItems(136961765);
+
+//var_dump($ESI->CorporationInformation->getDivisions());
+
+//$ESI->Wallet->updateCorpWalletBalance();
+
+//var_dump($ESI->Wallet->getCorporationWalletJournal(1));
+
+//var_dump($ESI->Universe->getNamesForIdsMap(array(95465499, 30000142)));
+
+//$ESI->Wallet->updateRefTypes();
+
+var_dump($ESI->Wallet->updateCorpWalletTransactions(4));
 
 ?>

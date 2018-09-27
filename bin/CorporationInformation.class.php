@@ -10,15 +10,62 @@ class CorporationInformation extends Route {
         $this->setCacheInterval(3600);
     }
     
-    public function getCorporation($corporationID) {
+    public function getCorporation($corporationID = null) {
         //secondly, get the corporation information
+        if (is_null($corporationID)) $corporationID = $this->ESI->getCorporationID();
+        $this->setRoute('/v4/corporations/');
+        $this->setCacheInterval(3600);
         $corp = $this->get( $corporationID . '/');
         if ($this->ESI->getDEBUG()) var_dump($corp);
         if (is_object($corp)) return $corp;
         return FALSE;
     }
     
-    public function update() {
+    public function getDivisions($corporationID = null) {
+        if (is_null($corporationID)) $corporationID = $this->ESI->getCorporationID();
+        $this->setRoute('/v1/corporations/');
+        $this->setCacheInterval(3600);
+        $divisions = $this->get(  $corporationID . '/divisions/');
+        return $divisions;
+    }
+    
+    public function updateDivisions() {
+        inform(get_class(), 'Updating Corporation Divisions...');
+        $divisions = $this->getDivisions();
+        
+        if ($this->getStatus()=='fresh') {
+            // apidivisions
+            // corporationID 	accountKey 	description
+            if (property_exists($divisions, 'hangar') && count($divisions->hangar) > 0){
+                db_uquery("DELETE FROM `apidivisions` WHERE `corporationID` = " . $this->ESI->getCorporationID());
+                $i = 0;
+                foreach ($divisions->hangar as $h) {
+                    $sql = "INSERT INTO `apidivisions` VALUES(" . $this->ESI->getCorporationID() . "," . $this->v($h, 'division',$i++) . "," . $this->s($this->v($h, 'name', '')) . ")";
+                    db_uquery($sql);
+                }
+            } else {
+                warning(get_class(), 'Updating Corporation Hangar Divisions Failed: no data returned by ESI.');
+            }
+            // apiwalletdivisions
+            // corporationID 	accountKey 	description
+            if (property_exists($divisions, 'wallet') && count($divisions->wallet) > 0){
+                db_uquery("DELETE FROM `apiwalletdivisions` WHERE `corporationID` = " . $this->ESI->getCorporationID());
+                $i = 0;
+                foreach ($divisions->wallet as $h) {
+                    $sql = "INSERT INTO `apiwalletdivisions` VALUES(" . $this->ESI->getCorporationID() . "," . $this->v($h, 'division',$i++) . "," . $this->s($this->v($h, 'name', '')) . ")";
+                    db_uquery($sql);
+                }
+            } else {
+                warning(get_class(), 'Updating Corporation Wallet Divisions Failed: no data returned by ESI.');
+            }
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
+        }
+        return TRUE;
+    }
+    
+    public function updateCorporationInformation() {
         inform(get_class(), 'Updating CorporationInformation...');
     //first, get corporation_id based on character_id who owns the ESI Token
         try {
@@ -102,6 +149,11 @@ class CorporationInformation extends Route {
                 "`color3` = 0" .
             ";";
 	db_uquery($sql);
+    }
+    
+    public function update() {
+        $this->updateCorporationInformation();
+        $this->updateDivisions();
     }
     
 }
