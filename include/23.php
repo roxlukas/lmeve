@@ -21,12 +21,10 @@ include_once 'tasks.php';
 </div>
 <a href="#down">Scroll down</a>
 <?php
-    $nr=$_GET['nr'];
-    if (!ctype_digit($nr)) {
-        die("Wrong parameter nr.");
-    }
-    $nr=addslashes($nr);
-    $lab=getLabs("apf.`facilityID`=$nr");
+
+    $nr = secureGETnum('nr');
+
+    $lab = getLabs("apf.`facilityID`=$nr");
     if (count($lab)==0) {
         echo("Such record does not exist.");
 	return;

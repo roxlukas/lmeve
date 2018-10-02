@@ -4,6 +4,7 @@
 //api.php?key=<apikey>&endpoint=MATERIALS&typeID=<itemID>&meLevel=<ME level 0-10>
 //api.php?key=<apikey>&endpoint=TASKS
 //api.php?key=<apikey>&endpoint=TASKS&characterID=<charID>
+//you can now use output=xml or output=json to format your data the way you need
 
 set_include_path("../include");
 date_default_timezone_set(@date_default_timezone_get());
@@ -28,6 +29,45 @@ if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
 
 $endpoint=secureGETstr('endpoint');
 $key=secureGETstr('key');
+
+class XMLSerializer {
+
+    // functions adopted from http://www.sean-barton.co.uk/2009/03/turning-an-array-or-object-into-xml-using-php/
+
+    public static function generateValidXmlFromObj(stdClass $obj, $node_block='nodes', $node_name='node') {
+        $arr = get_object_vars($obj);
+        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
+    }
+
+    public static function generateValidXmlFromArray($array, $node_block='nodes', $node_name='node') {
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?>';
+
+        $xml .= '<' . $node_block . '>';
+        $xml .= self::generateXmlFromArray($array, $node_name);
+        $xml .= '</' . $node_block . '>';
+
+        return $xml;
+    }
+
+    private static function generateXmlFromArray($array, $node_name) {
+        $xml = '';
+
+        if (is_array($array) || is_object($array)) {
+            foreach ($array as $key=>$value) {
+                if (is_numeric($key)) {
+                    $key = $node_name;
+                }
+
+                $xml .= '<' . $key . '>' . self::generateXmlFromArray($value, $node_name) . '</' . $key . '>';
+            }
+        } else {
+            $xml = htmlspecialchars($array, ENT_QUOTES);
+        }
+
+        return $xml;
+    }
+
+}
 
 function formatMaterials($materials) {
     $ret=array();
@@ -70,6 +110,32 @@ function json_beautify($json_string) {
     return $ret;
 }
 
+function encode($data, $nodes = 'data', $node = 'element') {
+    $output = 'json';
+    if(isset($_GET['output']) && $_GET['output'] == 'xml') $output = 'xml';
+    switch($output) {
+        case 'json':
+            return json_beautify(json_encode($data));
+        case 'xml':
+            return XMLSerializer::generateValidXmlFromArray($data,$nodes,$node);
+        default:
+            return json_beautify(json_encode($data));
+    }
+}
+
+function content_type() {
+    $output = 'json';
+    if(isset($_GET['output']) && $_GET['output'] == 'xml') $output = 'xml';
+    switch($output) {
+        case 'json':
+            return 'application/json';
+        case 'xml':
+            return  'application/xml';
+        default:
+            return 'application/json';
+    }
+}
+
 function checkApiKey($key) {
     $ret=db_asocquery("SELECT * FROM `lmnbapi` WHERE `apiKey`='$key';");
     if (count($ret)==1) {
@@ -81,16 +147,20 @@ function checkApiKey($key) {
 function RESTfulError($msg,$http_error_code=400) {
     header("HTTP/1.1 $http_error_code $msg");
     header("Status: $http_error_code $msg");
-     echo(json_encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
+     echo(encode(array('errorMsg' => $msg, 'errorCode' => $http_error_code)));
     die();
 }
 
+/**
+ * deprecated
+ * @param type $json
+ */
 function output($json) {
     echo(json_beautify($json));
 }
 
-//Add proper JSON MIME type in header
-header("Content-type: application/json");
+//Add proper JSON/XML MIME type in header
+header("Content-type: " . content_type());
 //Add CORS header in header so API can be used with web apps on other servers
 header("Access-Control-Allow-Origin: *");
 
@@ -108,13 +178,23 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (empty($meLevel)) $meLevel=0;
             if ($melevel>10) $melevel=10;
             if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
-            output(json_encode(formatMaterials(getBaseMaterials($typeID, 1, $meLevel))));
+            echo(encode(formatMaterials(getBaseMaterials($typeID, 1, $meLevel)), 'materials', 'type'));
             break;
         case 'TASKS':
             $characterID=secureGETnum('characterID');
             $sql="lmt.`characterID`=".$characterID;
             if (empty($characterID)) $sql="TRUE";
-            output(json_encode(getTasks($sql, "TRUE", "",date("Y"),date("m"))));
+            echo(encode(getTasks($sql, "TRUE", "",date("Y"),date("m")), 'tasks', 'task'));
+            break;
+        case 'KIT':
+            $tasks = getTasksByLab();
+            $materials = getMaterialsForTasks($tasks);
+            foreach ($materials as $k=>$m) {
+                $materials[$k]['quantity'] = $materials[$k]['notperfect'];
+                unset($materials[$k]['waste']);
+                unset($materials[$k]['notperfect']);
+            }
+            echo(encode($materials, 'materials', 'material'));
             break;
         case 'INVTYPES':
             $typeID=secureGETnum('typeID');
@@ -148,7 +228,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (count($traitData) > 0) $item['traits']=$traitData;
             if (count($bonusData) > 0) $item['bonuses']=$bonusData;
             if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
-            output(json_encode($item));
+            echo(encode($item));
             break;
         case 'INVGROUPS':
             $groupID=secureGETnum('groupID');
@@ -158,7 +238,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             $groups=db_asocquery("SELECT * FROM `$LM_EVEDB`.`invGroups`
                 WHERE $where_gid AND $where_cid;");
             if (count($groups)==0) RESTfulError('No data found.',404);
-            output(json_encode($groups));
+            echo(encode($groups, 'groups', 'group'));
             break;  
         case 'INVCATEGORIES':
             $categoryID=secureGETnum('categoryID');
@@ -166,7 +246,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             $categories=db_asocquery("SELECT * FROM `$LM_EVEDB`.`invCategories`
                 WHERE $where_cid;");
             if (count($categories)==0) RESTfulError('No data found.',404);
-            output(json_encode($categories));
+            echo(encode($categories, 'categories', 'category'));
             break; 
         case 'GRAPHICID':
             $typeID=secureGETnum('typeID');
@@ -180,7 +260,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (count($graphicData)==0) RESTfulError('typeID not found.',404);
             $item=$graphicData[0];
             if (count($graphicData) > 0) $item['sofDNA']=$graphicData[0]['sofHullName'].':'.$graphicData[0]['sofFactionName'].':'.$graphicData[0]['sofRaceName'];
-            output(json_encode($item));
+            echo(encode($item, 'graphicids', 'graphicid'));
             break;
         case 'ALLGRAPHICIDS':
             RESTfulError('ALLGRAPHICIDS endpoint is now obsolete. Use GRAPHICIDS instead.',404);
@@ -199,7 +279,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
                 ON itp.`groupID`=igp.`groupID`    
                 WHERE $where_gid AND $where_cid;");
             if (count($items)==0) RESTfulError('No data found.',404);
-            output(json_encode($items));
+            echo(encode($items, 'graphicids', 'graphicid'));
             break;
         case 'JEREMY':
             RESTfulError('JEREMY endpoint is now obsolete. Use JEREMYBULK instead.',404);
@@ -250,7 +330,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
                     if (count($bonusData) > 0) $retdata[$typeID]['bonuses']=$bonusData;
                     if (count($dogmaData) > 0) $retdata[$typeID]['attributes']=$dogmaData;
                 }
-                $tmpContent=json_encode($retdata);
+                $tmpContent=encode($retdata);
                 db_uquery("INSERT INTO `lmpagecache` VALUES ('JEREMYBULK','".addslashes($tmpContent)."', NOW()) ON DUPLICATE KEY UPDATE `pageContents`='".addslashes($tmpContent)."', timestamp=NOW();");
                 echo($tmpContent);
             }
@@ -261,7 +341,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (isset($regionID)) $regionWhere="`regionID`=$regionID"; else $regionWhere="TRUE";
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapRegions` WHERE $regionWhere;");
             if (count($items)==0) RESTfulError('region not found.',404);
-            output(json_encode($items));
+            echo(encode($items, 'regions', 'region'));
             break;
         case "MAPCONSTELLATIONS":
             //either regionID or contellationID is mandatory
@@ -279,7 +359,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (!$either) RESTfulError('Missing either regionID or constellationID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapConstellations` WHERE $regionWhere AND $constWhere;");
             if (count($items)==0) RESTfulError('constellation not found.',404);
-            output(json_encode($items));
+            echo(encode($items, 'constellations', 'constellation'));
             break;
         case "MAPSOLARSYSTEMS":
             //either regionID or contellationID is mandatory
@@ -297,7 +377,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (!$either) RESTfulError('Missing either regionID or constellationID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapSolarSystems` WHERE $regionWhere AND $constWhere;");
             if (count($items)==0) RESTfulError('solar systems not found.',404);
-            output(json_encode($items));
+            echo(encode($items, 'solarsystems', 'solarsystem'));
             break;
         case "MAPSOLARSYSTEM":
             //solarSystemID - mandatory
@@ -305,7 +385,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (empty($solarSystemID)) RESTfulError('Missing solarSystemID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `solarSystemID`=$solarSystemID;");
             if (count($items)==0) RESTfulError('solarSystemID not found.',404);
-            output(json_encode($items));
+            echo(encode($items));
             break;
         case "MAPLOCATION":
             //solarSystemID - mandatory
@@ -313,7 +393,7 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             if (empty($itemID)) RESTfulError('Missing itemID parameter.',400);
             $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `itemID`=$itemID;");
             if (count($items)==0) RESTfulError('itemID not found.',404);
-            output(json_encode($items));
+            echo(encode($items, 'locations', 'location'));
             break;
 	default:	
             RESTfulError('Invalid endpoint.',404);

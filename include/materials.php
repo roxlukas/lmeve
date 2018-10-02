@@ -535,9 +535,9 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
     }
 }
 
-function displayFacilityKit($tasks) {
+function getMaterialsForTasks($tasks) {
     $materials=array();
-    if (count($tasks)>0) {
+    if (count($tasks) > 0) {
         foreach ($tasks as $task) {
                 $typeID=$task['typeID'];
                 $activityID=$task['activityID'];
@@ -565,6 +565,15 @@ function displayFacilityKit($tasks) {
                     $materials[$requiredTypeID]['waste']=$tempmat['waste'];
                 }
          }
+    }
+    return $materials;
+}
+
+function displayFacilityKit($tasks) {
+    
+    if (count($tasks)>0) {
+        $structureID = $tasks[0]['structureID'];
+        $materials = getMaterialsForTasks($tasks);
          echo('<div style="width:400px;">');
          //$materials=array_msort($materials, array('typeName'=>SORT_ASC));
          displayKit2($materials,null,null,null,getLabDetails($structureID));

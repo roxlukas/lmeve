@@ -221,9 +221,10 @@ function clearExpiredSingletonTasks() {
     }
 }
 
-function getTasksByLab($nr) {
+function getTasksByLab($nr = NULL) {
     $year=date("Y"); $month=date("m");
-    $tasks=db_asocquery("SELECT * FROM `lmtasks` WHERE `structureID`=$nr
+    if (!is_null($nr)) $where = "`structureID`=$nr"; else $where = "TRUE";
+    $tasks=db_asocquery("SELECT * FROM `lmtasks` WHERE  $where
     AND ((`singleton`=1 AND `taskCreateTimestamp` BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (`singleton`=0));");
     return ($tasks);
 }
