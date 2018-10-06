@@ -45,9 +45,13 @@ Please refer to LMeve Wiki: https://github.com/roxlukas/lmeve/wiki/Installation-
 * Aideron Technologies - for excellent closed beta
 * CCP Games - for making such a great game and providing API for us, developer kind, to tinker with
 
-<h3>Donations are welcome</h3>
+<h3>Donations are welcome!</h3>
 
 According to CCP Developers License paragraph 4 section 4 (https://developers.eveonline.com/resource/license-agreement)
 you can buy me a coffe or help fund the server.
 
 If you'd like to support the development, feel free to do so: https://www.paypal.me/roxlukas
+
+<h4>Top donators:</h4>
+Starfire Dai, Crysis McNally
+
