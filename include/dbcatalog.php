@@ -182,7 +182,8 @@ function esiUpdateAll() {
     $e = esiUpdateApiIndustryJobsCrius();
     $f = esiUpdateApimarketorders();
     $g = esiUpdateApiContractItems();
-    return $a && $b && $c && $d && $e && $f && $g;
+    $h = esiUpdateApiAssets();
+    return $a && $b && $c && $d && $e && $f && $g && $h;
 }
 
 /**
@@ -201,6 +202,20 @@ function esiUpdateApicorps() {
     if ($found === FALSE) {
         return db_uquery("ALTER TABLE `apicorps` ADD COLUMN `tokenID` int(11) NULL DEFAULT  NULL;") &&
         db_uquery("ALTER TABLE `apicorps` CHANGE COLUMN `keyID` `keyID` VARCHAR(255) NULL DEFAULT NULL;");
+    }
+    return TRUE;
+}
+
+function esiUpdateApiAssets() {
+    $table = db_asocquery("DESCRIBE `apiassets`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='is_blueprint_copy' && $column['Type']=='int(11)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === FALSE) {
+        return db_uquery("ALTER TABLE `apiassets` ADD `is_blueprint_copy` INT NULL DEFAULT NULL AFTER `singleton`;");
     }
     return TRUE;
 }

@@ -73,6 +73,8 @@ var_dump($ESI->Markets->getMarketOrders(34,10000002,30000140));
 
 //$ESI->Wallet->updateRefTypes();
 
-var_dump($ESI->Wallet->updateCorpWalletTransactions(4));
+//var_dump($ESI->Wallet->updateCorpWalletTransactions(4));
+
+$ESI->Assets->updateCorpAssets();
 
 ?>

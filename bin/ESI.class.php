@@ -19,6 +19,7 @@ require_once('Markets.php');
 require_once('Universe.php');
 require_once('Contracts.php');
 require_once('Wallet.php');
+require_once('Assets.php');
 
 class ESI {
     public static $VERSION = 1;
@@ -97,6 +98,12 @@ class ESI {
     public $Contracts;
     
     /**
+     * Assets route instance
+     * @var Assets
+     */
+    public $Assets;
+    
+    /**
      * Wallet route instance
      * @var Wallet
      */
@@ -155,6 +162,7 @@ class ESI {
         $this->Universe = new Universe($this);
         $this->Contracts = new Contracts($this);
         $this->Wallet = new Wallet($this);
+        $this->Assets = new Assets($this);
     }
     
     /**
@@ -168,6 +176,7 @@ class ESI {
         $this->Markets->update();
         $this->Contracts->update();
         $this->Wallet->update();
+        $this->Assets->update();
     }
     
     /**

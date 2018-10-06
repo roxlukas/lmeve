@@ -23,6 +23,7 @@ abstract class Route {
     protected $ESI;
     protected $data;
     protected $xpages;
+    protected $esi_request_id;
     
     public function __construct($esi) {
         $this->ESI = $esi; //existing ESI class instance
@@ -105,10 +106,15 @@ abstract class Route {
      * @return type
      */
     protected function v($class, $property, $default='') {
-        if (property_exists($class, $property))
-            return $class->$property;
-        else
+        if (is_object($class)) {
+            if (property_exists($class, $property)) {
+                return $class->$property;
+            } else {
+                return $default;
+            }
+        } else {
             return $default;
+        }
     }
 
     private function saveStatus($errorCode, $errorMessage, $increaseErrorCount = FALSE) {
@@ -259,6 +265,14 @@ abstract class Route {
         $this->xpages = $xpages;
     }
     
+    public function setXEsiRequestId($id) {
+        $this->esi_request_id = $id;
+    }
+    
+    public function getXEsiRequestId() {
+        return $this->esi_request_id;
+    }
+    
     protected function httpResponseCodeHandler($http_response_header) {
         if (isset($http_response_header) && is_array($http_response_header) && count($http_response_header) > 0 ) {
             foreach ($http_response_header as $header) {
@@ -276,12 +290,14 @@ abstract class Route {
         //var_dump($http_response_header);
         if (isset($http_response_header) && is_array($http_response_header) && count($http_response_header) > 0 ) {
             foreach ($http_response_header as $header) {
-                if (preg_match('/(X-pages): (\d+)/', $header, $m)) {
+                if (preg_match('/(X-Pages): (\d+)/', $header, $m)) {
                     $this->setXpages($m[2]);
                 } else if (preg_match('/(X-Esi-Error-Limit-Remain): (\d+)/', $header, $m)) {
                     $this->ESI->setXEsiErrorLimitRemain($m[2]);
                 } else if (preg_match('/(X-Esi-Error-Limit-Reset): (\d+)/', $header, $m)) {
                     $this->ESI->setXEsiErrorLimitReset($m[2]);
+                } else if (preg_match('/(X-Esi-Request-Id): (.+)/', $header, $m)) {
+                    $this->setXEsiRequestId($m[2]);
                 }
             }
         }
