@@ -44,6 +44,7 @@ Please refer to LMeve Wiki: https://github.com/roxlukas/lmeve/wiki/Installation-
 * Crysis McNally - for excellent ideas and thorough testing
 * Aideron Technologies - for excellent closed beta
 * CCP Games - for making such a great game and providing API for us, developer kind, to tinker with
+* To all supporters and donators. Thank you!
 
 <h3>Donations are welcome!</h3>
 
