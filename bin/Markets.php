@@ -247,13 +247,39 @@ class Markets extends Route {
     }
     
     private function insertApiprices($typeID, $r) {
-        if ($this->ESI->getDEBUG()) inform(get_class (), $typeID . " buy " . $r['buy']['volume'] . ", " . $r['buy']['avg'] . ", " . $r['buy']['max'] . ", " . $r['buy']['min'] . ", " . $r['buy']['stddev'] . ", " . $r['buy']['median'] . ", 0.0)\r\n");
-        if ($this->ESI->getDEBUG()) inform(get_class (), $typeID . " sell " . $r['sell']['volume'] . ", " . $r['sell']['avg'] . ", " . $r['sell']['max'] . ", " . $r['sell']['min'] . ", " . $r['sell']['stddev'] . ", " . $r['sell']['median'] . ", 0.0)\r\n");
-        $a = db_uquery("DELETE FROM `apiprices` WHERE `typeID` = $typeID");
-        $b = db_uquery("INSERT INTO `apiprices` VALUES ($typeID, " . $r['buy']['volume'] . ", " . $r['buy']['avg'] . ", " . $r['buy']['max'] . ", " . $r['buy']['min'] . ", " . $r['buy']['stddev'] . ", " . $r['buy']['median'] . ", 0.0, 'buy')");
-        $c = db_uquery("INSERT INTO `apiprices` VALUES ($typeID, " . $r['sell']['volume'] . ", " . $r['sell']['avg'] . ", " . $r['sell']['max'] . ", " . $r['sell']['min'] . ", " . $r['sell']['stddev'] . ", " . $r['sell']['median'] . ", 0.0, 'sell')");
-
-        return $a && $b && $c;
+        // apiprices
+        // typeID 	volume 	avg 	max 	min 	stddev 	median 	percentile 	type
+        if ($this->ESI->getDEBUG()) inform(get_class (), "type_id=" . $typeID . " type=buy vol=" . $r['buy']['volume'] . ", avg=" . $r['buy']['avg'] . ", max=" . $r['buy']['max'] . ", min=" . $r['buy']['min'] . ", stdd=" . $r['buy']['stddev'] . ", med=" . $r['buy']['median'] . ", perc=0.0");
+        if ($this->ESI->getDEBUG()) inform(get_class (), "type_id=" . $typeID . " type=sell vol=" . $r['sell']['volume'] . ", avg=" . $r['sell']['avg'] . ", max=" . $r['sell']['max'] . ", min=" . $r['sell']['min'] . ", stdd=" . $r['sell']['stddev'] . ", med=" . $r['sell']['median'] . ", perc=0.0");
+        $a = FALSE; $b = FALSE; $c = FALSE; $d = FALSE; 
+        if ($r['buy']['volume'] > 0) {
+            $a = db_uquery("DELETE FROM `apiprices` WHERE `typeID` = $typeID && `type`='buy'");
+            $b = db_uquery("INSERT INTO `apiprices` VALUES ($typeID, " . 
+                    $r['buy']['volume'] . ", " . 
+                    $r['buy']['avg'] . ", " . 
+                    $r['buy']['max'] . ", " . 
+                    $r['buy']['min'] . ", " . 
+                    $r['buy']['stddev'] . ", " . 
+                    $r['buy']['median'] . ", 0.0, 'buy')"   
+                    );
+        } else {
+            if ($this->ESI->getDEBUG()) inform(get_class (), "NOTICE: BUY order volume=0 for $typeID - not updating in database.");
+        }
+        
+        if ($r['sell']['volume'] > 0) {
+            $c = db_uquery("DELETE FROM `apiprices` WHERE `typeID` = $typeID && `type`='sell'");
+            $b = db_uquery("INSERT INTO `apiprices` VALUES ($typeID, " .
+                    $r['sell']['volume'] . ", " . 
+                    $r['sell']['avg'] . ", " . 
+                    $r['sell']['max'] . ", " . 
+                    $r['sell']['min'] . ", " . 
+                    $r['sell']['stddev'] . ", " . 
+                    $r['sell']['median'] . ", 0.0, 'sell')" 
+                    );
+        } else {
+            if ($this->ESI->getDEBUG()) inform(get_class (), "NOTICE: SELL order volume=0 for $typeID - not updating in database.");
+        }
+        return $a && $b && $c && $d;
     }
     
     /**
