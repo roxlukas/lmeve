@@ -14,11 +14,41 @@ class Markets extends Route {
      * Update public market data, common for all corporations in LMeve
      */
     public function updatePublic() {
+        $this->updatePrices();
+        
         $typeids = db_asocquery("SELECT `typeID` FROM `cfgmarket`;");
         if (count($typeids) > 0) {
             foreach ($typeids as $typeid) $this->updateMinMax ($typeid['typeID']);
         }
-        $this->updatePrices();
+    }
+    
+    public function checkIfApiPriceExists($typeID, $type) {
+        if(!is_numeric($typeID)) return FALSE;
+        
+        $d = db_asocquery("SELECT * FROM `apiprices` WHERE `typeID` = $typeID AND `type` = '$type'");
+        if (count($d) > 0) {
+            if ($d[0]['volume'] > 0 ) return TRUE; else  return FALSE; 
+        } else {
+            return FALSE;
+        }
+    }
+    
+    public function fallbackToAvgPrice($typeID, $type) {
+        if ($this->ESI->getDEBUG()) inform(get_class (), "fallbackToAvgPrice() checking if old market $type price for typeID=$typeID exists...");
+        if(!is_numeric($typeID)) return FALSE;
+        
+        if (!$this->checkIfApiPriceExists($typeID, $type)) {
+            if ($this->ESI->getDEBUG()) inform(get_class (), "fallbackToAvgPrice() old market $type price for typeID=$typeID does not exist.");
+            if ($this->ESI->getDEBUG()) inform(get_class (), "fallbackToAvgPrice() checking if AVERAGE price for typeID=$typeID exists...");
+            $avgprice = db_asocquery("SELECT * FROM `crestmarketprices` WHERE `typeID` = $typeID");
+            if (count($avgprice) > 0) {
+                if ($this->ESI->getDEBUG()) inform(get_class (), "fallbackToAvgPrice() using AVERAGE price for typeID=$typeID");
+                $price = $avgprice[0]['averagePrice'];
+                db_uquery("DELETE FROM `apiprices` WHERE `typeID` = $typeID AND `type`='$type';");
+                db_uquery("INSERT INTO `apiprices` VALUES($typeID, 1, $price, $price, $price, 0, $price, 0, '$type')");
+                return TRUE;
+            } else return FALSE;
+        } else return FALSE;
     }
     
     /**
@@ -264,6 +294,7 @@ class Markets extends Route {
                     );
         } else {
             if ($this->ESI->getDEBUG()) inform(get_class (), "NOTICE: BUY order volume=0 for $typeID - not updating in database.");
+            $this->fallbackToAvgPrice($typeID, 'buy');
         }
         
         if ($r['sell']['volume'] > 0) {
@@ -278,6 +309,7 @@ class Markets extends Route {
                     );
         } else {
             if ($this->ESI->getDEBUG()) inform(get_class (), "NOTICE: SELL order volume=0 for $typeID - not updating in database.");
+            $this->fallbackToAvgPrice($typeID, 'sell');
         }
         return $a && $b && $c && $d;
     }
