@@ -54,6 +54,47 @@ class Assets extends Route {
         return $assets;
     }
     
+    public function getAssetNames() {
+        inform(get_class(), 'Updating Asset Names...');
+        inform(get_class(), 'Getting itemIDs from database...');
+        global $LM_EVEDB;
+        
+        $sql="SELECT aa.`itemID` FROM `apiassets` aa "
+                . "JOIN `$LM_EVEDB`.`invTypes` it ON aa.`typeID` = it.`typeID` "
+                . "JOIN `$LM_EVEDB`.`invGroups` ig ON it.`groupID` = ig.`groupID` "
+                . "WHERE ig.`categoryID` IN (2, 6) AND aa.`singleton` = 1 AND aa.`corporationID`=" . $this->ESI->getCorporationID();
+        if ($this->ESI->getDEBUG()) inform(get_class(), "SQL='$sql'");
+        
+        $items = db_asocquery($sql);
+        
+        $tmp = array();
+        $names = FALSE;
+        foreach($items as $item) {
+            array_push($tmp, $item['itemID']);
+        }
+        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs: ". json_encode($tmp));
+        // contact ESI
+        inform(get_class(), 'Getting names from ESI...');
+        if (count($tmp) > 0) {
+            $this->setRoute('/v1/corporations/' . $this->ESI->getCorporationID() . '/assets/names/');
+            $this->setCacheInterval(0);
+            $names = $this->post('',json_encode($tmp));
+        }
+        return $names;
+    }
+    
+    public function updateAssetNames($names) {
+        if (count($names) > 0) {
+            foreach ($names as $item) {
+                db_uquery("INSERT INTO `apiassetnames` VALUES (" . $this->v($item,'item_id',$i++) . "," . $this->s($this->v($item,'name','')) . ") "
+                        . "ON DUPLICATE KEY UPDATE `itemName`=" . $this->s($this->v($item,'name','')) );
+            }
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+    
     public function updateCorpAssets() {
         inform(get_class(), 'Updating corporation Assets...');
         

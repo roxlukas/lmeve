@@ -139,9 +139,9 @@ function getInventory($parentItemID=0,$corporationID=0) {
     global $LM_EVEDB;
     if ($corporationID==0) $crp='TRUE'; else $crp="ast.`corporationID`=$corporationID";
     $sql="SELECT ast.*,ing.`categoryID`,itp.`groupID`,
-        COALESCE(apl.`itemName`,itp.`typeName`) AS `typeName`,
+        COALESCE(aa.`itemName`,apl.`itemName`,itp.`typeName`) AS `typeName`,
         COALESCE(map.`itemName`,sta.`stationName`) AS `locationName`,
-        COALESCE(apl.`itemName`,NULL) AS `itemName`,
+        COALESCE(aa.`itemName`,apl.`itemName`,NULL) AS `itemName`,
         apc.`corporationName`
     FROM `apiassets` ast
     JOIN $LM_EVEDB.`invTypes` itp
@@ -154,6 +154,8 @@ function getInventory($parentItemID=0,$corporationID=0) {
     ON ast.`locationID`=map.`itemID`
     LEFT JOIN `apiconquerablestationslist` sta
     ON ast.`locationID`=sta.`stationID`
+    LEFT JOIN `apiassetnames` aa
+    ON ast.`itemID`=aa.`itemID`
     LEFT JOIN `apilocations` apl
     ON ast.`itemID`=apl.`itemID`
     WHERE `parentItemID`=$parentItemID AND $crp
@@ -201,14 +203,24 @@ function showInventory($data,$parentItemID=0,$corporationID=0,$hrefcallback='inv
                     echo("</td></tr><tr><th><h3>$lastLocation</h3></th></tr><tr><td>");
                 }
             }
+            if ($row['is_blueprint_copy'] == 1) {
+                $bpc_div_style='background: #cff';
+                //$bpc_div_style='background: url(\'ccp_icons/BPC.png\');';
+                $bpc_img_style='style="opacity: 0.66;"';
+                $bpc_sufix=' Copy';
+            } else {
+                $bpc_div_style='';
+                $bpc_img_style='';
+                $bpc_sufix='';
+            }
             ?>
             <div style="margin: 10px; width: 64px; height: 100px; float: left;">
-                <div style="position: absolute;">
+                <div style="position: absolute; <?=$bpc_div_style?>">
             <?php 
             if (function_exists($hrefcallback)) call_user_func($hrefcallback,$row['itemID'], $row['corporationID']);
             
 ?>
-            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName']?>" /></a>
+            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName'] . $bpc_sufix?>" <?=$bpc_img_style?> /></a>
                 </div>
                 <?php if ($row['singleton']==0) { ?>
                 <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">
@@ -446,8 +458,8 @@ function getInventoryHeader($itemID) {
     global $LM_EVEDB;
     $sql="SELECT ast.*,ing.`categoryID`,itp.`groupID`,
         COALESCE(apl.`itemName`,itp.`typeName`) AS `typeName`,
-        COALESCE(map.`itemName`,sta.`stationName`) AS `locationName`,
-        COALESCE(apl.`itemName`,NULL) AS `itemName`,
+        COALESCE(aa.`itemName`,map.`itemName`,sta.`stationName`) AS `locationName`,
+        COALESCE(aa.`itemName`,apl.`itemName`,NULL) AS `itemName`,
         apc.`corporationName`
     FROM `apiassets` ast
     JOIN $LM_EVEDB.`invTypes` itp
@@ -460,6 +472,8 @@ function getInventoryHeader($itemID) {
     ON ast.`locationID`=map.`itemID`
     LEFT JOIN `apiconquerablestationslist` sta
     ON ast.`locationID`=sta.`stationID`
+    LEFT JOIN `apiassetnames` aa
+    ON ast.`itemID`=aa.`itemID`
     LEFT JOIN `apilocations` apl
     ON ast.`itemID`=apl.`itemID`
     WHERE ast.`itemID`=$itemID;";

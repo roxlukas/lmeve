@@ -37,44 +37,8 @@ include_once('ESI.class.php');
 /*************************************************************************************************/
 
 $ESI = new ESI(5);
-/*
-//get Lukas Rox from LMeve database, subsequent request should use cache
-echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
-echo($ESI->Characters->getCharacterName(816121566) . "\r\n");
-//get Rixx Javix from ESI (it does not exist in database). Subsequent request should use cache
-echo($ESI->Characters->getCharacterName(245073304) . "\r\n");
-echo($ESI->Characters->getCharacterName(245073304) . "\r\n");
+echo("Testing\r\n");
 
-//get market history for Cruor in The Forge
-var_dump($ESI->Markets->getHistory(17926,10000002));
-
-//get market orders for Cruor in The Forge
-var_dump($ESI->Markets->getMarketOrders(17926,10000002,30000140));
-
-//get market orders for Tritanium in The Forge
-var_dump($ESI->Markets->getMarketOrders(34,10000002,30000140));
-*/
-//update Trit price
-//$ESI->Markets->updateMinMax(34);
-//test game calculated avg/adjusted prices
-//$d = $ESI->Markets->getPrices();
-
-//$o = $ESI->Markets->updateCorporationMarketOrders();
-
-//$ESI->Contracts->updateCorporationContractItems(136961765);
-
-//var_dump($ESI->CorporationInformation->getDivisions());
-
-//$ESI->Wallet->updateCorpWalletBalance();
-
-//var_dump($ESI->Wallet->getCorporationWalletJournal(1));
-
-//var_dump($ESI->Universe->getNamesForIdsMap(array(95465499, 30000142)));
-
-//$ESI->Wallet->updateRefTypes();
-
-//var_dump($ESI->Wallet->updateCorpWalletTransactions(4));
-
-$ESI->Assets->updateCorpAssets();
+$ESI->Assets->updateAssetNames($ESI->Assets->getAssetNames());
 
 ?>
