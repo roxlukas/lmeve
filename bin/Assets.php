@@ -83,7 +83,9 @@ class Assets extends Route {
         return $names;
     }
     
-    public function updateAssetNames($names) {
+    public function updateAssetNames() {
+        $names=$this->getAssetNames();
+        
         if (count($names) > 0) {
             foreach ($names as $item) {
                 db_uquery("INSERT INTO `apiassetnames` VALUES (" . $this->v($item,'item_id',$i++) . "," . $this->s($this->v($item,'name','')) . ") "
@@ -139,6 +141,7 @@ class Assets extends Route {
     
     public function update() {
         $this->updateCorpAssets();
+        $this->updateAssetNames();
     }
     
   
