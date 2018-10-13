@@ -2,7 +2,20 @@
 
 require_once('Route.class.php');
 
-class IndustryJobs extends Route {
+class Industry extends Route {
+    
+    private $activities = array(
+        'copying' => 5,
+        'duplicating' => 6,
+        'invention' => 8,
+        'manufacturing' => 1,
+        'none' => 0,
+        'reaction' => 11,
+        'researching_material_efficiency' => 4,
+        'researching_technology' => 2,
+        'researching_time_efficiency' => 3,
+        'reverse_engineering' => 7
+    );
     
     public function __construct($esi) {
         parent::__construct($esi);
@@ -10,10 +23,51 @@ class IndustryJobs extends Route {
         $this->setCacheInterval(300);
     }
     
-    public function update() {
-        inform(get_class(), 'Updating IndustryJobs...');
+    public function getActivityIdByName($string) {
+        if (isset($this->activities[$string])) return $this->activities[$string]; else return FALSE;
+    }
+    
+    public function getActivityNameById($activity_id) {
+        foreach ($this->activities as $k => $v) {
+            if ($v == $activity_id) return $k;
+        }
+        return FALSE;
+    }
+    
+    public function getSystemIndices() {
+        if ($this->ESI->getDEBUG()) inform(get_class(),"Getting System Indices...");
+        $this->setRoute('/v1/industry/systems');
+        $this->setCacheInterval(3600);
+        $systems = $this->get('');
+        //X-pages support
+        if ($this->xpages > 1) {
+            for ($i = 2; $i <= $this->xpages; $i++) {
+                if ($this->ESI->getDEBUG()) inform(get_class(),"Getting System Indices page $i of $this->xpages...");
+                $systems = array_merge($systems, $this->get( '?page=' . $i));
+            }
+        }
+        return $systems;
+    }
+    
+    public function getIndustryJobs() {
+        inform(get_class(),"Getting Industry Jobs...");
+        $this->setRoute('/v1/corporations/');
+        $this->setCacheInterval(300);
         $jobs = $this->get( $this->ESI->getCorporationID() . '/industry/jobs/?include_completed=true');
-        var_dump($jobs);
+        //X-pages support
+        if ($this->xpages > 1) {
+            for ($i = 2; $i <= $this->xpages; $i++) {
+                if ($this->ESI->getDEBUG()) inform(get_class(),"Getting Industry Jobs page $i of $this->xpages...");
+                $jobs = array_merge($jobs, $this->get( $this->ESI->getCorporationID() . '/industry/jobs/?include_completed=true' . '&page=' . $i));
+            }
+        }
+        return $jobs;
+    }
+    
+    public function updateIndustryJobs() {
+        inform(get_class(), 'Updating IndustryJobs...');
+        $jobs = $this->getIndustryJobs();
+        if ($this->ESI->getDEBUG()) var_dump($jobs);
         if ($this->getStatus()=='fresh') {
             if (count($jobs) > 0) {
                 foreach ($jobs as $job) {
@@ -24,6 +78,40 @@ class IndustryJobs extends Route {
             inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
             return TRUE;
         }
+    }
+    
+    public function updateSystemIndices() {
+        //crestindustrysystems
+        //solarSystemID 	costIndex 	activityID
+        inform(get_class(), 'Updating System Indices...');
+        $systems = $this->getSystemIndices();
+        
+        if ($this->getStatus()=='fresh') {
+            if (count($systems) > 0) {
+                foreach ($systems as $system) {
+                    $indices = $this->v($system,'cost_indices',array());
+                    if (count($indices > 0)) {
+                        //delete all indices for system_id
+                        db_uquery("DELETE FROM `crestindustrysystems` WHERE solarSystemID = " . $this->v($system,'solar_system_id',0));
+                        //insert new indices
+                        foreach ($indices as $index) {
+                            db_uquery("INSERT INTO `crestindustrysystems` VALUES(" .
+                                    $this->v($system,'solar_system_id',0) . ", " .
+                                    $this->v($index,'cost_index',0) . ", " .
+                                    $this->getActivityIdByName($this->v($index,'activity',0)) . ");"
+                                    );
+                        }
+                    }
+                }
+            }
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
+        }
+    }
+    
+    public function update() {
+        $this->updateIndustryJobs();
     }
     
     private function dbInsert($job) {

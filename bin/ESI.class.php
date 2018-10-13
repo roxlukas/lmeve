@@ -13,7 +13,7 @@ require_once('CorporationInformation.class.php');
 require_once('Characters.class.php');
 require_once('Stations.class.php');
 require_once('MemberTracking.class.php');
-require_once('IndustryJobs.php');
+require_once('Industry.php');
 require_once('Facilities.php');
 require_once('Markets.php');
 require_once('Universe.php');
@@ -69,9 +69,9 @@ class ESI {
     
     /**
      * IndustryJobs route instance
-     * @var IndustryJobs
+     * @var Industry
      */
-    public $IndustryJobs;
+    public $Industry;
     
     /**
      * Facilities route instance
@@ -157,7 +157,7 @@ class ESI {
         $this->Characters = new Characters($this);
         $this->Stations = new Stations($this);
         $this->Facilities = new Facilities($this);
-        $this->IndustryJobs = new IndustryJobs($this);
+        $this->Industry = new Industry($this);
         $this->Markets = new Markets($this);
         $this->Universe = new Universe($this);
         $this->Contracts = new Contracts($this);
@@ -172,7 +172,7 @@ class ESI {
         $this->CorporationInformation->update();
         $this->MemberTracking->update();
         $this->Facilities->update();
-        $this->IndustryJobs->update();
+        $this->Industry->update();
         $this->Markets->update();
         $this->Contracts->update();
         $this->Wallet->update();
@@ -183,6 +183,7 @@ class ESI {
      * Update all public information
      */
     public function updatePublic() {
+        $this->Industry->updateSystemIndices();
         $this->Markets->updatePublic();
     }
     

@@ -39,6 +39,6 @@ include_once('ESI.class.php');
 $ESI = new ESI(5);
 echo("Testing\r\n");
 
-$ESI->Assets->updateAssetNames($ESI->Assets->getAssetNames());
+$ESI->Industry->updateSystemIndices();
 
 ?>
