@@ -184,7 +184,8 @@ function esiUpdateAll() {
     $f = esiUpdateApimarketorders();
     $g = esiUpdateApiContractItems();
     $h = esiUpdateApiAssets();
-    return $a && $b && $c && $d && $e && $f && $g && $h;
+    $i = esiUpdateApikills();
+    return $a && $b && $c && $d && $e && $f && $g && $h && $i;
 }
 
 /**
@@ -217,6 +218,22 @@ function esiUpdateApiAssets() {
     }    
     if ($found === FALSE) {
         return db_uquery("ALTER TABLE `apiassets` ADD `is_blueprint_copy` INT NULL DEFAULT NULL AFTER `singleton`;");
+    }
+    return TRUE;
+}
+
+//ALTER TABLE `apikillvictims` ADD PRIMARY KEY ( `killID` )
+
+function esiUpdateApikills() {
+    $table = db_asocquery("DESCRIBE `apikills`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='killmail_hash' && $column['Type']=='varchar(40)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === FALSE) {
+        return db_uquery("ALTER TABLE `apikills` ADD `killmail_hash` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;");
     }
     return TRUE;
 }

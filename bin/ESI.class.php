@@ -20,6 +20,7 @@ require_once('Universe.php');
 require_once('Contracts.php');
 require_once('Wallet.php');
 require_once('Assets.php');
+require_once('Killmails.php');
 
 class ESI {
     public static $VERSION = 1;
@@ -110,6 +111,12 @@ class ESI {
     public $Wallet;
     
     /**
+     * Killmails route instance
+     * @var Killmails
+     */
+    public $Killmails;
+    
+    /**
      * $tokenID int - which refresh_token from cfgesitoken to use for this instance
      */
     public function __construct($tokenID) {
@@ -163,6 +170,7 @@ class ESI {
         $this->Contracts = new Contracts($this);
         $this->Wallet = new Wallet($this);
         $this->Assets = new Assets($this);
+        $this->Killmails = new Killmails($this);
     }
     
     /**
@@ -177,6 +185,7 @@ class ESI {
         $this->Contracts->update();
         $this->Wallet->update();
         $this->Assets->update();
+        $this->Killmails->update();
     }
     
     /**

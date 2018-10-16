@@ -400,7 +400,7 @@ function showVictim($victim) {
                 <th style="text-align: left;" colspan="2"><?=number_format($iskDropped+$iskLost+$iskShip, 0, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
             </tr>
             <tr>
-                <th style="text-align: right;" colspan="4"><a href="https://public-crest.eveonline.com/killmails/<?=$victim['killID']?>/<?=killmail_hash($victim['characterID'], getFinalBlowCharID($victim['involved']), $victim['shipTypeID'], $victim['killTime'])?>/" target="_blank" style="color: green;"><img src="<?=getUrl()?>ccp_icons/38_16_193.png" alt="" style="vertical-align: middle;"/> CREST verified</a></th>
+                <th style="text-align: right;" colspan="4"><a href="https://esi.evetech.net/v1/killmails/<?=$victim['killID']?>/<?=killmail_hash($victim['characterID'], getFinalBlowCharID($victim['involved']), $victim['shipTypeID'], $victim['killTime'])?>/" target="_blank" style="color: green;"><img src="<?=getUrl()?>ccp_icons/38_16_193.png" alt="" style="vertical-align: middle;"/> ESI verified</a></th>
             </tr>
             <?php
         
