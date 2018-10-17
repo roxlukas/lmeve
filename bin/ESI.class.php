@@ -9,7 +9,7 @@ include_once("$mypath/../include/configuration.php");
 //include_once("$mypath/../include/killboard.php");
 include_once("$mypath/../include/ssofunctions.php");
 //ESI Routes:
-require_once('CorporationInformation.class.php');
+require_once('Corporations.php');
 require_once('Characters.class.php');
 require_once('Stations.class.php');
 require_once('MemberTracking.class.php');
@@ -45,10 +45,10 @@ class ESI {
     private $EsiErrorLimitReset = 0;
 
      /**
-     * CorporationInformation route instance
-     * @var CorporationInformation 
+     * Corporations route instance
+     * @var Corporations 
      */
-    public $CorporationInformation;
+    public $Corporations;
     
     /**
      * MemberTracking route instance
@@ -159,7 +159,7 @@ class ESI {
      * Initialize instances for all routes
      */
     private function instantiateAll() {
-        $this->CorporationInformation = new CorporationInformation($this);
+        $this->Corporations = new Corporations($this);
         $this->MemberTracking = new MemberTracking($this);
         $this->Characters = new Characters($this);
         $this->Stations = new Stations($this);
@@ -177,7 +177,7 @@ class ESI {
      * Update private corporation data for all routes
      */
     public function updateAll() {
-        $this->CorporationInformation->update();
+        $this->Corporations->update();
         $this->MemberTracking->update();
         $this->Facilities->update();
         $this->Industry->update();
@@ -258,7 +258,7 @@ class ESI {
     }
 
     public function getCorporationID() {
-        if (is_null($this->corporationID)) $this->CorporationInformation->update();
+        if (is_null($this->corporationID)) $this->Corporations->update();
         return $this->corporationID;
     }
 

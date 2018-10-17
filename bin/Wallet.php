@@ -186,7 +186,7 @@ class Wallet extends Route {
     public function updateCorpWalletJournal() {
         inform(get_class(), 'Updating corporation Wallet Journal...');
         
-        $divisions = $this->ESI->CorporationInformation->getDivisions();
+        $divisions = $this->ESI->Corporations->getDivisions();
         
         if (property_exists($divisions, 'wallet') && count($divisions->wallet) > 0){
             foreach ($divisions->wallet as $wallet) {

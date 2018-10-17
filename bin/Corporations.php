@@ -2,7 +2,7 @@
 
 require_once('Route.class.php');
 
-class CorporationInformation extends Route {
+class Corporations extends Route {
     
     public function __construct($esi) {
         parent::__construct($esi);
@@ -27,6 +27,67 @@ class CorporationInformation extends Route {
         $this->setCacheInterval(3600);
         $divisions = $this->get(  $corporationID . '/divisions/');
         return $divisions;
+    }
+    
+    public function getBlueprints($corporationID = null) {
+        if (is_null($corporationID)) $corporationID = $this->ESI->getCorporationID();
+        $this->setRoute('/v2/corporations/');
+        $this->setCacheInterval(3600);
+        $blueprints = $this->get( $corporationID . '/blueprints/');
+        //X-pages support
+        if ($this->xpages > 1) {
+            for ($i = 2; $i <= $this->xpages; $i++) {
+                if ($this->ESI->getDEBUG()) inform(get_class(),"Getting Blueprints page $i of $this->xpages...");
+                $blueprints = array_merge($blueprints, $this->get( $corporationID . '/blueprints/' . '?page=' . $i));
+            }
+        }
+        return $blueprints;
+    }
+    
+    public function updateBlueprintMePe() {
+        inform(get_class(), 'Updating Blueprints ME and PE...');
+        
+        $sql="INSERT INTO cfgbpo (SELECT typeID, MAX( materialEfficiency ) AS me, MAX( timeEfficiency ) AS pe
+        FROM `apiblueprints`
+        WHERE runs = -1
+        GROUP BY typeID) ON DUPLICATE KEY UPDATE me=VALUES(me), pe=VALUES(pe);";
+        
+        return db_uquery($sql);
+    }
+    
+    public function updateBlueprints() {
+        inform(get_class(), 'Updating corporation Blueprints...');
+        
+        $blueprints = $this->getBlueprints();
+        
+        // apiassets
+        // itemID 	parentItemID 	locationID 	typeID 	quantity 	flag 	singleton 	is_blueprint_copy 	rawQuantity 	corporationID
+        if ($this->getStatus()=='fresh') {
+            if (count($blueprints) > 0) {
+                inform(get_class(), 'Inserting Blueprints records...');
+                db_uquery("DELETE FROM `apiblueprints` WHERE `corporationID`=" . $this->ESI->getCorporationID());
+                foreach ($blueprints as $c) {
+                    if ($this->v($c,'is_singleton',false) === true) $singleton = 1; else $singleton = 0;
+                    $sql="INSERT INTO `apiblueprints` VALUES (".
+                            $this->v($c,'item_id',$i++) . "," .
+                            $this->v($c,'location_id',$i++) . "," .
+                            $this->v($c,'type_id',0) . "," .
+                            $this->s($this->ESI->Universe->getTypeName($this->v($c,'type_id',0))) . "," .
+                            $this->ESI->Assets->invFlagToID($this->v($c,'location_flag',0)) . "," .
+                            $this->v($c,'quantity',0) . "," .
+                            $this->v($c,'time_efficiency',0) . "," .
+                            $this->v($c,'material_efficiency',0) . "," .
+                            $this->v($c,'runs',0) . "," .
+                            $this->ESI->getCorporationID() .
+                        ");";
+                    db_uquery($sql);
+                }
+            }
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
+        }
+        return TRUE;
     }
     
     public function updateDivisions() {
@@ -154,6 +215,8 @@ class CorporationInformation extends Route {
     public function update() {
         $this->updateCorporationInformation();
         $this->updateDivisions();
+        $this->updateBlueprints();
+        $this->updateBlueprintMePe();
     }
     
 }
