@@ -31,17 +31,37 @@
 
 **********************************************************************************/
 
+function getID() {
+    if (!isset($_GET['id'])) {
+        $id=getprefs();
+        $id=$id['defaultPage'];
+    } else {
+        $id=$_GET['id'];
+    }
+    
+    return $id;
+}
 
-function template_main() {
+function template_contents() {
+    $id = getID();
+    ob_start();
+    showTabContents($id);
+    $ret = ob_get_contents();
+    ob_end_clean();
+    return $ret;
+}
+
+function template_main($contents,$title,$meta) {
 	global $LM_APP_NAME, $lmver, $LANG, $LM_READONLY;
+        //<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
+	<!DOCTYPE html> 
+	<html prefix="og: http://ogp.me/ns#" lang="en" class="no-js">
 	<head>
-	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+	
+        <?=$meta?>
 	<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.php">
-	<title><?php echo("$LM_APP_NAME $lmver"); ?></title>
+
 	<?php
 	applycss(getcss());
 	?>
@@ -89,13 +109,7 @@ function template_main() {
 		<tr>
 	
 	<?php //draw menu
-	if (!isset($_GET['id'])) {
-		$id=getprefs();
-		$id=$id['defaultPage'];
-	} else {
-		$id=$_GET['id'];
-	}
-	
+	$id = getID();
 	menu($id);
 	?>
 		</tr>
@@ -122,9 +136,7 @@ function template_main() {
 	<?php } ?>
 		</td>
 		<td width="80%" class="tab-main" id="tab-main" valign="top">
-			<?php
-				showTabContents($id);
-			?>
+			<?=$contents?>
 		</td>
 		</tr>
 		</table>

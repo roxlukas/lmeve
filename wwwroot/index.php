@@ -86,6 +86,9 @@ if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
 
 if (isMobileUserAgent()) $MOBILE=1; else $MOBILE=0;
 
+$META = generate_meta();
+//$TITLE = "$LM_APP_NAME $lmver";
+
 //
 //AUTOLOGIN HERE IF YOU WANT
 //set the POST variable to the desired username and password
@@ -106,9 +109,9 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 				$_SESSION["status"]=1;
                                 //LOGIN HOOK
                                 login_hook();
-				//MAIN WINDOW
-				updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
-                                $MOBILE ? mobile_template_main() : template_main();
+				//redirect to MAIN WINDOW
+                                if ($_SERVER["HTTPS"] != "on") $https = "https://"; else $https = "http://";
+				header("Location: $https" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
 			} else { //LOGIN FAILURE?
 				//WRITE TO LOG FILE
 				$uzytk=htmlspecialchars($_POST['login']);
@@ -126,7 +129,8 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 			$MOBILE ? mobile_template_logout() : template_logout();
 		} else { //MAIN WINDOW
 			updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
-			$MOBILE ? mobile_template_main() : template_main();
+                        $contents = template_contents();
+			$MOBILE ? mobile_template_main($contents,$TITLE,$META) : template_main($contents,$TITLE,$META);
 		}
 	}
 }

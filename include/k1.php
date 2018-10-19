@@ -14,7 +14,7 @@ global $LM_EVEDB;
 include_once('killboard.php');
 include_once('inventory.php');
 
-    
+
 //submenu
     ?>
     <table cellpadding="0" cellspacing="2">
@@ -44,5 +44,34 @@ include_once('inventory.php');
         echo("killID cannot be empty.");
         return;
     }
-    showKill(getKill($killID));
+    
+    $km = getKill($killID);
+    
+    
+
+    if(count($km)>0) {
+        $items=$km['items'];
+
+        $iskLost=0;
+        $iskDropped=0;
+        $iskShip=getAveragePrice($km['shipTypeID']);
+        
+        if (count($items)>0) {
+            foreach($items as $item) {
+                $iskLost+=$item['qtyDestroyed']*$item['averagePrice'];
+                $iskDropped+=$item['qtyDropped']*$item['averagePrice'];
+            }
+        }
+        
+        $iskTotal = $iskLost + $iskDropped + $iskShip;
+        
+        $title = $km['shipTypeName'] . ' | ' . $km['characterName'] . ' | ' . $km['solarSystemName'] . ' | ' . generate_title();
+        $description = $km['characterName'] . ' (' . $km['corporationName'] . ') lost their ' . $km['shipTypeName'] . ' in ' . $km['solarSystemName'] . ' (' . $km['regionName'] . ') Total Value: ' . number_format($iskTotal, 0, $DECIMAL_SEP, $THOUSAND_SEP) . ' ISK';
+        $image = getTypeIDicon($km['shipTypeID'], 64);
+        generate_meta($description, $title, $image);
+    }
+            
+    
+    
+    showKill($km);
 ?>

@@ -1,5 +1,7 @@
 <?php
 
+include_once('template.php');
+
 function isMobileUserAgent() {
     $agents=array( '/iPhone|Android.*[mM]obile|BlackBerry|IEMobile|Windows Phone|Kindle|NetFront|Silk-Accelerated|(hpw|web)OS|Fennec|Minimo|Opera M(obi|ini)|Blazer|Dolfin|Dolphin|Skyfire|Zune/' );
     foreach ($agents as $agent) {
@@ -8,17 +10,15 @@ function isMobileUserAgent() {
     return FALSE;
 }
 
-function mobile_template_main() {
+function mobile_template_main($contents,$title,$meta) {
 	global $LM_APP_NAME, $lmver, $LANG, $LM_READONLY;
 	?>
 	<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
-        <html xmlns="http://www.w3.org/1999/xhtml">
+        <html prefix="og: http://ogp.me/ns#" lang="en" class="no-js" xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<?=$meta?>
 	<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.php" />
-	<title><?php echo("$LM_APP_NAME $lmver"); ?></title>
+	
 	<?php
 	applycss('css/mobile.css');
 	?>
@@ -59,12 +59,7 @@ function mobile_template_main() {
             <select id="menu" onchange="haha('menu');">
 
             <?php //draw menu
-            if (!isset($_GET['id'])) {
-                    $id=getprefs();
-                    $id=$id['defaultPage'];
-            } else {
-                    $id=$_GET['id'];
-            }
+            $id = getID();
 
             menu($id);
             ?>
@@ -74,9 +69,7 @@ function mobile_template_main() {
 
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr><td width="100%" class="tab-main" id="tab-main" valign="top">
-			<?php
-				showTabContents($id);
-			?>
+			<?=$contents?>
 		</td>
 		</tr>
 		</table>
@@ -156,12 +149,12 @@ function mobile_template_login() {
 	
 	<tr><td align="left">&nbsp;<!--<br><label for="user_login">User:</label>--></td></tr>
 	<tr><td><div class="tcen">
-			<input name="login" placeholder="Login" id="user_login" size=20 type="text" value="" style="" autocapitalize="off">
+			<input name="login" placeholder="Login" id="user_login" size=36 type="text" value="" style="" autocapitalize="off">
 		</div>
 	</td></tr>
 	<tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>
 	<tr><td><div class="tcen">
-                        <input name="password" placeholder="Password" id="user_pass" size="20" type="password" style="" autocapitalize="off">
+                        <input name="password" placeholder="Password" id="user_pass" size=36 type="password" style="" autocapitalize="off">
 		</div>
 	</td></tr>
         <tr><td align="left">&nbsp;<!--<label for="user_pass">Password:</label>--></td></tr>

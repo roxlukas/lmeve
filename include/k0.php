@@ -19,6 +19,10 @@ $corporationID=secureGETnum('corporationID');
 $allianceID=secureGETnum('allianceID');
 $solarSystemID=secureGETnum('solarSystemID');
 
+$title = generate_title("$PANELNAME");
+$description = "LMeve Killboard - EVE Online Hall of Fame";
+generate_meta($description, $title);
+
 if (isset($characterID) || isset($corporationID) || isset($allianceID) || isset($solarSystemID)) {
     //back navigation
     //submenu

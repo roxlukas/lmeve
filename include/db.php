@@ -55,6 +55,59 @@ function getTypeIDicon($typeID,$size=32) {
     return($icon);
 }
 
+function generate_title($subtitle = null) {
+    global $LM_APP_NAME, $lmver;
+    $main_title = "$LM_APP_NAME $lmver";
+    
+    if (is_null($subtitle)) $title="$main_title"; else $title="$main_title - $subtitle";
+    return $title;
+}
+
+function generate_meta($description=null, $title=null ,$image=null) {
+    global $META, $TITLE, $LM_APP_NAME, $lmver;
+    
+    if (is_null($description)) $description="LMeve: Industry Contribution and Mass Production Tracker.";
+    if (is_null($title)) $title = generate_title();
+    if (is_null($image)) $image = getUrl() . "ccp_icons/33_128_2.png";
+    
+    $url = parse_url(getUrl());
+    $domain = $url['scheme'] . '://' . $url['host'] ;
+    $site = $url['host'];
+    
+    $meta = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="Pragma" CONTENT="content-cache">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="' . $description . '">
+        <meta name="title" content="' . $title . '">
+        <meta name="keywords" content="eve-online, eve, ccp, ccp games, lmeve, industry, production, invention, manufacturing, crafting, massively, multiplayer, online, role, playing, game, mmorpg, isk, mmorpg">
+        <meta name="robots" content="index,follow">
+        <meta name="og:locale" content="en_US">
+        <meta name="og:type" content="website">
+        <meta name="og:site_name" content="' . $site . '">
+        <meta name="fb:app_id" content="">
+        <meta name="twitter:site" content="@rox_lukas">
+        <meta name="twitter:domain" content="' . $domain . '">
+        <meta name="application-name" content="LMeve" />
+        <meta name="msapplication-TileColor" content="#1D2C38" />
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="16x16" href="' . getUrl() . 'favicon.ico" />
+        <meta name="twitter:title" content="' . $title . '">
+        <meta name="twitter:image" content="' . $image . '">
+        <meta name="twitter:card" content="summary">
+        <meta name="og:title" content="' . $title . '">
+        <meta name="og:url" content="' . getUrl() . '">
+        <meta name="twitter:description" content="' . $description . '">
+        <meta name="og:description" content="' . $description . '">
+        <meta name="og:image" content="' . $image . '">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            ' . $title . '
+        </title>';
+    $META = $meta;
+    return $meta;
+}
+
 function printerr($text) {
 	echo("<br><table class=\"error\"><tr><td>$text</td></tr></table>");
 	echo('<input type="button" value="&lt; Back" onclick="history.back();">');

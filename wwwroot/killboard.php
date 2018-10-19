@@ -34,6 +34,10 @@ function page_kills() {
     $corporationID=secureGETnum('corporationID');
     $allianceID=secureGETnum('allianceID');
     $solarSystemID=secureGETnum('solarSystemID');
+    
+    $title = generate_title("Killboard");
+    $description = "LMeve Killboard - EVE Online Hall of Fame";
+    generate_meta($description, $title);
 
         if (isset($characterID) || isset($corporationID) || isset($allianceID) || isset($solarSystemID)) {
         //back navigation
@@ -151,11 +155,42 @@ function page_singlekill() {
             echo("killID cannot be empty.");
             return;
         }
-        showKill(getKill($killID));
+        
+        $km = getKill($killID);
+    
+    
+
+    if(count($km)>0) {
+        $items=$km['items'];
+
+        $iskLost=0;
+        $iskDropped=0;
+        $iskShip=getAveragePrice($km['shipTypeID']);
+        
+        if (count($items)>0) {
+            foreach($items as $item) {
+                $iskLost+=$item['qtyDestroyed']*$item['averagePrice'];
+                $iskDropped+=$item['qtyDropped']*$item['averagePrice'];
+            }
+        }
+        
+        $iskTotal = $iskLost + $iskDropped + $iskShip;
+        
+        $title = $km['shipTypeName'] . ' | ' . $km['characterName'] . ' | ' . $km['solarSystemName'] . ' | ' . generate_title();
+        $description = $km['characterName'] . ' (' . $km['corporationName'] . ') lost their ' . $km['shipTypeName'] . ' in ' . $km['solarSystemName'] . ' (' . $km['regionName'] . ') Total Value: ' . number_format($iskTotal, 0, $DECIMAL_SEP, $THOUSAND_SEP) . ' ISK';
+        $image = getTypeIDicon($km['shipTypeID'], 64);
+        generate_meta($description, $title, $image);
+    }
+            
+    
+    
+    showKill($km);
+        
     ?></center><?php
 }
 
 function showpage_public() {
+    ob_start();
     $id=12;
     $id2=$_GET['id2'];
     switch ($id2) {
@@ -166,18 +201,21 @@ function showpage_public() {
             page_singlekill();  //view single kill
             break;
     }
+    $ret = ob_get_contents();
+    ob_end_clean();
+    return $ret;
 }
 
-function template_public() {
+function template_public($contents,$title,$meta) {
 	global $LM_APP_NAME, $lmver, $LANG, $LM_READONLY;
 	?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
+	<!DOCTYPE html>
+	<html prefix="og: http://ogp.me/ns#" lang="en" class="no-js">
 	<head>
-	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+            
+	<?=$meta?>
 	<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.php">
-	<title><?php echo("$LM_APP_NAME"); ?> Killboard</title>
+        
 	<link type="text/css" href="css/rixx_fullscreen.css" rel="stylesheet">
         <!--<link rel="stylesheet" href="jquery-ui/css/ui-darkness/jquery-ui-1.10.3.custom.min.css" />-->
 	<link rel="icon" href="favicon.ico" type="image/ico">
@@ -220,9 +258,7 @@ function template_public() {
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 		<td width="100%" class="tab-main" id="tab-main" valign="top">
-			<?php
-                            showpage_public();
-			?>
+			<?=$contents?>
 		</td>
 		</tr>
 		</table>
@@ -242,5 +278,8 @@ function template_public() {
 	<?php
 }
 
-template_public();
+$META = generate_meta();
+$contents = showpage_public();
+
+template_public($contents,"",$META);
 ?>
