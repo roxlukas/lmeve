@@ -21,6 +21,7 @@ require_once('Contracts.php');
 require_once('Wallet.php');
 require_once('Assets.php');
 require_once('Killmails.php');
+require_once('Status.php');
 
 class ESI {
     public static $VERSION = 1;
@@ -117,6 +118,12 @@ class ESI {
     public $Killmails;
     
     /**
+     * Status route instance
+     * @var Status
+     */
+    public $Status;
+    
+    /**
      * $tokenID int - which refresh_token from cfgesitoken to use for this instance
      */
     public function __construct($tokenID) {
@@ -171,6 +178,7 @@ class ESI {
         $this->Wallet = new Wallet($this);
         $this->Assets = new Assets($this);
         $this->Killmails = new Killmails($this);
+        $this->Status = new Status($this);
     }
     
     /**
@@ -304,6 +312,10 @@ class ESI {
 
     public function setXEsiErrorLimitRemain($EsiErrorLimitRemain) {
         $this->EsiErrorLimitRemain = $EsiErrorLimitRemain;
+        if ($EsiErrorLimitRemain == 0) {
+            $e = new Exception("ESI error limit exhausted!");
+            throw $e;
+        }
     }
 
     public function setXEsiErrorLimitReset($EsiErrorLimitReset) {
@@ -314,6 +326,8 @@ class ESI {
         return $this->DATASOURCE;
     }
 
-
+    public function setDatasource($ds) {
+        $this->DATASOURCE=$ds;
+    }
 
 }

@@ -68,6 +68,12 @@ try {
     if (!isset($ESI)) $ESI = new ESI(null);
     inform("Main","ESI->updatePublic()...");
     $ESI->updatePublic();
+    //update game server status
+    $servers=array('tranquility','singularity');
+    foreach($servers as $s) {
+        $ESI->setDatasource($s);
+        $ESI->Status->updateServerStatus();
+    }
 } catch (Exception $e) {
     warning("Main","Exception occured in ESI(tokenID=$tokenID): " . $e->getMessage());
 }

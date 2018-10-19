@@ -185,7 +185,8 @@ function esiUpdateAll() {
     $g = esiUpdateApiContractItems();
     $h = esiUpdateApiAssets();
     $i = esiUpdateApikills();
-    return $a && $b && $c && $d && $e && $f && $g && $h && $i;
+    $j = esiCreateEsiServerStatus();
+    return $a && $b && $c && $d && $e && $f && $g && $h && $i&& $j;
 }
 
 /**
@@ -328,6 +329,22 @@ function esiCreateEsistatus() {
         `errorCount` int(11) NOT NULL DEFAULT '0',
         `errorMessage` varchar(1024) NOT NULL,
         PRIMARY KEY (`errorID`)
+      ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
+    }
+    return TRUE;
+}
+
+function esiCreateEsiServerStatus() {
+    if (!checkIfTableExists('esiserverstatus')) {
+        return db_uquery("CREATE TABLE IF NOT EXISTS `esiserverstatus` (
+        `statusID` int(11) NOT NULL AUTO_INCREMENT,
+        `date` datetime NOT NULL,
+        `server` varchar(20) NOT NULL,
+        `players` int(11) NOT NULL,
+        `version` varchar(20) NOT NULL,
+        `startTime` datetime NOT NULL,
+        `vip` tinyint(1) NOT NULL,
+        PRIMARY KEY (`statusID`)
       ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
     }
     return TRUE;
