@@ -431,7 +431,7 @@ if ($model) {
 		<table class="lmframework" style="width:100%;">
                     <tr><th>External price checks</th></tr>
 		<tr>
-                    <td>&raquo; <a href="http://eve-central.com/home/quicklook.html?typeid=<?php echo($nr); ?>" target="_blank">Check on eve-central.com</a></td>
+                    <td>&raquo; <a href="https://evemarketer.com/types/<?php echo($nr); ?>" target="_blank">Check on evemarketer.com</a></td>
                 </tr>
                 </table>
                 
