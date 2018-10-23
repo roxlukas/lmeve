@@ -11,11 +11,12 @@ function getBlueprintByProduct($typeID) {
             ON ybp.`blueprintTypeID`=itp.`typeID`
             LEFT JOIN $LM_EVEDB.`dgmTypeAttributes` dgm
             ON ybp.`productTypeID`=dgm.`typeID` AND dgm.`attributeID`=422
-            WHERE ybp.`productTypeID`=$typeID;";
+            WHERE ybp.`productTypeID`=$typeID
+            AND `activityID` != 11;";
 	$blueprint=db_asocquery($sql);
         if ($DEBUG) echo("<pre>$sql</pre>");
 	if (count($blueprint)>0) {
-            if ($DEBUG) echo("Found blueprint(s) in yamlBlueprintProducts<br/>");
+            if ($DEBUG) echo("Found blueprint(s) in yamlBlueprintProducts: " . print_r($blueprint,TRUE) . "<br/>");
             if ($blueprint[0]['techLevel']==3 && count($blueprint)>1) {
                 if ($DEBUG) echo("This is Tech III and has multiple blueprints (relics)<br/>");
                 if ($DEBUG) echo('<pre>');
@@ -640,6 +641,7 @@ function getEveCentralPrice($typeID,$type='sell',$minmax='min') {
  */
 function calcManufacturingCost($typeID) {
     global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_MAN;
+    $DEBUG = FALSE;
     
     $returns=array();
     $returns['price']=0;
@@ -647,11 +649,16 @@ function calcManufacturingCost($typeID) {
 
     $techLevel=getTechLevel($typeID);
     
+    if($DEBUG) echo("calcManufacturingCost($typeID) BEGIN<br/>");
+    
+    if($DEBUG) echo("\$techLevel = $techLevel<br/>");
+    
     //ME and PE settings
     if ($mepe=getMEPE($typeID)) {
         $melevel=$mepe['me'];
         $pelevel=$mepe['pe'];
     }
+    
     switch ($techLevel) {
         case 2:
             if (!isset($melevel)) $melevel=0;
@@ -662,13 +669,20 @@ function calcManufacturingCost($typeID) {
 	default:
             if (!isset($melevel)) $melevel=0;
     }
+    
+    if (!isset($pelevel)) $pelevel=0;
+    
+    if($DEBUG) echo("ME=$melevel TE=$pelevel<br/>");
  
     $baseMats=getBaseMaterials($typeID,1,$melevel);
     $portionSize=db_query("SELECT `portionSize` FROM `$LM_EVEDB`.`invTypes` WHERE `typeID`=$typeID");
     $portionSize=$portionSize[0][0];
     if (!isset($portionSize)) $portionSize=1;
    
+    if ($DEBUG) echo("calcManufacturingCost($typeID) \$baseMats=" . print_r($baseMats, TRUE) . "<br>");
+    
     //form a complete material list
+    $completeMats = array();
     if($baseMats) {
         foreach ($baseMats as $mat) {
             //echo("${mat['typeName']} = ${mat['quantity']} * $multiplier = ".$mat['quantity']*$multiplier."<br/>");
@@ -676,27 +690,31 @@ function calcManufacturingCost($typeID) {
             $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
         }
     }
+    
     //now that we have a complete list of materials, we can try to calculate the price
     //echo("count=".count($completeMats)."<br/>");
-    //var_dump($completeMats);
+    if ($DEBUG) echo("calcManufacturingCost($typeID) \$completeMats=" . print_r($completeMats, TRUE) . "<br>");
+    
     if (count($completeMats)>0) {
         foreach ($completeMats as $id => $mat) {
             if (getBlueprintByProduct($id)) {
+                if ($DEBUG) echo("calcManufacturingCost($typeID) getBlueprintByProduct($id)=". print_r(getBlueprintByProduct($id),TRUE)."<br>");
                 $subcost=calcManufacturingCost($id);
                 $returns['price']+=$mat['qty']*$subcost['price'];
                 $returns['accurate']=$subcost['accurate']&&$returns['accurate'];
             } else {
                 if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {  
-                    //echo("$id - $unitPrice<br/>");
+                    if ($DEBUG) echo("$id - $unitPrice<br/>");
                     $returns['price']+=$mat['qty']*$unitPrice;
                 } else {
                     $returns['accurate']=false;
-                    //echo("Missing price: ${mat['typeName']}<br/>");
+                    if ($DEBUG) echo("Missing price: ${mat['typeName']}<br/>");
                 }
             }
         }
         $returns['price']=$returns['price']/$portionSize;
         $returns['portionSize']=$portionSize;
+        if ($DEBUG) echo("calcManufacturingCost($typeID) RETURN \$returns=" . print_r($returns, TRUE) . "<br>");
         return $returns;
     } else {
         return false;
