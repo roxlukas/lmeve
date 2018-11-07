@@ -115,11 +115,11 @@ function encode($data, $nodes = 'data', $node = 'element') {
     if(isset($_GET['output']) && $_GET['output'] == 'xml') $output = 'xml';
     switch($output) {
         case 'json':
-            return json_beautify(json_encode($data));
+            return json_beautify(json_encode($data, JSON_NUMERIC_CHECK ));
         case 'xml':
             return XMLSerializer::generateValidXmlFromArray($data,$nodes,$node);
         default:
-            return json_beautify(json_encode($data));
+            return json_beautify(json_encode($data, JSON_NUMERIC_CHECK ));
     }
 }
 
