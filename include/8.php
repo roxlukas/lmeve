@@ -8,6 +8,10 @@
 //default route
     if ($id2=='') $id2=2;
 //submenu
+    $title = generate_title("Statistics");
+    $description = "LMeve Statistics";
+    generate_meta($description, $title);
+    
     ?>
     <strong>Industry</strong>
     <table cellpadding="0" cellspacing="2">

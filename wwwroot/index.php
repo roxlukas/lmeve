@@ -94,11 +94,13 @@ $META = generate_meta();
 //set the POST variable to the desired username and password
 //
 if ($LM_LOCKED==1) { //APP IS LOCKED!
-	$MOBILE ? mobile_template_locked() : template_locked();
+	//$MOBILE ? mobile_template_locked($META) : template_locked($META);
+        template_locked($META);
 } else { 			 //APP NOT LOCKED
 	if ($_SESSION['status']==0) { //NOT LOGGED ON
 		if (empty($_POST['login'])&&empty($_SESSION["status"])) { //NO LOGIN DATA? DISPLAY PROMPT
-                        $MOBILE ? mobile_template_login() : template_login();
+                        //$MOBILE ? mobile_template_login($META) : template_login(generate_meta(null, generate_title("Login")));
+                        template_login(generate_meta(null, generate_title("Login")));
 		} else { //FILLED DATA? CHECK CREDENTIALS
                         //if user table is empty, reset admin password
                         resetAdminPassword();
@@ -110,8 +112,8 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
                                 //LOGIN HOOK
                                 login_hook();
 				//redirect to MAIN WINDOW
-                                if ($_SERVER["HTTPS"] != "on") $https = "https://"; else $https = "http://";
-				header("Location: $https" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+                                $contents = template_contents();
+                                $MOBILE ? mobile_template_main($contents,$TITLE,$META) : template_main($contents,$TITLE,$META);
 			} else { //LOGIN FAILURE?
 				//WRITE TO LOG FILE
 				$uzytk=htmlspecialchars($_POST['login']);

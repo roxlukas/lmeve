@@ -64,6 +64,7 @@ function template_main($contents,$title,$meta) {
 
 	<?php
 	applycss(getcss());
+        applycss("css/print.css");
 	?>
         <!--<link rel="stylesheet" href="jquery-ui/css/ui-darkness/jquery-ui-1.10.3.custom.min.css" />-->
 	<link rel="icon" href="favicon.ico" type="image/ico">
@@ -104,7 +105,7 @@ function template_main($contents,$title,$meta) {
 	if ($LM_READONLY==1) echo($LANG['READONLY']);
 	?>
 	</td></tr>
-	<tr><td width="100%" style="padding: 0;">
+	<tr><td class="tab-menu" width="100%" style="padding: 0;">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 	
@@ -156,16 +157,17 @@ function template_main($contents,$title,$meta) {
 	<?php
 }
 
-function template_locked($msg=null) {
+function template_locked($meta, $msg=null) {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG;
         if (is_null($msg)) $msg=$LANG['MAINTENANCE'];
 	?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
+	<!DOCTYPE html> 
+	<html prefix="og: http://ogp.me/ns#" lang="en" class="no-js">
 	<head>
-	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-	<title><?php echo($LM_APP_NAME); ?> - Unavailable</title>
+            
+	<?=$meta?>
+	<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.php">
+
 	<?php
 	applycss($LM_DEFAULT_CSS);
 	?>
@@ -195,15 +197,16 @@ function template_locked($msg=null) {
 	<?php
 }
 
-function template_login() {
+function template_login($meta) {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG,$SSOENABLED;
 	?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
+	<!DOCTYPE html> 
+	<html prefix="og: http://ogp.me/ns#" lang="en" class="no-js">
 	<head>
-	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-2">
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-	<title><?php echo($LM_APP_NAME); ?> - Please log in</title>
+            
+	<?=$meta?>
+	<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.php">
+
 	<?php
 	applycss($LM_DEFAULT_CSS);
 	?>
@@ -230,9 +233,13 @@ function template_login() {
 	<tr><td><div class="tcen">
 			<input name="logon" type="submit" value="Log in"><br/>
 			<?php if ($SSOENABLED) { ?> <hr style="opacity: 0.2;" />
-			<a href="ssologin.php"><img src="<?=getUrl()?>img/EVE_SSO_Login_Buttons_Small_White.png"></a><hr style="opacity: 0.2;" />
-                        <em>By using this service you agree that your EVE Online character's information will be processed by the administrator of this service. Information will be processed as long as your character(s) remain a member of the EVE Online Corporation which is using this service.</em>
+			<a href="ssologin.php"><img src="<?=getUrl()?>img/EVE_SSO_Login_Buttons_Small_White.png"></a>
 			<?php } ?>
+                        
+                        <?php if (getConfigItem('publicKillboard')=='enabled') { ?> <hr style="opacity: 0.2;" />
+			<a href="killboard.php"><img src="<?=getUrl()?>img/lmeve-killboard.png"></a>
+			<?php } ?>
+                        
 		 </div>
 	</td></tr>
 	</table>

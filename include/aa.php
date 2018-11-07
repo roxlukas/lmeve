@@ -10,6 +10,11 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Ship Explorer'; //Panel name (optional)
 //standard header ends here
 
+$title = generate_title("$PANELNAME");
+$description = "LMeve $PANELNAME - Explore all starships in EVE Online";
+$image = "https://imageserver.eveonline.com/Render/638_512.png";
+generate_meta($description, $title, $image);
+
 include_once 'inventory.php';
 include_once('yaml_graphics.php');
 include_once('skins.php');

@@ -66,8 +66,8 @@ function generate_title($subtitle = null) {
 function generate_meta($description=null, $title=null ,$image=null) {
     global $META, $TITLE, $LM_APP_NAME, $lmver;
     
-    if (is_null($description)) $description="LMeve: Industry Contribution and Mass Production Tracker.";
-    if (is_null($title)) $title = generate_title();
+    if (is_null($description)) $description="LMeve: Industry Contribution and Mass Production Tracker."; else $description = htmlentities($description);
+    if (is_null($title)) $title = generate_title(); else $title = htmlentities($title);
     if (is_null($image)) $image = getUrl() . "ccp_icons/33_128_2.png";
     
     $url = parse_url(getUrl());

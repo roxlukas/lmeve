@@ -71,6 +71,7 @@ if (!empty($marketGroupID)) {
 	if (!empty($marketGroupID)) {
 		$node=getMarketNode($marketGroupID);
 		$parentGroupID=$node['parentGroupID'];
+                if (empty($last_node)) $last_node = $node['marketGroupName'];
 		do {
 			$breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID=${node['marketGroupID']}\">${node['marketGroupName']}</a> $breadcrumbs";
 			if (!empty($node['parentGroupID'])) {
@@ -82,6 +83,8 @@ if (!empty($marketGroupID)) {
 		} while(TRUE);
 		echo("<a href=\"?id=10&id2=0\"> Start </a> $breadcrumbs");
 	}
+        
+        if (empty($last_node)) $last_node="Item Database";
 
 	?>
 			<table cellspacing="2" cellpadding="0">
@@ -143,4 +146,7 @@ if (!empty($marketGroupID)) {
 	//echo('<form method="get" action=""><input type="hidden" name="id" value="1"><input type="hidden" name="id2" value="1"><input type="hidden" name="nr" value="'.$nr.'"><input type="submit" value="Cancel"></form>');
 	echo('</table>');	
 	
+        $title = generate_title($last_node);
+        $description = "LMeve Database - $last_node";
+        generate_meta($description, $title);
 	?>

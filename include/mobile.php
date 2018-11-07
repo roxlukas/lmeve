@@ -69,7 +69,7 @@ function mobile_template_main($contents,$title,$meta) {
 
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr><td width="100%" class="tab-main" id="tab-main" valign="top">
-			<?=$contents?>
+                        <center><?=$contents?></center>
 		</td>
 		</tr>
 		</table>

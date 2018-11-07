@@ -8,7 +8,9 @@
     if ($id2=='') $id2=0;
     if ($wikipage=='') $wikipage='start';
 //submenu
-    
+    $title = generate_title("Wiki");
+    $description = "LMeve Wiki - local corporation knowledge base";
+    generate_meta($description, $title);
     ?>
     <table border="0" cellpadding="0" cellspacing="2">
     <tr>

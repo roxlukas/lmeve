@@ -10,6 +10,10 @@ $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Killboard'; //Panel name (optional)
 //standard header ends here
 
+$title = generate_title("$PANELNAME");
+$description = "LMeve Killboard - EVE Online Hall of Fame";
+generate_meta($description, $title);
+
 global $LM_EVEDB;
 include_once('killboard.php');
 include_once('inventory.php');
@@ -18,10 +22,6 @@ $characterID=secureGETnum('characterID');
 $corporationID=secureGETnum('corporationID');
 $allianceID=secureGETnum('allianceID');
 $solarSystemID=secureGETnum('solarSystemID');
-
-$title = generate_title("$PANELNAME");
-$description = "LMeve Killboard - EVE Online Hall of Fame";
-generate_meta($description, $title);
 
 if (isset($characterID) || isset($corporationID) || isset($allianceID) || isset($solarSystemID)) {
     //back navigation

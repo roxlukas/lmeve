@@ -6,6 +6,10 @@
 //default route
     if ($id2=='') $id2=0;
 //submenu
+    $title = generate_title("Market");
+    $description = "LMeve Market - all buy and sell related information";
+    generate_meta($description, $title);
+    
     ?>
     <table border="0" cellpadding="0" cellspacing="2">
     <tr>

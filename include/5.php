@@ -6,6 +6,10 @@
 //default route
     if ($id2=='') $id2=0;
 //submenu
+    $title = generate_title("Settings");
+    $description = "LMeve Settings";
+    generate_meta($description, $title);
+    
     ?>
     <table border="0" cellpadding="0" cellspacing="2">
     <tr><td>

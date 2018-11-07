@@ -9,6 +9,7 @@ function login_hook() {
     createCitadelsView();
     esiUpdateAll();
     updateApiAssets();
+    decryptorTables();
 }
 
 ?>

@@ -371,3 +371,33 @@ function esiUpdateApiCorpMembers() {
     }
     return $a && $b && $c && $d;
 }
+
+function decryptorTables() {
+    if (!checkIfTableExists('cfgdecryptors')) {
+        db_uquery("CREATE TABLE IF NOT EXISTS `cfgdecryptors` (
+        `typeID` int(11) NOT NULL,
+        `decryptorTypeID` int(11) NOT NULL,
+        PRIMARY KEY (`typeID`)
+      ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
+    }
+    if (!checkIfTableExists('ramdecryptors')) {
+        db_uquery("CREATE TABLE IF NOT EXISTS `ramdecryptors` (
+        `typeID` int(11) NOT NULL,
+        `meBonus` int(11) NOT NULL,
+        `teBonus` int(11) NOT NULL,
+        `probabilityBonus` decimal(3,2) NOT NULL,
+        `runBonus` int(11) NOT NULL,
+        PRIMARY KEY (`typeID`)
+        ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
+        
+    }
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34207,1,-2,0.9,2)"); //Optimized Attainment Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34208,2,0,-0.1,7)"); //Optimized Augmentation Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34204,1,-2,0.5,3)"); //Parity Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34205,3,6,0.1,0)"); //Process Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34206,2,8,0.0,2)"); //Symmetry Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34201,2,10,0.2,1)"); //Accelerant Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34202,-1,4,0.8,4)"); //Attainment Decryptor
+    db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34203,-2,2,-0.4,9)"); //Augmentation Decryptor
+    return TRUE;
+}

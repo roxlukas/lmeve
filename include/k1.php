@@ -65,6 +65,7 @@ include_once('inventory.php');
         
         $iskTotal = $iskLost + $iskDropped + $iskShip;
         
+        //generate meta tags for killmail sharing
         $title = $km['shipTypeName'] . ' | ' . $km['characterName'] . ' | ' . $km['solarSystemName'] . ' | ' . generate_title();
         $description = $km['characterName'] . ' (' . $km['corporationName'] . ') lost their ' . $km['shipTypeName'] . ' in ' . $km['solarSystemName'] . ' (' . $km['regionName'] . ') Total Value: ' . number_format($iskTotal, 0, $DECIMAL_SEP, $THOUSAND_SEP) . ' ISK';
         $image = getTypeIDicon($km['shipTypeID'], 64);

@@ -25,6 +25,51 @@ function url_replace($input) {
     return "<a href=\"index.php?id=10&id2=1&nr=".$input[1]."\">";
 }
 
+function displayHints($techLevel) {
+    $msg[1] = '<a href="https://wiki.eveuniversity.org/Manufacturing" target="_blank">Tech I production guide on EVE University</a>';
+    $msg[2] = '<a href="https://wiki.eveuniversity.org/Invention" target="_blank">Tech II production guide on EVE University</a>';
+    $msg[3] = '<a href="https://wiki.eveuniversity.org/Tech_3_Production" target="_blank">Tech III production guide on EVE University</a>';
+    if (getConfigItem('showHints','enabled') == 'enabled') {
+    ?>
+        <table class="lmframework" style="width:100%;">
+            <tr><th>Production guides</th></tr>
+            <tr>
+                <td>&raquo; <?=$msg[$techLevel]?></td>
+            </tr>
+        </table> 
+    <?php
+    }
+}
+
+function decryptors($typeID, $techLevel) {
+    global $LM_EVEDB;
+    if ($techLevel >= 2 && $techLevel <= 3) {
+        $decryptors = getDecryptors();
+        $selected = getDecryptor($typeID);
+    ?>
+        <table class="lmframework" style="width:100%;">
+            <tr><th colspan="3">Decryptors <span id="save_decryptors_label"></span></th></tr>
+            <tr>
+                <td style="text-align: center; width: 32px;"><img src="<?=  getTypeIDicon(34201, 16)?>" /></td>
+                <td style="text-align: center;">
+                    <select name="decryptorTypeID" id="decryptorTypeID" onchange="update_decryptors();">
+                        <option value="0">- none -</option>
+                        <?php
+                        foreach($decryptors as $d) {
+                            $selected['decryptorTypeID'] == $d['typeID'] ? $s = "selected" : $s = "";
+                            echo("<option value=\"${d['typeID']}\" $s>${d['typeName']}</option>");
+                        }
+                        ?>
+                </select></td>
+                <td style="text-align: center;">
+                    <input type="button" id="save_decryptors" value="Save" onclick="save_decryptors();">
+		</td>
+            </tr>
+        </table> 
+    <?php
+    }
+}
+
 ?>	    
 		<script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
 		<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
@@ -470,15 +515,31 @@ if ($model) {
                 echo('<div id="quote"></div>'); //ajax hook
 		echo("<script type=\"text/javascript\"> ajax_get('ajax.php?act=GET_QUOTE&typeID=$nr','quote'); </script>");
 
+                displayHints($techLevel);
 //SKILLS
         	displaySkills(getSkills($bpo[0],1));
 
 		?>
 		<script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 		<script type="text/javascript">
-			function func(s) {
-				//var s=document.getElementById('melevel');
+                        var decryptors = <?=json_encode(getDecryptors())?>;
+                    
+			function update_me(s) {
 				ajax_get('ajax.php?act=GET_MATERIALS&typeID=<?php echo($nr); ?>&melevel='+s.value,'materials');
+			}
+                        
+                        function update_decryptors() {
+				var decryptorTypeID=document.getElementById('decryptorTypeID').value;
+                                var me=document.getElementById('melevel');
+				var pe=document.getElementById('pelevel');
+                                if (decryptorTypeID > 0) {
+                                    me.value = 2 + parseInt(decryptors[decryptorTypeID]['meBonus']);
+                                    pe.value = 2 + parseInt(decryptors[decryptorTypeID]['teBonus']);
+                                } else {
+                                    me.value = 2;
+                                    pe.value = 2;
+                                }
+                                ajax_get('ajax.php?act=GET_MATERIALS&typeID=<?php echo($nr); ?>&melevel='+me.value,'materials');
 			}
 			
 			function save_mepe() {
@@ -486,14 +547,32 @@ if ($model) {
 				var pe=document.getElementById('pelevel').value;
 				ajax_save('index.php?id=10&id2=5&nr=<?php echo($nr); ?>&me='+me+'&pe='+pe,'save_me','save_me_label');
                                 ajax_get('ajax.php?act=GET_QUOTE&typeID=<?php echo($nr); ?>','quote');
+                                ajax_get('ajax.php?act=GET_MATERIALS&typeID=<?php echo($nr); ?>&melevel='+me,'materials');
+			}
+                        
+                        function save_decryptors() {
+				var decryptorTypeID=document.getElementById('decryptorTypeID').value;
+                                var me=document.getElementById('melevel');
+				var pe=document.getElementById('pelevel');
+                                if (decryptorTypeID > 0) {
+                                    me.value = 2 + parseInt(decryptors[decryptorTypeID]['meBonus']);
+                                    pe.value = 2 + parseInt(decryptors[decryptorTypeID]['teBonus']);
+                                } else {
+                                    me.value = 2;
+                                    pe.value = 2;
+                                }
+				ajax_save('index.php?id=10&id2=11&nr=<?php echo($nr); ?>&decryptorTypeID='+decryptorTypeID,'save_decryptors','save_decryptors_label');
+                                ajax_get('ajax.php?act=GET_QUOTE&typeID=<?php echo($nr); ?>','quote');
+                                ajax_get('ajax.php?act=GET_MATERIALS&typeID=<?php echo($nr); ?>&melevel='+me.value,'materials');
 			}
 		</script>
 		<?php
-		
+//DECRYPTORS
+    decryptors($nr, $techLevel);	
 //ME and PE form		
 		echo('<table class="lmframework" width="100%"><tr><th colspan="3">Materials <span id="save_me_label"></span></th></tr><tr><td style="text-align: center;">');
 		echo('<strong>ME: </strong>');
-		echo('<input type="text" id="melevel" onclick="select_all(this);" onkeyup="func(this);" size="6" value="'.$melevel.'">');		
+		echo('<input type="text" id="melevel" onclick="select_all(this);" onkeyup="update_me(this);" size="6" value="'.$melevel.'">');		
 		echo('</td><td style="text-align: center;">');
 		echo('<strong>TE: </strong>');
 		echo('<input type="text" id="pelevel" onclick="select_all(this);" size="6" value="'.$pelevel.'">');		
@@ -505,6 +584,7 @@ if ($model) {
 		}
 		
 		echo('</tr></table>');
+
 		
 //MATERIALS - AJAX
 		echo('<div id="materials"></div>'); //ajax hook
@@ -723,4 +803,9 @@ if (!$MOBILE) {
 	
 	
 	echo('</td></tr></table>');
+        
+        $title = generate_title($item['typeName']);
+        $description = $descript;
+        $model ? $image = getTypeIDicon($item['typeID'], 512) : $image = getTypeIDicon($item['typeID'], 64);
+        generate_meta($description, $title, $image);
 ?>

@@ -6,6 +6,10 @@
 //default route
     if ($id2=='') $id2=0;
 //submenu
+    $title = generate_title("Inventory");
+    $description = "LMeve Inventory - everything the corporation owns";
+    generate_meta($description, $title);
+    
     ?>
     <table cellpadding="0" cellspacing="2">
     <tr>

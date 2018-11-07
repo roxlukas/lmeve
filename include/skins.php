@@ -130,7 +130,7 @@ function showSkins($skins) {
 	echo('</pre>');*/
 	if (count($skins)>0) {
             //echo("<pre>DEBUG: ".print_r($skins,TRUE)."</pre>");
-		?><table class="lmframework" width="100%"><tr><th colspan="3">Ship SKINs</th></tr><?php
+            ?><table class="lmframework" width="100%"><tr><th colspan="3">Ship SKINs <a href="javascript:toggler('skinpanel')">(hide)</a></th></tr><?php
 		foreach ($skins as $skin) {
 			$rnd=md5(random_pseudo_bytes_wrapper(24));
 			?><tr>

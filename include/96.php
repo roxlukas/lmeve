@@ -57,6 +57,7 @@ if (strlen($date)==6) {
 			//$month=date("m");
 			$char=db_asocquery("SELECT * from `apicorpmembers` WHERE `characterID`=$nr");
 			$char=$char[0];
+                        
 			$corp=db_asocquery("SELECT * from `apicorps` WHERE `corporationID`=${char['corporationID']}");
 		    $corp=$corp[0];
 		    $stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
@@ -81,7 +82,8 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			$industry_tasks=db_asocquery($sql);
 		    
 		    echo('<table border="0" cellspacing="2" cellpadding=""><tr><td width="256" class="tab">');
-		    echo("<img src=\"https://imageserver.eveonline.com/character/${char['characterID']}_256.jpg\" title=\"${char['name']}\" />");
+                    $image = "https://imageserver.eveonline.com/character/${char['characterID']}_256.jpg";
+		    echo("<img src=\"$image\" title=\"${char['name']}\" />");
 		    echo('</td><td width="256" class="tab" style="vertical-align:top;">');
 		    echo("<h2>${char['name']}</h2>");
 		    if (!empty($char['title'])) echo("${char['title']}<br>");	
@@ -101,6 +103,11 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
                             echo("<strong>Character owner:</strong> ${realname['login']}<br>");
                         }
                     }
+                    
+                    $title = generate_title("${char['name']} (${realname['login']})");
+                    $description = "LMeve Characters - viewing character ${char['name']} owned by ${realname['login']}";
+                    generate_meta($description, $title, $image);
+                    
 		    echo('</td><td width="256" class="tab" style="vertical-align:top;">');
 		    
 					$sumstat=0.0;

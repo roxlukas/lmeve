@@ -7,6 +7,9 @@ global $MOBILE;
 //default route
     if ($id2=='') $id2=0;
 //submenu
+    $title = generate_title("Database");
+    $description = "LMeve Database - EVE Online item database";
+    generate_meta($description, $title);
     ?>
     <table border="0" cellpadding="0" cellspacing="2">
     <tr>
@@ -95,6 +98,9 @@ global $MOBILE;
 		break;
                 case 10:
 		include("aa.php");  //Ship Explorer
+		break;
+                case 11:
+                include("ab.php");  //Save Decryptors (cfgdecryptors)
 		break;
 	    }
 ?>

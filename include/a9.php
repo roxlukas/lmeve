@@ -10,6 +10,10 @@ $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Profit Chart'; //Panel name (optional)
 //standard header ends here
 
+$title = generate_title($PANELNAME);
+$description = "LMeve Database - $PANELNAME";
+generate_meta($description, $title);
+
 global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_SELL;
 
 include_once('materials.php'); //material related subroutines

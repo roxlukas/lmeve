@@ -94,7 +94,7 @@ function getT1BPOforT2BPO($typeID) {
                 JOIN $LM_EVEDB.`invTypes` itp
                 ON ybp.`blueprintTypeID`=itp.`typeID`
                 WHERE `productTypeID`=$typeID;");
-        if (count($blueprint)==1) {
+        if (count($blueprint)>=1) { //it's exactly 1 for most items, but some T1 items have two possible Tech II outcomes, so >= 1
             return $blueprint[0];
 	} else { //blueprint not found... maybe given typeID is a blueprint itself??
             return FALSE;
@@ -722,6 +722,46 @@ function calcManufacturingCost($typeID) {
 }
 
 /**
+ * Get list of available decryptors
+ * 
+ * @return array - list of decryptors and their parameters
+ */
+function getDecryptors() {
+    global $LM_EVEDB;
+    $decryptors = db_asocquery("SELECT *
+        FROM `ramdecryptors` rd
+        JOIN `$LM_EVEDB`.`invTypes` itp ON rd.`typeID` = itp.`typeID`");
+    $ret = array();
+    foreach ($decryptors as $d) {
+        $ret[$d['typeID']] = $d;
+    }
+    return $ret;
+}
+
+/**
+ * Get configured decryptor for a given typeID invention
+ * 
+ * @param type $typeID - typeID of the item (product) in question
+ * @return array - decryptor parameters
+ */
+function getDecryptor($typeID) {
+    global $LM_EVEDB;
+    $selected = db_asocquery("SELECT *
+        FROM `cfgdecryptors` cd
+        JOIN `$LM_EVEDB`.`invTypes` itp ON cd.`decryptorTypeID` = itp.`typeID`
+        JOIN `ramdecryptors` rd ON cd.`decryptorTypeID` = rd.`typeID`    
+        WHERE cd.`typeID`=$typeID");
+        
+        if (count($selected > 0)) {
+            $selected = $selected[0];
+        } else {
+            $selected = array();
+            $selected['decryptorTypeID'] = 0;
+        }
+    return $selected;
+}
+
+/**
  * Calculates invention cost for a given typeID
  * 
  * @param type $typeID - typeID of the item (product) in question
@@ -743,6 +783,9 @@ function calcInventionCost($typeID) {
         if ($DEBUG) echo("Invention requires the item to be at least Tech II or higher (this job is tech ".$t2bpo['techLevel'].")<br/>");
         return false;
     }
+    if ($DEBUG) echo("Getting decryptor<br/>");
+    $decryptor = getDecryptor($typeID);
+    if ($DEBUG) print_r($decryptor);
     
     //Number of invented runs:
     //CategoryID = 6 - ships - have 1 run
@@ -760,6 +803,9 @@ function calcInventionCost($typeID) {
     } else {
         $bpcruns=10; //static 10 runs BPC for everything else
     }
+    
+//DECRYPTOR NUMBER OF RUNS MODIFICATION
+    $bpcruns += $decryptor['runBonus'];
     
     if ($DEBUG) echo("Using $bpcruns BPC runs<br/>");
     
@@ -781,6 +827,9 @@ function calcInventionCost($typeID) {
     $invchance=$t1bptypeID['probability'];
     $t1bptypeID=$t1bptypeID['blueprintTypeID'];
     
+//DECRYPTOR PROBABILITY MODIFICATION
+    $invchance += $invchance * $decryptor['probabilityBonus'];
+    
     //echo("t1bptypeID=".$t1bptypeID['blueprintTypeID']);
     if ($DEBUG) echo("Getting materials...<br/>");
     $extraMats=getBaseMaterials($t1bptypeID, 1, 0, 8);
@@ -792,7 +841,13 @@ function calcInventionCost($typeID) {
             $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
         }
     }
-
+    
+//DECRYPTOR ADD DECRYPTOR TO LIST
+    if ($decryptor['decryptorTypeID'] > 0) {
+        $completeMats[$decryptor['decryptorTypeID']]['qty']=1;
+        $completeMats[$decryptor['decryptorTypeID']]['typeName']=$decryptor['typeName'];
+    }
+    
     if (count($completeMats)>0) {
         foreach ($completeMats as $id => $mat) {
             if ($unitPrice=getEveCentralPrice($id,$EC_PRICE_TO_USE_FOR_MAN['type'],$EC_PRICE_TO_USE_FOR_MAN['price'])) {             

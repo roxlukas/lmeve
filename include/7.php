@@ -1,6 +1,11 @@
 <?php
 checksession(); //check if we are called by a valid session
 	    $f=$_GET['id2'];
+            
+            $title = generate_title("Administration");
+            $description = "LMeve Administration";
+            generate_meta($description, $title);
+            
 	    switch ($f) {
 	    case 0:
 		include("70.php");  //lista users
