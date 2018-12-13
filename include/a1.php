@@ -41,6 +41,14 @@ function displayHints($techLevel) {
     }
 }
 
+function addplus($val) {
+    if (is_numeric($val) && $val >= 0) {
+        return "+" . $val;
+    } else {
+        return $val;
+    }
+}
+
 function decryptors($typeID, $techLevel) {
     global $LM_EVEDB;
     if ($techLevel >= 2 && $techLevel <= 3) {
@@ -57,7 +65,7 @@ function decryptors($typeID, $techLevel) {
                         <?php
                         foreach($decryptors as $d) {
                             $selected['decryptorTypeID'] == $d['typeID'] ? $s = "selected" : $s = "";
-                            echo("<option value=\"${d['typeID']}\" $s>${d['typeName']}</option>");
+                            echo("<option value=\"" . $d['typeID'] . "\" $s>" . $d['typeName'] . " " . addplus($d['meBonus']) . "/" . addplus($d['teBonus']) . " " . addplus(100 * $d['probabilityBonus']) . "% " . addplus($d['runBonus']) . " runs</option>");
                         }
                         ?>
                 </select></td>

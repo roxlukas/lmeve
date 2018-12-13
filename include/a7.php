@@ -10,7 +10,10 @@ $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Ore values table'; //Panel name (optional)
 //standard header ends here
 
+include_once 'market.php';
 global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP;
+
+generate_meta('Ore Values Chart shows mineral composition and current value of all ores available in EVE Online.');
 
 /*function dbhrefedit($nr) {
     echo("<a href=\"index.php?id=10&id2=1&nr=$nr\">");
@@ -94,9 +97,9 @@ foreach($ores_raw as $row) {
                     ?>
                     <tr>
                         <td style="width: 32px; padding: 0px; text-align: center;">
-                    <?php dbhrefedit($row['typeID']); ?><img src="<?php echo(getTypeIDicon($row['typeID'])); ?>" title="<?php echo($row['typeName']); ?>" /></a>
+                    <?php itemhrefedit($row['typeID']); ?><img src="<?php echo(getTypeIDicon($row['typeID'])); ?>" title="<?php echo($row['typeName']); ?>" /></a>
                         </td>
-                        <td><?php dbhrefedit($row['typeID']); echo($row['typeName']); ?></a></td>
+                        <td><?php itemhrefedit($row['typeID']); echo($row['typeName']); ?></a></td>
                         <td style="text-align: right;"><?php echo($row['volume']); ?></td>
                         <td style="text-align: right;"><?php echo($row['portionSize']); ?></td>
                         <td style="text-align: center;"><?php if($tritanium>0) echo($tritanium); else echo('-'); ?></td>
