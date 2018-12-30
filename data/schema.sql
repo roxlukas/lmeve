@@ -1240,6 +1240,8 @@ CREATE TABLE IF NOT EXISTS `wiki` (
 --
 -- Funkcje
 --
+DELIMITER $$
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `findNearest`(`x1` DOUBLE, `y1` DOUBLE, `z1` DOUBLE, `solarSystemID1` INT) RETURNS int(11)
     READS SQL DATA
 RETURN (
