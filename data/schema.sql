@@ -1,11 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.7deb7
+-- version 3.3.7deb8
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Czas wygenerowania: 14 Mar 2014, 10:26
--- Wersja serwera: 5.1.66
--- Wersja PHP: 5.3.3-7+squeeze14
+-- Czas wygenerowania: 30 Gru 2018, 09:12
 
 -- IMPORTANT:
 --
@@ -41,10 +39,17 @@ CREATE TABLE IF NOT EXISTS `apiaccountbalance` (
   PRIMARY KEY (`accountID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- Zrzut danych tabeli `apiaccountbalance`
+-- Struktura tabeli dla  `apiassetnames`
 --
 
+CREATE TABLE IF NOT EXISTS `apiassetnames` (
+  `itemID` bigint(11) NOT NULL AUTO_INCREMENT,
+  `itemName` varchar(255) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1025025696005 ;
 
 -- --------------------------------------------------------
 
@@ -58,17 +63,33 @@ CREATE TABLE IF NOT EXISTS `apiassets` (
   `locationID` bigint(11) NOT NULL,
   `typeID` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
-  `flag` tinyint(4) NOT NULL,
+  `flag` int(11) NOT NULL,
   `singleton` tinyint(4) NOT NULL,
+  `is_blueprint_copy` int(11) DEFAULT NULL,
   `rawQuantity` int(11) DEFAULT NULL,
   `corporationID` bigint(11) NOT NULL,
   PRIMARY KEY (`itemID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- Zrzut danych tabeli `apiassets`
+-- Struktura tabeli dla  `apiblueprints`
 --
 
+CREATE TABLE IF NOT EXISTS `apiblueprints` (
+  `itemID` bigint(11) NOT NULL,
+  `locationID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `typeName` varchar(256) DEFAULT NULL,
+  `flagID` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `timeEfficiency` int(11) NOT NULL,
+  `materialEfficiency` int(11) NOT NULL,
+  `runs` int(11) NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -86,7 +107,6 @@ CREATE TABLE IF NOT EXISTS `apiconquerablestationslist` (
   PRIMARY KEY (`stationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 -- --------------------------------------------------------
 
 --
@@ -100,11 +120,6 @@ CREATE TABLE IF NOT EXISTS `apicontactlist` (
   `corporationID` bigint(11) NOT NULL,
   PRIMARY KEY (`contactID`,`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apicontactlist`
---
-
 
 -- --------------------------------------------------------
 
@@ -129,11 +144,6 @@ CREATE TABLE IF NOT EXISTS `apicontainerlog` (
   `corporationID` bigint(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Zrzut danych tabeli `apicontainerlog`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -145,6 +155,7 @@ CREATE TABLE IF NOT EXISTS `apicontractitems` (
   `recordID` bigint(11) NOT NULL,
   `typeID` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
+  `rawQuantity` int(11) DEFAULT NULL,
   `singleton` int(11) NOT NULL,
   `included` int(11) NOT NULL,
   `corporationID` bigint(11) NOT NULL,
@@ -153,11 +164,6 @@ CREATE TABLE IF NOT EXISTS `apicontractitems` (
   KEY `typeID` (`typeID`),
   KEY `corporationID` (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apicontractitems`
---
-
 
 -- --------------------------------------------------------
 
@@ -197,11 +203,6 @@ CREATE TABLE IF NOT EXISTS `apicontracts` (
   KEY `corporationID` (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Zrzut danych tabeli `apicontracts`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -224,11 +225,6 @@ CREATE TABLE IF NOT EXISTS `apicorpmembers` (
   KEY `corporationID` (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Zrzut danych tabeli `apicorpmembers`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -244,11 +240,6 @@ CREATE TABLE IF NOT EXISTS `apicorps` (
   `tokenID` int(11) DEFAULT NULL,
   PRIMARY KEY (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apicorps`
---
-
 
 -- --------------------------------------------------------
 
@@ -281,11 +272,6 @@ CREATE TABLE IF NOT EXISTS `apicorpsheet` (
   PRIMARY KEY (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Zrzut danych tabeli `apicorpsheet`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -299,11 +285,6 @@ CREATE TABLE IF NOT EXISTS `apidivisions` (
   KEY `corporationId` (`corporationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Zrzut danych tabeli `apidivisions`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -315,6 +296,988 @@ CREATE TABLE IF NOT EXISTS `apierrorlist` (
   `errorText` varchar(1024) NOT NULL,
   PRIMARY KEY (`errorCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apifacilities`
+--
+
+CREATE TABLE IF NOT EXISTS `apifacilities` (
+  `facilityID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `typeName` varchar(255) NOT NULL,
+  `solarSystemID` int(11) NOT NULL,
+  `solarSystemName` varchar(255) NOT NULL,
+  `regionID` int(11) NOT NULL,
+  `regionName` varchar(255) NOT NULL,
+  `starbaseModifier` decimal(20,2) NOT NULL,
+  `tax` decimal(20,2) NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`facilityID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apifacwarstats`
+--
+
+CREATE TABLE IF NOT EXISTS `apifacwarstats` (
+  `factionID` int(11) NOT NULL,
+  `factionName` varchar(64) NOT NULL,
+  `enlisted` datetime NOT NULL,
+  `pilots` int(11) NOT NULL,
+  `killsYesterday` int(11) NOT NULL,
+  `killsLastWeek` int(11) NOT NULL,
+  `killsTotal` int(11) NOT NULL,
+  `victoryPointsYesterday` int(11) NOT NULL,
+  `victoryPointsLastWeek` int(11) NOT NULL,
+  `victoryPointsTotal` int(11) NOT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  PRIMARY KEY (`corporationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apiindustryjobs`
+--
+
+CREATE TABLE IF NOT EXISTS `apiindustryjobs` (
+  `jobID` bigint(11) NOT NULL,
+  `assemblyLineID` bigint(11) NOT NULL,
+  `containerID` bigint(11) NOT NULL,
+  `installedItemID` bigint(11) NOT NULL,
+  `installedItemLocationID` bigint(11) NOT NULL,
+  `installedItemQuantity` bigint(11) NOT NULL,
+  `installedItemProductivityLevel` bigint(11) NOT NULL,
+  `installedItemMaterialLevel` bigint(11) NOT NULL,
+  `installedItemLicensedProductionRunsRemaining` bigint(11) NOT NULL,
+  `outputLocationID` bigint(11) NOT NULL,
+  `installerID` bigint(11) NOT NULL,
+  `runs` int(11) NOT NULL,
+  `licensedProductionRuns` int(11) NOT NULL,
+  `installedInSolarSystemID` bigint(11) NOT NULL,
+  `containerLocationID` bigint(11) NOT NULL,
+  `materialMultiplier` decimal(16,15) NOT NULL,
+  `charMaterialMultiplier` decimal(16,15) NOT NULL,
+  `timeMultiplier` decimal(16,15) NOT NULL,
+  `charTimeMultiplier` decimal(16,15) NOT NULL,
+  `installedItemTypeID` int(11) NOT NULL,
+  `outputTypeID` int(11) NOT NULL,
+  `containerTypeID` int(11) NOT NULL,
+  `installedItemCopy` int(11) NOT NULL,
+  `completed` int(11) NOT NULL,
+  `completedSuccessfully` int(11) NOT NULL,
+  `successfulRuns` int(11) DEFAULT NULL,
+  `installedItemFlag` int(11) NOT NULL,
+  `outputFlag` int(11) NOT NULL,
+  `activityID` int(11) NOT NULL,
+  `completedStatus` int(11) NOT NULL,
+  `installTime` datetime NOT NULL,
+  `beginProductionTime` datetime NOT NULL,
+  `endProductionTime` datetime NOT NULL,
+  `pauseProductionTime` datetime NOT NULL,
+  `corporationID` bigint(11) DEFAULT NULL,
+  PRIMARY KEY (`jobID`),
+  KEY `installedItemTypeID` (`installedItemTypeID`),
+  KEY `outputTypeID` (`outputTypeID`),
+  KEY `installerID` (`installerID`),
+  KEY `endProductionTime` (`endProductionTime`),
+  KEY `beginProductionTime` (`beginProductionTime`),
+  KEY `installedItemID` (`installedItemID`),
+  KEY `installTime` (`installTime`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apiindustryjobscrius`
+--
+
+CREATE TABLE IF NOT EXISTS `apiindustryjobscrius` (
+  `jobID` bigint(11) NOT NULL,
+  `installerID` bigint(11) NOT NULL,
+  `installerName` varchar(255) NOT NULL,
+  `facilityID` bigint(11) NOT NULL,
+  `solarSystemID` int(11) NOT NULL,
+  `solarSystemName` varchar(255) NOT NULL,
+  `stationID` bigint(11) NOT NULL,
+  `activityID` int(11) NOT NULL,
+  `blueprintID` bigint(11) NOT NULL,
+  `blueprintTypeID` int(11) NOT NULL,
+  `blueprintTypeName` varchar(255) NOT NULL,
+  `blueprintLocationID` bigint(11) NOT NULL,
+  `outputLocationID` bigint(11) NOT NULL,
+  `runs` int(11) NOT NULL,
+  `cost` decimal(20,2) NOT NULL,
+  `teamID` bigint(11) NOT NULL,
+  `licensedRuns` int(11) NOT NULL,
+  `probability` decimal(20,2) NOT NULL,
+  `productTypeID` int(11) NOT NULL,
+  `productTypeName` varchar(255) NOT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `timeInSeconds` int(11) NOT NULL,
+  `startDate` datetime NOT NULL,
+  `endDate` datetime NOT NULL,
+  `pauseDate` datetime NOT NULL,
+  `completedDate` datetime NOT NULL,
+  `completedCharacterID` bigint(11) NOT NULL,
+  `successfulRuns` int(11) DEFAULT NULL,
+  `corporationID` bigint(11) DEFAULT NULL,
+  PRIMARY KEY (`jobID`),
+  KEY `installerID` (`installerID`),
+  KEY `facilityID` (`facilityID`),
+  KEY `solarSystemID` (`solarSystemID`),
+  KEY `stationID` (`stationID`),
+  KEY `blueprintTypeID` (`blueprintTypeID`),
+  KEY `productTypeID` (`productTypeID`),
+  KEY `startDate` (`startDate`),
+  KEY `endDate` (`endDate`),
+  KEY `completedDate` (`completedDate`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apikillattackers`
+--
+
+CREATE TABLE IF NOT EXISTS `apikillattackers` (
+  `killID` int(11) NOT NULL,
+  `characterID` int(11) NOT NULL,
+  `characterName` varchar(255) NOT NULL,
+  `corporationID` int(11) DEFAULT NULL,
+  `corporationName` varchar(255) DEFAULT NULL,
+  `allianceID` int(11) DEFAULT NULL,
+  `allianceName` varchar(255) DEFAULT NULL,
+  `factionID` int(11) DEFAULT NULL,
+  `factionName` varchar(255) DEFAULT NULL,
+  `securityStatus` decimal(15,2) NOT NULL,
+  `damageDone` int(11) NOT NULL,
+  `finalBlow` int(11) NOT NULL,
+  `weaponTypeID` int(11) NOT NULL,
+  `shipTypeID` int(11) NOT NULL,
+  KEY `apikillattackers_IX_killID` (`killID`),
+  KEY `apikillattackers_IX_characterID` (`characterID`),
+  KEY `apikillattackers_IX_corporationID` (`corporationID`),
+  KEY `apikillattackers_IX_allianceID` (`allianceID`),
+  KEY `apikillattackers_IX_factionID` (`factionID`),
+  KEY `apikillattackers_IX_weaponTypeID` (`shipTypeID`),
+  KEY `apikillattackers_IX_shipTypeID` (`shipTypeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apikillitems`
+--
+
+CREATE TABLE IF NOT EXISTS `apikillitems` (
+  `killID` int(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `flag` int(11) NOT NULL,
+  `qtyDropped` int(11) DEFAULT NULL,
+  `qtyDestroyed` int(11) DEFAULT NULL,
+  `singleton` int(11) NOT NULL,
+  KEY `apikillitems_IX_killID` (`killID`),
+  KEY `apikillitems_IX_typeID` (`typeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apikills`
+--
+
+CREATE TABLE IF NOT EXISTS `apikills` (
+  `killID` int(11) NOT NULL,
+  `solarSystemID` int(11) NOT NULL,
+  `killTime` datetime DEFAULT NULL,
+  `moonID` int(11) NOT NULL,
+  `killmail_hash` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`killID`),
+  KEY `apikills_IX_solarSystemID` (`solarSystemID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apikillvictims`
+--
+
+CREATE TABLE IF NOT EXISTS `apikillvictims` (
+  `killID` int(11) NOT NULL,
+  `characterID` int(11) NOT NULL,
+  `characterName` varchar(255) NOT NULL,
+  `corporationID` int(11) DEFAULT NULL,
+  `corporationName` varchar(255) DEFAULT NULL,
+  `allianceID` int(11) DEFAULT NULL,
+  `allianceName` varchar(255) DEFAULT NULL,
+  `factionID` int(11) DEFAULT NULL,
+  `factionName` varchar(255) DEFAULT NULL,
+  `damageTaken` int(11) NOT NULL,
+  `shipTypeID` int(11) NOT NULL,
+  KEY `apikillvictims_IX_killID` (`killID`),
+  KEY `apikillvictims_IX_characterID` (`characterID`),
+  KEY `apikillvictims_IX_corporationID` (`corporationID`),
+  KEY `apikillvictims_IX_allianceID` (`allianceID`),
+  KEY `apikillvictims_IX_factionID` (`factionID`),
+  KEY `apikillvictims_IX_shipTypeID` (`shipTypeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apilocations`
+--
+
+CREATE TABLE IF NOT EXISTS `apilocations` (
+  `itemID` bigint(20) NOT NULL,
+  `itemName` varchar(256) NOT NULL,
+  `x` double NOT NULL,
+  `y` double NOT NULL,
+  `z` double NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apimarketorders`
+--
+
+CREATE TABLE IF NOT EXISTS `apimarketorders` (
+  `orderID` bigint(11) NOT NULL,
+  `charID` bigint(11) NOT NULL,
+  `stationID` int(11) NOT NULL,
+  `volEntered` int(11) NOT NULL,
+  `volRemaining` int(11) NOT NULL,
+  `minVolume` int(11) NOT NULL,
+  `orderState` int(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `range` varchar(12) DEFAULT NULL,
+  `accountKey` int(11) NOT NULL,
+  `duration` int(11) NOT NULL,
+  `escrow` decimal(20,2) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `bid` int(11) NOT NULL,
+  `issued` datetime NOT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  PRIMARY KEY (`orderID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apipocolist`
+--
+
+CREATE TABLE IF NOT EXISTS `apipocolist` (
+  `itemID` bigint(20) NOT NULL,
+  `solarSystemID` int(11) NOT NULL,
+  `solarSystemName` varchar(256) NOT NULL,
+  `reinforceHour` int(11) NOT NULL,
+  `allowAlliance` int(11) NOT NULL,
+  `allowStandings` int(11) NOT NULL,
+  `standingLevel` int(11) NOT NULL,
+  `taxRateAlliance` float NOT NULL,
+  `taxRateCorp` float NOT NULL,
+  `taxRateStandingHigh` float NOT NULL,
+  `taxRateStandingGood` float NOT NULL,
+  `taxRateStandingNeutral` float NOT NULL,
+  `taxRateStandingBad` float NOT NULL,
+  `taxRateStandingHorrible` float NOT NULL,
+  `corporationID` int(11) NOT NULL,
+  PRIMARY KEY (`itemID`),
+  KEY `itemID` (`itemID`),
+  KEY `solarSystemID` (`solarSystemID`),
+  KEY `corporationID` (`corporationID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apipollerstats`
+--
+
+CREATE TABLE IF NOT EXISTS `apipollerstats` (
+  `statID` int(11) NOT NULL AUTO_INCREMENT,
+  `statDateTime` datetime NOT NULL,
+  `pollerSeconds` decimal(10,3) NOT NULL,
+  PRIMARY KEY (`statID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=189260 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apiprices`
+--
+
+CREATE TABLE IF NOT EXISTS `apiprices` (
+  `typeID` int(11) NOT NULL,
+  `volume` bigint(11) NOT NULL,
+  `avg` decimal(20,2) NOT NULL,
+  `max` decimal(20,2) NOT NULL,
+  `min` decimal(20,2) NOT NULL,
+  `stddev` decimal(20,2) NOT NULL,
+  `median` decimal(20,2) NOT NULL,
+  `percentile` decimal(20,2) DEFAULT NULL,
+  `type` varchar(5) NOT NULL,
+  UNIQUE KEY `unique` (`typeID`,`type`),
+  KEY `type` (`type`),
+  KEY `typeID` (`typeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apireftypes`
+--
+
+CREATE TABLE IF NOT EXISTS `apireftypes` (
+  `refTypeID` int(11) NOT NULL,
+  `refTypeName` varchar(128) NOT NULL,
+  PRIMARY KEY (`refTypeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apistarbasedetail`
+--
+
+CREATE TABLE IF NOT EXISTS `apistarbasedetail` (
+  `itemID` bigint(11) NOT NULL,
+  `state` int(11) NOT NULL,
+  `stateTimestamp` datetime NOT NULL,
+  `onlineTimestamp` datetime NOT NULL,
+  `usageFlags` int(11) NOT NULL,
+  `deployFlags` int(11) NOT NULL,
+  `allowCorporationMembers` int(11) NOT NULL,
+  `allowAllianceMembers` int(11) NOT NULL,
+  `useStandingsFrom` int(11) NOT NULL,
+  `onStandingDrop` int(11) NOT NULL,
+  `onStatusDrop` int(11) NOT NULL,
+  `onStatusDropStanding` int(11) NOT NULL,
+  `onAggression` int(11) NOT NULL,
+  `onCorporationWar` int(11) NOT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  PRIMARY KEY (`itemID`),
+  KEY `corporationID` (`corporationID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apistarbasefuel`
+--
+
+CREATE TABLE IF NOT EXISTS `apistarbasefuel` (
+  `itemID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `quantity` bigint(11) NOT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  PRIMARY KEY (`itemID`,`typeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apistarbaselist`
+--
+
+CREATE TABLE IF NOT EXISTS `apistarbaselist` (
+  `itemID` bigint(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `locationID` int(11) NOT NULL,
+  `moonID` int(11) NOT NULL,
+  `state` int(11) NOT NULL,
+  `stateTimestamp` datetime NOT NULL,
+  `onlineTimestamp` datetime NOT NULL,
+  `standingOwnerID` int(11) NOT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apistatus`
+--
+
+CREATE TABLE IF NOT EXISTS `apistatus` (
+  `errorID` int(11) NOT NULL AUTO_INCREMENT,
+  `keyID` varchar(255) NOT NULL,
+  `fileName` varchar(255) NOT NULL,
+  `date` datetime NOT NULL,
+  `errorCode` int(11) NOT NULL,
+  `errorCount` int(11) NOT NULL DEFAULT '0',
+  `errorMessage` varchar(1024) NOT NULL,
+  PRIMARY KEY (`errorID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=223 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apiwalletdivisions`
+--
+
+CREATE TABLE IF NOT EXISTS `apiwalletdivisions` (
+  `corporationID` int(11) NOT NULL,
+  `accountKey` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  KEY `corporationId` (`corporationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apiwalletjournal`
+--
+
+CREATE TABLE IF NOT EXISTS `apiwalletjournal` (
+  `date` datetime NOT NULL,
+  `refID` bigint(11) NOT NULL,
+  `refTypeID` int(11) NOT NULL,
+  `ownerName1` varchar(255) DEFAULT NULL,
+  `ownerID1` int(11) NOT NULL,
+  `ownerName2` varchar(255) DEFAULT NULL,
+  `ownerID2` int(11) NOT NULL,
+  `argName1` varchar(255) DEFAULT NULL,
+  `argID1` int(11) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `balance` decimal(20,2) NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  `accountKey` int(11) NOT NULL DEFAULT '1000',
+  PRIMARY KEY (`refID`),
+  KEY `refTypeID` (`refTypeID`),
+  KEY `corporationID` (`corporationID`),
+  KEY `date` (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `apiwallettransactions`
+--
+
+CREATE TABLE IF NOT EXISTS `apiwallettransactions` (
+  `transactionDateTime` datetime NOT NULL,
+  `transactionID` bigint(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `typeName` varchar(255) DEFAULT NULL,
+  `typeID` int(11) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `clientID` bigint(11) NOT NULL,
+  `clientName` varchar(255) DEFAULT NULL,
+  `characterID` bigint(11) NOT NULL,
+  `characterName` varchar(255) DEFAULT NULL,
+  `stationID` int(11) NOT NULL,
+  `stationName` varchar(255) DEFAULT NULL,
+  `transactionType` varchar(255) DEFAULT NULL,
+  `transactionFor` varchar(255) DEFAULT NULL,
+  `journalTransactionID` bigint(11) NOT NULL,
+  `accountKey` int(11) NOT NULL,
+  `corporationID` bigint(11) NOT NULL,
+  PRIMARY KEY (`transactionID`),
+  KEY `transactionDateTime` (`transactionDateTime`),
+  KEY `typeID` (`typeID`),
+  KEY `characterID` (`characterID`),
+  KEY `corporationID` (`corporationID`),
+  KEY `journalTransactionID` (`journalTransactionID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `ccpwglmapping`
+--
+
+CREATE TABLE IF NOT EXISTS `ccpwglmapping` (
+  `typeID` int(11) NOT NULL AUTO_INCREMENT,
+  `shipModel` varchar(1024) NOT NULL,
+  `background` varchar(1024) NOT NULL,
+  `thrusters` varchar(1024) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=33191 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgapikeys`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgapikeys` (
+  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
+  `keyID` varchar(255) NOT NULL,
+  `vCode` varchar(255) NOT NULL,
+  PRIMARY KEY (`apiKeyID`),
+  UNIQUE KEY `keyID` (`keyID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgbpo`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgbpo` (
+  `typeID` int(11) NOT NULL,
+  `me` int(11) NOT NULL,
+  `pe` int(11) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgbuying`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgbuying` (
+  `typeID` int(11) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgdecryptors`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgdecryptors` (
+  `typeID` int(11) NOT NULL,
+  `decryptorTypeID` int(11) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgesitoken`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgesitoken` (
+  `tokenID` int(11) NOT NULL AUTO_INCREMENT,
+  `token` varchar(255) NOT NULL,
+  PRIMARY KEY (`tokenID`),
+  UNIQUE KEY `keyID` (`token`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgmarket`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgmarket` (
+  `typeID` int(11) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgpoints`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgpoints` (
+  `activityID` int(11) NOT NULL,
+  `hrsPerPoint` int(11) NOT NULL,
+  PRIMARY KEY (`activityID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `cfgstock`
+--
+
+CREATE TABLE IF NOT EXISTS `cfgstock` (
+  `typeID` int(11) NOT NULL,
+  `amount` int(11) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `crestindustrysystems`
+--
+
+CREATE TABLE IF NOT EXISTS `crestindustrysystems` (
+  `solarSystemID` bigint(11) NOT NULL,
+  `costIndex` decimal(20,4) NOT NULL,
+  `activityID` int(11) NOT NULL,
+  PRIMARY KEY (`solarSystemID`,`activityID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `crestmarketprices`
+--
+
+CREATE TABLE IF NOT EXISTS `crestmarketprices` (
+  `typeID` int(11) NOT NULL,
+  `adjustedPrice` decimal(20,2) NOT NULL,
+  `averagePrice` decimal(20,2) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `esiserverstatus`
+--
+
+CREATE TABLE IF NOT EXISTS `esiserverstatus` (
+  `statusID` int(11) NOT NULL AUTO_INCREMENT,
+  `date` datetime NOT NULL,
+  `server` varchar(20) NOT NULL,
+  `players` int(11) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `startTime` datetime NOT NULL,
+  `vip` tinyint(1) NOT NULL,
+  PRIMARY KEY (`statusID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10714 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `esistatus`
+--
+
+CREATE TABLE IF NOT EXISTS `esistatus` (
+  `errorID` int(11) NOT NULL AUTO_INCREMENT,
+  `tokenID` varchar(255) NOT NULL,
+  `route` varchar(255) NOT NULL,
+  `date` datetime NOT NULL,
+  `errorCode` int(11) NOT NULL,
+  `errorCount` int(11) NOT NULL DEFAULT '0',
+  `errorMessage` varchar(1024) NOT NULL,
+  PRIMARY KEY (`errorID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `linki`
+--
+
+CREATE TABLE IF NOT EXISTS `linki` (
+  `idLink` int(11) NOT NULL AUTO_INCREMENT,
+  `link` varchar(4096) COLLATE latin2_bin DEFAULT NULL,
+  PRIMARY KEY (`idLink`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin2 COLLATE=latin2_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmbuyback`
+--
+
+CREATE TABLE IF NOT EXISTS `lmbuyback` (
+  `orderID` int(11) NOT NULL AUTO_INCREMENT,
+  `orderSerialized` text,
+  `timestmp` int(11) NOT NULL,
+  `shortHash` varchar(256) DEFAULT NULL,
+  `fullHash` varchar(256) DEFAULT NULL,
+  `userID` int(11) NOT NULL,
+  PRIMARY KEY (`orderID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=341 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmchars`
+--
+
+CREATE TABLE IF NOT EXISTS `lmchars` (
+  `charID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  PRIMARY KEY (`charID`),
+  KEY `userid` (`userID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmconfig`
+--
+
+CREATE TABLE IF NOT EXISTS `lmconfig` (
+  `itemLabel` varchar(64) NOT NULL,
+  `itemValue` text NOT NULL,
+  PRIMARY KEY (`itemLabel`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmlabs`
+--
+
+CREATE TABLE IF NOT EXISTS `lmlabs` (
+  `structureID` int(11) NOT NULL AUTO_INCREMENT,
+  `parentTowerID` bigint(20) DEFAULT NULL,
+  `structureTypeID` int(11) NOT NULL,
+  `structureName` varchar(48) NOT NULL,
+  PRIMARY KEY (`structureID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=63 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmnbapi`
+--
+
+CREATE TABLE IF NOT EXISTS `lmnbapi` (
+  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
+  `userID` int(11) NOT NULL DEFAULT '0',
+  `apiKey` varchar(64) NOT NULL,
+  `lastAccess` datetime DEFAULT NULL,
+  `lastIP` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`apiKeyID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmownerhash`
+--
+
+CREATE TABLE IF NOT EXISTS `lmownerhash` (
+  `characterID` bigint(11) NOT NULL,
+  `ownerHash` varchar(255) NOT NULL,
+  PRIMARY KEY (`characterID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmpagecache`
+--
+
+CREATE TABLE IF NOT EXISTS `lmpagecache` (
+  `pageLabel` varchar(32) NOT NULL,
+  `pageContents` mediumtext NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pageLabel`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmrights`
+--
+
+CREATE TABLE IF NOT EXISTS `lmrights` (
+  `rightID` int(11) NOT NULL AUTO_INCREMENT,
+  `rightName` varchar(256) NOT NULL,
+  PRIMARY KEY (`rightID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=42 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmrolerights`
+--
+
+CREATE TABLE IF NOT EXISTS `lmrolerights` (
+  `roleID` int(11) NOT NULL,
+  `rightID` int(11) NOT NULL,
+  UNIQUE KEY `roleID` (`roleID`,`rightID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmroles`
+--
+
+CREATE TABLE IF NOT EXISTS `lmroles` (
+  `roleID` int(11) NOT NULL AUTO_INCREMENT,
+  `roleName` varchar(256) NOT NULL,
+  PRIMARY KEY (`roleID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmtasks`
+--
+
+CREATE TABLE IF NOT EXISTS `lmtasks` (
+  `taskID` int(11) NOT NULL AUTO_INCREMENT,
+  `characterID` int(11) NOT NULL,
+  `typeID` int(11) NOT NULL,
+  `activityID` int(11) NOT NULL,
+  `runs` int(11) NOT NULL,
+  `taskCreateTimestamp` datetime NOT NULL,
+  `singleton` tinyint(3) NOT NULL,
+  `structureID` bigint(11) DEFAULT NULL,
+  PRIMARY KEY (`taskID`),
+  KEY `characterID` (`characterID`),
+  KEY `activityID` (`activityID`),
+  KEY `typeID` (`typeID`),
+  KEY `taskCreateTimestamp` (`taskCreateTimestamp`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1308 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmuserapikeys`
+--
+
+CREATE TABLE IF NOT EXISTS `lmuserapikeys` (
+  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
+  `keyID` varchar(255) NOT NULL,
+  `vCode` varchar(255) NOT NULL,
+  `userID` int(11) NOT NULL,
+  PRIMARY KEY (`apiKeyID`),
+  UNIQUE KEY `keyID` (`keyID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmuserroles`
+--
+
+CREATE TABLE IF NOT EXISTS `lmuserroles` (
+  `userID` int(11) NOT NULL,
+  `roleID` int(11) NOT NULL,
+  UNIQUE KEY `roleID` (`userID`,`roleID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `lmusers`
+--
+
+CREATE TABLE IF NOT EXISTS `lmusers` (
+  `userID` int(8) NOT NULL,
+  `login` varchar(24) CHARACTER SET latin2 NOT NULL,
+  `pass` varchar(64) DEFAULT NULL,
+  `lastip` varchar(16) CHARACTER SET latin2 DEFAULT '127.0.0.1',
+  `last` varchar(24) CHARACTER SET latin2 DEFAULT NULL,
+  `defaultPage` int(8) DEFAULT NULL,
+  `css` varchar(50) CHARACTER SET latin2 DEFAULT NULL,
+  `act` int(11) DEFAULT '1'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `message`
+--
+
+CREATE TABLE IF NOT EXISTS `message` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `msgto` int(8) NOT NULL,
+  `msgfrom` int(8) NOT NULL,
+  `msgdate` varchar(24) DEFAULT NULL,
+  `msgread` int(8) DEFAULT NULL,
+  `msgtopic` varchar(128) DEFAULT NULL,
+  `msg` varchar(4096) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin2 AUTO_INCREMENT=2446 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `message_sent`
+--
+
+CREATE TABLE IF NOT EXISTS `message_sent` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `msgto` int(8) NOT NULL,
+  `msgfrom` int(8) NOT NULL,
+  `msgdate` varchar(24) DEFAULT NULL,
+  `msgread` int(8) DEFAULT NULL,
+  `msgtopic` varchar(128) DEFAULT NULL,
+  `msg` varchar(4096) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin2 AUTO_INCREMENT=288 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `ramdecryptors`
+--
+
+CREATE TABLE IF NOT EXISTS `ramdecryptors` (
+  `typeID` int(11) NOT NULL,
+  `meBonus` int(11) NOT NULL,
+  `teBonus` int(11) NOT NULL,
+  `probabilityBonus` decimal(3,2) NOT NULL,
+  `runBonus` int(11) NOT NULL,
+  PRIMARY KEY (`typeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla  `wiki`
+--
+
+CREATE TABLE IF NOT EXISTS `wiki` (
+  `idpage` int(11) NOT NULL AUTO_INCREMENT,
+  `wikipage` varchar(32) NOT NULL,
+  `contents` text,
+  PRIMARY KEY (`idpage`),
+  UNIQUE KEY `wikipage` (`wikipage`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=31 ;
+
+-- --------------------------------------------------------
+
+--
+-- Funkcje
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `findNearest`(`x1` DOUBLE, `y1` DOUBLE, `z1` DOUBLE, `solarSystemID1` INT) RETURNS int(11)
+    READS SQL DATA
+RETURN (
+SELECT a.itemID FROM 
+    (SELECT (POW(x1-x,2)+POW(y1-y,2)+POW(z1-z,2)) AS distance,itemID
+    FROM mapDenormalize 
+    WHERE `solarSystemID`=solarSystemID1
+    AND groupID=7
+    ORDER BY distance ASC 
+    LIMIT 1) a
+)$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `thirtyDayIncome`(`planetID` INT) RETURNS double
+    READS SQL DATA
+RETURN (
+SELECT SUM(awj.amount) AS amount FROM
+apiwalletjournal awj
+WHERE
+awj.`argID1`=`planetID`
+AND awj.`refTypeID` IN (96, 97)
+AND awj.`date` BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()
+)$$
+
+DELIMITER ;
+
+--
+-- Zrzut danych tabeli `ramdecryptors`
+--
+
+INSERT INTO `ramdecryptors` (`typeID`, `meBonus`, `teBonus`, `probabilityBonus`, `runBonus`) VALUES
+(34207, 1, -2, '0.90', 2),
+(34208, 2, 0, '-0.10', 7),
+(34204, 1, -2, '0.50', 3),
+(34205, 3, 6, '0.10', 0),
+(34206, 2, 8, '0.00', 2),
+(34201, 2, 10, '0.20', 1),
+(34202, -1, 4, '0.80', 4),
+(34203, -2, 2, '-0.40', 9);
 
 --
 -- Zrzut danych tabeli `apierrorlist`
@@ -403,227 +1366,6 @@ INSERT INTO `apierrorlist` (`errorCode`, `errorText`) VALUES
 (904, 'Your IP address has been temporarily blocked because it is causing too many errors. See the cacheUntil timestamp for when it will be opened again. IPs that continually cause a lot of errors in the API will be permanently banned, please take measures to minimize problematic API calls from your application.'),
 (999, 'User forced test error condition.'),
 (1001, 'Cache is invalid');
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apifacwarstats`
---
-
-CREATE TABLE IF NOT EXISTS `apifacwarstats` (
-  `factionID` int(11) NOT NULL,
-  `factionName` varchar(64) NOT NULL,
-  `enlisted` datetime NOT NULL,
-  `pilots` int(11) NOT NULL,
-  `killsYesterday` int(11) NOT NULL,
-  `killsLastWeek` int(11) NOT NULL,
-  `killsTotal` int(11) NOT NULL,
-  `victoryPointsYesterday` int(11) NOT NULL,
-  `victoryPointsLastWeek` int(11) NOT NULL,
-  `victoryPointsTotal` int(11) NOT NULL,
-  `corporationID` bigint(11) NOT NULL,
-  PRIMARY KEY (`corporationID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apifacwarstats`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apiindustryjobs`
---
-
-CREATE TABLE IF NOT EXISTS `apiindustryjobs` (
-  `jobID` bigint(11) NOT NULL,
-  `assemblyLineID` bigint(11) NOT NULL,
-  `containerID` bigint(11) NOT NULL,
-  `installedItemID` bigint(11) NOT NULL,
-  `installedItemLocationID` bigint(11) NOT NULL,
-  `installedItemQuantity` bigint(11) NOT NULL,
-  `installedItemProductivityLevel` bigint(11) NOT NULL,
-  `installedItemMaterialLevel` bigint(11) NOT NULL,
-  `installedItemLicensedProductionRunsRemaining` bigint(11) NOT NULL,
-  `outputLocationID` bigint(11) NOT NULL,
-  `installerID` bigint(11) NOT NULL,
-  `runs` int(11) NOT NULL,
-  `licensedProductionRuns` int(11) NOT NULL,
-  `installedInSolarSystemID` bigint(11) NOT NULL,
-  `containerLocationID` bigint(11) NOT NULL,
-  `materialMultiplier` decimal(16,15) NOT NULL,
-  `charMaterialMultiplier` decimal(16,15) NOT NULL,
-  `timeMultiplier` decimal(16,15) NOT NULL,
-  `charTimeMultiplier` decimal(16,15) NOT NULL,
-  `installedItemTypeID` int(11) NOT NULL,
-  `outputTypeID` int(11) NOT NULL,
-  `containerTypeID` int(11) NOT NULL,
-  `installedItemCopy` int(11) NOT NULL,
-  `completed` int(11) NOT NULL,
-  `completedSuccessfully` int(11) NOT NULL,
-  `successfulRuns` int(11) NULL,
-  `installedItemFlag` int(11) NOT NULL,
-  `outputFlag` int(11) NOT NULL,
-  `activityID` int(11) NOT NULL,
-  `completedStatus` int(11) NOT NULL,
-  `installTime` datetime NOT NULL,
-  `beginProductionTime` datetime NOT NULL,
-  `endProductionTime` datetime NOT NULL,
-  `pauseProductionTime` datetime NOT NULL,
-  `corporationID` bigint(11) DEFAULT NULL,
-  PRIMARY KEY (`jobID`),
-  KEY `installedItemTypeID` (`installedItemTypeID`),
-  KEY `outputTypeID` (`outputTypeID`),
-  KEY `installerID` (`installerID`),
-  KEY `endProductionTime` (`endProductionTime`),
-  KEY `beginProductionTime` (`beginProductionTime`),
-  KEY `installedItemID` (`installedItemID`),
-  KEY `installTime` (`installTime`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apiindustryjobs`
---
-
-CREATE TABLE IF NOT EXISTS `apiindustryjobscrius` (
-  `jobID` bigint(11) NOT NULL,
-  `installerID` bigint(11) NOT NULL,
-  `installerName` varchar(255) NOT NULL,
-  `facilityID` bigint(11) NOT NULL,
-  `solarSystemID` int(11) NOT NULL,
-  `solarSystemName` varchar(255) NOT NULL,
-  `stationID` bigint(11) NOT NULL,
-  `activityID` int(11) NOT NULL,
-  `blueprintID` bigint(11) NOT NULL,
-  `blueprintTypeID` int(11) NOT NULL,
-  `blueprintTypeName` varchar(255) NOT NULL,
-  `blueprintLocationID` bigint(11) NOT NULL,
-  `outputLocationID` bigint(11) NOT NULL,
-  `runs` int(11) NOT NULL,
-  `cost` decimal (20,2) NOT NULL,
-  `teamID` bigint(11) NOT NULL,
-  `licensedRuns` int(11) NOT NULL,
-  `probability` decimal (20,2) NOT NULL,
-  `productTypeID` int(11) NOT NULL,
-  `productTypeName` varchar(255) NOT NULL,
-  `status` int(11) NOT NULL,
-  `timeInSeconds` int(11) NOT NULL,
-  `startDate` datetime NOT NULL,
-  `endDate` datetime NOT NULL,
-  `pauseDate` datetime NOT NULL,
-  `completedDate` datetime NOT NULL,
-  `completedCharacterID` bigint(11) NOT NULL,
-  `successfulRuns` int(11) NULL,
-  `corporationID` bigint(11) DEFAULT NULL,
-  PRIMARY KEY (`jobID`),
-  KEY `installerID` (`installerID`),
-  KEY `facilityID` (`facilityID`),
-  KEY `solarSystemID` (`solarSystemID`),
-  KEY `stationID` (`stationID`),
-  KEY `blueprintTypeID` (`blueprintTypeID`),
-  KEY `productTypeID` (`productTypeID`),
-  KEY `startDate` (`startDate`),
-  KEY `endDate` (`endDate`),
-  KEY `completedDate` (`completedDate`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;				
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apilocations`
---
-CREATE TABLE IF NOT EXISTS `apilocations` (
-	`itemID` BIGINT(20) NOT NULL,
-	`itemName` VARCHAR(256) NOT NULL,
-	`x` DOUBLE NOT NULL,
-	`y` DOUBLE NOT NULL,
-	`z` DOUBLE NOT NULL,
-	`corporationID` INT(11) NOT NULL,
-	PRIMARY KEY (`itemID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
-
---
--- Zrzut danych tabeli `apilocations`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apimarketorders`
---
-
-CREATE TABLE IF NOT EXISTS `apimarketorders` (
-  `orderID` bigint(11) NOT NULL,
-  `charID` bigint(11) NOT NULL,
-  `stationID` int(11) NOT NULL,
-  `volEntered` int(11) NOT NULL,
-  `volRemaining` int(11) NOT NULL,
-  `minVolume` int(11) NOT NULL,
-  `orderState` int(11) NOT NULL,
-  `typeID` int(11) NOT NULL,
-  `range` int(11) NOT NULL,
-  `accountKey` int(11) NOT NULL,
-  `duration` int(11) NOT NULL,
-  `escrow` decimal(20,2) NOT NULL,
-  `price` decimal(20,2) NOT NULL,
-  `bid` int(11) NOT NULL,
-  `issued` datetime NOT NULL,
-  `corporationID` bigint(11) NOT NULL,
-  PRIMARY KEY (`orderID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apimarketorders`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apipollerstats`
---
-
-CREATE TABLE IF NOT EXISTS `apipollerstats` (
-  `statID` int(11) NOT NULL AUTO_INCREMENT,
-  `statDateTime` datetime NOT NULL,
-  `pollerSeconds` decimal(10,3) NOT NULL,
-  PRIMARY KEY (`statID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apiprices`
---
-
-CREATE TABLE IF NOT EXISTS `apiprices` (
-  `typeID` int(11) NOT NULL,
-  `volume` bigint(11) NOT NULL,
-  `avg` decimal(20,2) NOT NULL,
-  `max` decimal(20,2) NOT NULL,
-  `min` decimal(20,2) NOT NULL,
-  `stddev` decimal(20,2) NOT NULL,
-  `median` decimal(20,2) NOT NULL,
-  `percentile` decimal(20,2) DEFAULT NULL,
-  `type` varchar(5) NOT NULL,
-  KEY `typeID` (`typeID`),
-  KEY `type` (`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apireftypes`
---
-
-CREATE TABLE IF NOT EXISTS `apireftypes` (
-  `refTypeID` int(11) NOT NULL,
-  `refTypeName` varchar(128) NOT NULL,
-  PRIMARY KEY (`refTypeID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Zrzut danych tabeli `apireftypes`
@@ -772,197 +1514,6 @@ INSERT INTO `apireftypes` (`refTypeID`, `refTypeName`) VALUES
 (11004, 'Unknown'),
 (11005, 'Unknown');
 
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apistarbaselist`
---
-
-CREATE TABLE IF NOT EXISTS `apistarbaselist` (
-  `itemID` bigint(11) NOT NULL,
-  `typeID` int(11) NOT NULL,
-  `locationID` int(11) NOT NULL,
-  `moonID` int(11) NOT NULL,
-  `state` int(11) NOT NULL,
-  `stateTimestamp` datetime NOT NULL,
-  `onlineTimestamp` datetime NOT NULL,
-  `standingOwnerID` int(11) NOT NULL,
-  `corporationID` bigint(11) NOT NULL,
-  PRIMARY KEY (`itemID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apistarbaselist`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apistatus`
---
-
-CREATE TABLE IF NOT EXISTS `apistatus` (
-  `errorID` int(11) NOT NULL AUTO_INCREMENT,
-  `keyID` varchar(255) NOT NULL,
-  `fileName` varchar(255) NOT NULL,
-  `date` datetime NOT NULL,
-  `errorCode` int(11) NOT NULL,
-  `errorCount` int(11) NOT NULL DEFAULT '0',
-  `errorMessage` varchar(1024) NOT NULL,
-  PRIMARY KEY (`errorID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apiwalletdivisions`
---
-
-CREATE TABLE IF NOT EXISTS `apiwalletdivisions` (
-  `corporationID` int(11) NOT NULL,
-  `accountKey` int(11) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  KEY `corporationId` (`corporationID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apiwalletdivisions`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apiwalletjournal`
---
-
-CREATE TABLE IF NOT EXISTS `apiwalletjournal` (
-  `date` datetime NOT NULL,
-  `refID` bigint(11) NOT NULL,
-  `refTypeID` int(11) NOT NULL,
-  `ownerName1` varchar(255) DEFAULT NULL,
-  `ownerID1` int(11) NOT NULL,
-  `ownerName2` varchar(255) DEFAULT NULL,
-  `ownerID2` int(11) NOT NULL,
-  `argName1` varchar(255) DEFAULT NULL,
-  `argID1` int(11) NOT NULL,
-  `amount` decimal(20,2) NOT NULL,
-  `balance` decimal(20,2) NOT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `corporationID` bigint(11) NOT NULL,
-  `accountKey` int(11) NOT NULL DEFAULT '1000',
-  PRIMARY KEY (`refID`),
-  KEY `refTypeID` (`refTypeID`),
-  KEY `corporationID` (`corporationID`),
-  KEY `date` (`date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apiwalletjournal`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `apiwallettransactions`
---
-
-CREATE TABLE IF NOT EXISTS `apiwallettransactions` (
-  `transactionDateTime` datetime NOT NULL,
-  `transactionID` bigint(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `typeName` varchar(255) DEFAULT NULL,
-  `typeID` int(11) NOT NULL,
-  `price` decimal(20,2) NOT NULL,
-  `clientID` bigint(11) NOT NULL,
-  `clientName` varchar(255) DEFAULT NULL,
-  `characterID` bigint(11) NOT NULL,
-  `characterName` varchar(255) DEFAULT NULL,
-  `stationID` int(11) NOT NULL,
-  `stationName` varchar(255) DEFAULT NULL,
-  `transactionType` varchar(255) DEFAULT NULL,
-  `transactionFor` varchar(255) DEFAULT NULL,
-  `journalTransactionID` bigint(11) NOT NULL,
-  `accountKey` int(11) NOT NULL,
-  `corporationID` bigint(11) NOT NULL,
-  PRIMARY KEY (`transactionID`),
-  KEY `transactionDateTime` (`transactionDateTime`),
-  KEY `typeID` (`typeID`),
-  KEY `characterID` (`characterID`),
-  KEY `corporationID` (`corporationID`),
-  KEY `journalTransactionID` (`journalTransactionID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `apiwallettransactions`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `ccpwglmapping`
---
-
-CREATE TABLE IF NOT EXISTS `ccpwglmapping` (
-  `typeID` int(11) NOT NULL AUTO_INCREMENT,
-  `shipModel` varchar(1024) NOT NULL,
-  `background` varchar(1024) NOT NULL,
-  `thrusters` varchar(1024) NOT NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `cfgapikeys`
---
-
-CREATE TABLE IF NOT EXISTS `cfgapikeys` (
-  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
-  `keyID` varchar(255) NOT NULL,
-  `vCode` varchar(255) NOT NULL,
-  PRIMARY KEY (`apiKeyID`),
-  UNIQUE KEY `keyID` (`keyID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `cfgapikeys`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `cfgbpo`
---
-
-CREATE TABLE IF NOT EXISTS `cfgbpo` (
-  `typeID` int(11) NOT NULL,
-  `me` int(11) NOT NULL,
-  `pe` int(11) NOT NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `cfgbpo`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `cfgbuying`
---
-
-CREATE TABLE IF NOT EXISTS `cfgbuying` (
-  `typeID` int(11) NOT NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 --
 -- Zrzut danych tabeli `cfgbuying`
 --
@@ -976,17 +1527,6 @@ INSERT INTO `cfgbuying` (`typeID`) VALUES
 (39),
 (40),
 (11399);
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `cfgmarket`
---
-
-CREATE TABLE IF NOT EXISTS `cfgmarket` (
-  `typeID` int(11) NOT NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Zrzut danych tabeli `cfgmarket`
@@ -1002,18 +1542,6 @@ INSERT INTO `cfgmarket` (`typeID`) VALUES
 (40),
 (11399);
 
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `cfgpoints`
---
-
-CREATE TABLE IF NOT EXISTS `cfgpoints` (
-  `activityID` int(11) NOT NULL,
-  `hrsPerPoint` int(11) NOT NULL,
-  PRIMARY KEY (`activityID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 --
 -- Zrzut danych tabeli `cfgpoints`
 --
@@ -1025,18 +1553,6 @@ INSERT INTO `cfgpoints` (`activityID`, `hrsPerPoint`) VALUES
 (5, 1500),
 (7, 300),
 (8, 300);
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `cfgstock`
---
-
-CREATE TABLE IF NOT EXISTS `cfgstock` (
-  `typeID` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Zrzut danych tabeli `cfgstock`
@@ -1051,95 +1567,6 @@ INSERT INTO `cfgstock` (`typeID`, `amount`) VALUES
 (39, 0),
 (40, 0),
 (11399, 0);
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `linki`
---
-
-CREATE TABLE IF NOT EXISTS `linki` (
-  `idLink` int(11) NOT NULL AUTO_INCREMENT,
-  `link` varchar(4096) COLLATE latin2_bin DEFAULT NULL,
-  PRIMARY KEY (`idLink`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin2 COLLATE=latin2_bin AUTO_INCREMENT=2 ;
-
---
--- Zrzut danych tabeli `linki`
---
-
-INSERT INTO `linki` (`idLink`, `link`) VALUES
-(1, '&lt;h2&gt;&lt;u&gt;Links&lt;/u&gt;&lt;/h2&gt;\r\n\r\n&lt;script&gt;\r\n$(function() {\r\n    $( \\&quot;#accordion\\&quot; ).accordion({\r\n      heightStyle: \\&quot;content\\&quot;\r\n    });\r\n  });\r\n&lt;/script&gt;\r\n&lt;div id=\\&quot;accordion\\&quot;&gt;\r\n  &lt;h3&gt;&amp;#187; Aideron Technologies&lt;/h3&gt;\r\n  &lt;div&gt;\r\n&lt;ul&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;index.php?id=3&amp;id2=1\\&quot;&gt;Buy Calculator&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;index.php?id=10&amp;id2=7\\&quot;&gt;Ore Values&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;index.php?id=2&amp;id2=2\\&quot;&gt;Lab assignments&lt;/a&gt;&lt;/li&gt;\r\n&lt;!--&lt;li&gt;&lt;a href=\\&quot;https://docs.google.com/spreadsheet/ccc?key=0Atv4WV8DEJUPdENuZGxLd3E4NS1Hb3d1azRDakxVWlE#gid=4\\&quot;&gt;OLD GDOCS Buy calculator&lt;/a&gt;&lt;/li&gt;--&gt;\r\n&lt;/ul&gt;\r\n&lt;/div&gt;\r\n\r\n&lt;h3&gt;&amp;#187; Blogs by Aideron members&lt;/h3&gt;\r\n&lt;div&gt;\r\n&lt;ul&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://highdrag.wordpress.com/\\&quot;&gt;Highdrag Podcast&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://eve-prosper.blogspot.dk/\\&quot;&gt;Eve-Prosper&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://eve-x.blogspot.com/\\&quot;&gt;EVE-Xperience&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://www.ninveah.com/\\&quot;&gt;Inner Sanctum of Ninveah&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://ninveah.podbean.com/\\&quot;&gt;Broadcasts from the Ninveah&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://www.warpto0.blogspot.com\\&quot;&gt;Warp to Zero&lt;/a&gt;&lt;/li&gt;\r\n&lt;li&gt;&lt;a href=\\&quot;http://pozniak.pl/wp/\\&quot;&gt;Torchwood Archives&lt;/a&gt;&lt;/li&gt;\r\n&lt;/ul&gt;\r\n&lt;/div&gt;\r\n&lt;/div&gt;');
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmbuyback`
---
-
-CREATE TABLE IF NOT EXISTS `lmbuyback` (
-  `orderID` int(11) NOT NULL AUTO_INCREMENT,
-  `orderSerialized` text,
-  `timestmp` int(11) NOT NULL,
-  `shortHash` varchar(256) DEFAULT NULL,
-  `fullHash` varchar(256) DEFAULT NULL,
-  `userID` int(11) NOT NULL,
-  PRIMARY KEY (`orderID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Zrzut danych tabeli `lmbuyback`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmchars`
---
-
-CREATE TABLE IF NOT EXISTS `lmchars` (
-  `charID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
-  PRIMARY KEY (`charID`),
-  KEY `userid` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `lmchars`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmlabs` (deprecated)
---
-
-CREATE TABLE IF NOT EXISTS `lmlabs` (
-  `structureID` int(11) NOT NULL AUTO_INCREMENT,
-  `parentTowerID` bigint(20) DEFAULT NULL,
-  `structureTypeID` int(11) NOT NULL,
-  `structureName` varchar(48) NOT NULL,
-  PRIMARY KEY (`structureID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Zrzut danych tabeli `lmlabs`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmrights`
---
-
-CREATE TABLE IF NOT EXISTS `lmrights` (
-  `rightID` int(11) NOT NULL AUTO_INCREMENT,
-  `rightName` varchar(256) NOT NULL,
-  PRIMARY KEY (`rightID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
 
 --
 -- Zrzut danych tabeli `lmrights`
@@ -1184,18 +1611,6 @@ INSERT INTO `lmrights` (`rightID`, `rightName`) VALUES
 (36, 'EditPOS'),
 (37, 'ViewActivity'),
 (38, 'ViewKillboard');
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmrolerights`
---
-
-CREATE TABLE IF NOT EXISTS `lmrolerights` (
-  `roleID` int(11) NOT NULL,
-  `rightID` int(11) NOT NULL,
-  UNIQUE KEY `roleID` (`roleID`,`rightID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Zrzut danych tabeli `lmrolerights`
@@ -1272,18 +1687,6 @@ INSERT INTO `lmrolerights` (`roleID`, `rightID`) VALUES
 (7, 22),
 (7, 32);
 
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmroles`
---
-
-CREATE TABLE IF NOT EXISTS `lmroles` (
-  `roleID` int(11) NOT NULL AUTO_INCREMENT,
-  `roleName` varchar(256) NOT NULL,
-  PRIMARY KEY (`roleID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
-
 --
 -- Zrzut danych tabeli `lmroles`
 --
@@ -1297,149 +1700,12 @@ INSERT INTO `lmroles` (`roleID`, `roleName`) VALUES
 (6, 'Database only'),
 (7, 'Buy Calc Only');
 
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmtasks`
---
-
-CREATE TABLE IF NOT EXISTS `lmtasks` (
-  `taskID` int(11) NOT NULL AUTO_INCREMENT,
-  `characterID` int(11) NOT NULL,
-  `typeID` int(11) NOT NULL,
-  `activityID` int(11) NOT NULL,
-  `runs` int(11) NOT NULL,
-  `taskCreateTimestamp` datetime NOT NULL,
-  `singleton` tinyint(3) NOT NULL,
-  `structureID` bigint(11) DEFAULT NULL,
-  PRIMARY KEY (`taskID`),
-  KEY `characterID` (`characterID`),
-  KEY `activityID` (`activityID`),
-  KEY `typeID` (`typeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Zrzut danych tabeli `lmtasks`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmuserapikeys`
---
-
-CREATE TABLE IF NOT EXISTS `lmuserapikeys` (
-  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
-  `keyID` varchar(255) NOT NULL,
-  `vCode` varchar(255) NOT NULL,
-  `userID` int(11) NOT NULL,
-  PRIMARY KEY (`apiKeyID`),
-  UNIQUE KEY `keyID` (`keyID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Zrzut danych tabeli `lmuserapikeys`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmuserroles`
---
-
-CREATE TABLE IF NOT EXISTS `lmuserroles` (
-  `userID` int(11) NOT NULL,
-  `roleID` int(11) NOT NULL,
-  UNIQUE KEY `roleID` (`userID`,`roleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 --
 -- Zrzut danych tabeli `lmuserroles`
 --
 
 INSERT INTO `lmuserroles` (`userID`, `roleID`) VALUES
 (1, 1);
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `lmusers`
---
-
-CREATE TABLE IF NOT EXISTS `lmusers` (
-  `userID` int(8) NOT NULL,
-  `login` varchar(24) CHARACTER SET latin2 NOT NULL,
-  `pass` varchar(64) NOT NULL DEFAULT '',
-  `lastip` varchar(16) CHARACTER SET latin2 DEFAULT '127.0.0.1',
-  `last` varchar(24) CHARACTER SET latin2 DEFAULT NULL,
-  `defaultPage` int(8) DEFAULT NULL,
-  `css` varchar(50) CHARACTER SET latin2 DEFAULT NULL,
-  `act` int(11) DEFAULT '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Zrzut danych tabeli `lmusers`
---
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `message`
---
-
-CREATE TABLE IF NOT EXISTS `message` (
-  `id` int(8) NOT NULL AUTO_INCREMENT,
-  `msgto` int(8) NOT NULL,
-  `msgfrom` int(8) NOT NULL,
-  `msgdate` varchar(24) DEFAULT NULL,
-  `msgread` int(8) DEFAULT NULL,
-  `msgtopic` varchar(128) DEFAULT NULL,
-  `msg` varchar(4096) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin2 AUTO_INCREMENT=1 ;
-
---
--- Zrzut danych tabeli `message`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `message_sent`
---
-
-CREATE TABLE IF NOT EXISTS `message_sent` (
-  `id` int(8) NOT NULL AUTO_INCREMENT,
-  `msgto` int(8) NOT NULL,
-  `msgfrom` int(8) NOT NULL,
-  `msgdate` varchar(24) DEFAULT NULL,
-  `msgread` int(8) DEFAULT NULL,
-  `msgtopic` varchar(128) DEFAULT NULL,
-  `msg` varchar(4096) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin2 AUTO_INCREMENT=1 ;
-
---
--- Zrzut danych tabeli `message_sent`
---
-
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla  `wiki`
---
-
-CREATE TABLE IF NOT EXISTS `wiki` (
-  `idpage` int(11) NOT NULL AUTO_INCREMENT,
-  `wikipage` varchar(32) NOT NULL,
-  `contents` text,
-  PRIMARY KEY (`idpage`),
-  UNIQUE KEY `wikipage` (`wikipage`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
 -- Zrzut danych tabeli `wiki`
@@ -1448,258 +1714,4 @@ CREATE TABLE IF NOT EXISTS `wiki` (
 INSERT INTO `wiki` (`idpage`, `wikipage`, `contents`) VALUES
 (1, 'start', '=====Wiki start page=====\r\n\r\n===Fill your wiki with information!===\r\n\r\n* it allows bullet lists\r\n* it allows bullet lists\r\n* it allows bullet lists\r\n');
 
--- --------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `apifacilities` (
-  `facilityID` bigint(11) NOT NULL,
-  `typeID` int(11) NOT NULL,
-  `typeName` varchar(255) NOT NULL,
-  `solarSystemID` int(11) NOT NULL,
-  `solarSystemName` varchar(255) NOT NULL,
-  `regionID` int(11) NOT NULL,
-  `regionName` varchar(255) NOT NULL,
-  `starbaseModifier` decimal(20,2) NOT NULL,
-  `tax` decimal(20,2) NOT NULL,
-  `corporationID` int(11) NOT NULL,
-  PRIMARY KEY (`facilityID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `crestmarketprices` (
-  `typeID` int(11) NOT NULL,
-  `adjustedPrice` decimal(20,2) NOT NULL,
-  `averagePrice` decimal(20,2) NOT NULL,
-  PRIMARY KEY (`typeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;	
-
--- schema delta for EVE SSO functionality in release 0.1.47
-
-CREATE TABLE IF NOT EXISTS `lmownerhash` (
-  `characterID` bigint(11) NOT NULL,
-  `ownerHash` varchar(255) NOT NULL,
-  PRIMARY KEY (`characterID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- schema delta for db based configuration and keys for LMeve external JSON api
-
-CREATE TABLE IF NOT EXISTS `lmconfig` (
-  `itemLabel` varchar(64) NOT NULL,
-  `itemValue` text NOT NULL,
-  PRIMARY KEY (`itemLabel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `lmnbapi` (
-  `apiKeyID` int(11) NOT NULL AUTO_INCREMENT,
-  `userID` int(11) NOT NULL,
-  `apiKey` varchar(64) NOT NULL,
-  `lastAccess` datetime NULL,
-  `lastIP` varchar(32) NULL,
-  PRIMARY KEY (`apiKeyID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `apiblueprints` (
-  `itemID` bigint(11) NOT NULL,
-  `locationID` bigint(11) NOT NULL,
-  `typeID` int(11) NOT NULL,
-  `typeName` varchar(256) NULL,
-  `flagID` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `timeEfficiency` int(11) NOT NULL,
-  `materialEfficiency` int(11) NOT NULL,
-  `runs` int(11) NOT NULL,
-  `corporationID` int(11) NOT NULL,
-  PRIMARY KEY (`itemID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- schema delta for page cache
-
-CREATE TABLE IF NOT EXISTS `lmpagecache` (
-  `pageLabel` varchar(32) NOT NULL,
-  `pageContents` mediumtext NOT NULL,
-  `timestamp` TIMESTAMP NOT NULL,
-  PRIMARY KEY (`pageLabel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- function for PoCo planet finding
-
-DROP FUNCTION IF EXISTS `findNearest`;
-
-CREATE FUNCTION `findNearest`(`x1` DOUBLE, `y1` DOUBLE, `z1` DOUBLE, `solarSystemID1` INT)
-RETURNS INT 
-NOT DETERMINISTIC 
-READS SQL DATA 
-SQL SECURITY DEFINER
-RETURN (
-SELECT a.itemID FROM 
-    (SELECT (POW(x1-x,2)+POW(y1-y,2)+POW(z1-z,2)) AS distance,itemID
-    FROM mapDenormalize 
-    WHERE `solarSystemID`=solarSystemID1
-    ORDER BY distance ASC 
-    LIMIT 1) a
-);
-
--- function for PoCo last 30 days income
-
-DROP FUNCTION IF EXISTS `thirtyDayIncome`;
-
-CREATE FUNCTION `thirtyDayIncome`(`planetID` INT)
-RETURNS DOUBLE 
-NOT DETERMINISTIC 
-READS SQL DATA 
-SQL SECURITY DEFINER
-RETURN (
-SELECT SUM(awj.amount) AS amount FROM
-apiwalletjournal awj
-WHERE
-awj.`argID1`=`planetID`
-AND awj.`refTypeID` IN (96, 97)
-AND awj.`date` BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()
-);
-
--- apipocolist - table for pocos
-
-CREATE TABLE IF NOT EXISTS `apipocolist` (
-  `itemID` bigint(20) NOT NULL,
-  `solarSystemID` int(11) NOT NULL,
-  `solarSystemName` varchar(256) NOT NULL,
-  `reinforceHour` int(11) NOT NULL,
-  `allowAlliance` int(11) NOT NULL,
-  `allowStandings` int(11) NOT NULL,
-  `standingLevel` int(11) NOT NULL,
-  `taxRateAlliance` float NOT NULL,
-  `taxRateCorp` float NOT NULL,
-  `taxRateStandingHigh` float NOT NULL,
-  `taxRateStandingGood` float NOT NULL,
-  `taxRateStandingNeutral` float NOT NULL,
-  `taxRateStandingBad` float NOT NULL,
-  `taxRateStandingHorrible` float NOT NULL,
-  `corporationID` int(11) NOT NULL,
-  PRIMARY KEY (`itemID`),
-  KEY `itemID` (`itemID`),
-  KEY `solarSystemID` (`solarSystemID`),
-  KEY `corporationID` (`corporationID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- schema delta for northbound api
-
--- (change included in table definition)
-
--- schema delta for starbase detail, starbase fuel and crest industry system index
-
-CREATE TABLE IF NOT EXISTS `apistarbasedetail` (
-`itemID` bigint(11) NOT NULL,
-`state` int(11) NOT NULL,
-`stateTimestamp` datetime NOT NULL,
-`onlineTimestamp` datetime NOT NULL,
-`usageFlags` int(11) NOT NULL,
-`deployFlags` int(11) NOT NULL,
-`allowCorporationMembers` int(11) NOT NULL,
-`allowAllianceMembers` int(11) NOT NULL,
-`useStandingsFrom` int(11) NOT NULL,
-`onStandingDrop` int(11) NOT NULL,
-`onStatusDrop` int(11) NOT NULL,
-`onStatusDropStanding` int(11) NOT NULL,
-`onAggression` int(11) NOT NULL,
-`onCorporationWar` int(11) NOT NULL,
-`corporationID` bigint(11) NOT NULL,
-PRIMARY KEY (`itemID`),
-KEY `corporationID` (`corporationID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `apistarbasefuel` (
-  `itemID` bigint(11) NOT NULL,
-  `typeID` int(11) NOT NULL,
-  `quantity` bigint(11) NOT NULL,
-  `corporationID` bigint(11) NOT NULL,
-  PRIMARY KEY (`itemID`,`typeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `crestindustrysystems` (
-  `solarSystemID` bigint(11) NOT NULL,
-  `costIndex` decimal(20,4) NOT NULL,
-  `activityID` int(11) NOT NULL,
-  PRIMARY KEY (`solarSystemID`,`activityID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- schema delta for killmails
-
-CREATE TABLE IF NOT EXISTS `apikills` (
-  `killID` int(11) not null,
-  `solarSystemID` int(11) NOT NULL,
-  `killTime` datetime NULL,
-  `moonID` int(11) NOT NULL,
-  PRIMARY KEY (`killID`),
-  KEY `apikills_IX_solarSystemID` (`solarSystemID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `apikillvictims` (
-  `killID` int(11) not null,
-  `characterID` int(11) not null,
-  `characterName` varchar(255) not null,
-  `corporationID` int(11) null,
-  `corporationName` varchar(255) null,
-  `allianceID` int(11) null,
-  `allianceName` varchar(255) null,
-  `factionID` int(11) null,
-  `factionName` varchar(255) null,
-  `damageTaken` int(11) not null,
-  `shipTypeID` int(11) not null,
-  KEY `apikillvictims_IX_killID` (`killID`),
-  KEY `apikillvictims_IX_characterID` (`characterID`),
-  KEY `apikillvictims_IX_corporationID` (`corporationID`),
-  KEY `apikillvictims_IX_allianceID` (`allianceID`),
-  KEY `apikillvictims_IX_factionID` (`factionID`),
-  KEY `apikillvictims_IX_shipTypeID` (`shipTypeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `apikillattackers` (
-  `killID` int(11) not null,
-  `characterID` int(11) not null,
-  `characterName` varchar(255) not null,
-  `corporationID` int(11) null,
-  `corporationName` varchar(255) null,
-  `allianceID` int(11) null,
-  `allianceName` varchar(255) null,
-  `factionID` int(11) null,
-  `factionName` varchar(255) null,
-  `securityStatus` decimal(15,2) not null,
-  `damageDone` int(11) not null,
-  `finalBlow` int(11) not null,
-  `weaponTypeID` int(11) not null,
-  `shipTypeID` int(11) not null,
-  KEY `apikillattackers_IX_killID` (`killID`),
-  KEY `apikillattackers_IX_characterID` (`characterID`),
-  KEY `apikillattackers_IX_corporationID` (`corporationID`),
-  KEY `apikillattackers_IX_allianceID` (`allianceID`),
-  KEY `apikillattackers_IX_factionID` (`factionID`),
-  KEY `apikillattackers_IX_weaponTypeID` (`shipTypeID`),
-  KEY `apikillattackers_IX_shipTypeID` (`shipTypeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `apikillitems` (
-  `killID` int(11) not null,
-  `typeID` int(11) not null,
-  `flag` int(11) not null,
-  `qtyDropped` int(11) null,
-  `qtyDestroyed` int(11) null,
-  `singleton` int(11) not null,
-  KEY `apikillitems_IX_killID` (`killID`),
-  KEY `apikillitems_IX_typeID` (`typeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `cfgesitoken` (
-    `tokenID` int(11) NOT NULL AUTO_INCREMENT,
-    `token` varchar(255) NOT NULL,
-    PRIMARY KEY (`tokenID`),
-    UNIQUE KEY `keyID` (`token`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
-
-CREATE TABLE IF NOT EXISTS `esistatus` (
-    `errorID` int(11) NOT NULL AUTO_INCREMENT,
-    `tokenID` varchar(255) NOT NULL,
-    `route` varchar(255) NOT NULL,
-    `date` datetime NOT NULL,
-    `errorCode` int(11) NOT NULL,
-    `errorCount` int(11) NOT NULL DEFAULT '0',
-    `errorMessage` varchar(1024) NOT NULL,
-    PRIMARY KEY (`errorID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
