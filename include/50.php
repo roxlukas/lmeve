@@ -153,6 +153,14 @@ Settings
                         </tr>
                         <tr>
                             <td>
+                                Auto hide Non-recurring tasks:<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="singletonTaskAutoHide" <?php if (getConfigItem('singletonTaskAutoHide','enabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Relic to use for Tech III:<br/>
                             </td><td>
                                 <select name="T3relicType"> <?php

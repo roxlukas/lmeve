@@ -38,6 +38,7 @@ global $LM_EVEDB;
                 if (secureGETstr('publicKillboard')=='on') setConfigItem('publicKillboard','enabled'); else setConfigItem('publicKillboard','disabled');
                 if (secureGETstr('useCRESTkillmails')=='on') setConfigItem('useCRESTkillmails','enabled'); else setConfigItem('useCRESTkillmails','disabled');
                 if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');
+                if (secureGETstr('singletonTaskAutoHide')=='on') setConfigItem('singletonTaskAutoHide','enabled'); else setConfigItem('singletonTaskAutoHide','disabled');
                 
                 if (in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
 		if (secureGETnum('siloPercentage')>=0 && secureGETnum('siloPercentage')<=100) setConfigItem('siloPercentage', secureGETnum('siloPercentage'));

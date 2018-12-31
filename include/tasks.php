@@ -21,7 +21,7 @@ include_once("percentage.php");
 function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	global $LM_EVEDB, $USERSTABLE;
         /**** ORIGINAL TASKS SQL, works fast ****/
-        $sql_original="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
+        /*$sql_original="SELECT a.*,b.runsDone,b.jobsDone,c.jobsSuccess,d.jobsCompleted,e.runsCompleted
 	FROM (SELECT acm.name, lmt.characterID, itp.typeName, lmt.typeID, rac.activityName, lmt.activityID, lmt.taskID, lmt.runs
 	FROM lmtasks lmt
 	JOIN apicorpmembers acm
@@ -83,7 +83,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS e
 	ON a.taskID=e.taskID
-	$ORDERBY";
+	$ORDERBY";*/
 
         /**** NEW TASKS SQL - way slower ****/
         /* runs - number of individual items to build/invent in a task
@@ -329,7 +329,8 @@ function showTasks($tasklist) {
 		$rights=checkrights("Administrator,EditTasks");
 		foreach($tasklist as $row) {
                     //dirty hack to hide completed one time tasks
-                    if ($row['singleton']==1 && $row['runsDone'] >= $row['runs']) continue;
+                    if (getConfigItem('singletonTaskAutoHide','enabled') == 'enabled' && ($row['singleton']==1 && $row['runsDone'] >= $row['runs'])) continue;
+                    
                     //end dirty hack
                     
 			echo('<tr><td style="padding: 0px; width: 32px;">');
