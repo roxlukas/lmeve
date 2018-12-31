@@ -68,7 +68,7 @@ function insert_log($ip,$fetch,$ok,$ref,$cacheInUse,$url,$http_code,$size) {
 }
 
 //get fetch var
-$addr=$_GET['fetch'];
+$addr = secureGETstr('fetch');
 
 //prepare logging vars
 if ($LM_CCPWGL_PROXYAUDIT) {
