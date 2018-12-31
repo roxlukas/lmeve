@@ -53,7 +53,7 @@ include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
 include_once('hooks.php'); //hooks - login hook
 
-$lmver="0.1.58 beta";
+$lmver="0.1.59 beta";
  
 //setting session cookie params
 $param=session_get_cookie_params();

@@ -106,7 +106,7 @@ Settings
                         </tr>
                         <tr>
                             <td>
-                                ESI verbose/debug logging:<br/>
+                                ESI DEBUG logging (very verbose; up to 1GB logs per day):<br/>
                             </td>
                             <td>
                                 <input type="checkbox" size="32" name="ESIdebug" <?php if (getConfigItem('ESIdebug','enabled')=='enabled') echo('checked'); ?> />
