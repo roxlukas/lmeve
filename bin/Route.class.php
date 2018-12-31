@@ -73,6 +73,12 @@ abstract class Route {
      * @param String $string string to be treated for DB insertion
      */
     protected function s($string) {
+        //if string is a JS datetime yyyy-mm-ddThh:mm:ssZ convert to MySQL datetime format
+        //patch for issue #58
+        if (preg_match('/(\d{4,4}\-\d{2,2}\-\d{2,2})T(\d{2,2}\:\d{2,2}\:\d{2,2})Z/',$string,$m)) {
+            if($this->ESI->getDEBUG()) inform('Route', "Converting '$string' to '${m[1]} ${m[2]}'");
+            $string = $m[1] . ' ' . $m[2];
+        }
         return "'" . addslashes($string) . "'";
     }
     
