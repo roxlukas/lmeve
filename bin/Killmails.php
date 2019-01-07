@@ -67,7 +67,7 @@ class Killmails extends Route {
                         db_uquery("INSERT IGNORE INTO `apikills` VALUES(" .
                                 $killmail_id . "," . 
                                 $solar_system_id . "," . 
-                                $this->s($killmail_time) . "," . 
+                                $this->d($killmail_time) . "," . 
                                 $moon_id . "," . 
                                 $this->s($killmail_hash) . 
                                 ")");

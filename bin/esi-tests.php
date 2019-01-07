@@ -27,6 +27,7 @@ date_default_timezone_set(@date_default_timezone_get());
 //set_include_path("$mypath/../include");
 include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
+include_once("$mypath/../include/dbcatalog.php");
 include_once("$mypath/../include/configuration.php");
 include_once("$mypath/../include/killboard.php");
 include_once('libpoller.php');       
@@ -39,7 +40,9 @@ include_once('ESI.class.php');
 $ESI = new ESI(5);
 echo("Testing\r\n");
 
-$ESI->Corporations->updateBlueprints();
+alterTableChangeColumnNull('apicontainerlog', 'logTime');
+
+//$ESI->Corporations->updateBlueprints();
 
 //$ESI->Killmails->updateKillmails();
 

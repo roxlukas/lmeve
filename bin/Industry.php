@@ -201,16 +201,16 @@ class Industry extends Route {
         $this->s($this->ESI->Universe->getTypeName($productTypeID)).",". //lookup using Universe
         $this->s($this->v($job,'status','') ).",".
         $this->v($job,'duration',0) .",".
-        $this->s($this->v($job,'start_date','') ).",".
-        $this->s($this->v($job,'end_date','') ).",".
-        $this->s($this->v($job,'pause_date','') ).",".
-        $this->s($this->v($job,'completed_date','') ).",".
+        $this->d($this->v($job,'start_date','') ).",".
+        $this->d($this->v($job,'end_date','') ).",".
+        $this->d($this->v($job,'pause_date','') ).",".
+        $this->d($this->v($job,'completed_date','') ).",".
         $this->v($job,'completed_character_id',0) .",".
         $this->v($job,'successful_runs',0) .",".
         $corporationID .
         ") ON DUPLICATE KEY UPDATE".
         " status=" . $this->s($this->v($job,'status','') ) .
-        ",completedDate=".$this->s($this->v($job,'completed_date',0) ).
+        ",completedDate=".$this->d($this->v($job,'completed_date',0) ).
         ",completedCharacterID=".$this->v($job,'completed_character_id',0) .
         ",successfulRuns=".$this->v($job,'successful_runs',0) .
         ",productTypeID=".$this->v($job,'product_type_id',0) .

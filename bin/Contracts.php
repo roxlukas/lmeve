@@ -77,11 +77,11 @@ class Contracts extends Route {
                             $this->s($this->v($c,'title','')) .",".
                             $for_corporation .",".
                             $this->s($this->v($c,'availability','')) .",".
-                            $this->s($this->v($c,'date_issued','0000-00-00 00:00:00')) .",".
-                            $this->s($this->v($c,'date_expired','0000-00-00 00:00:00')) .",".
-                            $this->s($this->v($c,'date_accepted','0000-00-00 00:00:00')) .",".
+                            $this->d($this->v($c,'date_issued','')) .",".
+                            $this->d($this->v($c,'date_expired','')) .",".
+                            $this->d($this->v($c,'date_accepted','')) .",".
                             $this->v($c,'days_to_complete',0) .",".
-                            $this->s($this->v($c,'date_completed','0000-00-00 00:00:00')) .",".
+                            $this->d($this->v($c,'date_completed','')) .",".
                             $this->v($c,'price',0) .",".
                             $this->v($c,'reward',0) .",".
                             $this->v($c,'collateral',0) .",".
@@ -89,9 +89,9 @@ class Contracts extends Route {
                             $this->v($c,'volume',0) .",".
                             $this->ESI->getCorporationID() .
                         ") ON DUPLICATE KEY UPDATE ".
-				"dateExpired=" . $this->s($this->v($c,'date_expired','0000-00-00 00:00:00')) .",".
-				"dateAccepted=" . $this->s($this->v($c,'date_accepted','0000-00-00 00:00:00')) .",".
-				"dateCompleted=" . $this->s($this->v($c,'date_completed','0000-00-00 00:00:00')) .",".
+				"dateExpired=" . $this->d($this->v($c,'date_expired','')) .",".
+				"dateAccepted=" . $this->d($this->v($c,'date_accepted','')) .",".
+				"dateCompleted=" . $this->d($this->v($c,'date_completed','')) .",".
 				"acceptorID=" . $this->v($c,'acceptor_id',0) .",".
 				"status=" . $this->s($this->v($c,'status','unknown')) .
                     ";";

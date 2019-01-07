@@ -186,7 +186,8 @@ function esiUpdateAll() {
     $h = esiUpdateApiAssets();
     $i = esiUpdateApikills();
     $j = esiCreateEsiServerStatus();
-    return $a && $b && $c && $d && $e && $f && $g && $h && $i&& $j;
+    $k = datetimeDefaultNull();
+    return $a && $b && $c && $d && $e && $f && $g && $h && $i && $j && $k;
 }
 
 /**
@@ -400,4 +401,63 @@ function decryptorTables() {
     db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34202,-1,4,0.8,4)"); //Attainment Decryptor
     db_uquery("INSERT IGNORE INTO `ramdecryptors` VALUES(34203,-2,2,-0.4,9)"); //Augmentation Decryptor
     return TRUE;
+}
+
+/**
+ * Function checks if column has "NOT NULL" and changes it to "NULL DEFAULT NULL"
+ * 
+ * @return boolean returns TRUE if table was correctly updated or if the update was already performed. Returns FALSE if update was not possible.
+ */
+function alterTableChangeColumnNull($table,$column) {
+    $tab = db_asocquery("DESCRIBE `$table`;");
+    $found = FALSE;
+    foreach ($tab as $col) {
+        if ($col['Field'] == $column && $col['Null'] == 'NO') {
+            //var_dump($col);
+            $type = $col['Type'];
+            $found = TRUE;
+        }
+    }    
+    if ($found === TRUE) {
+        return db_uquery("ALTER TABLE `$table` CHANGE COLUMN `$column` `$column` $type NULL DEFAULT NULL;");
+    }
+    return TRUE;
+}
+
+/**
+ * Function checks if datetime columns have "NOT NULL" and changes it to "NULL DEFAULT NULL"
+ * 
+ * @return boolean returns TRUE if table was correctly updated or if the update was already performed. Returns FALSE if update was not possible.
+ */
+function datetimeDefaultNull() {
+    alterTableChangeColumnNull('apicontainerlog', 'logTime');
+    alterTableChangeColumnNull('apicontracts', 'dateIssued');
+    alterTableChangeColumnNull('apicontracts', 'dateExpired');
+    alterTableChangeColumnNull('apicontracts', 'dateAccepted');
+    alterTableChangeColumnNull('apicontracts', 'dateCompleted');
+    alterTableChangeColumnNull('apicorpmembers', 'startDateTime');
+    alterTableChangeColumnNull('apicorpmembers', 'logonDateTime');
+    alterTableChangeColumnNull('apicorpmembers', 'logoffDateTime');
+    alterTableChangeColumnNull('apifacwarstats', 'enlisted');
+    alterTableChangeColumnNull('apiindustryjobs', 'installTime');
+    alterTableChangeColumnNull('apiindustryjobs', 'beginProductionTime');
+    alterTableChangeColumnNull('apiindustryjobs', 'endProductionTime');
+    alterTableChangeColumnNull('apiindustryjobs', 'pauseProductionTime');
+    alterTableChangeColumnNull('apiindustryjobscrius', 'startDate');
+    alterTableChangeColumnNull('apiindustryjobscrius', 'endDate');
+    alterTableChangeColumnNull('apiindustryjobscrius', 'pauseDate');
+    alterTableChangeColumnNull('apiindustryjobscrius', 'completedDate');
+    alterTableChangeColumnNull('apikills', 'killTime');
+    alterTableChangeColumnNull('apimarketorders', 'issued');
+    alterTableChangeColumnNull('apipollerstats', 'statDateTime');
+    alterTableChangeColumnNull('apistarbasedetail', 'stateTimestamp');
+    alterTableChangeColumnNull('apistarbasedetail', 'onlineTimestamp');
+    alterTableChangeColumnNull('apistarbaselist', 'stateTimestamp');
+    alterTableChangeColumnNull('apistarbaselist', 'onlineTimestamp');
+    alterTableChangeColumnNull('apistatus', 'date');
+    alterTableChangeColumnNull('apiwalletjournal', 'date');
+    alterTableChangeColumnNull('apiwallettransactions', 'transactionDateTime');
+    alterTableChangeColumnNull('esiserverstatus', 'date');
+    alterTableChangeColumnNull('esiserverstatus', 'startTime');
+    alterTableChangeColumnNull('esistatus', 'date');
 }

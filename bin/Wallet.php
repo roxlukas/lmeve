@@ -207,7 +207,7 @@ class Wallet extends Route {
                         //insert data into DB
                         foreach ($journal as $c) {
                             $sql="INSERT IGNORE INTO `apiwalletjournal` VALUES (".
-                                    $this->s($this->v($c,'date','0000-00-00 00:00:00')) .",".
+                                    $this->d($this->v($c,'date','')) .",".
                                     $this->v($c,'id',$i++) .",".
                                     $this->glueRefTypeToId($this->v($c,'ref_type','player_trading')) .",".
                                     "'" . $names[$this->v($c,'first_party_id',0)] . "',".
@@ -256,7 +256,7 @@ class Wallet extends Route {
                 foreach ($orders as $o) {
                     if ($this->v($o,'is_buy',false) === true) $bid = 'buy'; else $bid = 'sell';
                     $sql="INSERT IGNORE INTO `apiwallettransactions` VALUES (".
-                            $this->s($this->v($o,'date','0000-00-00 00:00:00')) .",".
+                            $this->d($this->v($o,'date','')) .",".
                             $this->v($o,'transaction_id',$i++) . ',' .
                             $this->v($o,'quantity',0) . ',' .
                             $this->s($this->ESI->Universe->getTypeName($this->v($o,'type_id',0))) . ',' . //type name

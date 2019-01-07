@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `apicontactlist` (
 --
 
 CREATE TABLE IF NOT EXISTS `apicontainerlog` (
-  `logTime` datetime NOT NULL,
+  `logTime` datetime DEFAULT NULL,
   `itemID` bigint(11) NOT NULL,
   `itemTypeID` int(11) NOT NULL,
   `actorID` bigint(11) NOT NULL,
@@ -184,11 +184,11 @@ CREATE TABLE IF NOT EXISTS `apicontracts` (
   `title` varchar(255) DEFAULT NULL,
   `forCorp` int(11) NOT NULL,
   `availability` varchar(32) DEFAULT NULL,
-  `dateIssued` datetime NOT NULL,
-  `dateExpired` datetime NOT NULL,
-  `dateAccepted` datetime NOT NULL,
+  `dateIssued` datetime DEFAULT NULL,
+  `dateExpired` datetime DEFAULT NULL,
+  `dateAccepted` datetime DEFAULT NULL,
   `numDays` int(11) NOT NULL,
-  `dateCompleted` datetime NOT NULL,
+  `dateCompleted` datetime DEFAULT NULL,
   `price` decimal(20,2) NOT NULL,
   `reward` decimal(20,2) NOT NULL,
   `collateral` decimal(20,2) NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS `apicontracts` (
 CREATE TABLE IF NOT EXISTS `apicorpmembers` (
   `characterID` bigint(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `startDateTime` datetime NOT NULL,
+  `startDateTime` datetime DEFAULT NULL,
   `baseID` bigint(11) NOT NULL,
   `base` varchar(1024) DEFAULT NULL,
   `title` varchar(1024) DEFAULT NULL,
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS `apifacilities` (
 CREATE TABLE IF NOT EXISTS `apifacwarstats` (
   `factionID` int(11) NOT NULL,
   `factionName` varchar(64) NOT NULL,
-  `enlisted` datetime NOT NULL,
+  `enlisted` datetime DEFAULT NULL,
   `pilots` int(11) NOT NULL,
   `killsYesterday` int(11) NOT NULL,
   `killsLastWeek` int(11) NOT NULL,
@@ -375,10 +375,10 @@ CREATE TABLE IF NOT EXISTS `apiindustryjobs` (
   `outputFlag` int(11) NOT NULL,
   `activityID` int(11) NOT NULL,
   `completedStatus` int(11) NOT NULL,
-  `installTime` datetime NOT NULL,
-  `beginProductionTime` datetime NOT NULL,
-  `endProductionTime` datetime NOT NULL,
-  `pauseProductionTime` datetime NOT NULL,
+  `installTime` datetime DEFAULT NULL,
+  `beginProductionTime` datetime DEFAULT NULL,
+  `endProductionTime` datetime DEFAULT NULL,
+  `pauseProductionTime` datetime DEFAULT NULL,
   `corporationID` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`jobID`),
   KEY `installedItemTypeID` (`installedItemTypeID`),
@@ -419,10 +419,10 @@ CREATE TABLE IF NOT EXISTS `apiindustryjobscrius` (
   `productTypeName` varchar(255) NOT NULL,
   `status` varchar(255) DEFAULT NULL,
   `timeInSeconds` int(11) NOT NULL,
-  `startDate` datetime NOT NULL,
-  `endDate` datetime NOT NULL,
-  `pauseDate` datetime NOT NULL,
-  `completedDate` datetime NOT NULL,
+  `startDate` datetime DEFAULT NULL,
+  `endDate` datetime DEFAULT NULL,
+  `pauseDate` datetime DEFAULT NULL,
+  `completedDate` datetime DEFAULT NULL,
   `completedCharacterID` bigint(11) NOT NULL,
   `successfulRuns` int(11) DEFAULT NULL,
   `corporationID` bigint(11) DEFAULT NULL,
@@ -564,7 +564,7 @@ CREATE TABLE IF NOT EXISTS `apimarketorders` (
   `escrow` decimal(20,2) NOT NULL,
   `price` decimal(20,2) NOT NULL,
   `bid` int(11) NOT NULL,
-  `issued` datetime NOT NULL,
+  `issued` datetime DEFAULT NULL,
   `corporationID` bigint(11) NOT NULL,
   PRIMARY KEY (`orderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -605,7 +605,7 @@ CREATE TABLE IF NOT EXISTS `apipocolist` (
 
 CREATE TABLE IF NOT EXISTS `apipollerstats` (
   `statID` int(11) NOT NULL AUTO_INCREMENT,
-  `statDateTime` datetime NOT NULL,
+  `statDateTime` datetime DEFAULT NULL,
   `pollerSeconds` decimal(10,3) NOT NULL,
   PRIMARY KEY (`statID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=189260 ;
@@ -652,8 +652,8 @@ CREATE TABLE IF NOT EXISTS `apireftypes` (
 CREATE TABLE IF NOT EXISTS `apistarbasedetail` (
   `itemID` bigint(11) NOT NULL,
   `state` int(11) NOT NULL,
-  `stateTimestamp` datetime NOT NULL,
-  `onlineTimestamp` datetime NOT NULL,
+  `stateTimestamp` datetime DEFAULT NULL,
+  `onlineTimestamp` datetime DEFAULT NULL,
   `usageFlags` int(11) NOT NULL,
   `deployFlags` int(11) NOT NULL,
   `allowCorporationMembers` int(11) NOT NULL,
@@ -695,8 +695,8 @@ CREATE TABLE IF NOT EXISTS `apistarbaselist` (
   `locationID` int(11) NOT NULL,
   `moonID` int(11) NOT NULL,
   `state` int(11) NOT NULL,
-  `stateTimestamp` datetime NOT NULL,
-  `onlineTimestamp` datetime NOT NULL,
+  `stateTimestamp` datetime DEFAULT NULL,
+  `onlineTimestamp` datetime DEFAULT NULL,
   `standingOwnerID` int(11) NOT NULL,
   `corporationID` bigint(11) NOT NULL,
   PRIMARY KEY (`itemID`)
@@ -712,7 +712,7 @@ CREATE TABLE IF NOT EXISTS `apistatus` (
   `errorID` int(11) NOT NULL AUTO_INCREMENT,
   `keyID` varchar(255) NOT NULL,
   `fileName` varchar(255) NOT NULL,
-  `date` datetime NOT NULL,
+  `date` datetime DEFAULT NULL,
   `errorCode` int(11) NOT NULL,
   `errorCount` int(11) NOT NULL DEFAULT '0',
   `errorMessage` varchar(1024) NOT NULL,
@@ -739,7 +739,7 @@ CREATE TABLE IF NOT EXISTS `apiwalletdivisions` (
 --
 
 CREATE TABLE IF NOT EXISTS `apiwalletjournal` (
-  `date` datetime NOT NULL,
+  `date` datetime DEFAULT NULL,
   `refID` bigint(11) NOT NULL,
   `refTypeID` int(11) NOT NULL,
   `ownerName1` varchar(255) DEFAULT NULL,
@@ -766,7 +766,7 @@ CREATE TABLE IF NOT EXISTS `apiwalletjournal` (
 --
 
 CREATE TABLE IF NOT EXISTS `apiwallettransactions` (
-  `transactionDateTime` datetime NOT NULL,
+  `transactionDateTime` datetime DEFAULT NULL,
   `transactionID` bigint(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   `typeName` varchar(255) DEFAULT NULL,
@@ -937,11 +937,11 @@ CREATE TABLE IF NOT EXISTS `crestmarketprices` (
 
 CREATE TABLE IF NOT EXISTS `esiserverstatus` (
   `statusID` int(11) NOT NULL AUTO_INCREMENT,
-  `date` datetime NOT NULL,
+  `date` datetime DEFAULT NULL,
   `server` varchar(20) NOT NULL,
   `players` int(11) NOT NULL,
   `version` varchar(20) NOT NULL,
-  `startTime` datetime NOT NULL,
+  `startTime` datetime DEFAULT NULL,
   `vip` tinyint(1) NOT NULL,
   PRIMARY KEY (`statusID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10714 ;
@@ -956,7 +956,7 @@ CREATE TABLE IF NOT EXISTS `esistatus` (
   `errorID` int(11) NOT NULL AUTO_INCREMENT,
   `tokenID` varchar(255) NOT NULL,
   `route` varchar(255) NOT NULL,
-  `date` datetime NOT NULL,
+  `date` datetime DEFAULT NULL,
   `errorCode` int(11) NOT NULL,
   `errorCount` int(11) NOT NULL DEFAULT '0',
   `errorMessage` varchar(1024) NOT NULL,
@@ -1118,7 +1118,7 @@ CREATE TABLE IF NOT EXISTS `lmtasks` (
   `typeID` int(11) NOT NULL,
   `activityID` int(11) NOT NULL,
   `runs` int(11) NOT NULL,
-  `taskCreateTimestamp` datetime NOT NULL,
+  `taskCreateTimestamp` datetime DEFAULT NULL,
   `singleton` tinyint(3) NOT NULL,
   `structureID` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`taskID`),

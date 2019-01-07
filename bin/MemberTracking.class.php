@@ -22,13 +22,13 @@ class MemberTracking extends Route {
                 array_push($sqlrows, "(".
                                     $m->character_id . ",".
                                     $this->s($c->name) . ",".
-                                    $this->s($m->start_date) . ",".
+                                    $this->d($m->start_date) . ",".
                                     "0,".
                                     "'',".
                                     "'',".
                                     $this->ESI->getCorporationID() . ",".
-                                    $this->s($m->logon_date) . ",".
-                                    $this->s($m->logoff_date) . ",".
+                                    $this->d($m->logon_date) . ",".
+                                    $this->d($m->logoff_date) . ",".
                                     $m->location_id . ",".
                                     $ship_type_id .
                                     ")");
