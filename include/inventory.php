@@ -599,12 +599,22 @@ function getControlTowersOld($where='TRUE') {
 
 function getLabs($where='TRUE') {
     global $LM_EVEDB;
-    $sql_labs="SELECT apf.*,apl.itemName
+    $sql_labs="SELECT * FROM (
+SELECT apf.*,apl.`itemName`
     FROM `apifacilities` apf
     JOIN `apilocations` apl
     ON apf.`facilityID`=apl.`itemID`
-    WHERE $where
-    ORDER BY apl.itemName;";
+UNION
+SELECT apf.*,map.`itemName`
+    FROM `apifacilities` apf
+    JOIN `apiassets` apa
+    ON apf.`facilityID`=apa.`locationID`
+    JOIN `mapDenormalize` map
+    ON apf.`facilityID` = map.`itemID`
+    WHERE apa.`typeID`=27
+) AS apf
+WHERE $where
+ORDER BY apf.itemName";
     //echo("DEBUG: $sql_labs<br/>");
     $rawlabdata=db_asocquery($sql_labs);
     return $rawlabdata;
@@ -697,6 +707,13 @@ function getLabsAndTasks($corporationID) {
     return $towers;
 }
 
+/**
+ * Function gets corp owned Engineering Complexes and NPC Stations with facilities
+ * 
+ * @global type $LM_EVEDB
+ * @param type $corporationID
+ * @return type
+ */
 function getECAndTasks($corporationID) {
     global $LM_EVEDB;
     
@@ -704,14 +721,44 @@ function getECAndTasks($corporationID) {
     
     $ec = array();
     
-    $sql ="SELECT apf.*,apl.`itemName`
+    $sql ="SELECT * FROM (
+        SELECT apf.*,apl.`itemName`
+            FROM `apifacilities` apf
+            JOIN `$LM_EVEDB`.`invTypes` itp
+                ON apf.`typeID` = itp.`typeID`
+            JOIN `apilocations` apl
+                ON apf.`facilityID` = apl.`itemID`
+            WHERE itp.`groupID` = 1404
+            AND apf.`corporationID` = $corporationID
+        UNION
+        SELECT apf.*,map.`itemName`
+            FROM `apifacilities` apf
+            JOIN `apiassets` apa
+                ON apf.`facilityID`=apa.`locationID`
+            JOIN `mapDenormalize` map
+                ON apf.`facilityID` = map.`itemID`
+            WHERE apa.`typeID`=27 AND apa.`corporationID` = $corporationID
+        )AS apf
+ORDER BY apf.itemName;";
+    
+    /*
+SELECT * FROM (
+SELECT apf.*,apl.`itemName`
     FROM `apifacilities` apf
-    JOIN `$LM_EVEDB`.`invTypes` itp
-        ON apf.`typeID` = itp.`typeID`
     JOIN `apilocations` apl
-        ON apf.`facilityID` = apl.`itemID`
-    WHERE itp.`groupID` = 1404
-    AND apf.`corporationID` = $corporationID;";
+    ON apf.`facilityID`=apl.`itemID`
+UNION
+SELECT apf.*,map.`itemName`
+    FROM `apifacilities` apf
+    JOIN `apiassets` apa
+    ON apf.`facilityID`=apa.`locationID`
+    JOIN `mapDenormalize` map
+    ON apf.`facilityID` = map.`itemID`
+    WHERE apa.`typeID`=27
+) AS a
+WHERE TRUE
+ORDER BY a.itemName
+     */
     
     $ec_raw = db_asocquery($sql);
 
@@ -812,7 +859,7 @@ function showLabsAndTasks($towers) {
         <?php
         }
     } else {
-        echo('<table class="lmframework" style="width: 80%; min-width: 700px;"><tr><th style="text-align: center;">Corporation doesn\'t own any Starbase Control Towers</th</tr></table>');
+        echo('<table class="lmframework" style="width: 80%; min-width: 700px;"><tr><th style="text-align: center;">Corporation doesn\'t own any Legacy Starbase Control Towers</th</tr></table>');
     }
 }
 
@@ -1026,7 +1073,7 @@ function showControlTowers($controltowers) {
 	    </table>
 	    <?php
         } else {
-		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Starbase Control Towers</th</tr></table>');
+		echo('<table class="lmframework" style="min-width: 800px; width: 90%;"><tr><th style="text-align: center;">Corporation doesn\'t own any Legacy Starbase Control Towers</th</tr></table>');
         }
 }
 
