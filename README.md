@@ -23,6 +23,7 @@ There is no installer currently, so there is some setup work to get LMeve to run
 
 <h3>1. Pre-built VMware VM</h3>
 
+** THIS VM IS OUT OF DATE - DO NOT USE **
 This is the easiest way to try out LMeve. Download the VM image from https://pozniak.pl/lmeve-vm/
 You will need free VMware Player to run this VM. You can download it here: https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/7_0
 
