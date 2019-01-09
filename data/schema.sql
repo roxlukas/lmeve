@@ -255,7 +255,7 @@ CREATE TABLE IF NOT EXISTS `apicorpsheet` (
   `ceoName` varchar(255) NOT NULL,
   `stationID` bigint(11) NOT NULL,
   `stationName` varchar(1024) NOT NULL,
-  `description` varchar(2048) NOT NULL,
+  `description` varchar(4096) NOT NULL,
   `url` varchar(255) NOT NULL,
   `allianceID` int(11) NOT NULL,
   `taxRate` int(11) NOT NULL,
@@ -552,7 +552,7 @@ CREATE TABLE IF NOT EXISTS `apilocations` (
 CREATE TABLE IF NOT EXISTS `apimarketorders` (
   `orderID` bigint(11) NOT NULL,
   `charID` bigint(11) NOT NULL,
-  `stationID` int(11) NOT NULL,
+  `stationID` bigint(11) NOT NULL,
   `volEntered` int(11) NOT NULL,
   `volRemaining` int(11) NOT NULL,
   `minVolume` int(11) NOT NULL,

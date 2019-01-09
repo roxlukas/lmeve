@@ -90,7 +90,7 @@ class Industry extends Route {
             if (count($systems) > 0) {
                 foreach ($systems as $system) {
                     $indices = $this->v($system,'cost_indices',array());
-                    if (count($indices > 0)) {
+                    if (is_array($indices) && count($indices > 0)) {
                         //delete all indices for system_id
                         db_uquery("DELETE FROM `crestindustrysystems` WHERE solarSystemID = " . $this->v($system,'solar_system_id',0));
                         //insert new indices
@@ -210,7 +210,7 @@ class Industry extends Route {
         $corporationID .
         ") ON DUPLICATE KEY UPDATE".
         " status=" . $this->s($this->v($job,'status','') ) .
-        ",completedDate=".$this->d($this->v($job,'completed_date',0) ).
+        ",completedDate=".$this->d($this->v($job,'completed_date','') ).
         ",completedCharacterID=".$this->v($job,'completed_character_id',0) .
         ",successfulRuns=".$this->v($job,'successful_runs',0) .
         ",productTypeID=".$this->v($job,'product_type_id',0) .

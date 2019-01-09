@@ -101,7 +101,7 @@ class Markets extends Route {
                             $this->v($o,'escrow',0) . ',' .
                             $this->v($o,'price',0) . ',' .
                             $bid . ',' .
-                            $this->s($this->v($o,'issued','')) . ',' .
+                            $this->d($this->v($o,'issued','')) . ',' .
                             $this->ESI->getCorporationID() .
                         ")" .
                     ";";

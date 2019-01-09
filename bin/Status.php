@@ -23,7 +23,7 @@ class Status extends Route {
         $status = $this->getServerStatus();
         
         if ($this->getStatus()=='fresh') {
-            if (count($status) > 0) {
+            if (is_object($status) && count($status) > 0) {
                     if ($this->v($c,'vip',false) === true) $vip = 1; else $vip = '0';
                     $sql="INSERT INTO esiserverstatus VALUES (".
                             "DEFAULT" . "," .

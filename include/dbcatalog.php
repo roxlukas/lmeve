@@ -204,8 +204,20 @@ function esiUpdateApicorps() {
         }
     }    
     if ($found === FALSE) {
-        return db_uquery("ALTER TABLE `apicorps` ADD COLUMN `tokenID` int(11) NULL DEFAULT  NULL;") &&
+        db_uquery("ALTER TABLE `apicorps` ADD COLUMN `tokenID` int(11) NULL DEFAULT  NULL;");
         db_uquery("ALTER TABLE `apicorps` CHANGE COLUMN `keyID` `keyID` VARCHAR(255) NULL DEFAULT NULL;");
+    }
+    //apicorpsheet
+    //`description` varchar(4096) NOT NULL,
+    $table = db_asocquery("DESCRIBE `apicorpsheet`;");
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='description' && $column['Type']!='varchar(4096)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === TRUE) {
+        db_uquery("ALTER TABLE `apicorpsheet` CHANGE COLUMN `description` `description` varchar(4096) NOT NULL;");
     }
     return TRUE;
 }
@@ -247,6 +259,7 @@ function esiUpdateApikills() {
  */
 function esiUpdateApimarketorders() {
     $table = db_asocquery("DESCRIBE `apimarketorders`;");
+    
     $found = FALSE;
     foreach ($table as $column) {
         if ($column['Field']=='range' && $column['Type']=='int(11)') {
@@ -254,8 +267,19 @@ function esiUpdateApimarketorders() {
         }
     }    
     if ($found === TRUE) {
-        return db_uquery("ALTER TABLE `apimarketorders` CHANGE COLUMN `range` `range` VARCHAR(12) NULL DEFAULT NULL;");
+        db_uquery("ALTER TABLE `apimarketorders` CHANGE COLUMN `range` `range` VARCHAR(12) NULL DEFAULT NULL;");
     }
+    
+    $found = FALSE;
+    foreach ($table as $column) {
+        if ($column['Field']=='stationID' && $column['Type']=='int(11)') {
+            $found = TRUE;
+        }
+    }    
+    if ($found === TRUE) {
+        db_uquery("ALTER TABLE `apimarketorders` CHANGE COLUMN `stationID` `stationID` bigint(11) NOT NULL;");
+    }
+    
     return TRUE;
 }
 
