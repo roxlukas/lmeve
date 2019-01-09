@@ -280,10 +280,10 @@ class Industry extends Route {
         "0,".
         $this->v($job,'activity_id',0) .",".
         $completedStatus.",".
-        $this->s($this->v($job,'start_date',0) ).",".
-        $this->s($this->v($job,'start_date',0) ).",".
-        $this->s($this->v($job,'end_date',0) ).",".
-        $this->s($this->v($job,'pause_date',0) ).",".
+        $this->d($this->v($job,'start_date','') ).",".
+        $this->d($this->v($job,'start_date','') ).",".
+        $this->d($this->v($job,'end_date','') ).",".
+        $this->d($this->v($job,'pause_date','') ).",".
         $corporationID.
         ") ON DUPLICATE KEY UPDATE".
         " completed=".$completed.

@@ -31,7 +31,7 @@ class Status extends Route {
                             $this->s($this->ESI->getDatasource()) . "," .
                             $this->v($status,'players') . "," .
                             $this->s($this->v($status,'server_version')) . "," .
-                            $this->s($this->v($status,'start_time')) . "," .
+                            $this->d($this->v($status,'start_time','')) . "," .
                             $vip .
                         ")" .
                     ";";
