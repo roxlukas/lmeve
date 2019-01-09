@@ -90,7 +90,7 @@ class Industry extends Route {
             if (count($systems) > 0) {
                 foreach ($systems as $system) {
                     $indices = $this->v($system,'cost_indices',array());
-                    if (is_array($indices) && count($indices > 0)) {
+                    if (is_array($indices) && count($indices) > 0) {
                         //delete all indices for system_id
                         db_uquery("DELETE FROM `crestindustrysystems` WHERE solarSystemID = " . $this->v($system,'solar_system_id',0));
                         //insert new indices
