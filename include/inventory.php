@@ -5,6 +5,7 @@ include_once("yaml_graphics.php");
 include_once("skins.php");
 include_once("percentage.php");
 include_once("dbcatalog.php");
+include_once("auth.php");
 
 function dbhrefedit($nr) {
     echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"Click to open database\">");
@@ -1727,5 +1728,106 @@ function showStock($inventory, $corpID) {
     </table>
     <?php
     
+}
+
+function inventorySettings($typeID,$labels=TRUE) {
+    global $LM_EVEDB, $MOBILE;
+    $item=db_asocquery("SELECT itp.*,igp.`categoryID`
+        FROM $LM_EVEDB.`invTypes` itp
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+        WHERE `typeID` = $typeID ;");
+
+    if (count($item)==0) {
+            return;
+    }
+
+    $item=$item[0];
+    
+    if (!is_null($item['marketGroupID'])) {
+            $pricesDisabled='';
+    } else {
+            $pricesDisabled='disabled';
+    }
+    
+    $style='';
+    if ($labels != TRUE) $style = 'style="text-align: center;"';
+    
+    if (checkrights("Administrator,EditPricesFlag")) {
+            echo('<td '.$style.'>');
+            if ($typeID > 0) { 
+                if ($labels === TRUE) echo('<strong>Fetch Prices: </strong>');
+                $pricesFlag=db_asocquery("SELECT * FROM `cfgmarket` WHERE `typeID`=$typeID;");
+                if (count($pricesFlag)>0) {
+                        $pricesChecked='checked';
+                } else {
+                        $pricesChecked='';
+                }
+                echo('<input type="checkbox" name="cfgmarket_'.$typeID.'" id="cfgmarket_'.$typeID.'" ' . $pricesChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=3&nr='.$typeID.'\',\'cfgmarket_'.$typeID.'\',\'cfgmarket_label_'.$typeID.'\');">');
+                echo('<div id="cfgmarket_label_'.$typeID.'" style="position: fixed;"></div>');
+            }
+            echo('</td>');
+    }
+    if (checkrights("Administrator,EditBuyingFlag")) {
+            echo('<td '.$style.'>');
+            if ($typeID > 0) { 
+                if ($labels === TRUE) echo('<strong>Show in Buy Calc: </strong>');
+                $buyingFlag=db_asocquery("SELECT * FROM `cfgbuying` WHERE `typeID`=$typeID;");
+                if (count($buyingFlag)>0) {
+                        $buyingChecked='checked';
+                } else {
+                        $buyingChecked='';
+                }
+                echo('<input type="checkbox" name="cfgbuying_'.$typeID.'" id="cfgbuying_'.$typeID.'" '.$buyingChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=4&nr='.$typeID.'\',\'cfgbuying_'.$typeID.'\',\'cfgbuying_label_'.$typeID.'\');">');
+                echo('<div id="cfgbuying_label_'.$typeID.'" style="position: fixed;"></div>');
+            }
+            echo('</td>');
+    }
+    if (checkrights("Administrator,EditStock")) {
+            echo('<td '.$style.'>');
+            if ($typeID > 0) { 
+                $stocks=db_asocquery("SELECT * FROM `cfgstock` WHERE `typeID`=$typeID;");
+                if (count($stocks)>0) {
+                        $stockChecked='checked';
+                        $stockAmount=$stocks[0]['amount'];
+                } else {
+                        $stockChecked='';
+                        $stockAmount=0;
+                }
+                if ($labels === TRUE) echo('<strong>Track: ');
+                echo('<input type="checkbox" name="cfgstock_'.$typeID.'" title="Check \'Track\' first, then input a number in \'Stock\' and press enter" id="cfgstock_'.$typeID.'" '.$stockChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=6&nr='.$typeID.'&amount=\'+getStockAmount(\'stockamount_'.$typeID.'\'),\'cfgstock_'.$typeID.'\',\'cfgstock_label_'.$typeID.'\');">');
+                if ($MOBILE) echo('<br/>');
+                if ($labels === TRUE) echo(' Stock: ');
+                echo('<input '.$pricesDisabled.' type="text" name="stockamount_'.$typeID.'" id="stockamount_'.$typeID.'" size="8" title="Press Enter to save the amount" value="'.$stockAmount.'" onchange="ajax_save(\'index.php?id=10&id2=6&nr='.$typeID.'&update=1&amount=\'+getStockAmount(\'stockamount_'.$typeID.'\'),\'cfgstock_'.$typeID.'\',\'cfgstock_label_'.$typeID.'\');" /></strong>');
+                echo('<div id="cfgstock_label_'.$typeID.'" style="position: fixed;"></div>');
+            }
+            echo('</td>');
+    }
+}
+
+function inventorySettingsHeaders() {
+    if (checkrights("Administrator,EditPricesFlag")) {
+            echo('<th>');
+            echo('Fetch prices');
+            echo('</th>');
+    }
+    if (checkrights("Administrator,EditBuyingFlag")) {
+            echo('<th>');
+            echo('Show in Buy Calc');
+            echo('</th>');
+    }
+    if (checkrights("Administrator,EditStock")) {
+            echo('<th>');
+            echo('Track stock');
+            echo('</th>');
+    }
+}
+
+function inventorySettingsColspan() {
+    $i = 1;
+    if (checkrights("Administrator,EditPricesFlag")) $i++;
+    if (checkrights("Administrator,EditBuyingFlag")) $i++;
+    if (checkrights("Administrator,EditStock")) $i++;
+    return $i;
 }
 ?>

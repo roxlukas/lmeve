@@ -12,6 +12,7 @@ $PANELNAME='Item Database'; //Panel name (optional)
 
 global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE, $USERSTABLE, $ESI_BASEURL;
 include_once('materials.php');
+include_once('inventory.php');
 include_once('yaml_graphics.php');
 include_once('skins.php');
 
@@ -157,61 +158,7 @@ function decryptors($typeID, $techLevel) {
                 echo('<td>');
                 echo('<table style="width: 100%;"><tr>');
                 
-		if (checkrights("Administrator,EditPricesFlag")) {
-                        if (!$MOBILE) {
-                            echo('<td style="width: 12%; min-width: 110px;">');
-                        } else {
-                            echo('<td>');
-                        }
-			echo('<strong>Fetch Prices: </strong>');
-			$pricesFlag=db_asocquery("SELECT * FROM `cfgmarket` WHERE `typeID`=$nr;");
-			if (count($pricesFlag)>0) {
-				$pricesChecked='checked';
-			} else {
-				$pricesChecked='';
-			}
-			echo('<input type="checkbox" name="cfgmarket" id="cfgmarket" '.$pricesChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=3&nr='.$nr.'\',\'cfgmarket\',\'cfgmarket_label\');">');
-			echo('<div id="cfgmarket_label" style="position: fixed;"></div>');
-			echo('</td>');
-		}
-		if (checkrights("Administrator,EditBuyingFlag")) {
-                        if (!$MOBILE) {
-                            echo('<td style="width: 13%; min-width: 130px;">');
-                        } else {
-                            echo('<td>');
-                        }
-			echo('<strong>Show in Buy Calc: </strong>');
-			$buyingFlag=db_asocquery("SELECT * FROM `cfgbuying` WHERE `typeID`=$nr;");
-			if (count($buyingFlag)>0) {
-				$buyingChecked='checked';
-			} else {
-				$buyingChecked='';
-			}
-			echo('<input type="checkbox" name="cfgbuying" id="cfgbuying" '.$buyingChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=4&nr='.$nr.'\',\'cfgbuying\',\'cfgbuying_label\');">');
-			echo('<div id="cfgbuying_label" style="position: fixed;"></div>');
-			echo('</td>');
-		}
-                if (checkrights("Administrator,EditStock")) {
-                        if (!$MOBILE) {
-                            echo('<td style="width: 20%; min-width: 180px;">');
-                        } else {
-                            echo('<td>');
-                        }
-			$stocks=db_asocquery("SELECT * FROM `cfgstock` WHERE `typeID`=$nr;");
-			if (count($stocks)>0) {
-				$stockChecked='checked';
-                                $stockAmount=$stocks[0]['amount'];
-			} else {
-				$stockChecked='';
-                                $stockAmount=0;
-			}
-                        echo('<strong>Track: ');
-                        echo('<input type="checkbox" name="cfgstock" title="Check \'Track\' first, then input a number in \'Stock\' and press enter" id="cfgstock" '.$stockChecked.' '.$pricesDisabled.' onclick="ajax_save(\'index.php?id=10&id2=6&nr='.$nr.'&amount=\'+getStockAmount(\'stockamount\'),\'cfgstock\',\'cfgstock_label\');">');
-                        if ($MOBILE) echo('<br/>');
-                        echo(' Stock: <input '.$pricesDisabled.' type="text" name="stockamount" id="stockamount" size="8" title="Press Enter to save the amount" value="'.$stockAmount.'" onchange="ajax_save(\'index.php?id=10&id2=6&nr='.$nr.'&update=1&amount=\'+getStockAmount(\'stockamount\'),\'cfgstock\',\'cfgstock_label\');" /></strong>');
-			echo('<div id="cfgstock_label" style="position: fixed;"></div>');
-			echo('</td>');
-		}
+		inventorySettings($nr);
                 
                 echo('</tr></table>');
                 echo('</td>');

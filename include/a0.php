@@ -11,6 +11,7 @@ $PANELNAME='Item Database'; //Panel name (optional)
 //standard header ends here
 
 global $LM_EVEDB;
+include_once('inventory.php');
 
 $marketGroupID=secureGETnum('marketGroupID');
 
@@ -87,12 +88,13 @@ if (!empty($marketGroupID)) {
         if (empty($last_node)) $last_node="Item Database";
 
 	?>
-			<table cellspacing="2" cellpadding="0">
-			<tr><td class="tab-header">
+			<table class="lmframework">
+			<tr><th>
 				<b>Icon</b>
-			</td><td class="tab-header">
+			</th><th>
 				<b>Name</b>
-			</td>
+			</th>
+                        <?php inventorySettingsHeaders(); ?>
 			</tr>
 	<?php
 	if (!empty($marketGroupID)) {
@@ -105,41 +107,44 @@ if (!empty($marketGroupID)) {
 			</tr>
 		*/
 		?>
-			<tr><td class="tab">
+			<tr><td>
 				<b><a href="?id=10&id2=0&marketGroupID=<?php echo($parentGroupID); ?>"><img src="<?=getUrl()?>ccp_icons/23_64_1.png" style="width: 32px; height: 32px;" title="Parent Group" /></a></b>
-			</td><td class="tab">
+			</td><td>
 				<b><a href="?id=10&id2=0&marketGroupID=<?php echo($parentGroupID); ?>">..</a></b>
 			</td>
+                        <?php inventorySettings(0,FALSE); ?>
 			</tr>
 		<?php
 	}
 	
 	if (sizeof($groups)>0) {		
 				foreach($groups as $row) {
-					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
+					echo('<tr><td style="padding: 0px; width: 32px;">');
 						hrefedit_group($row['marketGroupID']);
 						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"${row['marketGroupName']}\" />");
 						echo('</a>');
-					echo('</td><td class="tab">');
+					echo('</td><td>');
 						hrefedit_group($row['marketGroupID']);
 						echo($row['marketGroupName']);
 						echo('</a>');
 					echo('</td>');
+                                        inventorySettings(0,FALSE);
 					echo('</tr>');
 				}
 	}
 
 	if (sizeof($items)>0) {
 				foreach($items as $row) {
-					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
+					echo('<tr><td style="padding: 0px; width: 32px;">');
 						hrefedit_item($row['typeID']);
 						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
 						echo('</a>');
-					echo('</td><td class="tab">');
+					echo('</td><td>');
 						hrefedit_item($row['typeID']);
 						echo($row['typeName']);
 						echo('</a>');
 					echo('</td>');
+                                        inventorySettings($row['typeID'],FALSE);
 					echo('</tr>');
 				}
 	}
