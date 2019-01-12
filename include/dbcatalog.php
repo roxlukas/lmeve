@@ -78,6 +78,9 @@ function recreateSdeCompatViews() {
      //updateYamlSkinMaterials(FALSE);
      if (!checkIfTableExists('skinMaterialSets')) updateYamlSkinMaterialSets(TRUE,'../data/graphicMaterialSets.yaml');
      if (!checkIfTableExists('skinMaterialsRGB')) createSkinMaterialsRGBview();
+     
+     db_uquery("CREATE OR REPLACE VIEW `mapDenormalize` AS SELECT * FROM `$LM_EVEDB`.`mapDenormalize`");
+     
     return TRUE;
 }
 
