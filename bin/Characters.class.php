@@ -14,7 +14,7 @@ class Characters extends Route {
     
     public function getCharacter($characterID) {
         $this->setRoute('/v4/characters/');
-        if (!is_numeric($characterID) && $characterID > 0) throw new Exception("getCharacter() characterID must be numeric and > 0.");
+        if ( !( is_numeric($characterID) && $characterID > 0 ) ) throw new Exception("getCharacter() characterID must be numeric and > 0.");
         inform(get_class(), "Updating Character $characterID...");
         $data = $this->get($characterID . '/');
         if ($this->ESI->getDEBUG()) var_dump($data);
