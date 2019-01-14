@@ -32,6 +32,8 @@
 **********************************************************************************/
 header('Content-Type: text/html; charset=UTF-8');
 
+if (!function_exists('mb_internal_encoding')) die('Please make sure you\'ve installed and enabled php-mbstring');
+
 mb_internal_encoding('UTF-8'); 
 mb_http_output('UTF-8'); 
 mb_http_input('UTF-8'); 
