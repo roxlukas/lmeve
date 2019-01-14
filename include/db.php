@@ -161,6 +161,10 @@ function db_connect() {
         $ret = new PDO("$dsn:host=$LM_dbhost;dbname=$LM_dbname;charset=utf8", $LM_dbuser, $LM_dbpass, array(PDO::ATTR_EMULATE_PREPARES => false, 
                                                                                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
         $ret->exec("SET CHARACTER SET utf8");
+        
+        //for MySQL 5.7.5 and newer - workaround for ONLY_FULL_GROUP_BY
+        $ret->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+        
     } catch(PDOException $ex) {
         if ($LM_DEBUG==1) {
                     printerr("No connection to the database.<br />MySQL reply: ".$ex->getMessage());
