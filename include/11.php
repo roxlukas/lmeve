@@ -104,8 +104,12 @@ $runs=secureGETnum('runs');
 		    echo('Activity:<br></td><td width="200">');
 		    echo('<select name="activityID">');
 		    foreach($activities as $row) {
-				if ($row['activityID']==$task['activityID']) $select='selected'; else $select='';
-				echo("<option value=\"${row['activityID']}\" $select>${row['activityName']}</option>");
+                        if (!$new) {
+			    if ( $row['activityID'] == $task['activityID'] ) $select='selected'; else $select='';
+                        } else {
+                            if ( isset($_SESSION['taskActivityID']) && $row['activityID'] == $_SESSION['taskActivityID'] ) $select='selected'; else $select='';
+                        }
+			echo("<option value=\"${row['activityID']}\" $select>${row['activityName']}</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');
@@ -113,8 +117,12 @@ $runs=secureGETnum('runs');
 		    echo('<tr><td width="150">Character:<br></td><td width="200">');
 		    echo('<select name="characterID">');
 		    foreach($chars as $row) {
-				if ($row['characterID']==$task['characterID']) $select='selected'; else $select='';
-				echo("<option value=\"${row['characterID']}\" $select>${row['name']}</option>");
+                        if (!$new) {
+			    if ( $row['characterID'] == $task['characterID'] ) $select='selected'; else $select='';
+                        } else {
+                            if ( isset($_SESSION['taskCharacterID']) && $row['characterID'] == $_SESSION['taskCharacterID'] ) $select='selected'; else $select='';
+                        }
+			echo("<option value=\"${row['characterID']}\" $select>${row['name']}</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');
@@ -124,8 +132,12 @@ $runs=secureGETnum('runs');
                     if (is_null($row['structureID'])) $select='selected'; else $select='';
 		    echo("<option value=\"null\" $select>- none -</option>");
 		    foreach($labs as $row) {
-				if ($row['facilityID']==$task['structureID']) $select='selected'; else $select='';
-				echo("<option value=\"${row['facilityID']}\" $select>".stripslashes($row['itemName'])."</option>");
+                        if (!$new) {
+			    if ( $row['facilityID'] == $task['structureID'] ) $select='selected'; else $select='';
+                        } else {
+                            if ( isset($_SESSION['taskFacilityID']) && $row['facilityID'] == $_SESSION['taskFacilityID'] ) $select='selected'; else $select='';
+                        }
+			echo("<option value=\"${row['facilityID']}\" $select>".stripslashes($row['itemName'])."</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');
@@ -133,7 +145,16 @@ $runs=secureGETnum('runs');
 		    echo('<tr><td width="150">');
 		    echo('Quantity:<br></td><td width="200">');
 		    echo('<input type="text" name="runs" size="25" value="');
-		    echo(stripslashes($task['runs']));
+                    if ($new) {
+                        if ( isset($_SESSION['taskRuns'])) {
+                            $runs = $_SESSION['taskRuns'];
+                        } else {
+                            $runs = 1;
+                        }
+                    } else {
+                        $runs = $task['runs'];
+                    }
+		    echo(stripslashes($runs));
 		    echo('">');
 		    echo('</td></tr>');
 		    
@@ -166,6 +187,6 @@ $runs=secureGETnum('runs');
 		    echo('</table>');
 		    
 		    echo('<div class="tleft"><table border="0"><tr>');
-		    echo('<td width="60" valign="top"><input type="submit" value="OK"><br></form></td><td width="75" valign="top"><form method="get" action=""><input type="hidden" name="id" value="1"><input type="hidden" name="id2" value="3"><input type="submit" value="Cancel"></form></td>');
+		    echo('<td width="60" valign="top"><input type="submit" value="OK"><br></form></td><td width="75" valign="top"><form method="get" action=""><input type="hidden" name="id" value="1"><input type="hidden" name="id2" value="0"><input type="submit" value="Cancel"></form></td>');
 		    echo('</tr></table></div>');
 		?>

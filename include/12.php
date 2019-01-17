@@ -58,6 +58,12 @@ global $LM_EVEDB;
 		if ($autoadd_copy=='on') $autoadd_copy=TRUE; else $autoadd_copy=FALSE;
                 if ($autoadd_invention=='on') $autoadd_invention=TRUE; else $autoadd_invention=FALSE;
                 if ($autoadd_tech1=='on') $autoadd_tech1=TRUE; else $autoadd_tech1=FALSE;
+                
+                //remember defaults
+                $_SESSION['taskActivityID'] = $activityID;
+                $_SESSION['taskCharacterID'] = $characterID;
+                $_SESSION['taskFacilityID'] = $structureID;
+                $_SESSION['taskRuns'] = $runs;
 		
 		//walidacja
 		if(empty($typeID)) {
