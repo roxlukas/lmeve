@@ -237,12 +237,12 @@ class ESI {
             //first, obtain auth token using saved refresh_token
             $token = get_access_token($this->getRefreshToken());
             //check if we've got a valid Bearer token
+            if ($this->DEBUG) var_dump($token);
             if (!(isset($token->access_token) && isset($token->token_type) && isset($token->expires_in) && $token->token_type=='Bearer' && $token->expires_in>0)) {
                 //problem with token, bail!
                 warning("ESI","EVE SSO: Invalid Bearer token received from SSO login site.");
                 return FALSE;
             }
-            if ($this->DEBUG) var_dump($token);
             //we've got a valid token
             $this->access_token = $token->access_token;
             $this->access_token_expire = time() + $token->expires_in;
