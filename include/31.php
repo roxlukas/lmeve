@@ -22,8 +22,9 @@ include_once("inventory.php");
 <!--<em><b>Warning:</b> There is a weird performance problem with this form with the <b>LastPass</b> extension enabled. I'm investigating it right now.<br/>If you run into problems, try disabling that add-on, or use in-game browser instead.</em>-->
 <?php
 // GETTING BUY CALC DATA
-$buycalc=getBuyCalc();
 $inventory=getStock();
+$buycalc=getBuyCalc($inventory);
+
                 
 // DISPLAYING THE BUY CALC                
 showBuyCalc($buycalc,$inventory);

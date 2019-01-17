@@ -11,6 +11,7 @@ $PANELNAME='Buy Calculator'; //Panel name (optional)
 //standard header ends here
 
 include_once("market.php");
+include_once("inventory.php");
 include_once("configuration.php");
 global $LM_EVEDB;
 
@@ -28,10 +29,29 @@ $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, apr.`
 		
 $total=0;
 
-$buyCalcPriceModifier=getConfigItem('buyCalcPriceModifier', 1.0);
+$buyCalcPriceModifier = getConfigItem('buyCalcPriceModifier', 1.0);
+$buyCalcPriceModifierHigh = getConfigItem('buyCalcPriceModifierHigh', 0.9);
+$buyCalcPriceModifierVeryHigh = getConfigItem('buyCalcPriceModifierVeryHigh', 0.8);
+
+$inventory = getStock();
 
 foreach($buycalc as $row) {
-        $row['max']=round($buyCalcPriceModifier * $row['max'],2);
+        //apply different price modifiers depending on stock
+        $amount = $inventory[$row['groupID']]['types'][$row['typeID']]['amount']; //required amount
+        $quantity = $inventory[$row['groupID']]['types'][$row['typeID']]['quantity']; //actual quantity
+        if ($amount>0) {
+            $percent = 100 * $quantity/$amount;
+            if ($percent < $LM_HINTLOW) {
+                $row['max'] = round($buyCalcPriceModifier * $row['max'],2);
+            } else if ($percent < $LM_HINTHIGH) {
+                $row['max'] = round($buyCalcPriceModifierHigh * $row['max'],2);
+            } else {
+                $row['max'] = round($buyCalcPriceModifierVeryHigh * $row['max'],2);
+            }
+        } else { //fall back to default multiplier
+            $row['max'] = round($buyCalcPriceModifier * $row['max'],2);
+        }
+        
 	$q=secureGETnum('q_'.$row['typeID']);
 	if ($q>0) {
 		$order[$row['typeID']]['typeID']=$row['typeID'];

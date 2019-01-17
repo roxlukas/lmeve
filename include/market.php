@@ -2,6 +2,16 @@
 include_once("percentage.php");
 include_once("configuration.php");
 
+global $LM_BUYCALC_SHOWHINTS, $LM_HINTGREEN, $LM_HINTYELLOW, $LM_HINTRED, $LM_HINTGREENIMG, $LM_HINTYELLOWIMG, $LM_HINTREDIMG, $LM_HINTLOW, $LM_HINTHIGH;
+$LM_HINTGREEN = "We need this, and will be happy to buy it.";
+$LM_HINTYELLOW = "We *can* buy this, but we would prefer something green instead.";
+$LM_HINTRED = "We don't need this right now.";
+$LM_HINTGREENIMG = "ccp_icons/38_16_183.png";
+$LM_HINTYELLOWIMG = "ccp_icons/38_16_167.png";
+$LM_HINTREDIMG = "ccp_icons/38_16_151.png";
+$LM_HINTLOW = 100;
+$LM_HINTHIGH = 200;
+
 function shorthash($input) {
 	global $LM_SALT;
 	$hash = substr(strtolower(preg_replace('/[0-9_\/]+/','',base64_encode(sha1($LM_SALT.$input)))),0,14);
@@ -356,9 +366,13 @@ function buchrefedit($nr) {
 	echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"Click to see item details\">");
 }
 
-function getBuyCalc() {
-    global $LM_EVEDB;
-    $buyCalcPriceModifier=getConfigItem('buyCalcPriceModifier', 1.0);
+function getBuyCalc($inventory) {
+    global $LM_EVEDB,$LM_HINTLOW,$LM_HINTHIGH;
+    
+    $buyCalcPriceModifier = getConfigItem('buyCalcPriceModifier', 1.0);
+    $buyCalcPriceModifierHigh = getConfigItem('buyCalcPriceModifierHigh', 0.9);
+    $buyCalcPriceModifierVeryHigh = getConfigItem('buyCalcPriceModifierVeryHigh', 0.8);
+
     $buycalc=db_asocquery("SELECT buy.`typeID`, itp.`typeName`, itp.`groupID`, igp.`groupName`, apr.`max`
     FROM `cfgbuying` AS buy
     JOIN $LM_EVEDB.`invTypes` AS itp
@@ -375,21 +389,29 @@ function getBuyCalc() {
         $rearrange[$row['groupID']]['groupName']=$row['groupName'];
         $rearrange[$row['groupID']]['types'][$row['typeID']]['typeID']=$row['typeID'];
         $rearrange[$row['groupID']]['types'][$row['typeID']]['typeName']=$row['typeName'];
-        $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy']=round($buyCalcPriceModifier * $row['max'],2);
+
+        //apply different price modifiers depending on stock
+        $amount = $inventory[$row['groupID']]['types'][$row['typeID']]['amount']; //required amount
+        $quantity = $inventory[$row['groupID']]['types'][$row['typeID']]['quantity']; //actual quantity
+        if ($amount>0) {
+            $percent = 100 * $quantity/$amount;
+            if ($percent < $LM_HINTLOW) {
+                $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy'] = round($buyCalcPriceModifier * $row['max'],2);
+            } else if ($percent < $LM_HINTHIGH) {
+                $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy'] = round($buyCalcPriceModifierHigh * $row['max'],2);
+            } else {
+                $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy'] = round($buyCalcPriceModifierVeryHigh * $row['max'],2);
+            }
+        } else { //fall back to default multiplier
+            $rearrange[$row['groupID']]['types'][$row['typeID']]['maxbuy'] = round($buyCalcPriceModifier * $row['max'],2);
+        }
     }
     return($rearrange);
 }
 
 function showBuyCalc($buycalc,$inventory=array()) {
-    global $LM_BUYCALC_SHOWHINTS;
-    $LM_HINTGREEN='We need this, and will be happy to buy it.';
-    $LM_HINTYELLOW='We *can* buy this, but we would prefer something green instead.';
-    $LM_HINTRED='We don\'t need this right now.';
-    $LM_HINTGREENIMG='ccp_icons/38_16_183.png';
-    $LM_HINTYELLOWIMG='ccp_icons/38_16_167.png';
-    $LM_HINTREDIMG='ccp_icons/38_16_151.png';
-    $LM_HINTLOW=100;
-    $LM_HINTHIGH=200;
+    global $LM_BUYCALC_SHOWHINTS, $LM_HINTGREEN, $LM_HINTYELLOW, $LM_HINTRED, $LM_HINTGREENIMG, $LM_HINTYELLOWIMG, $LM_HINTREDIMG, $LM_HINTLOW, $LM_HINTHIGH;
+
     $rights_viewdatabase=checkrights("Administrator,ViewDatabase");
     ?>
     <script type="text/javascript">

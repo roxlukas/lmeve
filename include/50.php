@@ -11,6 +11,7 @@ $PANELNAME='Settings'; //Panel name (optional)
 //standard header ends here
 
 include('../config/config.php'); //wczytaj nastawy konfiguracji
+include_once('market.php');
 
 global $LM_EVEDB;
 ?>
@@ -175,11 +176,29 @@ Settings
                         </tr>
                         <tr>
                             <td>
-                                Buy calculator price multiplier:<br/>
+                                Buy calculator price multiplier (low stock): <img src="<?=getUrl()?><?php echo($LM_HINTGREENIMG); ?>" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="<?php echo($LM_HINTGREEN); ?>" /><br/>
                                 <em>1.0 = original price</em>
                             </td>
                             <td>
                                 <input type="text" size="6" name="buyCalcPriceModifier" value="<?=getConfigItem('buyCalcPriceModifier', 1.0);?>" />x
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Buy calculator price multiplier (high stock): <img src="<?=getUrl()?><?php echo($LM_HINTYELLOWIMG); ?>" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="<?php echo($LM_HINTYELLOW); ?>" /><br/>
+                                <em>1.0 = original price</em>
+                            </td>
+                            <td>
+                                <input type="text" size="6" name="buyCalcPriceModifierHigh" value="<?=getConfigItem('buyCalcPriceModifierHigh', 0.9);?>" />x
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Buy calculator price multiplier (very high stock): <img src="<?=getUrl()?><?php echo($LM_HINTREDIMG); ?>" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="<?php echo($LM_HINTRED); ?>" /><br/>
+                                <em>1.0 = original price</em>
+                            </td>
+                            <td>
+                                <input type="text" size="6" name="buyCalcPriceModifierVeryHigh" value="<?=getConfigItem('buyCalcPriceModifierVeryHigh', 0.8);?>" />x
                             </td>
                         </tr>
                         
