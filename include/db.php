@@ -64,7 +64,7 @@ function generate_title($subtitle = null) {
 }
 
 function filter_description($description) {
-    return preg_replace('/[\x78-\xFF]/','',$description);
+    return preg_replace('/[\x7F-\xFF]/','',$description);
 }
 
 function generate_meta($description=null, $title=null ,$image=null) {
