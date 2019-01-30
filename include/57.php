@@ -17,8 +17,14 @@ $PANELNAME='Settings'; //Panel name (optional)
                 if (!token_verify()) die("Invalid or expired token.");
                 
 		$blad=0;
-
-		$templink=secureGETstr('link',4096); //zbierz zmienne od przegladarki
+                
+                $max = 8192;
+                
+                if (count($_GET['link']) > $max) {
+                    echo("This filed supports a maximum of $max characters");
+                    return;
+                }
+		$templink=secureGETstr('link',$max); //zbierz zmienne od przegladarki
                 setConfigItem('leftSidebar', $templink);
 		
 			/*$sql="UPDATE `linki` SET
