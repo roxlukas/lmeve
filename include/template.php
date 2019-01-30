@@ -65,14 +65,23 @@ function template_main($contents,$title,$meta) {
 	<?php
 	applycss(getcss());
         applycss("css/print.css");
+        applycss("css/grid.css");
+        applycss("css/mg.css");
 	?>
         <!--<link rel="stylesheet" href="jquery-ui/css/ui-darkness/jquery-ui-1.10.3.custom.min.css" />-->
 	<link rel="icon" href="favicon.ico" type="image/ico">
         <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>chart.js/Chart.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>mg.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
 	<script type="text/javascript">
 		function logoff() {
 		logout=window.open("index.php?logoff=1","logoff_window","toolbar=0,location=0,scrollbars=0,resizable=0,height=64,width=64,top=100,left=100");
@@ -81,6 +90,7 @@ function template_main($contents,$title,$meta) {
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
+        <canvas id="testCanvas" width="1" height="1" style="width: 1px; height: 1px; display: none;"></canvas>
 	<table class="tab-container">
 	<tr><td width="100%" class="tab-horizbar">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -121,7 +131,7 @@ function template_main($contents,$title,$meta) {
 	</td></tr>
 	<tr><td width="100%" style="padding: 0;">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
-		<tr><td class="tab-links" style="width: 20%; vertical-align: top; padding: 5px;">
+		<tr><td class="tab-links" id="tab-links" style="width: 20%; vertical-align: top; padding: 5px;">
 	<?php //draw links from db
         $sidebar=getConfigItem('leftSidebar','Administrators can freely edit this sidebar.');
         
@@ -239,7 +249,8 @@ function template_login($meta) {
                         <?php if (getConfigItem('publicKillboard')=='enabled') { ?> <hr style="opacity: 0.2;" />
 			<a href="killboard.php"><img src="<?=getUrl()?>img/lmeve-killboard.png"></a>
 			<?php } ?>
-                        
+                        <hr style="opacity: 0.2;" />
+                        <em>Administrator of <?=$LM_APP_NAME?> is processing EVE Online information owned by <a href="https://www.ccpgames.com/company">CCP hf</a> and shared under <a href="https://developers.eveonline.com/resource/license-agreement">Developer License Agreement</a>.<br/> <?=$LM_APP_NAME?> is using cookies so it can keep you logged in.</em>
 		 </div>
 	</td></tr>
 	</table>

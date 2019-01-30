@@ -436,13 +436,14 @@ function generateTurretCode($graphics) {
     $index=1;
     if (count($graphics)>0) {
         ?><script type="text/javascript">
+            window.addEventListener("load", function(){ 
         <?php
         foreach ($graphics as $turret) {
             ?>
                 loadTurret(<?=$index++?>, '<?=$turret['graphicFile']?>');
             <?php
         }
-        ?></script><?php
+        ?> });</script><?php
     }
 }
 

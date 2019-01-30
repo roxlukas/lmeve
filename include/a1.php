@@ -80,8 +80,7 @@ function decryptors($typeID, $techLevel) {
 }
 
 ?>	    
-		<script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
-		<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
+		
 		<div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
@@ -236,11 +235,7 @@ if ($model=getResourceFromYaml($nr)) {
             </div>
     <input type="button" id="buttonFull" value="Fullscreen" style="position: relative; top: -418px; left: 2px; z-index: 10;" onclick="togglefull();"/></td>
     <td style="vertical-align: top;">
-		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
-		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
-		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
-		<script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
-                <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
+		
 		<script type="text/javascript">
                     settings.canvasID = 'wglCanvas';
                     settings.sofHullName = '<?=$model['sofHullName']?>';
@@ -307,12 +302,14 @@ if ($model) {
     ?>
     <input type="button" id="3dbutton_main" onclick="toggler('3dpreview'); loadPreview(settings,'default');" value="3D" disabled/>
     <script type="text/javascript">
-        if (WGLSUPPORT) {
-            document.getElementById('3dbutton_main').disabled=false;
-            document.getElementById('3dbutton_main').title="Click to preview the 3D model";
-        } else {
-            document.getElementById('3dbutton_main').title="Your browser does not support WebGL";
-        }
+        window.addEventListener("load", function(){ if (WGLSUPPORT) {
+                document.getElementById('3dbutton_main').disabled=false;
+                document.getElementById('3dbutton_main').title="Click to preview the 3D model";
+            } else {
+                document.getElementById('3dbutton_main').title="Your browser does not support WebGL";
+            }
+        });
+        
     </script>    
     <?php
 }

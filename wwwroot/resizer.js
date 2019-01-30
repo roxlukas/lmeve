@@ -34,8 +34,6 @@ function _resize() {
     document.getElementById('tab-main').style.height=$(window).height()-205+"px";
 }
 
-window.onresize = function(event) {
-    _resize();
-};
+window.addEventListener("resize", _resize);
 
 _resize();

@@ -1,0 +1,14 @@
+{
+    "name": "LMeve",
+    "short_name": "LMeve",
+    "icons": [
+        {
+            "src": "/img/android-chrome-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#1d2c38",
+    "background_color": "#1d2c38",
+    "display": "standalone"
+}

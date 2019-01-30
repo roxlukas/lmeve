@@ -32,6 +32,46 @@ function outsiderhrefedit($characterName) {
     echo("<a href=\"https://gate.eveonline.com/Profile/${cn}\" target=\"_blank\" title=\"Click to open character information\">");
 }
 
+function getInvTypes($typeID, $onlyDogma = FALSE) {
+    global $LM_EVEDB;
+    $items=db_asocquery("SELECT itp.*,cre.`averagePrice` FROM $LM_EVEDB.`invTypes` itp LEFT JOIN `crestmarketprices` cre ON itp.`typeID`=cre.`typeID` WHERE itp.`typeID`=$typeID;");
+    if (count($items)==0) return FALSE;
+    
+    if ($onlyDogma === FALSE) { 
+        $item=$items[0]; 
+    } else {
+        $item = array();
+    }
+    
+    $traitData=db_asocquery("SELECT yit.*, eun.displayName
+        FROM `$LM_EVEDB`.`yamlInvTraits` yit
+        LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+        ON yit.`unitID`=eun.`unitID`
+        WHERE `typeID`=$typeID AND `skillID`=-1;");
+    $bonusData=db_asocquery("SELECT yit.*, eun.displayName
+        FROM `$LM_EVEDB`.`yamlInvTraits` yit
+        LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
+        ON yit.`unitID`=eun.`unitID`
+        WHERE `typeID`=$typeID AND `skillID`!=-1;");
+    $dogmaData=db_asocquery("SELECT valueFloat,valueInt,displayName,description
+        FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
+        JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
+        ON dta.attributeID=da.attributeID
+        WHERE dta.typeID=$typeID
+        AND displayName != '';");
+    $graphicData=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
+        JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
+        ON yti.`graphicID`=ygi.`graphicID`
+        JOIN `$LM_EVEDB`.`invTypes` itp
+        ON yti.`typeID`=itp.`typeID`
+        WHERE yti.`typeID`=$typeID;");
+    if (count($graphicData) > 0) $item['sofDNA'] = $graphicData[0]['sofHullName'].':'.$graphicData[0]['sofFactionName'].':'.$graphicData[0]['sofRaceName'];    
+    if (count($traitData) > 0) $item['traits']=$traitData;
+    if (count($bonusData) > 0) $item['bonuses']=$bonusData;
+    if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
+    return $item;
+}
+
 function pocohrefedit($nr) {
     echo("<a href=\"index.php?id=2&id2=7&nr=$nr\" >");
 }
@@ -314,7 +354,7 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
     ?>
     
     
-    <table class="lmframework" style="width: 100%;"><tr><td style="width:636px;">
+    <table class="lmframework killboard" style="width: 100%;"><tr><td style="width:636px;">
     <div style="width: 636px; height: 563px; float: left;">
           <div style="position: absolute; margin-left: 52px; margin-top: 20px; ">
               <img src="<?php echo(getTypeIDicon($shipTypeID,512));?>" style="width: 532px; height: 532px;" />
@@ -403,14 +443,15 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
     ?>
         </td></tr></table>
     </td></tr></table>
-<?php if (getConfigItem(useWebGLpreview,'enabled')=='enabled') { ?>
-    <script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+<?php if (getConfigItem(useWebGLpreview,'enabled')=='enabled') { /* <script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
     <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
     <script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
     <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
-    <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
+    <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script> */?>
+    
     <script type="text/javascript">
         //webgl suprt
+        window.addEventListener("load", function(){ 
         settings.canvasID = 'wglCanvas';
         settings.sofHullName = '<?=$model['sofHullName']?>';
         settings.sofRaceName = '<?=$model['sofRaceName']?>';
@@ -424,6 +465,8 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
             
             
         }
+    });
+        
     </script>
     <?php
     }

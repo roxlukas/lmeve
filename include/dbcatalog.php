@@ -96,6 +96,18 @@ function checkIfTableExists($tab) {
     return FALSE;
 }
 
+function checkIfTableExistsLmeve($tab) {
+    global $LM_dbname;
+    
+    $ret=db_asocquery("SHOW TABLES FROM `$LM_dbname`;");
+    foreach ($ret as $row) {
+        foreach ($row as $col) {
+            if ($col==$tab) return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 function updateUserstable() {
     global $USERSTABLE;
     $table=db_asocquery("DESCRIBE $USERSTABLE;");
@@ -325,7 +337,7 @@ function esiUpdateApiIndustryJobsCrius() {
 }
 
 function esiCreateApiassetnames() {
-    if (!checkIfTableExists('apiassetnames')) {
+    if (!checkIfTableExistsLmeve('apiassetnames')) {
         return db_uquery("CREATE TABLE IF NOT EXISTS `apiassetnames` (
             `itemID` bigint(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `itemName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
@@ -335,7 +347,7 @@ function esiCreateApiassetnames() {
 }
 
 function esiCreateCfgesitoken() {
-    if (!checkIfTableExists('cfgesitoken')) {
+    if (!checkIfTableExistsLmeve('cfgesitoken')) {
         return db_uquery("CREATE TABLE IF NOT EXISTS `cfgesitoken` (
             `tokenID` int(11) NOT NULL AUTO_INCREMENT,
             `token` varchar(255) NOT NULL,
@@ -347,7 +359,7 @@ function esiCreateCfgesitoken() {
 }
 
 function esiCreateEsistatus() {
-    if (!checkIfTableExists('esistatus')) {
+    if (!checkIfTableExistsLmeve('esistatus')) {
         return db_uquery("CREATE TABLE IF NOT EXISTS `esistatus` (
         `errorID` int(11) NOT NULL AUTO_INCREMENT,
         `tokenID` varchar(255) NOT NULL,
@@ -363,7 +375,7 @@ function esiCreateEsistatus() {
 }
 
 function esiCreateEsiServerStatus() {
-    if (!checkIfTableExists('esiserverstatus')) {
+    if (!checkIfTableExistsLmeve('esiserverstatus')) {
         return db_uquery("CREATE TABLE IF NOT EXISTS `esiserverstatus` (
         `statusID` int(11) NOT NULL AUTO_INCREMENT,
         `date` datetime NOT NULL,
@@ -401,14 +413,14 @@ function esiUpdateApiCorpMembers() {
 }
 
 function decryptorTables() {
-    if (!checkIfTableExists('cfgdecryptors')) {
+    if (!checkIfTableExistsLmeve('cfgdecryptors')) {
         db_uquery("CREATE TABLE IF NOT EXISTS `cfgdecryptors` (
         `typeID` int(11) NOT NULL,
         `decryptorTypeID` int(11) NOT NULL,
         PRIMARY KEY (`typeID`)
       ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
     }
-    if (!checkIfTableExists('ramdecryptors')) {
+    if (!checkIfTableExistsLmeve('ramdecryptors')) {
         db_uquery("CREATE TABLE IF NOT EXISTS `ramdecryptors` (
         `typeID` int(11) NOT NULL,
         `meBonus` int(11) NOT NULL,

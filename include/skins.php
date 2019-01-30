@@ -140,11 +140,13 @@ function showSkins($skins) {
 				<td><?php skinhrefedit($skin['licenseTypeID']); echo($skin['internalName']); ?></a></td>
 				<td style="width: 36px; text-align: center;"><input type="button" id="3dbutton_<?=$rnd?>" onclick="toggler_on('3dpreview'); loadPreview(settings,'<?=$skin['material']?>');" value="3D" disabled/>
 					<script type="text/javascript">
-						if (WGLSUPPORT) {
+                                            window.addEventListener("load", function(){ if (WGLSUPPORT) {
 							document.getElementById('3dbutton_<?=$rnd?>').disabled=false;
 							document.getElementById('3dbutton_<?=$rnd?>').title="Click to preview this SKIN";
                                                         getDesignerSkin(<?=$skin['skinID']?>, '3dbutton_<?=$rnd?>');
 						}
+                                            });
+						
 					</script>
 				</td>
 			</tr><?php

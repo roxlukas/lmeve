@@ -199,35 +199,8 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
         case 'INVTYPES':
             $typeID=secureGETnum('typeID');
             if (empty($typeID)) RESTfulError('Missing typeID parameter.',400);
-            $items=db_asocquery("SELECT itp.*,cre.`averagePrice` FROM $LM_EVEDB.`invTypes` itp LEFT JOIN `crestmarketprices` cre ON itp.`typeID`=cre.`typeID` WHERE itp.`typeID`=$typeID;");
-            if (count($items)==0) RESTfulError('typeID not found.',404);
-            $item=$items[0];
-            $traitData=db_asocquery("SELECT yit.*, eun.displayName
-                FROM `$LM_EVEDB`.`yamlInvTraits` yit
-                LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
-                ON yit.`unitID`=eun.`unitID`
-                WHERE `typeID`=$typeID AND `skillID`=-1;");
-            $bonusData=db_asocquery("SELECT yit.*, eun.displayName
-                FROM `$LM_EVEDB`.`yamlInvTraits` yit
-                LEFT JOIN `$LM_EVEDB`.`eveUnits` eun
-                ON yit.`unitID`=eun.`unitID`
-                WHERE `typeID`=$typeID AND `skillID`!=-1;");
-            $dogmaData=db_asocquery("SELECT valueFloat,valueInt,displayName,description
-                FROM $LM_EVEDB.`dgmTypeAttributes` AS dta
-                JOIN $LM_EVEDB.`dgmAttributeTypes` AS da
-                ON dta.attributeID=da.attributeID
-                WHERE dta.typeID=$typeID
-                AND displayName != '';");
-            $graphicData=db_asocquery("SELECT yti.`typeID`,itp.`groupID`,itp.`typeName`,ygi.* FROM `$LM_EVEDB`.`yamlTypeIDs` yti
-                JOIN `$LM_EVEDB`.`yamlGraphicIDs` ygi
-                ON yti.`graphicID`=ygi.`graphicID`
-                JOIN `$LM_EVEDB`.`invTypes` itp
-                ON yti.`typeID`=itp.`typeID`
-                WHERE yti.`typeID`=$typeID;");
-            if (count($graphicData) > 0) $item['sofDNA'] = $graphicData[0]['sofHullName'].':'.$graphicData[0]['sofFactionName'].':'.$graphicData[0]['sofRaceName'];    
-            if (count($traitData) > 0) $item['traits']=$traitData;
-            if (count($bonusData) > 0) $item['bonuses']=$bonusData;
-            if (count($dogmaData) > 0) $item['attributes']=$dogmaData;
+            $item = getInvTypes($typeID);
+            if ($item === FALSE) RESTfulError('typeID not found.',404);
             echo(encode($item));
             break;
         case 'INVGROUPS':
@@ -339,7 +312,10 @@ if (!(checkApiKey($key) || $_SESSION['status']==1)) RESTfulError("Invalid LMeve 
             //regionID - optional
             $regionID=secureGETnum('regionID');
             if (isset($regionID)) $regionWhere="`regionID`=$regionID"; else $regionWhere="TRUE";
-            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapRegions` WHERE $regionWhere;");
+            $items=db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapRegions` reg "
+                    . "LEFT JOIN `$LM_EVEDB`.`mapLocationScenes` loc ON reg.`regionID` = loc.`locationID` "
+                    . "LEFT JOIN `$LM_EVEDB`.`eveGraphics` gra ON loc.`graphicID` = gra.`graphicID` "
+                    . "WHERE $regionWhere;");
             if (count($items)==0) RESTfulError('region not found.',404);
             echo(encode($items, 'regions', 'region'));
             break;

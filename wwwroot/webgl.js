@@ -13,7 +13,7 @@ function checkwglsuprt() {
 			  //window.alert("Cannot create WebGLRenderingContext. WebGL disabled.");
 			  console.log('WebGL is NOT supported! (Cannot create WebGLRenderingContext)');return false;   
 		  }
-		  var canvas = document.getElementById(settings.canvasID);
+		  var canvas = document.getElementById('testCanvas');
 		  var experimental = false;
 		  try {gl = canvas.getContext("webgl");}
 		  catch (x) {gl = null;}
@@ -29,10 +29,12 @@ function checkwglsuprt() {
                   console.log('WebGL is supported');
 		  return true;
 }
-		
+
 var scene = null,
 ship = null,
-WGLSUPPORT = checkwglsuprt();
+WGLSUPPORT = null;
+
+window.addEventListener("load", function(){ WGLSUPPORT = checkwglsuprt(); });
 	
 function loadPreview(settings,skin) {
     if (skin=='default' || !skin || skin=='NULL') skin=settings.sofFactionName;
@@ -178,3 +180,147 @@ function togglefull() {
                 skinpanel.style.right="0px";
         }
 }
+
+function loadDna(dna) {
+    ccpwgl.getSofHullConstructor(dna, function (constructor)
+    {
+        if (constructor)
+        {
+            try
+            {
+                scene.removeObject(0);
+            }
+            catch (e)
+            {
+            }
+            ship = scene[constructor](dna);
+            if ('setBoosterStrength' in ship)
+            {
+                ship.setBoosterStrength($('#booster-intensity').val() / 50);
+            }
+        }
+    });
+}
+
+function loadObject(settings,dna) {
+    console.log("Loading Object " + dna);
+
+    var canvas = document.getElementById(settings.canvasID);
+    
+    var camera = new TestCamera(canvas);
+        camera.minDistance = 10;
+        camera.maxDistance = 50000;
+        camera.fov = 30;
+        camera.distance=50000;
+        camera.rotationX = -0.75;
+        camera.rotationY = 0.2;
+        camera.nearPlane = 1;
+        camera.farPlane = 10000000;
+        camera.minPitch = -0.5;
+        camera.maxPitch = 0.65;
+    
+    if (!ship) {
+        console.log("Initializing Canvas with ID: " + settings.canvasID);
+        ccpwgl.initialize(canvas);
+        console.log("Setting camera");
+        ccpwgl.setCamera(camera);
+    } else {
+        console.log("Scene was already initialized");
+    }
+    console.log("Initializing scene");
+    scene = ccpwgl.loadScene(settings.background);
+    scene.loadSun('res:/fisfx/lensflare/orange_sun.red');
+    scene.setSunDirection([1, 0, 0.7]);
+
+    console.log("Loading object into scene");
+    loadDna(dna);
+
+    ccpwgl.onPreRender = function () 
+    { 
+
+    };
+
+}
+
+function loadShipInHangar(settings, raceID, dna) {
+    console.log("Loading Object " + dna);
+
+    var canvas = document.getElementById(settings.canvasID);
+    
+    var hangars = [];
+    hangars[1] = "res:/dx9/model/hangar/caldari/ch1/ch1.red";
+    hangars[2] = "res:/dx9/model/hangar/minmatar/mh1/mh1.red";
+    hangars[4] = "res:/dx9/model/hangar/amarr/ah1/ah1.red";
+    hangars[8] = "res:/dx9/model/hangar/gallente/gh1/gh1.red";
+        
+    var stationPath = hangars[raceID];
+
+    var shipHeightFromLandingPad = 500;
+    
+    ccpwgl.initialize(canvas);
+    //ccpwgl.debug = true;
+    var camera = ccpwgl.createCamera(canvas, undefined, true);
+    camera.poi[1] = shipHeightFromLandingPad;
+    scene = ccpwgl.loadScene(stationPath, function()
+    {
+        hangar = scene.wrappedObjects[0];
+        // Hide lights in caldari hangar
+        if (stationPath === hangars[1])
+        {
+            scene.wrappedObjects[0].display = false;
+        }
+        // Remove station ship traffic - causes errors
+        for (var i = 1; i < scene.wrappedObjects.length; i++)
+        {
+            if (scene.wrappedObjects[i] instanceof ccpwgl_int.EveShip)
+            {
+                scene.wrappedObjects[i].display = false;
+            }
+        }
+    });
+    var lastHull = null;
+    if (settings.postprocess)
+        ccpwgl.enablePostprocessing(true);
+    
+    function loadDna(dna) {
+        ccpwgl.getSofHullConstructor(dna, function(constructor)
+        {
+            if (constructor)
+            {
+                try
+                {
+                    scene.removeObject(0);
+                }
+                catch (e)
+                {
+                }
+                ship = scene[constructor](dna, function()
+                {
+                    // Position the ship above the landing pad
+                    // This probably should be calculated from bounding sphere...
+                    this.setTransform([
+                        1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, shipHeightFromLandingPad, 0, 1
+                    ]);
+                    // Turn boosters down
+                    if (this.setBoosterStrength)
+                    {
+                        this.setBoosterStrength(0.1);
+                    }
+                    var hull = dna.split(':')[0];
+                    if (lastHull !== hull)
+                    {
+                        camera.focus(this, 3, 50, true);
+                        lastHull = hull;
+                    }
+                });
+            }
+        });
+    }
+    
+    loadDna(dna);
+    
+}
+

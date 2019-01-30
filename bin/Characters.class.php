@@ -94,4 +94,24 @@ class Characters extends Route {
         $this->getCharacter($this->ESI->getCharacterID() .'/');
     }
     
+    public function addCharacter($characterID) {
+        $c = $this->getCharacter($characterID);
+        //var_dump($c);
+        $sql = "INSERT IGNORE INTO `apicorpmembers` VALUES (".
+                                    $characterID . ",".
+                                    $this->s($c->name) . ",".
+                                    $this->d($c->birthday) . ",".
+                                    "0,".
+                                    "'',".
+                                    "'',".
+                                    $c->corporation_id . ",".
+                                    "NOW(),".
+                                    "NOW(),".
+                                    "NULL,".
+                                    "NULL" .
+                                    ")" . ';';
+        //echo($sql);
+        db_uquery($sql);
+    }
+    
 }

@@ -2,13 +2,19 @@
 ## LMeve specific
 #################
 
-wwwroot/ccp_img/*.png
-wwwroot/ccp_img/*.jpg
-wwwroot/ccp_icons/*.png
-wwwroot/ccp_icons/*.jpg
+wwwroot/ccp_img/
+wwwroot/ccp_icons/
+wwwroot/UI/
+wwwroot/ui/
 wwwroot/css/aideron.css
 wwwroot/img/aideron-robotics.jpg
 config/config.php
+
+wwwroot/mg.js
+wwwroot/ajax.php
+include/mg.php
+include/z.php
+include/z0.php
 
 #################
 ## NetBeans

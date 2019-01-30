@@ -1,6 +1,10 @@
 body {
-	background: url('../img/aideron-robotics_rixx.jpg') #0e1e28 no-repeat center top;
-	margin-top: 90px;
+	background: url('../img/bg-onslaught.jpg') #444 no-repeat;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        /* background: #0e1e28 no-repeat center top; */
+	margin: 0px;
 }
 body,p,td,div,a,span {
 	font-family:"helvetica ce","arial ce",helvetica,arial,sans-serif;
@@ -14,9 +18,16 @@ body,p,td,div,a,span {
 input[type="button"],input[type="submit"] {
 	font-family: Verdana,Tahoma,sans-serif;
 	font-size: 10px;
-	background-color: #FFFFFF;
+	background-color: #ddd;
+        border-color: rgba(90,90,90,1.0);
 	border-style: ridge;
+        color: #000;
 }
+
+input:disabled[type="button"],input:disabled[type="submit"] {
+        color: #888;
+}
+
 input {
 	font-family: Verdana,Tahoma,sans-serif;
 	font-size: 10px;
@@ -35,10 +46,10 @@ select {
 /* end of fixed checkbox formatting */
 
 a {
-	color: #78f0ef;
+	color: #ff9e20;
 }
 a:hover {
-	color: #ff8400;
+	color: #ffffff;
 	text-decoration: underline;
 }
 img {
@@ -108,7 +119,7 @@ img {
 
 .menu {
 	/*background-color: #becfe6;*/
-	background: rgba(7, 15, 28, 0.75);
+	background: rgba(20,20,20,0.75);
 	margin-left: 10px;
 	margin-top: 0px;
 	margin-bottom: 0px;
@@ -135,7 +146,7 @@ img {
 
 .menua {
 	/*background-color: #85a5cf;*/
-	background: rgba(29,44,56,0.75);
+	background: rgba(70,70,70,0.75);
 	margin-left: 10px;
 	margin-top: 0px;
 	margin-bottom: 0px;
@@ -235,21 +246,21 @@ img {
 }
 /* new table style */
 
+.lmframework div {
+	background: rgba(90,90,90,0.50);
+}
+
 .lmframework table {
 	border-collapse: separate;
 	border-spacing: 2px;
 }
 
-.lmframework div {
-	background: rgba(39,54,66,0.50);
-}
-
 .lmframework tr {
-	background: rgba(39,54,66,0.50);
+	background: rgba(90,90,90,0.50);
 }
 
 .lmframework tr:nth-child(odd) {
-	background: rgba(49,64,76,0.50);
+	background: rgba(60,60,60,0.50);
 }
 
 .lmframework td {
@@ -258,7 +269,7 @@ img {
 
 .lmframework th {
 	background-repeat: repeat-x;
-	background: rgba(49,64,76,0.75);
+	background: rgba(90,90,90,0.75);
 	padding: 5px;
 }
 
@@ -268,7 +279,7 @@ img {
 }
 
 .lmeditor td {
-	background: rgba(29,44,56,0.33);
+	background: rgba(70,70,70,0.33);
 	width: 200px;
 	padding: 5px;
 }
@@ -276,7 +287,7 @@ img {
 .lmeditor th {
 	background-repeat: repeat-x;
 	background-color: #abbcd1;
-	background: rgba(29,44,56,0.75);
+	background: rgba(70,70,70,0.75);
 	padding: 5px;
 	width: 150px;
 	font-weight: normal;
@@ -293,30 +304,30 @@ img {
 	/*background: url('../img/gradient3.png');
 	background-repeat: repeat-x;
 	background-color: #abbcd1;*/
-	background: rgba(49,64,76,0.75);
+	background: rgba(90,90,90,0.75);
 	padding: 5px;
 }
 
 .tab-text {
 	/*background-color: #e0f0ff;*/
-	background: rgba(39,54,66,0.75);
+	background: rgba(90,90,90,0.75);
 	padding: 5px;
 }
 
 .tab-double {
 	/*background-color: #e0e8f0;*/
-	background: rgba(39,54,66,0.75);
+	background: rgba(90,90,90,0.75);
 	padding: 5px;
 }
 
 .tab {
 	/*background-color: #e0e8f0;*/
-	background: rgba(39,54,66,0.50);
+	background: rgba(90,90,90,0.50);
 	padding: 5px;
 }
 
 .login {
-	background: rgba(29,44,56,0.75);
+	background: rgba(70,70,70,0.75);
 	padding: 10px;
 	/*border-radius: 5px;*/
         border: 1px solid rgba(255,255,255,0.1);
@@ -324,7 +335,7 @@ img {
 }
 
 .tab-horizbar {
-	background: rgba(29,44,56,0.75);
+	background: rgba(70,70,70,0.75);
 	color: #ffffff;
 	/*background: url('../img/gradient.png');
 	background-color: #85a5cf;*/
@@ -337,32 +348,32 @@ img {
 
 .tab-logo {
 	/*background-color: #becfe6;*/
-	background: rgba(7, 15, 28, 0.75);
+	background: rgba(20,20,20,0.75);
 }
 
 .tab-links {
 	/*background: url('../img/gradient2.png');
 	background-repeat: repeat-x;
 	background-color: #abbcd1;*/
-	background: rgba(29,44,56,0.75);
+	background: rgba(70,70,70,0.75);
 }
 
 .tab-main {
-	background: url('../img/today-robotics_rixx.jpg') #0e1e28 no-repeat center top;
+	/* background: url('../img/bg-onslaught.jpg') #0e1e28 no-repeat left top; */
 	box-shadow: rgba(0,0,0,0.2) 3px 3px 6px 3px inset;
 	padding: 5px 20px 20px 20px;
-    /*background: rgba(7,25,28,0.75);*/
-    /*BORDER-RIGHT: #85a5cf 3px solid;
-    BORDER-TOP: #85a5cf 0px solid;
-    BACKGROUND: url(../img/stumbler.png) #ffffff no-repeat right bottom;
-    BORDER-LEFT: #85a5cf 0px solid;
-    BORDER-BOTTOM: #85a5cf 0px solid*/
+        background: rgba(20,20,20,0.65);
+        /*BORDER-RIGHT: #85a5cf 3px solid;
+        BORDER-TOP: #85a5cf 0px solid;
+        BACKGROUND: url(../img/stumbler.png) #ffffff no-repeat right bottom;
+        BORDER-LEFT: #85a5cf 0px solid;
+        BORDER-BOTTOM: #85a5cf 0px solid*/
 }
 
 .tab-container {
 	border-spacing: 0;
         border-collapse: collapse;
-        width: 90%;
+        width: 100%;
         box-shadow: rgba(0,0,0,0.15) 3px 3px 9px 5px;
 }
 

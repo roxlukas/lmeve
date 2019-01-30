@@ -40,17 +40,6 @@ include_once('ESI.class.php');
 $ESI = new ESI(5);
 echo("Testing\r\n");
 
-alterTableChangeColumnNull('apicontainerlog', 'logTime');
-
-//$ESI->Corporations->updateBlueprints();
-
-//$ESI->Killmails->updateKillmails();
-
-/* 
- DELETE FROM `apikills` WHERE `killID` IN (72950309, 72950369);
- DELETE FROM `apikillvictims` WHERE `killID` IN (72950309, 72950369);
- DELETE FROM `apikillattackers` WHERE `killID` IN (72950309, 72950369);
- DELETE FROM `apikillitems` WHERE `killID` IN (72950309, 72950369);
- */
+$ESI->Characters->addCharacter(245073304);
 
 ?>

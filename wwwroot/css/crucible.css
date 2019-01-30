@@ -247,6 +247,10 @@ img {
 	border-spacing: 2px;
 }
 
+.lmframework div {
+	background:#323232;
+}
+
 .lmframework tr {
 	background:#323232;
 }
@@ -435,4 +439,8 @@ background-color: #1f1f1f;
 
 .ui-accordion-header {
 	cursor: pointer;
+}
+
+.killboard div {
+    background: none;
 }

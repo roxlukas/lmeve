@@ -93,9 +93,16 @@ function generate_meta($description=null, $title=null ,$image=null) {
         <meta name="twitter:site" content="@rox_lukas">
         <meta name="twitter:domain" content="' . $domain . '">
         <meta property="application-name" content="LMeve" />
-        <meta name="msapplication-TileColor" content="#1D2C38" />
         <meta name="mobile-web-app-capable" content="yes">
-        <link rel="shortcut icon" sizes="16x16" href="' . getUrl() . 'favicon.ico" />
+        <link rel="apple-touch-icon" sizes="120x120" href="' . getUrl() . 'img/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="' . getUrl() . 'img/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="' . getUrl() . 'img/favicon-16x16.png">
+        <link rel="manifest" href="' . getUrl() . 'img/site.webmanifest">
+        <link rel="mask-icon" href="' . getUrl() . 'img/safari-pinned-tab.svg" color="#1d2c38">
+        <link rel="shortcut icon" href="' . getUrl() . 'img/favicon.ico">
+        <meta name="msapplication-TileColor" content="#1d2c38">
+        <meta name="msapplication-config" content="' . getUrl() . 'img/browserconfig.xml">
+        <meta name="theme-color" content="#1d2c38">
         <meta name="twitter:title" content="' . $title . '">
         <meta name="twitter:image" content="' . $image . '">
         <meta name="twitter:card" content="summary">

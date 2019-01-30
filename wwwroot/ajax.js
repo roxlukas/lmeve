@@ -179,3 +179,4 @@ function pollerEsiRealTime(idDate,idFile,idMessage,idActive) {
     }
     });
 }
+
