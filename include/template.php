@@ -223,9 +223,10 @@ function template_login($meta) {
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
+            
 	<br>
 	<form name="loginform" id="loginform" method="post" action="">
-	
+	<img src="img/LMeve.png" alt='LMeve' />
 	<table border="0" cellspacing="0" cellpadding="0" width="300" class="login">
 	
 	
