@@ -12,6 +12,7 @@ config/config.php
 
 wwwroot/mg.js
 wwwroot/ajax.php
+wwwroot/css/mg.css
 include/mg.php
 include/z.php
 include/z0.php
