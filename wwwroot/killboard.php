@@ -222,11 +222,19 @@ function template_public($contents,$title,$meta) {
         <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>chart.js/Chart.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/external/glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl_int.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/test/TestCamera2.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>ccpwgl/ccpwgl.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>ajax.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>mg.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
+	<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
+        <canvas id="testCanvas" width="1" height="1" style="width: 1px; height: 1px; display: none;"></canvas>
 	<table class="tab-container">
 	<tr><td width="100%" class="tab-horizbar">
 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
