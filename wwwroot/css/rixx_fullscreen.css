@@ -236,6 +236,10 @@ img {
 }
 /* new table style */
 
+.lmframework div {
+	background: rgba(39,54,66,0.50);
+}
+
 .lmframework table {
 	border-collapse: separate;
 	border-spacing: 2px;
@@ -444,4 +448,8 @@ img {
 
 .ui-accordion-header {
 	cursor: pointer;
+}
+
+.killboard div {
+    background: none;
 }
