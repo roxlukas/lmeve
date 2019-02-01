@@ -70,6 +70,18 @@ function getCharacters() {
                 . "WHERE `userID` = " . $_SESSION['granted']);
 }
 
+function getCharactersDropdown() {
+    if (getConfigItem('only_linked_chars', 'disabled') == 'enabled') {
+        $chars=db_asocquery("SELECT apc.`characterID` , apc.`name`
+        FROM `apicorpmembers` apc
+        JOIN `lmchars` lmc ON apc.`characterID` = lmc.`charID`
+        ORDER BY name;");
+    } else {
+        $chars=db_asocquery("SELECT characterID, name FROM `apicorpmembers` ORDER BY name;");
+    }
+    return $chars;
+}
+
 function getCharacterPortrait($characterID, $size = 32) {
     if (!is_numeric($characterID)) $characterID=0;
     if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=256 && $size!=512)) $size=32;

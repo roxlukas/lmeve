@@ -11,6 +11,7 @@ $PANELNAME='Edit Tasks'; //Panel name (optional)
 //standard header ends here
 
 include_once 'inventory.php';
+include_once 'character.php';
 
 global $LM_EVEDB;
 
@@ -62,7 +63,8 @@ $runs=secureGETnum('runs');
 			if (isset($runs)) $task['runs']=$runs;
 						
 			//now we fill the drop down lists with characters and industry activities
-			$chars=db_asocquery("SELECT characterID, name FROM `apicorpmembers` ORDER BY name;");
+                        $chars = getCharactersDropdown();
+			
 			$activities=db_asocquery("SELECT `activityID`, `activityName` FROM $LM_EVEDB.`ramActivities` WHERE `published`=1 AND `activityID`>0 ORDER BY activityName;");
                         $labs=getLabs();
 
