@@ -165,7 +165,7 @@ Settings
                                 Only allow to assign tasks to characters linked to a user:<br/>
                             </td>
                             <td>
-                                <input type="checkbox" size="32" name="only_linked_chars" <?php if (getConfigItem('only_linked_chars','enabled')=='enabled') echo('checked'); ?> />
+                                <input type="checkbox" size="32" name="only_linked_chars" <?php if (getConfigItem('only_linked_chars','enabled')=='disabled') echo('checked'); ?> />
                             </td>
                         </tr>
                         <tr>
