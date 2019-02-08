@@ -139,10 +139,20 @@ class Killmails extends Route {
 
                                     $map = $this->ESI->Universe->getNamesForIdsMap($ids);
                                     
+                                    try {
+                                        $attacker_name = $this->ESI->Characters->getCharacterName($character_id);
+                                    } catch (Exception $ex) {
+                                        if ($this->ESI->getDEBUG()) {
+                                            warning(get_class(), "Cannot get Character Name for this attacker:");
+                                            var_dump($attacker);
+                                        }
+                                        $attacker_name = '';
+                                    }
+                                    
                                     db_uquery("INSERT IGNORE INTO `apikillattackers` VALUES(" .
                                             $killmail_id . "," . 
                                             $character_id . "," . 
-                                            $this->s($this->ESI->Characters->getCharacterName($character_id)) . "," . 
+                                            $this->s($attacker_name) . "," . 
                                             $corporation_id . "," . 
                                             $this->s($map[$corporation_id]) . "," . 
                                             $alliance_id . "," . 
