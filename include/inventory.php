@@ -363,7 +363,7 @@ function showInventoryFitting($data,$shipTypeID,$vertical=FALSE) {
               <canvas id="wglCanvas" width="532" height="532" style="width: 532px; height: 532px;"></canvas>
           </div>
           <div style="position: absolute; margin-left: 0px; margin-top: 0px; pointer-events: none; ">
-              <img src="<?=getUrl()?>img/fitting_mask.png" />
+              <img style="pointer-events: none;" src="<?=getUrl()?>img/fitting_mask.png" />
           </div>
 
     <?php
