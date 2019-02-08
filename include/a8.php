@@ -14,12 +14,26 @@ global $LM_EVEDB,$EC_PRICE_TO_USE_FOR_SELL;
 
 include_once('materials.php'); //material related subroutines
 
+if (getConfigItem('item_group_explorer','disabled')=='enabled') $item_group_explorer = TRUE; else $item_group_explorer = FALSE;
+
 $marketGroupID=secureGETnum('marketGroupID');
 
 if (!empty($marketGroupID)) {
 	$wheremarket="=$marketGroupID";
 } else {
 	$wheremarket="IS NULL";
+}
+
+if ($item_group_explorer) {
+    $db_group_id_field = 'groupID';
+    $db_group_name_field = 'groupName';
+    $db_group_table = 'invGroups';
+    $parent_group = "`published` = 1 AND `categoryID` IN (6,7,8,18,22,23,32,39,40,46,65,66,87) ORDER BY `groupName`";
+} else {
+    $db_group_id_field = 'marketGroupID';
+    $db_group_name_field = 'marketGroupName';
+    $db_group_table = 'invMarketGroups';
+    $parent_group = "`parentGroupID` $wheremarket";
 }
 
 //BEGIN Clientside sorting:
@@ -41,18 +55,19 @@ if (!empty($marketGroupID)) {
 	    </div>
 	    <?php echo("<em>Static Data schema: $LM_EVEDB</em><br />"); ?>
 	<?php
+        
 		if (!empty($marketGroupID)) {
 				$items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`
 				FROM `$LM_EVEDB`.`invTypes` itp
                                 JOIN `$LM_EVEDB`.`yamlBlueprintProducts` ybp
                                 ON itp.`typeID`=ybp.`productTypeID`
-				WHERE `marketGroupID` $wheremarket
+				WHERE `$db_group_id_field` $wheremarket
 				AND itp.`published` = 1
                                 AND ybp.`activityID` = 1
-				LIMIT 50;");
+				LIMIT 100;");
 		}
 		
-		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE `parentGroupID` $wheremarket ;");
+		$groups=db_asocquery("SELECT * FROM $LM_EVEDB.`$db_group_table` WHERE $parent_group ;");
 
 		?>
 	    
@@ -68,20 +83,20 @@ if (!empty($marketGroupID)) {
 		echo("<a href=\"index.php?id=10&id2=8&marketGroupID=$nr\">");
 	}
 	
-	function getMarketNode($marketGroupID) {
+	function getMarketNode($marketGroupID,$db_group_table,$db_group_id_field) {
 		global $LM_EVEDB;
 		if (empty($marketGroupID)) return;
-		$data=db_asocquery("SELECT * FROM $LM_EVEDB.`invMarketGroups` WHERE `marketGroupID` = $marketGroupID ;");
+		$data=db_asocquery("SELECT * FROM $LM_EVEDB.`$db_group_table` WHERE `$db_group_id_field` = $marketGroupID ;");
 		if (sizeof($data)==1) return($data[0]); else return;
 	}
 	
 	if (!empty($marketGroupID)) {
-		$node=getMarketNode($marketGroupID);
+		$node=getMarketNode($marketGroupID,$db_group_table,$db_group_id_field);
 		$parentGroupID=$node['parentGroupID'];
 		do {
-			$breadcrumbs="&gt; <a href=\"?id=10&id2=8&marketGroupID=${node['marketGroupID']}\">${node['marketGroupName']}</a> $breadcrumbs";
+			$breadcrumbs="&gt; <a href=\"?id=10&id2=8&marketGroupID=${node[$db_group_id_field]}\">${node[$db_group_name_field]}</a> $breadcrumbs";
 			if (!empty($node['parentGroupID'])) {
-				$node=getMarketNode($node['parentGroupID']);
+				$node=getMarketNode($node['parentGroupID'],$db_group_table,$db_group_id_field);
 			} else {
 				break;
 			}
@@ -123,19 +138,21 @@ if (!empty($marketGroupID)) {
 		<?php
 	}
 	?> </thead> <?php
-	if (sizeof($groups)>0) {		
+	if (sizeof($groups) > 0 )  {
+            if (($item_group_explorer && empty($marketGroupID)) || !$item_group_explorer ) {
 				foreach($groups as $row) {
 					echo('<tr><td style="padding: 0px; width: 32px;">');
-						hrefedit_group($row['marketGroupID']);
-						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"${row['marketGroupName']}\" />");
+						hrefedit_group($row[$db_group_id_field]);
+						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"${row[$db_group_name_field]}\" />");
 						echo('</a>');
 					echo('</td><td>');
-						hrefedit_group($row['marketGroupID']);
-						echo($row['marketGroupName']);
+						hrefedit_group($row[$db_group_id_field]);
+						echo($row[$db_group_name_field]);
 						echo('</a>');
 					echo('</td><td></td><td></td><td><td></td><td></td></td><td></td>');
 					echo('</tr>');
 				}
+            }
 	}
 
 	if (sizeof($items)>0) {

@@ -212,6 +212,22 @@ Settings
                         
                         <tr>
                             <td>
+                                Calculate Ore prices based on composition instead of fetching from ESI:<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="calculate_ore_prices" <?php if (getConfigItem('calculate_ore_prices','disabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Use Item Groups instead of Market Groups in Profit Explorer<br/>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="item_group_explorer" <?php if (getConfigItem('item_group_explorer','disabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 Get market prices from:<br/>
                             </td>
                             <td>

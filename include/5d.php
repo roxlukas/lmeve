@@ -44,6 +44,8 @@ global $LM_EVEDB;
                 if (secureGETstr('useWebGLpreview')=='on') setConfigItem('useWebGLpreview','enabled'); else setConfigItem('useWebGLpreview','disabled');
                 if (secureGETstr('singletonTaskAutoHide')=='on') setConfigItem('singletonTaskAutoHide','enabled'); else setConfigItem('singletonTaskAutoHide','disabled');
                 if (secureGETstr('only_linked_chars')=='on') setConfigItem('only_linked_chars','enabled'); else setConfigItem('only_linked_chars','disabled');
+                if (secureGETstr('calculate_ore_prices')=='on') setConfigItem('calculate_ore_prices','enabled'); else setConfigItem('calculate_ore_prices','disabled');
+                if (secureGETstr('item_group_explorer')=='on') setConfigItem('item_group_explorer','enabled'); else setConfigItem('item_group_explorer','disabled');
                 
                 if (in_array(secureGETstr('T3relicType'),array("Intact","Malfunctioning","Wrecked"))) setConfigItem('T3relicType', secureGETstr('T3relicType'));
 		if (secureGETnum('siloPercentage')>=0 && secureGETnum('siloPercentage')<=100) setConfigItem('siloPercentage', secureGETnum('siloPercentage'));
