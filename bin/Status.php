@@ -23,7 +23,8 @@ class Status extends Route {
         $status = $this->getServerStatus();
         
         if ($this->getStatus()=='fresh') {
-            if (is_object($status) && count($status) > 0) {
+            //var_dump($status);
+            if (is_object($status) && property_exists($status,'players')) {
                     if ($this->v($c,'vip',false) === true) $vip = 1; else $vip = '0';
                     $sql="INSERT INTO esiserverstatus VALUES (".
                             "DEFAULT" . "," .

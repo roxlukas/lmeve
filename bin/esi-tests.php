@@ -42,6 +42,8 @@ echo("Testing\r\n");
 
 //$ESI->Characters->addCharacter(245073304);
 
-$ESI->Wallet->updateCorpWalletTransactions();
+//$ESI->Wallet->updateCorpWalletTransactions();
+
+$ESI->Status->updateServerStatus();
 
 ?>
