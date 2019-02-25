@@ -8,8 +8,10 @@ For the most current version check the "Releases" page. The trunk code is unstab
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
+Official Discord channel: https://discord.gg/9yBhuPd
+
 <h3>Please do not contact "Lukas Rox" in game for support, because I do not read eve-mail</h3>
-If you find a problem, please open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
+If you find a problem, please come to official Discord channel here https://discord.gg/9yBhuPd and/or open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
 
 Try LMeve's Database module here: http://pozniak.pl/database/index.php
 
