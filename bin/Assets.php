@@ -74,7 +74,7 @@ class Assets extends Route {
         }
         if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs: ". json_encode($tmp));
         // contact ESI
-        inform(get_class(), 'Getting names from ESI...');
+        inform(get_class(), 'Getting ' . count($tmp) . ' names from ESI...');
         if (count($tmp) > 0) {
             $this->setRoute('/v1/corporations/' . $this->ESI->getCorporationID() . '/assets/names/');
             $this->setCacheInterval(0);
