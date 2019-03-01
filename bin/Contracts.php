@@ -97,6 +97,7 @@ class Contracts extends Route {
                     ";";
                     db_uquery($sql);
                     $this->updateCorporationContractItems($c->contract_id);
+                    $this->ESI->enforceMonolithRateLimit();
                 }
             }
         } else {
