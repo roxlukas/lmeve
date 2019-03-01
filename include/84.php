@@ -7,12 +7,15 @@ if (!checkrights("Administrator,ViewAPIStats")) { //"Administrator,ViewOverview"
 	return;
 }
 $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
-$PANELNAME='PVE Statistics'; //Panel name (optional)
+$PANELNAME='EVE XML API Statistics'; //Panel name (optional)
 //standard header ends here
 ?>
 
-<h2>EVE API Statistics</h2>
-<h3>Real time</h3>
+<h2>EVE XML API Statistics</h2>
+<h3 style="color: #f00;">Deprecated</h3>
+<h3>Check <a href="<?=getUrl()?>index.php?id=8&id2=7">ESI Statistics</a> instead.</h3>
+
+<!--<h3>Real time</h3>
 <table class="lmframework" style="width: 850px;">
     <tr>
         <th>
@@ -41,7 +44,7 @@ $PANELNAME='PVE Statistics'; //Panel name (optional)
     pollerRealTime('pollerDate','pollerFile','pollerMsg','pollerActive');
     window.setInterval(function(){ pollerRealTime('pollerDate','pollerFile','pollerMsg','pollerActive'); }, 5000);
 </script>
-
+-->
 	<?php
 		include("checkpoller.php");  
 	?>
