@@ -155,8 +155,8 @@ class Markets extends Route {
      */
     public function getMarketOrders($typeID, $regionID = null, $systemID = null) {
         $this->setRoute('/v1/markets/');
-//        $this->setCacheInterval(300);
-        $this->setCacheInterval(3600);
+//      $this->setCacheInterval(300);
+        $this->setCacheInterval(43200); //changing market polling to twice a day instead of once an hour
         if (is_null($regionID)) $regionID = getConfigItem ('marketRegionID', 10000002);
         //get data
         $a = $this->get( $regionID . '/orders/?type_id=' . $typeID . '&order_type=all');
