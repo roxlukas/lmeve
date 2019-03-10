@@ -72,7 +72,7 @@ $addr = secureGETstr('fetch');
 
 //prepare logging vars
 if ($LM_CCPWGL_PROXYAUDIT) {
-    $ip=$_SERVER['REMOTE_ADDR'];
+    $ip=get_remote_addr();
     $ref = $_SERVER['HTTP_REFERER'];
     $fetch=secureGETstr('fetch',256);
     db_uquery("CREATE TABLE IF NOT EXISTS `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog` (

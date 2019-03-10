@@ -49,7 +49,7 @@ if (checkpass($oldpass)) {
 		<?php
 	}
 } else {
-	$ip = $_SERVER['REMOTE_ADDR'];
+	$ip = get_remote_addr();
 	$tmpd=date('d.m.Y G:i:s');
         $id=$_SESSION['granted'];
 	$uzytk=getusers("WHERE `userID`=$id;");

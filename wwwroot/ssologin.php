@@ -98,7 +98,7 @@ if (!$SSOENABLED) { //if sso is not enabled, exit immediately
         //LOGIN HOOK
         login_hook();
         $_SESSION['LOGIN_REALM']='EVE_SSO';
-        updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
+        updatelast(date('d.m.Y G:i'),get_remote_addr());
         header("Location: index.php");
     }
 } else if ($_SESSION['status']==1 && $_SESSION['ssomode'] == "addkey") { //Add ESI token
