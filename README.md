@@ -23,73 +23,74 @@ If you find a problem, please open an Issue on GitHub project page: https://gith
 <h1>Setup instructions</h1>
 
 
-Steps for installing LMEVE : 
-	1. install LmEvE core
-	2. install dependancies
-	3. configure apache2
-	4. configure mysql
-	5. lmeve graphics
-	6. Registering with ccp
-	7. Finalization
-	
-1 install lmeve core : 
-  cd /var/www
-  sudo git clone https://github.com/roxlukas/lmeve
-    	  
-	  
-2 install lmeve dependancies : 
-  sudo apt-get install php-mysql php-pear apache2 libapache2-mod-php
-            php-cli php-dev libyaml-dev, php-mbstring 
-            python-yaml mysql-server mysql-client unzip
-  
-  
-3 Configure Apache2 :
-	sudo nano /etc/apache2/sites-enabled/000-default.conf
-	change DocumentRoot to : /var/www/lmeve/wwwroot
-	
-	  
-4 Configure MySQL install : 
-	sudo mkdir /Incoming
-	cd /Incoming
-	sudo wget "https://www.fuzzwork.co.uk/dump/mysql-latest.tar.bz2"
-	tar -xjf mysql-latest.tar.bz2 --wildcards --no-anchored '*sql' -C /Incoming/ --strip-components 1
-	sudo mv *.sql /Incoming/staticdata.sql
-	sudo mysql
-	CREATE DATABASE lmeve;
-	CREATE DATABASE EveStaticData;
-	USE lmeve;
-	source /var/www/lmeve/data/schema.sql;
-	USE EveStaticData;
-	source /Incoming/staticdata.sql;
-	CREATE USER 'lmeve'@'%' IDENTIFIED BY 'lmpassword';  		//<-- your custom password here
-	GRANT ALL PRIVILEGES ON `lmeve`.* TO 'lmeve'@'%';    		// Change % to your lmeve internal network address
-	GRANT ALL PRIVILEGES ON `EveStaticData`.* TO 'lmeve'@'%'; // Change % to your lmeve internal network address
-	FLUSH PRIVILEGES;
+Steps for installing LMEVE : <br>
+	1. install LmEvE core<br>
+	2. install dependancies<br>
+	3. configure apache2<br>
+	4. configure mysql<br>
+	5. lmeve graphics<br>
+	6. Registering with ccp<br>
+	7. Finalization<br>
+	<br>
+1 install lmeve core : <br>
+  cd /var/www<br>
+  sudo git clone https://github.com/roxlukas/lmeve<br>
+    	  <br>
+	  <br>
+2 install lmeve dependancies : <br>
 
-     
-5 install lmeve icons and graphics
- //remove placeholder ccp icon and img folders, download image package
-  cd /var/www/lmeve/wwwroot
-  sudo rm -fr ccp_icons ccp_img
-  cd /Incoming
-  sudo wget www.ash-online.net/lmevegfx/lmevegfx.tar.gz
-  sudo tar -zjvf lmevegfx.tar.gz -C /
-
-
-6 Configure CCP Developer application using the lmeve sso config guide :
-  https://github.com/roxlukas/lmeve/wiki/Integrating-LMeve-with-EVE-SSO
+  sudo apt-get install php-mysql php-pear apache2 libapache2-mod-php<br>
+            php-cli php-dev libyaml-dev, php-mbstring <br>
+            python-yaml mysql-server mysql-client unzip<br>
+  <br>
+  <br>
+3 Configure Apache2 : <br>
+	sudo nano /etc/apache2/sites-enabled/000-default.conf<br>
+	change DocumentRoot to : /var/www/lmeve/wwwroot<br>
+	<br>
+	  <br>
+4 Configure MySQL install : <br>
+	sudo mkdir /Incoming <br>
+	cd /Incoming <br>
+	sudo wget "https://www.fuzzwork.co.uk/dump/mysql-latest.tar.bz2" <br>
+	tar -xjf mysql-latest.tar.bz2 --wildcards --no-anchored '*sql' -C /Incoming/ --strip-components 1 <br>
+	sudo mv *.sql /Incoming/staticdata.sql <br>
+	sudo mysql <br>
+	CREATE DATABASE lmeve; <br>
+	CREATE DATABASE EveStaticData; <br>
+	USE lmeve;<br>
+	source /var/www/lmeve/data/schema.sql;<br>
+	USE EveStaticData;<br>
+	source /Incoming/staticdata.sql;<br>
+	CREATE USER 'lmeve'@'%' IDENTIFIED BY 'lmpassword';  		//<-- your custom password here<br>
+	GRANT ALL PRIVILEGES ON `lmeve`.* TO 'lmeve'@'%';    		// Change % to your lmeve internal network address<br>
+	GRANT ALL PRIVILEGES ON `EveStaticData`.* TO 'lmeve'@'%'; // Change % to your lmeve internal network address<br>
+	FLUSH PRIVILEGES;<br>
+<br>
+    <br> 
+5 install lmeve icons and graphics <br>
+ //remove placeholder ccp icon and img folders, download image package <br>
+  cd /var/www/lmeve/wwwroot <br>
+  sudo rm -fr ccp_icons ccp_img <br>
+  cd /Incoming <br>
+  sudo wget www.ash-online.net/lmevegfx/lmevegfx.tar.gz <br>
+  sudo tar -zjvf lmevegfx.tar.gz -C / <br>
 
 
-7 Finalize installation : 
-	cd /var/www/lmeve/config
-	sudo nano config-dist.php 
-	edit the config file and save it as config.php 
-  Set up API poller in cron to run every 15 minutes -   */15 * * * * apache2/bin/php -h /var/www/lmeve/bin/poller.php
-	login to lmeve using admin / admin credentials and wait a few minutes while lmeve parses and alters database tables
-	Change admin password in Settings 
-	Create a user accout for yourself
-	Logout, Login with your new account
-	Add corp ESI key in Settings -> ESI Keys
+6 Configure CCP Developer application using the lmeve sso config guide : <br>
+  https://github.com/roxlukas/lmeve/wiki/Integrating-LMeve-with-EVE-SSO <br>
+
+
+7 Finalize installation : <br>
+	cd /var/www/lmeve/config <br>
+	sudo nano config-dist.php  <br>
+	edit the config file and save it as config.php  <br>
+  Set up API poller in cron to run every 15 minutes -   */15 * * * * apache2/bin/php -h /var/www/lmeve/bin/poller.php <br>
+	login to lmeve using admin / admin credentials and wait a few minutes while lmeve parses and alters database tables <br>
+	Change admin password in Settings <br>
+	Create a user accout for yourself <br>
+	Logout, Login with your new account <br>
+	Add corp ESI key in Settings -> ESI Keys <br>
 
   
 <h1>Credits and copyrights</h1>
