@@ -40,6 +40,10 @@ include_once('ESI.class.php');
 $ESI = new ESI(5);
 echo("Testing\r\n");
 
-$ESI->Characters->addCharacter(245073304);
+//$ESI->Characters->addCharacter(245073304);
+
+//$ESI->Wallet->updateCorpWalletTransactions();
+
+$ESI->Status->updateServerStatus();
 
 ?>

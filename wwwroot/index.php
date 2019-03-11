@@ -132,7 +132,7 @@ if ($LM_LOCKED==1) { //APP IS LOCKED!
 			$_SESSION=array();
 			$MOBILE ? mobile_template_logout() : template_logout();
 		} else { //MAIN WINDOW
-			updatelast(date('d.m.Y G:i'),$_SERVER['REMOTE_ADDR']);
+			updatelast(date('d.m.Y G:i'),get_remote_addr());
                         $contents = template_contents();
 			$MOBILE ? mobile_template_main($contents,$TITLE,$META) : template_main($contents,$TITLE,$META);
 		}

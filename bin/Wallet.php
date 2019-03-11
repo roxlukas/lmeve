@@ -243,42 +243,54 @@ class Wallet extends Route {
         return $transactions;
     }
     
-    public function updateCorpWalletTransactions($division) {
+    public function updateCorpWalletTransactions() {
         // apiwallettransactions
         // transactionDateTime 	transactionID 	quantity 	typeName 	typeID 	price 	clientID 	
         // clientName 	characterID 	characterName 	stationID 	stationName 	transactionType 	
         // transactionFor 	journalTransactionID 	accountKey 	corporationID
-	
-        $orders = $this->getCorporationWalletTransactions($division);
-        if ($this->ESI->getDEBUG) var_dump($orders);
-        if ($this->getStatus()=='fresh') {
-            if (count($orders) > 0) {
-                foreach ($orders as $o) {
-                    if ($this->v($o,'is_buy',false) === true) $bid = 'buy'; else $bid = 'sell';
-                    $sql="INSERT IGNORE INTO `apiwallettransactions` VALUES (".
-                            $this->d($this->v($o,'date','')) .",".
-                            $this->v($o,'transaction_id',$i++) . ',' .
-                            $this->v($o,'quantity',0) . ',' .
-                            $this->s($this->ESI->Universe->getTypeName($this->v($o,'type_id',0))) . ',' . //type name
-                            $this->v($o,'type_id',0) . ',' .
-                            $this->v($o,'unit_price',0) . ',' .
-                            $this->v($o,'client_id',0) . ',' .
-                            'NULL' . ',' . //client name
-                            '0' . ',' . //character id - not in ESI
-                            'NULL' . ',' . //character name - not in ESI
-                            $this->v($o,'location_id',0) . ',' .
-                            'NULL' . ',' . //station name
-                            $this->s($bid) . "," .
-                            "'corporation'," .
-                            $this->v($o,'journal_ref_id',0) . ',' .
-                            $division . ',' .
-                            $this->ESI->getCorporationID() .
-                            ");";
-                    if ($this->ESI->getDEBUG()) inform(get_class (), $sql);
-                    db_uquery($sql);
+
+        inform(get_class(), 'Updating corporation Wallet Transactions...');
+        
+        $divisions = $this->ESI->Corporations->getDivisions();
+        
+        if (property_exists($divisions, 'wallet') && count($divisions->wallet) > 0){
+            foreach ($divisions->wallet as $wallet) {
+                $orders = $this->getCorporationWalletTransactions($wallet->division);
+                if ($this->ESI->getDEBUG) var_dump($orders);
+                if ($this->getStatus()=='fresh') {
+                    if (count($orders) > 0) {
+                        foreach ($orders as $o) {
+                            if ($this->v($o,'is_buy',false) === true) $bid = 'buy'; else $bid = 'sell';
+                            $sql="INSERT IGNORE INTO `apiwallettransactions` VALUES (".
+                                    $this->d($this->v($o,'date','')) .",".
+                                    $this->v($o,'transaction_id',$i++) . ',' .
+                                    $this->v($o,'quantity',0) . ',' .
+                                    $this->s($this->ESI->Universe->getTypeName($this->v($o,'type_id',0))) . ',' . //type name
+                                    $this->v($o,'type_id',0) . ',' .
+                                    $this->v($o,'unit_price',0) . ',' .
+                                    $this->v($o,'client_id',0) . ',' .
+                                    'NULL' . ',' . //client name
+                                    '0' . ',' . //character id - not in ESI
+                                    'NULL' . ',' . //character name - not in ESI
+                                    $this->v($o,'location_id',0) . ',' .
+                                    'NULL' . ',' . //station name
+                                    $this->s($bid) . "," .
+                                    "'corporation'," .
+                                    $this->v($o,'journal_ref_id',0) . ',' .
+                                    $wallet->division . ',' .
+                                    $this->ESI->getCorporationID() .
+                                    ");";
+                            if ($this->ESI->getDEBUG()) inform(get_class (), $sql);
+                            db_uquery($sql);
+                        }
+                    }
                 }
             }
+        } else {
+            warning(get_class(), 'Cannot read Wallet divisions!');
+            return FALSE;
         }
+        return TRUE;
     }
     
     public function updateRefTypes() {
@@ -298,6 +310,7 @@ class Wallet extends Route {
         $this->updateRefTypes();
         $this->updateCorpWalletBalance();
         $this->updateCorpWalletJournal();
+        $this->updateCorpWalletTransactions();
     }
     
   

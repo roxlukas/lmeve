@@ -50,19 +50,27 @@ class Universe extends Route {
     
     public function getNamesForIds($id_list) {
         // filter input data
-        $tmp = array();
+        $this->setRoute('/v2/universe/names/');
+        $this->setCacheInterval(0);
+        
+        $MAX_IDS = 1000;
+            
+        $checklist = array();
         $names = FALSE;
         foreach($id_list as $id) {
             if (is_numeric($id) && $id > 1000000 && $id < 100000000) {
-                array_push($tmp, $id);
+                array_push($checklist, $id);
             }
         }
-        if ($this->ESI->getDEBUG()) inform(get_class(), json_encode($tmp));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs: ". json_encode($checklist));
         // contact ESI
-        if (count($tmp) > 0) {
-            $this->setRoute('/v2/universe/names/');
-            $this->setCacheInterval(0);
-            $names = $this->post('',json_encode($tmp));
+        inform(get_class(), 'Getting ' . count($checklist) . ' Universe names from ESI...');
+        // contact ESI
+        if (count($checklist) > 0) {
+            for ($i = 0; $i < count($checklist) / $MAX_IDS; $i++) { //fix for #85 - can only ask about 1000 names in one batch
+                if ($this->ESI->getDEBUG()) inform(get_class(), "Getting page $i");
+                $names = array_merge($names, $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS))));
+            }
         }
         return $names;
     }

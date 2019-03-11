@@ -42,6 +42,8 @@ class ESI {
     private $DEBUG = TRUE;
     private $DATASOURCE = 'tranquility';
     
+    private $MonolithQueries = 0;
+    
     private $EsiErrorLimitRemain = 0;
     private $EsiErrorLimitReset = 0;
 
@@ -194,6 +196,14 @@ class ESI {
         $this->Wallet->update();
         $this->Assets->update();
         $this->Killmails->update();
+    }
+    
+    public function enforceMonolithRateLimit() {
+        if ($this->MonolithQueries > 0 && $this->MonolithQueries % 20 == 0) {
+            if ($this->DEBUG) inform(get_class(), 'Enforcing 10s delay between requests to Monolith database.');
+            sleep(10);
+        }
+        $this->MonolithQueries++;
     }
     
     /**

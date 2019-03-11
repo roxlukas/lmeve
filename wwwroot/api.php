@@ -139,7 +139,7 @@ function content_type() {
 function checkApiKey($key) {
     $ret=db_asocquery("SELECT * FROM `lmnbapi` WHERE `apiKey`='$key';");
     if (count($ret)==1) {
-        db_uquery("UPDATE `lmnbapi` SET `lastAccess`='".date('y-m-d H:i:s')."', `lastIP`='".$_SERVER['REMOTE_ADDR']."' WHERE `apiKey`='$key';");
+        db_uquery("UPDATE `lmnbapi` SET `lastAccess`='".date('y-m-d H:i:s')."', `lastIP`='" . get_remote_addr() . "' WHERE `apiKey`='$key';");
         return TRUE;
     } else return FALSE;
 }

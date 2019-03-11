@@ -37,7 +37,7 @@ function loguj($npliku=NULL,$data) {
     $uchwyt = fopen($npliku, "a");
     $tmpd=date('d.m.Y G:i:s');
     if (isset($_SERVER['REMOTE_ADDR'])) {
-    	$ip = $_SERVER['REMOTE_ADDR'];
+    	$ip = get_remote_addr();
     } else {
 	$ip="[CLI]";
     }

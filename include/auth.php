@@ -30,7 +30,7 @@ function check_expired_accounts() {
 function check_changed_session_ip() {
 	global $LM_IPCONTROL,$LANG;
 	if ($LM_IPCONTROL==1) {
-		$current_ip=$_SERVER['REMOTE_ADDR'];
+		$current_ip=get_remote_addr();
 		if ((isset($_SESSION['ip'])) && $_SESSION['ip'] != $current_ip) { //jest ustawiony, ale sie rozni
 			$do_logu="<b>IP Address has changed during session lifetime</b> Should be: ${_SESSION['ip']}";
 			loguj("../var/access.txt",$do_logu);
