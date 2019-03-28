@@ -186,7 +186,8 @@ $PANELNAME='ESI Statistics'; //Panel name (optional)
 				echo('" title="Click to reset this API feed status (it will be polled in the next cycle)">');
 	}
 	
-	$data=db_asocquery("SELECT * FROM esistatus ORDER BY tokenID,route;");
+	$data=db_asocquery("SELECT es.* FROM esistatus es 
+                JOIN cfgesitoken cet ON cet.`tokenID` = es.`tokenID` ORDER BY tokenID,route;");
 	
 	foreach($data as $row) {
 		echo('<tr><td class="tab">');
@@ -210,7 +211,7 @@ $PANELNAME='ESI Statistics'; //Panel name (optional)
 				echo($row['errorCount']);
 				echo('</a></td><td>');
 				hrefedit($row['errorID']);
-				echo($row['errorMessage']);
+				echo(strip_tags($row['errorMessage']));
 				echo('</a></td>');
 			echo('</tr>');
 	}

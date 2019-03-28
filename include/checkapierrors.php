@@ -20,7 +20,7 @@
             ?>
             <div class="newmsg">
                 <img src="<?=getUrl()?>img/exc.gif" alt="Warning" />
-                <a href="?id=8&id2=4"><?=$error['fileName']?>: <?=$error['errorMessage']?></a>
+                <a href="?id=8&id2=4"><?=$error['fileName']?>: <?=strip_tags($error['errorMessage'])?></a>
             </div>
             <?php
         }
@@ -37,7 +37,7 @@
             ?>
             <div class="newmsg">
                 <img src="<?=getUrl()?>img/exc.gif" alt="Warning" />
-                <a href="?id=8&id2=7">ESI error on route <?=$error['route']?>: <?=$error['errorMessage']?></a>
+                <a href="?id=8&id2=7">ESI error on route <?=$error['route']?>: <?=strip_tags($error['errorMessage'])?></a>
             </div>
             <?php
         }

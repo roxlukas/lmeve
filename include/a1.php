@@ -365,7 +365,7 @@ if ($model) {
         $crestPriceData=db_asocquery("SELECT * FROM `crestmarketprices` WHERE `typeID`=$nr;");
 	
 	if (count($priceData) > 0) {
-		$when=db_asocquery("SELECT `date` FROM `esistatus` WHERE `route`='/v1/markets/';");
+		$when=db_asocquery("SELECT MAX(`date`) AS `date` FROM `esistatus` WHERE `route`='/v1/markets/';");
 		$when=$when[0]['date'];	
 		?>
 		<table class="lmframework" style="width:100%;">
@@ -402,7 +402,7 @@ if ($model) {
         ?> </table> <?php
 	} 
         if (count($crestPriceData) > 0) {
-		$when=db_asocquery("SELECT `date` FROM `esistatus` WHERE `route`='/v1/markets/prices/';");
+		$when=db_asocquery("SELECT MAX(`date`) AS `date` FROM `esistatus` WHERE `route`='/v1/markets/prices/';");
 		$when=$when[0]['date'];	
 		?>
 		<table class="lmframework" style="width:100%;">
