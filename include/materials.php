@@ -343,7 +343,7 @@ function getBaseMaterials($typeID,$runs=1,$melvl_override=null,$activityID=1) {
 
         foreach($materials as $i => $row) {
             $materials[$i]['quantity']=$runs*$row['quantity'];
-            $materials[$i]['notperfect']=$runs*round($row['quantity']*$multiplier);
+            $materials[$i]['notperfect']=$runs*ceil($row['quantity']*$multiplier);
             $materials[$i]['waste']=$waste;
         }
         
