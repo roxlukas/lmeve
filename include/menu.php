@@ -57,8 +57,6 @@ $menu[11]['name']='Wiki';
 $menu[11]['php']='b.php';
 $menu[12]['name']='Killboard';
 $menu[12]['php']='k.php';
-$menu[253]['name']='MG';
-$menu[253]['php']='z.php';
 $menu[254]['name']='About';
 $menu[254]['php']='about.php';
 

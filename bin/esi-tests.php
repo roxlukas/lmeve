@@ -37,13 +37,15 @@ include_once('ESI.class.php');
 
 /*************************************************************************************************/
 
-$ESI = new ESI(5);
+$ESI = new ESI(10);
+
+$ESI->setDEBUG(TRUE);
 echo("Testing\r\n");
 
 //$ESI->Characters->addCharacter(245073304);
 
 //$ESI->Wallet->updateCorpWalletTransactions();
 
-$ESI->Status->updateServerStatus();
+$ESI->Killmails->update();
 
 ?>

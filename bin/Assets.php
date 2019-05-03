@@ -145,10 +145,29 @@ class Assets extends Route {
         return TRUE;
     }
     
+    public function copyPOCO() {
+        $pocos = db_asocquery("SELECT * FROM `apiassets` WHERE `typeID`=2233 AND `corporationID`=" . $this->ESI->getCorporationID());
+        
+        db_uquery("DELETE FROM `apipocolist` WHERE `corporationID`=" . $this->ESI->getCorporationID());
+        
+        foreach($pocos as $poco) {
+            db_uquery("INSERT INTO `apipocolist` VALUES(" . $poco['itemID']. ", " . $poco['locationID'] . ", " . $this->s($this->ESI->Universe->getSolarSystemName($poco['locationID'])) . ", 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0," . $this->ESI->getCorporationID() . ")");
+        }
+    }
+    
+    public function getCorporationPocos() {
+        
+    }
+    
+    public function updateCorporationPocos() {
+        $this->copyPOCO();
+    }
+    
     
     public function update() {
         $this->updateCorpAssets();
         $this->updateAssetNames();
+        $this->updateCorporationPocos();
     }
     
   

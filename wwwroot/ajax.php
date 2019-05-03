@@ -325,7 +325,7 @@ if ($act=='') $act=0;
             header("Content-type: application/json");
             echo(json_encode($message));
             break; 
-	default:
+		default:
             echo('Error in AJAX call.');
     }
 ?>

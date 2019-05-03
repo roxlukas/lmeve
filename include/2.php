@@ -4,7 +4,7 @@
 //routing
     $id2=$_GET['id2'];
 //default route
-    if ($id2=='') $id2=0;
+    if ($id2=='') $id2=8;
 //submenu
     $title = generate_title("Inventory");
     $description = "LMeve Inventory - everything the corporation owns";
@@ -13,18 +13,19 @@
     ?>
     <table cellpadding="0" cellspacing="2">
     <tr>
-    <?php if (checkrights("Administrator,ViewInventory")) { ?>
-        <td><form action="" method="get">
-        <input type="hidden" name="id" value="2" />
-        <input type="hidden" name="id2" value="0" />
-        <input type="submit" value="Stock" />
-        </form></td>
-    <?php } ?>
+    
     <?php if (checkrights("Administrator,ViewInventory")) { ?>
         <td><form action="" method="get">
         <input type="hidden" name="id" value="2" />
         <input type="hidden" name="id2" value="8" />
         <input type="submit" value="Inventory" />
+        </form></td>
+    <?php } ?>
+    <?php if (checkrights("Administrator,ViewInventory")) { ?>
+        <td><form action="" method="get">
+        <input type="hidden" name="id" value="2" />
+        <input type="hidden" name="id2" value="0" />
+        <input type="submit" value="Stock" />
         </form></td>
     <?php } ?>
         <?php if ($MOBILE) echo("<br/>");?>

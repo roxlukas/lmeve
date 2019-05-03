@@ -56,13 +56,17 @@ class Universe extends Route {
         $MAX_IDS = 1000;
             
         $checklist = array();
-        $names = FALSE;
+        $notcheck = array();
+        $names = array();
         foreach($id_list as $id) {
             if (is_numeric($id) && $id > 1000000 && $id < 100000000) {
                 array_push($checklist, $id);
+            } else {
+                array_push($notcheck, $id);
             }
         }
-        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs: ". json_encode($checklist));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs that WILL be checked: ". json_encode($checklist));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs that WON'T be checked: ". json_encode($notcheck));
         // contact ESI
         inform(get_class(), 'Getting ' . count($checklist) . ' Universe names from ESI...');
         // contact ESI
@@ -72,6 +76,7 @@ class Universe extends Route {
                 $names = array_merge($names, $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS))));
             }
         }
+        if ($this->ESI->getDEBUG()) inform(get_class(), "Returning names: ". json_encode($names));
         return $names;
     }
     
