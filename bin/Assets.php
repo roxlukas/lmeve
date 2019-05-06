@@ -156,13 +156,123 @@ class Assets extends Route {
     }
     
     public function getCorporationPocos() {
-        
+        // /v1/corporations/{corporation_id}/customs_offices/
+        $this->setRoute('/v1/corporations/');
+        $this->setCacheInterval(3600);
+        $poco = array();
+        $poco = $this->get( $this->ESI->getCorporationID() . '/customs_offices/');
+        //X-pages support
+        if ($this->xpages > 1) {
+            for ($i = 2; $i <= $this->xpages; $i++) {
+                if ($this->ESI->getDEBUG()) inform(get_class(),"Getting Customs_Offices page $i of $this->xpages...");
+                $poco = array_merge($poco, $this->get( $this->ESI->getCorporationID() . '/customs_offices/' . '?page=' . $i));
+            }
+        }
+        return $poco;
     }
     
     public function updateCorporationPocos() {
-        $this->copyPOCO();
+        inform(get_class(), 'Updating corporation Customs_Offices...');
+        
+        $poco = $this->getCorporationPocos();
+        //var_dump($poco);
+        
+        // apipocolist
+        // itemID 	solarSystemID 	solarSystemName 	reinforceHour 	allowAlliance 	allowStandings 	standingLevel 	
+        // taxRateAlliance 	taxRateCorp 	taxRateStandingHigh 	taxRateStandingGood 	taxRateStandingNeutral 	taxRateStandingBad 	
+        // taxRateStandingHorrible 	corporationID
+        
+        /*
+         object(stdClass)#24 (14) {
+            ["alliance_tax_rate"]=>
+            float(0)
+            ["allow_access_with_standings"]=>
+            bool(true)
+            ["allow_alliance_access"]=>
+            bool(true)
+            ["bad_standing_tax_rate"]=>
+            float(0.1)
+            ["corporation_tax_rate"]=>
+            float(0)
+            ["excellent_standing_tax_rate"]=>
+            float(0)
+            ["good_standing_tax_rate"]=>
+            float(0)
+            ["neutral_standing_tax_rate"]=>
+            float(0.1)
+            ["office_id"]=>
+            float(1030388723453)
+            ["reinforce_exit_end"]=>
+            int(1)
+            ["reinforce_exit_start"]=>
+            int(23)
+            ["standing_level"]=>
+            string(8) "terrible"
+            ["system_id"]=>
+            int(31000789)
+            ["terrible_standing_tax_rate"]=>
+            float(0.1)
+          }
+         */
+        if ($this->getStatus()=='fresh') {
+            if (count($poco) > 0) {
+                inform(get_class(), 'Inserting Customs_Offices records...');
+                db_uquery("DELETE FROM `apipocolist` WHERE `corporationID`=" . $this->ESI->getCorporationID());
+                foreach ($poco as $c) {
+                    $location_id = $this->v($c,'location_id',0);
+                    $location_type = $this->v($c,'location_type','other');
+                    if ($this->v($c,'allow_access_with_standings',false) === true) $allow_access_with_standings = 1; else $allow_access_with_standings = 0;
+                    if ($this->v($c,'allow_alliance_access',false) === true) $allow_alliance_access = 1; else $allow_alliance_access = 0;
+                    $sql="INSERT INTO `apipocolist` VALUES (".
+                            $this->v($c,'office_id',$i++) . "," .
+                            $this->v($c,'system_id',0) . "," .
+                            $this->s($this->ESI->Universe->getSolarSystemName($this->v($c,'system_id',0))) . "," .
+                            $this->v($c,'reinforce_exit_start',0) . "," .
+                            $allow_alliance_access . "," .
+                            $allow_access_with_standings . "," .
+                            $this->standingToNumber($this->v($c,'standing_level',0)) . "," .
+                            $this->v($c,'alliance_tax_rate',0) . "," .
+                            $this->v($c,'corporation_tax_rate',0) . "," .
+                            $this->v($c,'excellent_standing_tax_rate',0) . "," .
+                            $this->v($c,'good_standing_tax_rate',0) . "," .
+                            $this->v($c,'neutral_standing_tax_rate',0) . "," .
+                            $this->v($c,'bad_standing_tax_rate',0) . "," .
+                            $this->v($c,'terrible_standing_tax_rate',0) . "," .
+                            $this->ESI->getCorporationID() .
+                        ");";
+                    db_uquery($sql);
+                }
+            }
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
+        }
+        
+        return TRUE;
     }
     
+    public function standingToNumber($standing) {
+        switch ($standing) {
+            case 'bad':
+                return -4;
+                break;
+            case 'excellent':
+                return 8;
+                break;
+            case 'good':
+                return 4;
+                break;
+            case 'neutral':
+                return 0;
+                break;
+            case 'terrible':
+                return -8;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
     
     public function update() {
         $this->updateCorpAssets();
