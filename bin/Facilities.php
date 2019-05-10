@@ -21,7 +21,8 @@ JOIN `$LM_EVEDB`.`mapRegions` mrs
 ON mss.`regionID` = mrs.`regionID`
 SET af.`typeName`= itp.`typeName`,
 af.`solarSystemName` = mss.`solarSystemName`,
-af.`regionName` = mrs.`regionName`;
+af.`regionName` = mrs.`regionName`,
+af.`regionID` = mrs.`regionID`;
 ");
     }
     
@@ -64,6 +65,8 @@ af.`regionName` = mrs.`regionName`;
         
         if ($this->getStatus()=='fresh') {
             if (count($facs) > 0) {
+                $sql="DELETE FROM `apifacilities` WHERE `corporationID` = " . $this->ESI->getCorporationID() . ";";
+                db_uquery($sql);
                 foreach ($facs as $fac) {
                     $sql="INSERT IGNORE INTO apifacilities VALUES (".
                         $fac->facility_id . "," .

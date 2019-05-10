@@ -37,15 +37,34 @@ include_once('ESI.class.php');
 
 /*************************************************************************************************/
 
+$ESI = new ESI(12);
+
+$ESI->setDEBUG(TRUE);
+echo("Testing\r\n");
+
+$ESI->Facilities->updateCorp();
+$ESI->Assets->updateAssetNames();
+$ESI->Assets->updateCorporationPocos();
+$ESI->Assets->updateCorporationLocations();
+
+$ESI = new ESI(11);
+
+$ESI->setDEBUG(TRUE);
+echo("Testing\r\n");
+
+$ESI->Facilities->updateCorp();
+$ESI->Assets->updateAssetNames();
+$ESI->Assets->updateCorporationPocos();
+$ESI->Assets->updateCorporationLocations();
+
 $ESI = new ESI(10);
 
 $ESI->setDEBUG(TRUE);
 echo("Testing\r\n");
 
-//$ESI->Characters->addCharacter(245073304);
-
-//$ESI->Wallet->updateCorpWalletTransactions();
-
-$ESI->Killmails->update();
+$ESI->Facilities->updateCorp();
+$ESI->Assets->updateAssetNames();
+$ESI->Assets->updateCorporationPocos();
+$ESI->Assets->updateCorporationLocations();
 
 ?>

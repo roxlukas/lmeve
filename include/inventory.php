@@ -770,9 +770,11 @@ function getECAndTasks($corporationID) {
             FROM `apifacilities` apf
             JOIN `$LM_EVEDB`.`invTypes` itp
                 ON apf.`typeID` = itp.`typeID`
+            JOIN `$LM_EVEDB`.`invGroups` igp
+                ON igp.`groupID` = itp.`groupID`
             JOIN `apilocations` apl
                 ON apf.`facilityID` = apl.`itemID`
-            WHERE itp.`groupID` = 1404
+            WHERE igp.`categoryID` = 65
             AND apf.`corporationID` = $corporationID
         UNION
         SELECT apf.*,map.`itemName`

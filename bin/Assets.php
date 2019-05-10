@@ -64,13 +64,13 @@ class Assets extends Route {
         $sql="SELECT aa.`itemID` FROM `apiassets` aa "
                 . "JOIN `$LM_EVEDB`.`invTypes` it ON aa.`typeID` = it.`typeID` "
                 . "JOIN `$LM_EVEDB`.`invGroups` ig ON it.`groupID` = ig.`groupID` "
-                . "WHERE ig.`categoryID` IN (2, 6) AND aa.`singleton` = 1 AND aa.`corporationID`=" . $this->ESI->getCorporationID();
+                . "WHERE ig.`categoryID` IN (2, 6, 46, 65) AND aa.`singleton` = 1 AND aa.`corporationID`=" . $this->ESI->getCorporationID();
         if ($this->ESI->getDEBUG()) inform(get_class(), "SQL='$sql'");
         
         $items = db_asocquery($sql);
         
         $checklist = array();
-        $names = FALSE;
+        $names = array();
         foreach($items as $item) {
             array_push($checklist, $item['itemID']);
         }
@@ -86,10 +86,50 @@ class Assets extends Route {
                     $names = array_merge($names, $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS))));
                 }
             }
+        }  else {
+            return FALSE;
         }
         return $names;
     }
     
+    public function getCorporationLocations() {
+        inform(get_class(), 'Updating Corporation Locations...');
+        inform(get_class(), 'Getting itemIDs from database...');
+        global $LM_EVEDB;
+        
+        $MAX_IDS = 1000;
+        
+        $sql="SELECT aa.`itemID` FROM `apiassets` aa "
+                . "JOIN `$LM_EVEDB`.`invTypes` it ON aa.`typeID` = it.`typeID` "
+                . "JOIN `$LM_EVEDB`.`invGroups` ig ON it.`groupID` = ig.`groupID` "
+                . "WHERE ig.`categoryID` IN (46,65) AND aa.`singleton` = 1 AND aa.`corporationID`=" . $this->ESI->getCorporationID();
+        if ($this->ESI->getDEBUG()) inform(get_class(), "SQL='$sql'");
+        
+        $items = db_asocquery($sql);
+        
+        $checklist = array();
+        $locations = array();
+        foreach($items as $item) {
+            array_push($checklist, $item['itemID']);
+        }
+        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs: ". json_encode($checklist));
+        // contact ESI
+        inform(get_class(), 'Getting ' . count($checklist) . ' Locations from ESI...');
+        if (count($checklist) > 0) {
+            $this->setRoute('/v2/corporations/' . $this->ESI->getCorporationID() . '/assets/locations/');
+            $this->setCacheInterval(0);
+            if (count($checklist) > 0) {
+                for ($i = 0; $i < count($checklist) / $MAX_IDS; $i++) { //fix for #85 - can only ask about 1000 names in one batch
+                    if ($this->ESI->getDEBUG()) inform(get_class(), "Getting page $i");
+                    $locations = array_merge($locations, $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS))));
+                }
+            }
+        } else {
+            return FALSE;
+        }
+        return $locations;
+    }
+        
     public function updateAssetNames() {
         $names=$this->getAssetNames();
         
@@ -102,6 +142,14 @@ class Assets extends Route {
         } else {
             return FALSE;
         }
+    }
+    
+    public function denormalize() {
+        global $LM_EVEDB;
+        return db_uquery("UPDATE `apilocations` AS al
+            JOIN `apiassetnames` an
+            ON al.`itemID` = an.`itemID`
+            SET al.`itemName` = an.`itemName`;");
     }
     
     public function updateCorpAssets() {
@@ -251,6 +299,38 @@ class Assets extends Route {
         return TRUE;
     }
     
+    public function updateCorporationLocations() {
+        inform(get_class(), 'Updating corporation Locations...');
+        
+        $locations = $this->getCorporationLocations();
+        
+        if ($this->getStatus()=='fresh') {
+            if (count($locations) > 0) {
+                inform(get_class(), 'Inserting Locations records...');
+                db_uquery("DELETE FROM `apilocations` WHERE `corporationID`=" . $this->ESI->getCorporationID());
+                foreach ($locations as $c) {
+                    $location_id = $this->v($c,'location_id',0);
+                    $location_type = $this->v($c,'location_type','other');
+                    $sql="INSERT INTO `apilocations` VALUES (".
+                            $this->v($c,'item_id',$i++) . "," .
+                            "''," .
+                            $this->v($c->position,'x',0) . "," .
+                            $this->v($c->position,'y',0) . "," .
+                            $this->v($c->position,'z',0) . "," .
+                            $this->ESI->getCorporationID() .
+                        ");";
+                    db_uquery($sql);
+                    $this->denormalize();
+                }
+            }
+        } else {
+            inform(get_class(), 'Route ' . $this->getRoute() . $this->getParams() . ' is still cached, skipping...');
+            return TRUE;
+        }
+        
+        return TRUE;
+    }
+    
     public function standingToNumber($standing) {
         switch ($standing) {
             case 'bad':
@@ -278,6 +358,7 @@ class Assets extends Route {
         $this->updateCorpAssets();
         $this->updateAssetNames();
         $this->updateCorporationPocos();
+        $this->updateCorporationLocations();
     }
     
   
