@@ -82,8 +82,9 @@ class Markets extends Route {
         $orders = $this->getCorporationMarketOrders();
         if ($this->ESI->getDEBUG) var_dump($orders);
         if ($this->getStatus()=='fresh') {
+            db_uquery("DELETE FROM `apimarketorders` WHERE `corporationID` = " . $this->ESI->getCorporationID()); //delete old orders even if empty record set received, as long as correct data was received
+            // will prevent expired orders from showing up if no new orders were added after expiration
             if (count($orders) > 0) {
-                db_uquery("DELETE FROM `apimarketorders` WHERE `corporationID` = " . $this->ESI->getCorporationID());
                 foreach ($orders as $o) {
                     if ($this->v($o,'is_buy_order',false) === true) $bid = 1; else $bid = 0;
                     $sql="INSERT INTO `apimarketorders` VALUES (".
