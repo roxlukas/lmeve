@@ -210,11 +210,11 @@ class Wallet extends Route {
                                     $this->d($this->v($c,'date','')) .",".
                                     $this->v($c,'id',$i++) .",".
                                     $this->glueRefTypeToId($this->v($c,'ref_type','player_trading')) .",".
-                                    "'" . $names[$this->v($c,'first_party_id',0)] . "',".
+                                    $this->s($names[$this->v($c,'first_party_id',0)]) . ",".
                                     $this->v($c,'first_party_id',0) .",".
-                                    "'" . $names[$this->v($c,'second_party_id',0)] . "',".
+                                    $this->s($names[$this->v($c,'second_party_id',0)]) . ",".
                                     $this->v($c,'second_party_id',0) .",".
-                                    "'" . $names[$this->v($c,'context_id',0)] . "',".
+                                    $this->s($names[$this->v($c,'context_id',0)]) . ",".
                                     $this->v($c,'context_id',0) .",".
                                     $this->v($c,'amount',0) .",".
                                     $this->v($c,'balance',0) .",".

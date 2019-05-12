@@ -73,7 +73,7 @@ abstract class Route {
      * @param String $string string to be treated for DB insertion
      */
     protected function s($string) {
-        return "'" . addslashes($string) . "'";
+        return "'" . mysqli_escape_string(db_connect(), $string) . "'";
     }
     
     /**
