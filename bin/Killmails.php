@@ -25,6 +25,26 @@ class Killmails extends Route {
         return $killmails;
     }
     
+    public function denormalize() {
+        global $LM_EVEDB;
+        $q1 = db_uquery("UPDATE `apikillattackers` aka JOIN `$LM_EVEDB`.`invTypes` itp
+        ON aka.`shipTypeID` = itp.`typeID`
+        LEFT JOIN `$LM_EVEDB`.`chrFactions` fac
+        ON aka.`factionID` = fac.`factionID`
+        SET aka.`characterName` = itp.`typeName`
+        WHERE aka.`characterID` = 0;");
+        $q2 = db_uquery("UPDATE `apikillattackers` aka JOIN `$LM_EVEDB`.`invTypes` itp
+        ON aka.`shipTypeID` = itp.`typeID`
+        LEFT JOIN `$LM_EVEDB`.`chrFactions` fac
+        ON aka.`factionID` = fac.`factionID`
+        SET aka.`corporationName` = fac.`factionName`
+        WHERE aka.`factionID` != 0;");
+        $q3 = db_uquery("UPDATE `apikillattackers` 
+        SET `weaponTypeID` = `shipTypeID`
+        WHERE `weaponTypeID` = 0;");
+        return $q1 && $q2 && $q3;
+    }
+    
     public function getKillmailDetails($killmail_hash, $killmail_id) {
         if ($this->ESI->getDEBUG()) inform(get_class(),"Getting Killmail Details for $killmail_id...");
         $this->setRoute('/v1/killmails/');
@@ -182,5 +202,6 @@ class Killmails extends Route {
     
     public function update() {
         $this->updateKillmails();
+        $this->denormalize();
     }
 }
