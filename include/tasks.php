@@ -301,8 +301,23 @@ function showTasks($tasklist) {
 	} else {
             echo("Found ".count($tasklist)." tasks.");
 	?>
-	<table class="lmframework">
-	<tr><th>
+<script type="text/javascript" src="<?=getUrl()?>jquery-tablesorter/jquery.tablesorter.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="<?=getUrl()?>jquery-tablesorter/blue/style.css">
+  <script type="text/javascript">
+    $(document).ready(function() {        
+        $("#tasks").tablesorter({ 
+            headers: { 
+                0: { sorter: false },
+                3: { sorter: false },
+                7: { sorter: false },
+                8: { sorter: false },
+                9: { sorter: false }
+            } 
+        }); 
+    });
+  </script>
+	<table id="tasks" class="lmframework tablesorter">
+	<thead><tr><th>
 		
 	</th><?php if(!$MOBILE) { ?><th>
 		Character
@@ -322,7 +337,7 @@ function showTasks($tasklist) {
 		Success
 	</th><th style="width: 36px;">
 		Kit
-	</th>
+        </th></thead>
 	</tr>
 	<?php
 		//var_dump($tasklist);
