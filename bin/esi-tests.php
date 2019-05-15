@@ -42,29 +42,6 @@ $ESI = new ESI(12);
 $ESI->setDEBUG(TRUE);
 echo("Testing\r\n");
 
-$ESI->Facilities->updateCorp();
-$ESI->Assets->updateAssetNames();
-$ESI->Assets->updateCorporationPocos();
-$ESI->Assets->updateCorporationLocations();
-
-$ESI = new ESI(11);
-
-$ESI->setDEBUG(TRUE);
-echo("Testing\r\n");
-
-$ESI->Facilities->updateCorp();
-$ESI->Assets->updateAssetNames();
-$ESI->Assets->updateCorporationPocos();
-$ESI->Assets->updateCorporationLocations();
-
-$ESI = new ESI(10);
-
-$ESI->setDEBUG(TRUE);
-echo("Testing\r\n");
-
-$ESI->Facilities->updateCorp();
-$ESI->Assets->updateAssetNames();
-$ESI->Assets->updateCorporationPocos();
-$ESI->Assets->updateCorporationLocations();
+$ESI->Killmails->importZKillboardAPI(816121566);
 
 ?>
