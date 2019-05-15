@@ -46,9 +46,10 @@ abstract class Route {
         return $this->ESI->getESI_BASEURL() . $this->route . $this->params;
     }
     
-    protected function constructCacheFilename() {
+    protected function constructCacheFilename($postdata = null) {
+        if (is_null($postdata)) $postdata='';
         if (!is_null($this->ESI->getTokenID())) $t = $this->ESI->getTokenID(); else $t='0';
-        return $this->ESI->getMycache() . '/' . $t . '_' . md5($this->ESI->getTokenID() . $this->constructURL()).'.json';
+        return $this->ESI->getMycache() . '/' . $t . '_' . md5($this->ESI->getTokenID() . $this->constructURL() . $postdata).'.json';
     }
     
     protected function checkErrors() {
@@ -151,11 +152,11 @@ abstract class Route {
     
     private function request($type='GET', $postdata = null) {
         //ToDo: add X-pages support
-        $cache = $this->constructCacheFilename();
+        $cache = $this->constructCacheFilename($postdata);
         if ($this->ESI->getDEBUG()) {
             inform('Route', "New Route->request($type)");
             inform('Route', "constructURL()='" . $this->constructURL());
-            inform('Route', "constructCacheFilename()='" . $this->constructCacheFilename());
+            inform('Route', "constructCacheFilename()='" . $this->constructCacheFilename($postdata));
         }
 	if (file_exists($cache) && (filemtime($cache)>(time() - $this->cache_interval ))) {
    		$data = file_get_contents($cache);

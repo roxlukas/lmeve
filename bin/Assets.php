@@ -93,7 +93,7 @@ class Assets extends Route {
     }
     
     public function getCorporationLocations() {
-        inform(get_class(), 'Updating Corporation Locations...');
+        inform(get_class(), 'Getting Corporation Locations...');
         inform(get_class(), 'Getting itemIDs from database...');
         global $LM_EVEDB;
         

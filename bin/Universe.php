@@ -49,9 +49,63 @@ class Universe extends Route {
     }
     
     public function getNamesForIds($id_list) {
+        global $LM_EVEDB;
         // filter input data
         $this->setRoute('/v2/universe/names/');
-        $this->setCacheInterval(0);
+        $this->setCacheInterval(600);
+        
+        $MAX_IDS = 1000;
+            
+        $checklist = array();
+        $checksde = array();
+        $names = array();
+        foreach($id_list as $id) {
+            if (is_numeric($id) && $id > 69000003 && $id < 2000000000) {
+                array_push($checklist, $id);
+            } else {
+                array_push($checksde, $id);
+            }
+        }
+        if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): List of itemIDs that will be checked in ESI: ". json_encode($checklist));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): List of itemIDs that will be checked in SDE: ". json_encode($checksde));
+        //get from SDE
+        if (is_array($checksde) && count($checksde) > 0) {
+            inform(get_class(), 'getNamesForIds(): Getting ' . count($checksde) . ' Universe names from SDE...');
+            $sde = db_asocquery("SELECT `itemID` as `id`, `itemName` as `name` FROM `$LM_EVEDB`.`invNames` WHERE `itemID` IN (" . implode(',',$checksde) . ")");
+            $names = array_merge($names, $sde);
+        }
+        // contact ESI
+        inform(get_class(), 'getNamesForIds(): Getting ' . count($checklist) . ' Universe names from ESI...');
+        // contact ESI
+        if (count($checklist) > 0) {
+            for ($i = 0; $i < count($checklist) / $MAX_IDS; $i++) { //fix for #85 - can only ask about 1000 names in one batch
+                if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): Getting page $i");
+                $chunk = $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS)));
+                if ($chunk === FALSE) {
+                    warning(get_class(), "getNamesForIds(): Received error when trying to resolve names in BULK. Switching to one-by-one.");
+                    for ($j = 0; $j < count($checklist); $j++) {
+                        $tinychunk = $this->post('',json_encode(array($checklist[$j])));
+                        if ($tinychunk === FALSE) {
+                            warning(get_class(), "getNamesForIds(): Received ERROR when trying to resolve name name for ID=" . $checklist[$j]);
+                            continue;
+                        }
+                        $names = array_merge($names, $tinychunk);
+                    }
+                    break; //escape main loop
+                    //ToDo: one by one resolving. Report which IDs don't resolve.
+                }
+                $names = array_merge($names, $chunk);
+            }
+        }
+        if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): Returning names: ". json_encode($names));
+        return $names;
+    }
+    
+    
+    public function getNamesForIdsOld($id_list) {
+        // filter input data
+        $this->setRoute('/v2/universe/names/');
+        $this->setCacheInterval(600);
         
         $MAX_IDS = 1000;
             
@@ -59,24 +113,38 @@ class Universe extends Route {
         $notcheck = array();
         $names = array();
         foreach($id_list as $id) {
-            if (is_numeric($id) && $id > 1000000 && $id < 100000000) {
+            if (is_numeric($id) && $id > 1000000 && $id < 2000000000) {
                 array_push($checklist, $id);
             } else {
                 array_push($notcheck, $id);
             }
         }
-        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs that WILL be checked: ". json_encode($checklist));
-        if ($this->ESI->getDEBUG()) inform(get_class(), "List of itemIDs that WON'T be checked: ". json_encode($notcheck));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): List of itemIDs that WILL be checked: ". json_encode($checklist));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): List of itemIDs that WON'T be checked: ". json_encode($notcheck));
         // contact ESI
-        inform(get_class(), 'Getting ' . count($checklist) . ' Universe names from ESI...');
+        inform(get_class(), 'getNamesForIds(): Getting ' . count($checklist) . ' Universe names from ESI...');
         // contact ESI
         if (count($checklist) > 0) {
             for ($i = 0; $i < count($checklist) / $MAX_IDS; $i++) { //fix for #85 - can only ask about 1000 names in one batch
-                if ($this->ESI->getDEBUG()) inform(get_class(), "Getting page $i");
-                $names = array_merge($names, $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS))));
+                if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): Getting page $i");
+                $chunk = $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS)));
+                if ($chunk === FALSE) {
+                    warning(get_class(), "getNamesForIds(): Received error when trying to resolve names in BULK. Switching to one-by-one.");
+                    for ($j = 0; $j < count($checklist); $j++) {
+                        $tinychunk = $this->post('',json_encode(array($checklist[$j])));
+                        if ($tinychunk === FALSE) {
+                            warning(get_class(), "getNamesForIds(): Received ERROR when trying to resolve name name for ID=" . $checklist[$j]);
+                            continue;
+                        }
+                        $names = array_merge($names, $tinychunk);
+                    }
+                    break; //escape main loop
+                    //ToDo: one by one resolving. Report which IDs don't resolve.
+                }
+                $names = array_merge($names, $chunk);
             }
         }
-        if ($this->ESI->getDEBUG()) inform(get_class(), "Returning names: ". json_encode($names));
+        if ($this->ESI->getDEBUG()) inform(get_class(), "getNamesForIds(): Returning names: ". json_encode($names));
         return $names;
     }
     

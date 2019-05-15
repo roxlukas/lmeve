@@ -170,7 +170,7 @@ class Markets extends Route {
         }
         if (!is_null($systemID)) {
             $b = array();
-            if (count($a) > 0) {
+            if (is_array($a) && count($a) > 0) {
                 foreach($a as $k => $r) {
                     if ($r->system_id == $systemID) $b[$k] = $r;
                 }

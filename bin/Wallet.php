@@ -201,7 +201,7 @@ class Wallet extends Route {
                         foreach ($journal as $c) {
                              if ($this->v($c,'first_party_id',0) > 0) $ids[$c->first_party_id] = $c->first_party_id;
                              if ($this->v($c,'second_party_id',0) > 0) $ids[$c->second_party_id] = $c->second_party_id;
-                             if ($this->v($c,'context_id',0)  > 0) $ids[$c->context_id] = $c->context_id;
+                             //if ($this->v($c,'context_id',0)  > 0) $ids[$c->context_id] = $c->context_id;
                         }
                         $names = $this->ESI->Universe->getNamesForIdsMap($ids);
                         //insert data into DB
