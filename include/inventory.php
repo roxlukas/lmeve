@@ -8,7 +8,14 @@ include_once("dbcatalog.php");
 include_once("auth.php");
 
 function dbhrefedit($nr) {
-    echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"Click to open database\">");
+    global $LM_EVEDB;
+    if (is_numeric($nr) && $nr >= 0 && $nr <= 371027) {
+        $d = db_asocquery("SELECT `typeName` FROM `$LM_EVEDB`.`invTypes` WHERE `typeID`=$nr;");
+        $typeName = $d[0]['typeName'];
+    } else {
+        $typeName = 'Unknown';
+    }
+    echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"$typeName (Click to open database)\">");
 }
 
 function shipshrefedit($nr) {
