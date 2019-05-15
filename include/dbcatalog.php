@@ -264,6 +264,18 @@ function esiUpdateApikills() {
     if ($found === FALSE) {
         return db_uquery("ALTER TABLE `apikills` ADD `killmail_hash` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;");
     }
+    
+    $indexes = db_asocquery("SHOW INDEX FROM `apikillattackers`;");
+    $found = FALSE;
+    $i =0;
+    foreach ($indexes as $column) {
+        if ($column['Key_name']=='apikillattackers_unique_attackers') {
+            $i++;
+        }
+    }    
+    if ($i != 8) {
+        return db_uquery("ALTER TABLE `apikillattackers` ADD UNIQUE `apikillattackers_unique_attackers` (`killID`, `characterID`, `corporationID`, `allianceID`, `factionID`, `damageDone`, `weaponTypeID`, `shiptypeID`);");
+    }
     return TRUE;
 }
 

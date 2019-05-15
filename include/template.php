@@ -185,19 +185,17 @@ function template_locked($meta, $msg=null) {
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
-	<br>
+	<form name="loginform" id="loginform" method="get" action="">
+        <img src="img/LMeve.png" alt='LMeve' />
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
-	
-	
 	<tr><td><br><div class="tcen"><?php echo($msg); ?>
 	</div></td></tr>
 	<tr><td><div class="tcen"><br>
-		 <form method="get" action="">
-			<input type="submit" value="Try again">
-		 </form>
-		 </div>
+                <input type="submit" value="Try again">
+         </div>
 	</td></tr>
 	</table>
+        </form>
 	<?php
 	include("copyright.php");
 	?>
@@ -281,15 +279,15 @@ function template_badlogon() {
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
-	<br>
+	<form name="loginform" id="loginform" method="get" action="">
+        <img src="img/LMeve.png" alt='LMeve' />
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
 	<tr><td><div class="tcen"><br>Wrong username<br>or password.<br>&nbsp;</div></td></tr>
 	<tr><td align="center"><div class="tcen"><br>
-		 <form method="get" action="">
-			<input type="submit" value="Back">
-		 </form></div>
+		<input type="submit" value="Back">
 	</td></tr>
 	</table>
+        </form>
 	</center>
 	<?php
 	 include('copyright.php');
@@ -316,18 +314,16 @@ function template_logout($msg='Logged out.') {
 	</head>
 	<body text="#000000" bgcolor="#FFFFFF">
 	<center>
-	<br>
+	<form name="loginform" id="loginform" method="get" action="">
+        <img src="img/LMeve.png" alt='LMeve' />
 	<table border="0" cellspacing="0" cellpadding="0" width="250" class="login">
-	
-	
 	<tr><td><br><div class="tcen"><?=$msg?></div></td></tr>
 	<tr><td><div class="tcen"><br>
-		 <form method="get" action="">
-			<input type="submit" value="Login again">
-		 </form>
-		 </div>
+                <input type="submit" value="Login again">
+         </div>
 	</td></tr>
 	</table>
+        </form>
 	<?php
 	include("copyright.php");
 	?>
