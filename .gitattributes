@@ -20,3 +20,10 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+#Vendor libs
+
+wwwroot/ccpwgl/* linguist-vendored
+wwwroot/chart.js/* linguist-vendored
+wwwroot/jquery-tablesorter/* linguist-vendored
+wwwroot/jquery-ui/* linguist-vendored
