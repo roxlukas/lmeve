@@ -79,7 +79,7 @@ function generate_meta($description=null, $title=null ,$image=null) {
     
     if (is_null($description)) $description="LMeve: Industry Contribution and Mass Production Tracker."; else $description = htmlentities($description);
     if (is_null($title)) $title = generate_title(); else $title = htmlentities($title);
-    if (is_null($image)) $image = getUrl() . "ccp_icons/33_128_2.png";
+    if (is_null($image)) $image = getUrl() . "img/lmeve-social.jpg";
     
     $url = parse_url(getUrl());
     $domain = $url['scheme'] . '://' . $url['host'] ;
