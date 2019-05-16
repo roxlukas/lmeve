@@ -163,8 +163,18 @@ $PANELNAME='ESI Statistics'; //Panel name (optional)
                         </script>
     </div>
 
-	<table class="lmframework">
-	<tr><th width="64">
+<script type="text/javascript">
+    $(document).ready(function() {        
+        $("#esistats").tablesorter({ 
+            headers: { 
+                
+            } 
+        }); 
+    });
+    </script>
+
+	<table id="esistats" class="lmframework tablesorter">
+	<thead><tr><th width="64">
 		<b>tokenID</b>
 	  </th><th width="128">
 		<b>Route</b>
@@ -177,7 +187,7 @@ $PANELNAME='ESI Statistics'; //Panel name (optional)
 	   </th><th width="350">
 		<b>errorMessage</b>
 	   </th>
-	   </tr>
+            </tr></thead>
 	<?php
 	
 	function hrefedit($nr) {

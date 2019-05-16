@@ -139,10 +139,20 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 				}
 				
 				//var_dump($rearrange);
-				
+				$rnd = md5(random_pseudo_bytes_wrapper(24));
 			?>
-				<table class="lmframework">
-				<tr><th width="32" style="padding: 0px; text-align: center;">
+                            <script type="text/javascript">
+                            $(document).ready(function() {        
+                                $("#stats_<?=$rnd?>").tablesorter({ 
+                                    headers: { 
+                                        0: { sorter: false },
+                                        4: { sorter: false },
+                                    } 
+                                }); 
+                            });
+                            </script>
+				<table id="stats_<?=$rnd?>" class="lmframework tablesorter">
+				<thead><tr><th width="32" style="padding: 0px; text-align: center;">
 					<b>Icon</b>
 				</th><th style="text-align: center;">
 					<b><a href="?id=8&id2=0&mychars=<?php if ($mychars==1) echo(1); else echo(0); ?>">Type Name</a></b>
@@ -159,7 +169,7 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 					 ?>" style="text-align: center;">
 					<b><a href="?id=8&id2=1&mychars=<?php if ($mychars==1) echo(1); else echo(0); ?>">Contributors</a></b>
 				</th>
-				</tr>
+                                    </tr></thead>
 			 <?php
 
 			foreach($rearrange as $row) {

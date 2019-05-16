@@ -45,8 +45,7 @@ foreach($ores_raw as $row) {
 
 //BEGIN Clientside sorting:
 ?>
-  <script type="text/javascript" src="<?=getUrl()?>jquery-tablesorter/jquery.tablesorter.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="<?=getUrl()?>jquery-tablesorter/blue/style.css">
+
   <script type="text/javascript">
     $(document).ready(function() { 
         addTSCustomParsers();

@@ -296,16 +296,16 @@ function getMyChars($array=false) {
  */
 function showTasks($tasklist) {
     global $MOBILE;
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
 	if (!sizeof($tasklist)>0) {
 		echo('<h3>There are no tasks assigned!</h3>');
 	} else {
             echo("Found ".count($tasklist)." tasks.");
 	?>
-<script type="text/javascript" src="<?=getUrl()?>jquery-tablesorter/jquery.tablesorter.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="<?=getUrl()?>jquery-tablesorter/blue/style.css">
+
   <script type="text/javascript">
     $(document).ready(function() {        
-        $("#tasks").tablesorter({ 
+        $("#tasks_<?=$rnd?>").tablesorter({ 
             headers: { 
                 0: { sorter: false },
                 3: { sorter: false },
@@ -316,7 +316,7 @@ function showTasks($tasklist) {
         }); 
     });
   </script>
-	<table id="tasks" class="lmframework tablesorter">
+	<table id="tasks_<?=$rnd?>" class="lmframework tablesorter">
 	<thead><tr><th>
 		
 	</th><?php if(!$MOBILE) { ?><th>
@@ -568,13 +568,25 @@ function getCurrentJobs($MYTASKS, $SELECTEDCHAR, $ORDERBY) {
  */
 function showCurrentJobs($jobslist) {
     global $MOBILE;
-	if (!sizeof($jobslist)>0) {
-		echo('<h3>There are no jobs in progress!</h3>');
-	} else {
-	?>
-        <em>All times shown in EVE time.</em>
-	<table class="lmframework">
-	<tr><th>
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
+    if (!sizeof($jobslist)>0) {
+            echo('<h3>There are no jobs in progress!</h3>');
+    } else {
+    ?>
+    <em>All times shown in EVE time.</em>
+
+    <script type="text/javascript">
+        $(document).ready(function() {        
+            $("#jobs_<?=$rnd?>").tablesorter({ 
+                headers: { 
+                    0: { sorter: false },
+                    3: { sorter: false },
+                } 
+            }); 
+        });
+    </script>
+    <table id="jobs_<?=$rnd?>" class="lmframework tablesorter">	
+	<thead><tr><th>
 		
 	</th><?php if (!$MOBILE) { ?><th>
 		Character
@@ -588,8 +600,8 @@ function showCurrentJobs($jobslist) {
 		Start Time
 	</th><th>
 		End Time
-	</th>
-	</tr>
+        </th>
+	</tr></thead>
 	<?php
 		foreach($jobslist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
@@ -631,6 +643,7 @@ function getPoints() {
 
 function showPoints($points) {
     global $DECIMAL_SEP, $THOUSAND_SEP;
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
     $rights_edithours=FALSE;
     $ONEPOINT=getConfigItem('iskPerPoint','15000000'); //loaded from db now! :-)
     
@@ -640,12 +653,23 @@ function showPoints($points) {
     <?php 
         $rights_edithours=TRUE;
     }
-    echo('</h2><table class="lmframework">');
-    echo('<tr><th>');
-    echo('Activity');
-    echo('</td><th>');		
-    echo('Hours');
-    echo('</td></tr>');
+    ?>
+    <script type="text/javascript">
+    $(document).ready(function() {        
+        $("#points_<?=$rnd?>").tablesorter({ 
+            headers: { 
+                
+            } 
+        }); 
+    });
+    </script>
+    </h2><table id="points_<?=$rnd?>" class="lmframework tablesorter">
+    <thead><tr><th>
+    Activity
+    </th><th>		
+    Hours
+    </th></tr></thead>
+        <?php
     foreach($points as $point) {
             echo('<tr><td>');
             if ($rights_edithours) pointshrefedit($point['activityID']);
@@ -733,10 +757,20 @@ function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
 
 function timesheetHeader() {
     global $MOBILE;
-    
-    ?>			
-    <table class="lmframework">
-    <tr><th width="32" style="padding: 0px; text-align: center;">
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
+    ?>
+    <script type="text/javascript">
+    $(document).ready(function() {        
+        $("#timesheet_<?=$rnd?>").tablesorter({ 
+            headers: { 
+                0: { sorter: false },
+            } 
+        }); 
+    });
+  </script>
+    <table id="timesheet_<?=$rnd?>" class="lmframework tablesorter">		
+
+    <thead><tr><th width="32" style="padding: 0px; text-align: center;">
             <b></b>
     </th><th style="text-align: center;">
             <b>Name</b>
@@ -758,8 +792,8 @@ function timesheetHeader() {
             <b>Points</b>
     </th><th width="96" style="text-align: center;">
             <b>ISK</b>
-    </td>
-    </tr>
+    </th>
+        </tr></thead>
     <?php
 }
 
@@ -856,7 +890,7 @@ function timesheetTotals($totals,$label='Total') {
     </th><th width="96" style="text-align: right;">
             <b><?php echo(number_format($totals['ISK'], 2, $DECIMAL_SEP, $THOUSAND_SEP)); ?></b>
     </th>
-    </tr>
+        </tr>
     <?php
 }
     
@@ -878,7 +912,7 @@ function showTimesheet($timesheet,$aggregate=FALSE) {
     timesheetHeader();
     //draw "My characters" header
     if ($mychars) {
-        echo('<tr><th colspan="'. ($MOBILE ? 4 : 9) .'" style="text-align: center; font-weight: bold;">My characters</th></tr>');
+        echo('<thead><tr><th colspan="'. ($MOBILE ? 4 : 9) .'" style="text-align: center; font-weight: bold;">My characters</th></tr></thead>');
     }
     //display data for "My characters"
     foreach($timesheet as $row) {

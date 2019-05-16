@@ -56,95 +56,106 @@ function RDYIMG() {
 }
 
 function showBuyback($buybacklist) {
-	global $DECIMAL_SEP, $THOUSAND_SEP;
-	$rights_viewbuyorders=checkrights("Administrator,EditBuyOrders");
-	if (!sizeof($buybacklist)>0) {
-		echo('<h3>There are no buyback orders!</h3>');
-	} else {
-	?>
-	<table class="lmframework">
-	<tr><th>
-		Date
-	</th><th>
-		User
-	</th><th>
-		Value
-	</th><th>
-		Description
-	</th><th>
-		Hash
-	</th><th>
-		Contract
-	</th>
-	</tr>
-	<?php
-		
-		
-		foreach($buybacklist as $row) {
-			$order_fullhash=longhash($row['orderSerialized'].$row['timestmp']);
-			$contract=unserialize($row['orderSerialized']);
-			$value=0;
-			if (count($contract) > 0) {
-				foreach($contract as $item) {
-					$value+=$item['quantity']*$item['unitprice'];
-				}
-			} else {
-				$value=0.0;
-			}
-			echo('<tr>');
-			echo('<td>');
-				if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
-				echo(date('Y.m.d H:i:s',$row['timestmp']));
-				if ($rights_viewbuyorders) echo('</a>');
-			echo('</td>');
-			echo('<td>');
-				if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
-				echo($row['login']);
-				if ($rights_viewbuyorders) echo('</a>');
-			echo('</td>');
-			echo('<td style="text-align: right;">');
-				if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
-				echo(number_format($value, 2, $DECIMAL_SEP, $THOUSAND_SEP));
-				if ($rights_viewbuyorders) echo('</a>');
-			echo('</td>');
-			echo('<td>');
-				if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
-				echo($row['shortHash']);
-				if ($rights_viewbuyorders) echo('</a>');
-			echo('</td>');
-			echo('<td>');
-				//echo($row['orderSerialized']);
-				//echo("SAVED: ${row['fullHash']}<br />");
-				//echo("CALC: $order_fullhash<br />"); 
-				if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
-				if ($row['fullHash']==$order_fullhash) echo(OKIMG()." OK"); else echo(NOKIMG()." TAMPERED");
-				if ($rights_viewbuyorders) echo('</a>');
-			echo('<td>');
-				if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
-				if ($row['dateIssued']!='') {
-					//there is contract
-					/*$contractprice=round(str_replace('.',',',$row['price']));
-					$orderprice=round($value);*/
-					$contractprice=$row['price'];
-					$orderprice=$value;
-					if (abs($contractprice-$orderprice)<1) {
-						showContractStatus($row['status']);
-					} else {
-						echo(NOKIMG()." Wrong price in game: ");
-						echo(number_format($contractprice, 2, $DECIMAL_SEP, $THOUSAND_SEP));
-						echo(" ISK<br />");
-					}
-				} else {
-					//no contract yet
-					echo(NOKIMG()." No contract<br />");
-				}
-			if ($rights_viewbuyorders) echo('</a>');
-			echo('</td>');			
-			echo('</tr>');
-		}
-		echo('</table>');
-	}
-	return;
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    $rights_viewbuyorders=checkrights("Administrator,EditBuyOrders");
+    if (!sizeof($buybacklist)>0) {
+            echo('<h3>There are no buyback orders!</h3>');
+    } else {
+    ?>
+    <script type="text/javascript">
+        $(document).ready(function() {      
+            addTSCustomParsers();
+            $("#buyback_<?=$rnd?>").tablesorter({ 
+                headers: { 
+                    2: { sorter: 'numsep' },
+                } 
+            }); 
+        });
+    </script>
+    <table id="buyback_<?=$rnd?>" class="lmframework tablesorter">
+    <thead><tr><th>
+            Date
+    </th><th>
+            User
+    </th><th>
+            Value
+    </th><th>
+            Description
+    </th><th>
+            Hash
+    </th><th>
+            Contract
+    </th>
+        </tr></thead>
+    <?php
+
+
+        foreach($buybacklist as $row) {
+                $order_fullhash=longhash($row['orderSerialized'].$row['timestmp']);
+                $contract=unserialize($row['orderSerialized']);
+                $value=0;
+                if (count($contract) > 0) {
+                        foreach($contract as $item) {
+                                $value+=$item['quantity']*$item['unitprice'];
+                        }
+                } else {
+                        $value=0.0;
+                }
+                echo('<tr>');
+                echo('<td>');
+                        if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
+                        echo(date('Y.m.d H:i:s',$row['timestmp']));
+                        if ($rights_viewbuyorders) echo('</a>');
+                echo('</td>');
+                echo('<td>');
+                        if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
+                        echo($row['login']);
+                        if ($rights_viewbuyorders) echo('</a>');
+                echo('</td>');
+                echo('<td style="text-align: right;">');
+                        if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
+                        echo(number_format($value, 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                        if ($rights_viewbuyorders) echo('</a>');
+                echo('</td>');
+                echo('<td>');
+                        if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
+                        echo($row['shortHash']);
+                        if ($rights_viewbuyorders) echo('</a>');
+                echo('</td>');
+                echo('<td>');
+                        //echo($row['orderSerialized']);
+                        //echo("SAVED: ${row['fullHash']}<br />");
+                        //echo("CALC: $order_fullhash<br />"); 
+                        if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
+                        if ($row['fullHash']==$order_fullhash) echo(OKIMG()." OK"); else echo(NOKIMG()." TAMPERED");
+                        if ($rights_viewbuyorders) echo('</a>');
+                echo('<td>');
+                        if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
+                        if ($row['dateIssued']!='') {
+                                //there is contract
+                                /*$contractprice=round(str_replace('.',',',$row['price']));
+                                $orderprice=round($value);*/
+                                $contractprice=$row['price'];
+                                $orderprice=$value;
+                                if (abs($contractprice-$orderprice)<1) {
+                                        showContractStatus($row['status']);
+                                } else {
+                                        echo(NOKIMG()." Wrong price in game: ");
+                                        echo(number_format($contractprice, 2, $DECIMAL_SEP, $THOUSAND_SEP));
+                                        echo(" ISK<br />");
+                                }
+                        } else {
+                                //no contract yet
+                                echo(NOKIMG()." No contract<br />");
+                        }
+                if ($rights_viewbuyorders) echo('</a>');
+                echo('</td>');			
+                echo('</tr>');
+            }
+            echo('</table>');
+    }
+    return;
 }
 
 function showContractStatus($status) {
@@ -276,6 +287,7 @@ function getMarketOrders($where) {
 }
 
 function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
+        $rnd = md5(random_pseudo_bytes_wrapper(24));
 	global $DECIMAL_SEP, $THOUSAND_SEP;
         $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
         
@@ -284,7 +296,21 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
 		echo("<h3>There are no $label!</h3>");
 	} else {
 	?>
-	<table class="lmframework">
+        <script type="text/javascript">
+        $(document).ready(function() { 
+            addTSCustomParsers();
+
+            $("#orders_<?=$rnd?>").tablesorter({ 
+                headers: { 
+                    2: { sorter: false },
+                    4: { sorter: false },
+                    7: { sorter: 'numsep' },
+                    
+                } 
+            }); 
+        });
+        </script>
+	<table id="orders_<?=$rnd?>" class="lmframework tablesorter"><thead>
         <?php
             if (!is_null($label)) {
                 ?><tr><th colspan="9"><?=$label?></th></tr><?php
@@ -307,7 +333,7 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
 	</th><th colspan="2">
 		<?php if ( $sell === TRUE ) echo('Volume sold'); else echo('Volume bought'); ?>
 	</th>
-	</tr>
+        </tr></thead>
 	<?php
                 $total=0.0;
 		foreach($orderlist as $row) {

@@ -419,19 +419,33 @@ function getIndustryStats($corporationID,$year,$month) {
 }
 
 function showIndustryStats($stats) {
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
     $colors=getActivityColors();
     $sumstat=0.0;
     $sumjobs=0;
-    if (count($stats)>0) {                                        
-        echo("<h2>Statistics</h2>");
-        echo('<table class="lmframework">');
-        echo('<tr><th colspan="2">');
-        echo('Activity');
-        echo('</th><th>');		
-        echo('Jobs');
-        echo('</td><th>');		
-        echo('Hours');
-        echo('</th></tr>');
+    ?>
+    <script type="text/javascript">
+    $(document).ready(function() {        
+        $("#industats_<?=$rnd?>").tablesorter({ 
+            headers: { 
+                
+            } 
+        }); 
+    });
+    </script>
+    <?php
+    if (count($stats)>0) {  
+        ?>
+        <h2>Statistics</h2>
+        <table id="industats_<?=$rnd?>" class="lmframework tablesorter">
+        <thead><tr><th colspan="2">
+        Activity
+        </th><th>		
+        Jobs
+        </td><th>		
+        Hours
+        </th></tr></thead>
+        <?php
         foreach($stats as $stat) {
             echo('<tr><td width="10">');
             echo('<div style="width: 10px; height: 10px; background-color: rgba('.$colors[$stat['activityID']].',0.75);"></div>');

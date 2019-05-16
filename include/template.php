@@ -82,6 +82,8 @@ function template_main($contents,$title,$meta) {
         <script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
 	<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>jquery-tablesorter/jquery.tablesorter.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="<?=getUrl()?>jquery-tablesorter/blue/style.css">
 	<script type="text/javascript">
 		function logoff() {
 		logout=window.open("index.php?logoff=1","logoff_window","toolbar=0,location=0,scrollbars=0,resizable=0,height=64,width=64,top=100,left=100");

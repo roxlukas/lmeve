@@ -227,12 +227,22 @@ function killMailToInventory($kill_items) {
 }
 
 function showKills($kills) {
+    $rnd = md5(random_pseudo_bytes_wrapper(24));
     ?>
+    <script type="text/javascript">
+    $(document).ready(function() {        
+        $("#killmails_<?=$rnd?>").tablesorter({ 
+            headers: { 
+                1: { sorter: false },
+            } 
+        }); 
+    });
+    </script>
     <center>
-    <table class="lmframework" style="width: 95%; min-width: 600px; max-width: 1280px;">
+    <table id="killmails_<?=$rnd?>" class="lmframework tablesorter" style="width: 95%; min-width: 600px; max-width: 1280px;">
     <?php
     if(count($kills)>0) {
-        ?><tr><th>Date</th><th></th><th>Location</th><th colspan="2">Victim</th><th colspan="2">Final Blow</th></tr><?php
+        ?><thead><tr><th>Date</th><th></th><th>Location</th><th colspan="2">Victim</th><th colspan="2">Final Blow</th></tr></thead><?php
         foreach ($kills as $kill) {
             ?>
             <tr>
