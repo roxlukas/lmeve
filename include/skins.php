@@ -162,6 +162,7 @@ function showWglCtrlPanel() {
                 <strong>Thrusters</strong>
             </td><td>
                 <input type="range" min="0" max="200" step="1" oninput="ship.setBoosterStrength(1.0 * this.value / 100.0);" onchange="ship.setBoosterStrength(1.0 * this.value / 100.0);"/>
+                <input type="button" onclick="if (ship.siegeState==0) ship.setSiegeState(1); else ship.setSiegeState(0);" value="Siege"/>
             </td>
         </tr>
     </table>

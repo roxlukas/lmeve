@@ -108,8 +108,10 @@ $runs=secureGETnum('runs');
 		    foreach($activities as $row) {
                         if (!$new) {
 			    if ( $row['activityID'] == $task['activityID'] ) $select='selected'; else $select='';
-                        } else {
-                            if ( isset($_SESSION['taskActivityID']) && $row['activityID'] == $_SESSION['taskActivityID'] ) $select='selected'; else $select='';
+                        } else if (isset($activityID)) {
+                            if ( $row['activityID'] == $activityID ) $select='selected'; else $select='';
+                        } else if (isset($_SESSION['taskActivityID'])) {
+                            if ( $row['activityID'] == $_SESSION['taskActivityID'] ) $select='selected'; else $select='';
                         }
 			echo("<option value=\"${row['activityID']}\" $select>${row['activityName']}</option>");
 		    }

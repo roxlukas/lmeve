@@ -13,6 +13,7 @@ include_once('inventory.php'); //inventory and pos related subroutines
 include_once('stats.php'); //real time stats
 include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
+include_once('mg.php'); //configuration settings in db
 
 function hrefedit_item($nr) {
 		echo("<a href=\"index.php?id=10&id2=1&nr=$nr\">");
@@ -325,7 +326,122 @@ if ($act=='') $act=0;
             header("Content-type: application/json");
             echo(json_encode($message));
             break; 
-		default:
+/************************** MG **************************/
+        case 'MG_CALL_STATE':
+            if (!checkrights("Administrator,ViewOwnCharacters")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $state['error'] = 'Unknown session.';
+            } else {
+                //mg main screen
+                mg_server_tick();
+                $state = mg_create_session($_SESSION['mg_character_id']);
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($state));
+            break;
+        case 'MG_LOCAL_LIST':
+            if (!checkrights("Administrator,ViewOwnCharacters")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $state['error'] = 'Unknown session.';
+            } else {
+                mg_server_tick();
+                //var_dump($state);
+                $list = mg_chat_local_get_list(mg_get_solarsystemid());
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($list));
+            break;
+        case 'MG_LOCAL_ENTRY':
+            if (!checkrights("Administrator,ViewOwnCharacters")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $state['error'] = 'Unknown session.';
+            } else {
+                mg_local_entry(mg_get_solarsystemid(), $_SESSION['mg_character_id'], secureGETstr('text',1024));
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode('OK'));
+            break;    
+        case 'MG_LOCAL_GET_MESSAGES':
+            if (!checkrights("Administrator,ViewOwnCharacters")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $state['error'] = 'Unknown session.';
+            } else {
+                $msgs = mg_local_get_messages(mg_get_solarsystemid(), secureGETnum('last_timestamp'));
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo(json_encode($msgs));
+            break;  
+        case 'MG_STATION_LAYOUT':
+            if (!checkrights("Administrator,ViewOwnCharacters")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $layout['error'] = 'Unknown session.';
+            } else {
+                //mg main screen
+                $layout = mg_station_layout();
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo($layout);
+            break;
+        case 'MG_IN_SPACE_LAYOUT':
+            if (!checkrights("Administrator,ViewOwnCharacters")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $layout['error'] = 'Unknown session.';
+            } else {
+                //mg main screen
+                $layout = mg_in_space_layout();
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo($layout);
+            break;
+        case 'MG_GM_TELEPORT':
+            if (!checkrights("Administrator")) {
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $gm_cmd['error'] = 'Unknown session.';
+            } else {
+                //mg gm command
+                $itemID = secureGETnum('itemID');
+                $stationID = secureGETnum('stationID');
+                $gm_cmd = mg_gm_teleport($itemID, $stationID);
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: application/json");
+            echo($gm_cmd);
+            break;
+	default:
             echo('Error in AJAX call.');
     }
 ?>

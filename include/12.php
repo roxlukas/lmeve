@@ -146,7 +146,7 @@ if ($new) {
                                     $multipliedRuns,
                                     UTC_TIMESTAMP(),
                                     $singleton,
-                                    NULL
+                                    $structureID
                                     );";
                                     db_uquery($sql);
                                 }
@@ -161,7 +161,7 @@ if ($new) {
                                     $multipliedRuns,
                                     UTC_TIMESTAMP(),
                                     $singleton,
-                                    NULL
+                                    $structureID
                                     );";
                                     db_uquery($sql);
                                 }
@@ -176,7 +176,7 @@ if ($new) {
                                     $runs,
                                     UTC_TIMESTAMP(),
                                     $singleton,
-                                    NULL
+                                    $structureID
                                     );";
                                     db_uquery($sql);
                                 }
