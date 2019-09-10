@@ -351,3 +351,8 @@ function sub(editbox) {
         function jsRedirect(destination) {
             setTimeout(function(){ location.href = destination; }, 100);
         }
+        
+        function hideLeftPanel() {
+            var p = document.getElementById('tab-links');
+            p.style.display = 'none';
+        }

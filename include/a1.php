@@ -12,6 +12,7 @@ $PANELNAME='Item Database'; //Panel name (optional)
 
 global $LM_EVEDB, $LM_CCPWGL_URL, $LM_CCPWGL_USEPROXY, $MOBILE, $USERSTABLE, $ESI_BASEURL;
 include_once('materials.php');
+include_once('market.php');
 include_once('inventory.php');
 include_once('yaml_graphics.php');
 include_once('skins.php');
@@ -615,8 +616,13 @@ if ($model) {
                     $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`=${_SESSION['granted']};");
                     if (count($keys)>0) $apikey='key='.$keys[0]['apiKey'].'&'; else $apikey='';
                     ?>
-                    <td>LMeve API <a href="api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?></a></td>
+                        <td>LMeve API (Database) <a href="api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?></a></td>
                 </tr>
+                <?php if ($item['categoryID'] == 25) { ?>
+                <tr>
+                    <td>LMeve API (Ore Composition) <a href="api.php?<?=$apikey?>endpoint=ORECHART&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=ORECHART&typeID=<?=$nr?></a></td>
+                </tr>
+                <?php } ?>
                 <?php /*<tr>
                     <td>CREST <a href="<?=$CREST_BASEURL?>/inventory/types/<?=$nr?>/" target="_blank"><?=$CREST_BASEURL?>/inventory/types/<?=$nr?>/</a></td>
                 </tr> */ ?>
@@ -632,11 +638,42 @@ if (!$MOBILE) {
     echo('</td></tr><tr><td style="width: 100%; vertical-align: top;">');
 }
 
+        /************************* START OF ORE COMPOSITION *******************************/
+        if ($item['categoryID'] == 25) {
+            $ore = filterOresMakeup(getRecycleMaterialsOres($item['typeID']));
+            if (is_array($ore) && count($ore) > 0) {
+                ?><table class="lmframework" style="width:100%;"><thead><tr>
+                            <th colspan="4">Ore Composition</th></tr>
+                            <tr><th style="width:32px;"></th><th>Mineral</th><th>Quantity</th><th>Value</th>
+                        </tr></thead>
+                    <tbody>
+                        <?php
+                            foreach ($ore[$item['typeID']]['minerals'] as $mineral) {
+                                ?><tr><td style="width:32px;"><?php itemhrefedit($mineral['mineralID']); ?><img src="<?php echo(getTypeIDicon($mineral['mineralID'])); ?>" title="<?php echo($mineral['mineralTypeName']); ?>" /></a>
+                                    <td><?php itemhrefedit($mineral['mineralID']); ?><?=$mineral['mineralTypeName']?></a></td>
+                                <td style="text-align:right;"><?=number_format($mineral['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td>
+                                <td style="text-align:right;"><?=number_format($mineral['quantity'] * $mineral['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td></tr>
+                                <?php
+                            }
+                        ?>
+                        <tr>
+                            <th colspan="3">Batch Value</th><th style="text-align:right;"><?=number_format($ore[$item['typeID']]['value'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
+                        </tr>
+                        <tr>
+                            <th colspan="3">Unit Value</th><th style="text-align:right;"><?=number_format($ore[$item['typeID']]['value'] / $item['portionSize'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
+                        </tr>
+                    </tbody>
+                </table>
+                <?php
+            }
+        }
+	/************************* END OF ORE COMPOSITION *******************************/
 		
+        
+        
 	/****************************************************************************/
 	/* CODE BELOW IS COPIED FROM ANOTHER APP. IT NEEDS TO BE DESPAGHETTIFIED!!  */
 	/****************************************************************************/
-	
 	
 	/************************* START OF DOGMA *******************************/
 	echo("<table border=\"0\" cellspacing=\"3\" cellpadding=\"0\" style=\"width: 100%;\">");
@@ -751,8 +788,7 @@ if (!$MOBILE) {
 	echo('</table>');
 	/************************* END OF DOGMA *******************************/
 	
-
-	
+        
 	
 	echo('</td></tr></table>');
         

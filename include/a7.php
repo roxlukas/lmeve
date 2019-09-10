@@ -25,6 +25,9 @@ $minerals = filterOresMinerals($ores_raw);
 //echo("<h3>Minerals</h3><pre>"); var_dump($minerals); echo("</pre>");
 
 ?>
+<script type="text/javascript">
+    hideLeftPanel();
+ </script>
     <div class="tytul">
         <?php echo($PANELNAME); ?><br>
     </div>
