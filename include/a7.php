@@ -15,7 +15,7 @@ include_once 'materials.php';
 
 global $LM_EVEDB, $DECIMAL_SEP, $THOUSAND_SEP,$USERSTABLE;
 
-generate_meta('Ore Values Chart shows mineral composition and current value of all ores available in EVE Online.');
+generate_meta('Ore Values Chart shows mineral composition and current value of all ores available in EVE Online.', generate_title('Ore Chart'));
 
 $ores_raw = getRecycleMaterialsOres();
 $ores = filterOresMakeup($ores_raw);
@@ -28,6 +28,8 @@ $minerals = filterOresMinerals($ores_raw);
     <div class="tytul">
         <?php echo($PANELNAME); ?><br>
     </div>
+
+
 
 <?php
     $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`=${_SESSION['granted']};");
