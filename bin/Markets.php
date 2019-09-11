@@ -16,9 +16,19 @@ class Markets extends Route {
     public function updatePublic() {
         $this->updatePrices();
         
+        if (getConfigItem('calculate_ore_prices','disabled')=='enabled') {
+            inform(get_class(), 'updatePublic(): calculate_ore_prices == enabled, running updateMineralsMarketConfig()...');
+            updateMineralsMarketConfig();
+        }
+        
         $typeids = db_asocquery("SELECT `typeID` FROM `cfgmarket`;");
         if (count($typeids) > 0) {
             foreach ($typeids as $typeid) $this->updateMinMax ($typeid['typeID']);
+        }
+        
+        if (getConfigItem('calculate_ore_prices','disabled')=='enabled') {
+            inform(get_class(), 'updatePublic(): calculate_ore_prices == enabled, running updateOrePriceByComposition()...');
+            updateOrePriceByComposition();
         }
     }
     

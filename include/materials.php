@@ -1148,6 +1148,35 @@ function displayOreChart($ores, $minerals) {
             </tbody>
     </table>
     <?php
-}
+    }
+
+    function updateMineralsMarketConfig() {
+        global $LM_EVEDB;
+        
+        $ores_raw = getRecycleMaterialsOres();
+        
+        $minerals = filterOresMinerals($ores_raw);
+        
+        $mineralIDs = array_keys($minerals);
+                
+        //add mineral prices to market configuration
+        $sql = "INSERT IGNORE INTO `cfgmarket` SELECT typeID FROM `$LM_EVEDB`.invTypes WHERE typeID IN (" . implode(',', $mineralIDs) . ")";
+        
+        return db_uquery($sql);
+    }
+    
+    function updateOrePriceByComposition() {
+        $ores_raw = getRecycleMaterialsOres();
+        $ores = filterOresMakeup($ores_raw);
+        
+        $reprocessingYield = getConfigItem('reprocessingYield', 0.6957);
+        
+        foreach ($ores as $typeID => $ore) {
+            $v = $reprocessingYield * $ore['value'] / $ore['portionSize'];
+            db_uquery("DELETE FROM `apiprices` WHERE `typeID` = $typeID;");
+            db_uquery("INSERT INTO `apiprices` VALUES ($typeID, 0, $v, $v, $v, 0, $v, 0.00, 'sell'),($typeID, 0, $v, $v, $v, 0, $v, 0.00, 'buy')");
+        }
+    }
+
 
 ?>

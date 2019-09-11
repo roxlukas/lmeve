@@ -35,6 +35,13 @@ global $LM_EVEDB;
                 $indexRegionID=secureGETnum('indexRegionID');
                 if (!empty($indexRegionID)) setConfigItem('indexRegionID', $indexRegionID);
                 
+                $reprocessingYield = secureGETstr('reprocessingYield');
+                if (!is_numeric($reprocessingYield)) die('Wrong parameter value reprocessingYield: must be numeric'); else {
+                    if ($reprocessingYield < 0.5) $reprocessingYield = 0.5;
+                    if ($reprocessingYield > 1.0) $reprocessingYield = 1.0;
+                    setConfigItem('reprocessingYield', $reprocessingYield);
+                }
+                
                 if (secureGETstr('northboundApi')=='on') setConfigItem('northboundApi','enabled'); else setConfigItem('northboundApi','disabled');
                 if (secureGETstr('useESI')=='on') setConfigItem('useESI','enabled'); else setConfigItem('useESI','disabled');
                 if (secureGETstr('ESIdebug')=='on') setConfigItem('ESIdebug','enabled'); else setConfigItem('ESIdebug','disabled');

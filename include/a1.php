@@ -639,12 +639,13 @@ if (!$MOBILE) {
 }
 
         /************************* START OF ORE COMPOSITION *******************************/
+        $reprocessingYield = getConfigItem('reprocessingYield', 0.6957);
         if ($item['categoryID'] == 25) {
             $ore = filterOresMakeup(getRecycleMaterialsOres($item['typeID']));
             if (is_array($ore) && count($ore) > 0) {
                 ?><table class="lmframework" style="width:100%;"><thead><tr>
-                            <th colspan="4">Ore Composition</th></tr>
-                            <tr><th style="width:32px;"></th><th>Mineral</th><th>Quantity</th><th>Value</th>
+                            <th colspan="5">Ore Composition</th></tr>
+                            <tr><th style="width:32px;"></th><th>Mineral</th><th>Raw Quantity</th><th>Reprocessed at <?=number_format(100 * $reprocessingYield, 2, $DECIMAL_SEP, $THOUSAND_SEP)?>%</th><th>Value</th>
                         </tr></thead>
                     <tbody>
                         <?php
@@ -652,15 +653,20 @@ if (!$MOBILE) {
                                 ?><tr><td style="width:32px;"><?php itemhrefedit($mineral['mineralID']); ?><img src="<?php echo(getTypeIDicon($mineral['mineralID'])); ?>" title="<?php echo($mineral['mineralTypeName']); ?>" /></a>
                                     <td><?php itemhrefedit($mineral['mineralID']); ?><?=$mineral['mineralTypeName']?></a></td>
                                 <td style="text-align:right;"><?=number_format($mineral['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td>
-                                <td style="text-align:right;"><?=number_format($mineral['quantity'] * $mineral['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td></tr>
+                                <td style="text-align:right;"><?=number_format($reprocessingYield * $mineral['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td>
+                                <td style="text-align:right;"><?=number_format($reprocessingYield * $mineral['quantity'] * $mineral['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td></tr>
                                 <?php
                             }
                         ?>
                         <tr>
-                            <th colspan="3">Batch Value</th><th style="text-align:right;"><?=number_format($ore[$item['typeID']]['value'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
+                            <th colspan="2">Batch Value</th>
+                            <td style="text-align:right;"><?=number_format($ore[$item['typeID']]['value'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td>
+                            <td colspan="2" style="text-align:right;"><?=number_format($reprocessingYield * $ore[$item['typeID']]['value'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td>
                         </tr>
                         <tr>
-                            <th colspan="3">Unit Value</th><th style="text-align:right;"><?=number_format($ore[$item['typeID']]['value'] / $item['portionSize'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
+                            <th colspan="2">Unit Value</th>
+                            <td style="text-align:right;"><?=number_format($ore[$item['typeID']]['value'] / $item['portionSize'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</td>
+                            <th colspan="2" style="text-align:right;"><?=number_format($reprocessingYield * $ore[$item['typeID']]['value'] / $item['portionSize'], 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th>
                         </tr>
                     </tbody>
                 </table>

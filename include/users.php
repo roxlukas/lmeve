@@ -20,17 +20,19 @@ function showUsers($admini) {
 	    </th></tr></thead>
 <?php
     foreach ($admini as $admin) {
-			$tmp=explode(' ',$admin['last']);
-			$tmpd=explode('.',$tmp[0]);
-			$tmp_data=sprintf('%d-%d-%d %s',$tmpd[2],$tmpd[1],$tmpd[0],$tmp[1]);
-			$t0 = strtotime($tmp_data);
-			$t2 = time();
-			$dt=$t2-$t0;
-			if ($dt < 300) {
-				$log=' class="tab-act"';
-			} else {
-				$log='';
-			}
+            //$tmp=explode(' ',$admin['last']);
+            //$tmpd=explode('.',$tmp[0]);
+            //$tmp_data=sprintf('%d-%d-%d %s',$tmpd[2],$tmpd[1],$tmpd[0],$tmp[1]);
+            $t0 = strtotime($admin['last']);
+            $t2 = time();
+            $dt=$t2-$t0;
+            
+            if ($dt < 300) {
+                    $log=' class="tab-act"';
+            } else {
+                    $log='';
+            }
+            
 	    echo("<tr>");
    	    echo("<td$log>");
 		if ($admin['act']=="0") echo('<font color="#a0a0a0">');

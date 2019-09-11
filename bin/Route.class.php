@@ -4,6 +4,7 @@ include_once("$mypath/../include/log.php");
 include_once("$mypath/../include/db.php");
 include_once("$mypath/../include/configuration.php");
 include_once("$mypath/../include/killboard.php");
+include_once("$mypath/../include/materials.php");
 
 include_once('ESI.class.php');
 

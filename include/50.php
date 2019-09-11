@@ -78,7 +78,13 @@ Settings
         if (checkrights("Administrator")) { ?>
             <h3>LMeve Global Settings</h3>
             <form method="post" action="?id=5&id2=13">
-                <?php token_generate(); ?>
+                <?php 
+                
+                /****** THIS FORM IS SAVED BY 5d.php ******/
+                
+                token_generate(); 
+                
+                ?>
 		<input type="hidden" name="nr" value="<?=$nr?>">
 		    <table class="lmframework">
                         <tr>
@@ -216,6 +222,15 @@ Settings
                             </td>
                             <td>
                                 <input type="checkbox" size="32" name="calculate_ore_prices" <?php if (getConfigItem('calculate_ore_prices','disabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Reprocessing yield<br/>
+                                <em>Used for Ore Chart and Ore prices based on mineral composition. 0.5 - 1.0</em>
+                            </td>
+                            <td>
+                                <input type="text" size="6" name="reprocessingYield" value="<?=getConfigItem('reprocessingYield', 0.6957);?>" />x
                             </td>
                         </tr>
                         <tr>

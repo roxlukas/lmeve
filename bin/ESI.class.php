@@ -8,6 +8,7 @@ include_once("$mypath/../include/db.php");
 include_once("$mypath/../include/configuration.php");
 //include_once("$mypath/../include/killboard.php");
 include_once("$mypath/../include/ssofunctions.php");
+include_once("$mypath/../include/materials.php");
 //ESI Routes:
 require_once('Corporations.php');
 require_once('Characters.class.php');
