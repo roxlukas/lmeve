@@ -374,17 +374,31 @@ function mg_station_layout(mg, shipTypeID, stationTypeID, stationID,  regionID) 
 
 function mg_create_local_window() {
     var t = document.getElementById('tab-main');
-    var h = parseInt(t.style.getPropertyValue('height'));
+    var hw = parseInt(t.style.getPropertyValue('height'));
     var y = 106;
-    var h2 = 360;
+    var h = 360;
     var w = 360;
-    var y2 = (h+y)-h2;
+    var y2 = (hw + y) - h;
     //console.log( 'y=' + y + ' h=' + h + ' h2=' + h2 + ' y2=' + y2 );
     //console.log('wm.createWindow(34,' + y2 + ',320,' + h2 + ')');
-    var local_window = wm.createWindow(34,y2,w,h2,'Local');
+    var local_window = wm.createWindow(34,y2,w,h,'Local');
     local_window.setContent('<div id="chat-local-content" class="col-8 window-content chat-70pct"></div><div id="chat-local-list" class="col-4 window-content chat-70pct"></div><div id="chat-local-entry" class="col-12 window-content chat-30pct"><textarea name="local-entry" id="local-entry"></textarea></div>');
     var textbox = document.getElementById('local-entry');
     textbox.onkeypress = mg_local_submit;
+}
+
+function mg_create_industry_window() {
+    var t = document.getElementById('tab-main');
+    var hw = parseInt(t.style.getPropertyValue('height'));
+    var y = 106;
+    var h = 400;
+    var w = 740;
+    var y2 = y + 100;
+    var x = 100;
+    //console.log( 'y=' + y + ' h=' + h + ' h2=' + h2 + ' y2=' + y2 );
+    //console.log('wm.createWindow(34,' + y2 + ',320,' + h2 + ')');
+    var industry_window = wm.createWindow(x,y2,w,h,'Industry');
+    industry_window.setContent('<div id="industry-content" class="window-content"></div>');
 }
 
 function mg_in_space_layout(mg) {
@@ -548,4 +562,41 @@ function mg_local_get_messages() {
         return true;
     }
     });
+}
+
+function mg_industry_get_tasks() {
+
+    console.log("mg_industry_get_tasks("+ t +") getting tasks...");
+    $.ajax({
+    url:'ajax.php?act=MG_INDUSTRY_GET_TASKS',
+    type:'GET',
+    success: function( tasks ) {
+        if ( tasks.length > 0 ) {
+            console.log(tasks);
+            wm.findByTitle('Industry').setContent(tasks);
+        }
+        
+        return true;
+    },
+    error: function(  ) {
+        
+        return true;
+    }
+    });
+}
+
+function mg_create_or_toggle(windowName) {
+    var win = wm.findByTitle(windowName);
+    if (win == false) {
+        switch(windowName) {
+            case 'Local':
+                mg_create_local_window();
+                break;
+            case 'Industry':
+                mg_create_industry_window();
+                break;
+        }
+    } else {
+        win.toggle();
+    }
 }

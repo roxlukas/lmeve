@@ -423,6 +423,30 @@ if ($act=='') $act=0;
             header("Content-type: application/json");
             echo($layout);
             break;
+        case 'MG_INDUSTRY_GET_TASKS':
+            if (!checkrights("Administrator,ViewOwnTasks,ViewAllTasks,EditTasks")) { //"Administrator,ViewOverview"
+                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                return;
+            }
+            if (!isset($_SESSION['mg_character_id'])) {
+                //character select screen
+                $tasks['error'] = 'Unknown session.';
+            } else {
+                $SELECTEDCHAR="lmt.characterID=" . $_SESSION['mg_character_id'];
+                $ORDERBY_tasks="ORDER BY  a.name, a.typeName, a.activityName";
+                $year=date("Y");
+		$month=date("m");
+                if ($chars = getMyChars()) {
+                    $MYTASKS="lmt.`characterID` IN ($chars)";
+                } else {
+                    $MYTASKS='FALSE';
+                }
+                $tasks = getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month);
+            }
+            //Add proper JSON MIME type in header
+            header("Content-type: text/html");
+            echo(showTasks($tasks));
+            break;
         case 'MG_GM_TELEPORT':
             if (!checkrights("Administrator")) {
                 echo("<h2>${LANG['NORIGHTS']}</h2>");

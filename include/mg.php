@@ -85,6 +85,7 @@ function mg_dbcatalog() {
 }
 
 function mg_load_dogma($itemID) {
+    if (!(is_numeric($itemID) && $itemID > 0)) return FALSE;
     //return stored dogma
     $dogma =  db_asocquery("SELECT *"
             . "FROM `mg_dogma` mgs "
@@ -269,6 +270,8 @@ function mg_create_ship($characterID, $typeID, $locationID) {
 }
 
 function mg_fit_item($shipItemID, $typeID, $flag) {
+    if (!(is_numeric($itemID) && $itemID > 0)) return FALSE;
+    if (!(is_numeric($shipItemID) && $shipItemID > 0)) return FALSE;
     $assets = db_asocquery("SELECT * FROM `mg_assets` WHERE `itemID`=$shipItemID LIMIT 1;");
     if (is_array($assets) && count($assets) > 0) {
         $assets = $assets[0];
@@ -346,8 +349,8 @@ function mg_station_layout() {
             <div id="neocom" class="neocom-color">
                 <div class="neocom-button white-translucent"><img src="<?=getUrl()?>ccp_icons/79_64_11.png" style="width: 20px; margin: 6px;"  onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')" alt="Neocom" title="Neocom"/></div>
                 <img src="<?=getCharacterPortrait($_SESSION['mg_character_id'], 32)?>" alt="<?=getCharacterName($_SESSION['mg_character_id'])?>" title="<?=getCharacterName($_SESSION['mg_character_id'])?>" /><br/>
-                <div class="neocom-button white-translucent" title="Chat" onclick="wm.findByTitle('Local').toggle()"><img src="<?=getUrl()?>UI/WindowIcons/chatchannel.png" width="30"></div>
-                <div class="neocom-button white-translucent" onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')"> </div>
+                <div class="neocom-button white-translucent" title="Chat" onclick="mg_create_or_toggle('Local')"><img src="<?=getUrl()?>UI/WindowIcons/chatchannel.png" width="30"></div>
+                <div class="neocom-button white-translucent" title="Industry" onclick="mg_create_or_toggle('Industry'); mg_industry_get_tasks();"><img src="<?=getUrl()?>UI/WindowIcons/Industry.png" width="30"></div>
                 <div class="neocom-button white-translucent" onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')"> </div>
                 <div class="neocom-button white-translucent" onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')"> </div>
                 <div class="neocom-button white-translucent" onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')"> </div>
@@ -376,7 +379,7 @@ function mg_station_layout() {
             <div class="col-2 neocom-color" id="station-panel">
                 <div id="logout-button"><a href="?id=253&logoff_mg" title="Logout from minigame">x</a></div>
                 <div id="station-owner-logo"></div>
-                <!--<div id="station-undock-button"><span onclick="alert('Scotty the Docking Manager is currently on sick leave, so there is no one to pull that lever.')"><img src="<?=getUrl()?>ccp_icons/9_64_6.png"/>Undock</span></div>-->
+               <div id="station-undock-button"><span onclick="alert('Scotty the Docking Manager is currently on sick leave, so there is no one to pull that lever.')"><img src="<?=getUrl()?>ccp_icons/9_64_6.png"/>Undock</span></div>
                 <div class="row">
                     <div class="station-button  white-translucent" onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')"> </div>
                     <div class="station-button  white-translucent" onclick="alert('You press the button, but except from an audible click, nothing else seems to have happened.')"> </div>  
