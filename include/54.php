@@ -26,6 +26,7 @@ $prefs=getprefs();
 
 global $menu;
 foreach ($menu as $i => $menuitem) {
+    if ($i != 253) {
 	echo('<option value="');
 	echo($i);
 	if ($prefs['defaultPage']==$i) {
@@ -35,6 +36,7 @@ foreach ($menu as $i => $menuitem) {
 	}
 	echo($menuitem['name']);
 	echo('</option>');
+    }
 }
 ?>
 </select></td></tr>

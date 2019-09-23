@@ -35,8 +35,13 @@ function getID() {
     if (!isset($_GET['id'])) {
         $id=getprefs();
         $id=$id['defaultPage'];
+        if (!is_numeric($id)) $id = 0; //default in case preferences are not set
     } else {
-        $id=$_GET['id'];
+        if (is_numeric($_GET['id'])) {
+            $id = $_GET['id'];
+        } else {
+            $id = 0;
+        }
     }
     
     return $id;
