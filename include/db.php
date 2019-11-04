@@ -95,7 +95,13 @@ function getCorporationLogo($corporationID,$size=64) {
  */
 function getCharacterPortrait($characterID,$size=64) {
     //echo("getCorporationLogo($corporationID,$size)");
-    if (!is_numeric($characterID)) return "";
+    if (!is_numeric($characterID) || $characterID == 0) {
+        if (file_exists("../wwwroot/ccp_icons/DudeYourChin_64px_Icon.jpg")) {
+            return getUrl()."ccp_icons/DudeYourChin_64px_Icon.jpg";
+        } else {
+            return "";
+        }
+    }
     if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=128 && $size!=256 && $size!=512)) $size=64;
     $icon="https://images.evetech.net/characters/$characterID/portrait?size=$size";
     return($icon);
