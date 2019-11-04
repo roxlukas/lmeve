@@ -108,7 +108,7 @@ if (strlen($date)==6) {
 		    		    
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
-				echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
 				
 						
 if ($mychars==1) {
@@ -168,7 +168,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			foreach($rearrange as $row) {
 				echo('<tr><td>');
 					if ($rights_viewallchars) hrefedit($row['installerID']);
-						echo("<img src=\"https://imageserver.eveonline.com/character/${row['installerID']}_32.jpg\" title=\"${row['name']}\" />");
+                                                echo("<img src=\"" . getCharacterPortrait($row['installerID'], 32) . "\" title=\"${row['name']}\" />");
 					if ($rights_viewallchars) echo('</a>');
 				echo('</td><td>');
 					if ($rights_viewallchars) hrefedit($row['installerID']);

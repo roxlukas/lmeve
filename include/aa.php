@@ -12,7 +12,8 @@ $PANELNAME='Ship Explorer'; //Panel name (optional)
 
 $title = generate_title("$PANELNAME");
 $description = "LMeve $PANELNAME - Explore all starships in EVE Online";
-$image = "https://imageserver.eveonline.com/Render/638_512.png";
+
+$image = getTypeIDicon(638, 512);
 generate_meta($description, $title, $image);
 
 include_once 'inventory.php';

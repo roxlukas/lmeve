@@ -351,7 +351,7 @@ function showTasks($tasklist) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
                         echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+				echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['name']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -489,7 +489,7 @@ function showTasks_old($tasklist) {
 		foreach($tasklist as $row) {
 			echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+				echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['name']}\" />");
 			echo('</a>');
 			echo('</td><td class="tab">');
 			taskhrefedit($row['characterID'],$year.$month);
@@ -605,7 +605,7 @@ function showCurrentJobs($jobslist) {
 	<?php
 		foreach($jobslist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
-                            echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['name']}\" />");
+                            echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['name']}\" />");
 			echo('</td>');
                         if (!$MOBILE) {
                             echo('<td>');
@@ -810,7 +810,7 @@ function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE,$aggregate=FALS
         if (!$aggregate) {
             if ($rights_viewallchars) charhrefedit($row['characterID']);
                 ?>
-                   <img src="https://imageserver.eveonline.com/character/<?=$row['characterID']?>_32.jpg" title="<?=$row['name']?>" />
+  <img src="<?= getCharacterPortrait($row['characterID'], 32)?>" title="<?=$row['name']?>" />
                 <?php
             if ($rights_viewallchars) echo('</a>');
         } else {
@@ -818,7 +818,7 @@ function timesheetRow ($row,& $totals,$rights_viewallchars=FALSE,$aggregate=FALS
                 ?>
                     <div style="width: 32px; height: 32px;" title="<?=$row['count']?> character<?=$s?> owned by <?=$row['name']?>">
                         <div style="position: absolute;">
-                            <img src="https://imageserver.eveonline.com/character/0_32.jpg" />
+                            <img src="<?= getCharacterPortrait(0, 32)?>" title="<?=$row['name']?>" />
                             <div style="width: 32px; text-align: center; top: 5px; position: absolute; font-weight: bold;"><?=$row['count']?></div>
                         </div>
                     </div>

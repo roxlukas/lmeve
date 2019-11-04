@@ -119,7 +119,7 @@ $pointsDisplayed=false;
                         $incursions="";
                         $ratting="";
                         $daystab="";
-				echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
 ?>
 
 <?php

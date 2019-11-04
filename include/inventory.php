@@ -882,7 +882,7 @@ function showLabsAndTasks($towers) {
                     <?php 
                     if (count($row['users'])>0) foreach ($row['users'] as $user => $name) {
                         if ($rights_viewallchars) toonhrefedit($user);
-                        echo("<img src=\"https://imageserver.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
+                        echo("<img src=\"" . getCharacterPortrait($user, 32) . "\" title=\"$name\">");
 			if ($rights_viewallchars) echo('</a>');
                     }
                     ?>
@@ -957,7 +957,7 @@ function showECAndTasks($ecs) {
                 <?php 
                 if (count($ec['users'])>0) foreach ($ec['users'] as $user => $name) {
                     if ($rights_viewallchars) toonhrefedit($user);
-                    echo("<img src=\"https://imageserver.eveonline.com/character/${user}_32.jpg\" title=\"$name\">");
+                    echo("<img src=\"" . getCharacterPortrait($user, 32) . "\" title=\"$name\">");
                     if ($rights_viewallchars) echo('</a>');
                 }
                 ?>
@@ -1362,7 +1362,7 @@ function showPocoClients($clients) {
         foreach ($clients as $row) {
             echo('<tr><td style="width: 32px; padding: 0px; text-align: center;">');
                 outsiderhrefedit($row['characterName']);
-                    echo("<img src=\"https://imageserver.eveonline.com/character/${row['characterID']}_32.jpg\" title=\"${row['characterName']}\" />");
+                    echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['characterName']}\">");
                 echo('</a>');
             echo('</td><td style="text-align: left;">');
                 outsiderhrefedit($row['characterName']);
@@ -1536,7 +1536,7 @@ function showPocoDetail($pocos,$income=null) {
                             <h2><?=$row['planetName']?></h2>
                             <?=$row['planetTypeName']?>
                         </td><td style="text-align: center;">
-                            <h2><img src="https://imageserver.eveonline.com/Corporation/<?=$row['corporationID']?>_32.png" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
+                            <h2><img src="<?=getCorporationLogo($row['corporationID'], 32)?>" style="vertical-align: middle;"> <?php $corp=getCorp($row['corporationID']); echo($corp['corporationName']); ?></h2>
 				
 			</td></tr>
                         </table>

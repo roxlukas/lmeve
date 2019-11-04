@@ -33,7 +33,7 @@ if (checkrights("Administrator,ViewMarket")) {
 	echo('<em><img src="'.getUrl().'ccp_icons/38_16_208.png" alt="(i)"/> Market Orders show current in game market order status.</em><br />');
         $corps=db_asocquery("SELECT * FROM apicorps;");
 	foreach ($corps as $corp) { //begin corps loop
-            echo("<h3><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_32.png\" style=\"vertical-align: middle;\" /> ${corp['corporationName']}</h3>");
+            echo("<h3><img src=\"" . getCorporationLogo($corp['corporationID'], 32) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
             $marketdata=getMarketOrders("WHERE amo.bid=0 AND amo.orderState=0 AND amo.volRemaining>0 AND amo.corporationID=${corp['corporationID']}");
             showMarketOrders($marketdata,'Sell orders',TRUE);
             $buyorddata=getMarketOrders("WHERE amo.bid=1 AND amo.orderState=0 AND amo.volRemaining>0 AND amo.corporationID=${corp['corporationID']}");

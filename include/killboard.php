@@ -254,10 +254,10 @@ function showKills($kills) {
                 <td style="padding: 0px; width: 48px;"><?php
                     if ($kill['allianceID']==0) {
                         corpkillshrefedit($kill['corporationID']);
-                        echo("<img src=\"https://imageserver.eveonline.com/Corporation/${kill['corporationID']}_64.png\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
+                        echo("<img src=\"" . getCorporationLogo($kill['corporationID']) . "\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
                     } else {
                         allykillshrefedit($kill['allianceID']);
-                        echo("<img src=\"https://imageserver.eveonline.com/Alliance/${kill['allianceID']}_64.png\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
+                        echo("<img src=\"" . getAllianceLogo($kill['allianceID']) . "\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
                     }
                 ?></td>
                 <td><strong><?php charkillshrefedit($kill['characterID']); ?><?=$kill['characterName']?></a></strong>
@@ -269,10 +269,10 @@ function showKills($kills) {
                 <td style="padding: 0px; width: 48px;"><?php
                     if ($kill['atkAllianceID']==0) {
                         corpkillshrefedit($kill['atkCorporationID']);
-                        echo("<img src=\"https://imageserver.eveonline.com/Corporation/${kill['atkCorporationID']}_64.png\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
+                        echo("<img src=\"" . getCorporationLogo($kill['atkCorporationID']) . "\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
                     } else {
                         allykillshrefedit($kill['atkAllianceID']);
-                        echo("<img src=\"https://imageserver.eveonline.com/Alliance/${kill['atkAllianceID']}_64.png\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
+                        echo("<img src=\"" . getAllianceLogo($kill['atkAllianceID']) . "\" alt=\"\" style=\"width: 48px; height: 48px\" /></a>");
                     }
                 ?></td>
                 <td><strong><?php charkillshrefedit($kill['atkCharacterID']); ?><?=$kill['atkCharacterName']?></a></strong>
@@ -297,12 +297,12 @@ function showCharacter($char,$showCorpLogos=FALSE,$skipHTMLTable=FALSE) {
     if (!$skipHTMLTable) echo('<table class="lmframework" style="min-width: '.getKbMinWidth().';"><tr>');
     ?>
     <td style="padding: 0px; width: 64px;">
-         <?php charkillshrefedit($char['characterID']); echo("<img src=\"https://imageserver.eveonline.com/Character/${char['characterID']}_64.jpg\" alt=\"\" /></a>"); ?>
+         <?php charkillshrefedit($char['characterID']); echo("<img src=\"" . getCharacterPortrait($char['characterID']) . "\" alt=\"\" /></a>"); ?>
     </td>
     <td style="padding: 0px; width: 32px; vertical-align: top;">
         <?php if($showCorpLogos) {
-            corpkillshrefedit($char['corporationID']); ?><img src="https://imageserver.eveonline.com/Corporation/<?=$char['corporationID']?>_32.png" alt="" /></a><br/><?php 
-            if ($char['allianceID']>0) { allykillshrefedit($char['allianceID']); ?><img src="https://imageserver.eveonline.com/Alliance/<?=$char['allianceID']?>_32.png" alt="" /></a><?php }
+            corpkillshrefedit($char['corporationID']); ?><img src="<?=getCorporationLogo($char['corporationID'], 32)?>" alt="" /></a><br/><?php 
+            if ($char['allianceID']>0) { allykillshrefedit($char['allianceID']); ?><img src="<?=getAllianceLogo($char['allianceID'], 32)?>" alt="" /></a><?php }
         } else {
             dbhrefedit($char['shipTypeID']); ?><img src="<?=getTypeIDicon($char['shipTypeID'],32)?>" alt="" /></a><br/><?php 
             dbhrefedit($char['weaponTypeID']); ?><img src="<?=getTypeIDicon($char['weaponTypeID'],32)?>" alt="" /></a>     

@@ -44,10 +44,9 @@ if (strlen($date)==6) {
             <?php
             $corps=db_asocquery("SELECT * FROM apicorps;");
             foreach ($corps as $corp) { //begin corps loop
-                //echo("<h1><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
                 ?>
                 <div id="corp">
-                        <h1><img src="https://imageserver.eveonline.com/Corporation/<?=$corp['corporationID']?>_64.png" style="vertical-align: middle;"> <?=$corp['corporationName']?></h1>
+                    <h1><img src="<?=getCorporationLogo($corp['corporationID'], 64)?>" style="vertical-align: middle;"> <?=$corp['corporationName']?></h1>
                         <div id="wrapper" style="overflow: hidden;">
                             <div id="col1" style="float: left;">
                                 <?php showIndustryActivities($corp['corporationID'],$year, $month, getIndustryActivities($corp['corporationID'], $year, $month)) ?>

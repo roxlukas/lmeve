@@ -81,14 +81,14 @@ function getCharactersDropdown() {
     }
     return $chars;
 }
-
+/* moved to db.php
 function getCharacterPortrait($characterID, $size = 32) {
     if (!is_numeric($characterID)) $characterID=0;
     if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=256 && $size!=512)) $size=32;
     $icon="https://imageserver.eveonline.com/character/${characterID}_${size}.jpg";
     return($icon);
 }
-
+*/
 function isValidCorp($corporationID) {
     $count=db_count("SELECT `corporationID` FROM `apicorps` WHERE `corporationID`=$corporationID;");
     if ($count==1) return TRUE; else return FALSE;
@@ -120,7 +120,7 @@ function displayCharacters($chars) {
         foreach($chars as $toon) {
             $attrs=$toon->attributes();
             ?>
-            <img src="https://imageserver.eveonline.com/Character/<?php echo($attrs->characterID); ?>_64.jpg" alt="<?php echo($attrs->name); ?>" title="<?php echo($attrs->name); ?>" /> <img src="https://imageserver.eveonline.com/Corporation/<?php echo($attrs->corporationID); ?>_64.png" alt="<?php echo($attrs->corporationName); ?>" title="<?php echo($attrs->corporationName); ?>" /><br />
+            <img src="<?=getCharacterPortrait($attrs->characterID, 64)?>" alt="<?php echo($attrs->name); ?>" title="<?php echo($attrs->name); ?>" /> <img src="<?= getCorporationLogo($attrs->corporationID, 64)?>" alt="<?php echo($attrs->corporationName); ?>" title="<?php echo($attrs->corporationName); ?>" /><br />
             <?php
         }   
     } else {

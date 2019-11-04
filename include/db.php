@@ -36,22 +36,85 @@ include_once(dirname(__FILE__).'/../config/config.php');
 
 $PDO_CONNECTION=null;
 
+/**
+ * Get the URL of item icon for specific typeID from CCP Image Service
+ * updated for new Image Service: https://developers.eveonline.com/blog/article/from-image-server-to-a-whole-new-image-service-1
+ * Type icons: https://images.evetech.net/types/587/icon
+ * Type renders: https://images.evetech.net/types/587/render
+ * 
+ * @param int $typeID typeID of the item
+ * @param int $size size of the icon (32, 64, 512)
+ * @return string URL to icon
+ */
 function getTypeIDicon($typeID,$size=32) {
     if (!is_numeric($typeID)) $typeID=0;
-    if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=512)) $size=32;
+    if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=128 && $size!=256 && $size!=512)) $size=32;
     if ($size != 512) {
         if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
             $icon=getUrl()."ccp_img/${typeID}_${size}.png";
         } else {
-            $icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
+            //$icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
+            $icon="https://images.evetech.net/types/${typeID}/icon?size=${size}";
         }
     } else {
         if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
             $icon=getUrl()."ccp_renders/${typeID}.png";
         } else {
-            $icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
+            //$icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
+            $icon="https://images.evetech.net/types/${typeID}/render?size=${size}";
         }
     }
+    return($icon);
+}
+
+/**
+ * Get the URL of Corporation Logo for specific corporationID from CCP Image Service
+ * updated for new Image Service: https://developers.eveonline.com/blog/article/from-image-server-to-a-whole-new-image-service-1
+ * Corporation logos: https://images.evetech.net/corporations/109299958/logo
+ * 
+ * @param int $corporationID corporationID of the corporation
+ * @param int $size size of the icon (32, 64, 512)
+ * @return string URL to icon
+ */
+function getCorporationLogo($corporationID,$size=64) {
+    //echo("getCorporationLogo($corporationID,$size)");
+    if (!is_numeric($corporationID)) return "";
+    if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=128 && $size!=256 && $size!=512)) $size=64;
+    $icon="https://images.evetech.net/corporations/$corporationID/logo?size=$size";
+    return($icon);
+}
+
+/**
+ * Get the URL of Character Portrait for specific characterID from CCP Image Service
+ * updated for new Image Service: https://developers.eveonline.com/blog/article/from-image-server-to-a-whole-new-image-service-1
+ Character portraits: https://images.evetech.net/characters/1338057886/portrait
+ * 
+ * @param int $characterID characterID of the character
+ * @param int $size size of the icon (32, 64, 512)
+ * @return string URL to icon
+ */
+function getCharacterPortrait($characterID,$size=64) {
+    //echo("getCorporationLogo($corporationID,$size)");
+    if (!is_numeric($characterID)) return "";
+    if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=128 && $size!=256 && $size!=512)) $size=64;
+    $icon="https://images.evetech.net/characters/$characterID/portrait?size=$size";
+    return($icon);
+}
+
+/**
+ * Get the URL of Alliance Logo for specific allianceID from CCP Image Service
+ * updated for new Image Service: https://developers.eveonline.com/blog/article/from-image-server-to-a-whole-new-image-service-1
+ * Alliance logos: https://images.evetech.net/alliances/434243723/logo
+ * 
+ * @param int $allianceID allianceID of the alliance
+ * @param int $size size of the icon (32, 64, 512)
+ * @return string URL to icon
+ */
+function getAllianceLogo($allianceID,$size=64) {
+    //echo("getCorporationLogo($corporationID,$size)");
+    if (!is_numeric($allianceID)) return "";
+    if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=128 && $size!=256 && $size!=512)) $size=64;
+    $icon="https://images.evetech.net/alliances/$allianceID/logo?size=$size";
     return($icon);
 }
 

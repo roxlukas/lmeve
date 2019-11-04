@@ -82,13 +82,13 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			$industry_tasks=db_asocquery($sql);
 		    
 		    echo('<table border="0" cellspacing="2" cellpadding=""><tr><td width="256" class="tab">');
-                    $image = "https://imageserver.eveonline.com/character/${char['characterID']}_256.jpg";
+                    $image = getCharacterPortrait($char['characterID'], 256);
 		    echo("<img src=\"$image\" title=\"${char['name']}\" />");
 		    echo('</td><td width="256" class="tab" style="vertical-align:top;">');
 		    echo("<h2>${char['name']}</h2>");
 		    if (!empty($char['title'])) echo("${char['title']}<br>");	
                     $corp['corporationName']=str_replace(' ','&nbsp;',$corp['corporationName']);
-		    echo("<h3><img src=\"https://imageserver.eveonline.com/Corporation/${corp['corporationID']}_64.png\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
+                    echo("<h3><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
 		    echo("<strong>Joined:</strong> ${char['startDateTime']}<br>");
 		    if (!empty($char['base'])) echo("<strong>Base:</strong> ${char['base']}<br>");
                     //real name ident

@@ -343,7 +343,7 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
 			echo('</td>');
 			echo('<td style="padding: 0px; width: 32px;">');
                             if ($rights_viewallchars) charhrefedit($row['charID']);
-                                echo("<img src=\"https://imageserver.eveonline.com/character/${row['charID']}_32.jpg\" title=\"${row['name']}\" />");
+                                echo("<img src=\"" . getCharacterPortrait($row['charID'], 32) . "\" title=\"${row['name']}\" />");
                             if ($rights_viewallchars) echo("</a>");
 			echo('</td>');
                         echo('<td>');
