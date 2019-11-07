@@ -1,5 +1,6 @@
 <?php
 
+include_once("db.php");
 include_once("materials.php");
 include_once("yaml_graphics.php");
 include_once("skins.php");
@@ -10,12 +11,11 @@ include_once("auth.php");
 function dbhrefedit($nr) {
     global $LM_EVEDB;
     if (is_numeric($nr) && $nr >= 0 && $nr <= 371027) {
-        $d = db_asocquery("SELECT `typeName` FROM `$LM_EVEDB`.`invTypes` WHERE `typeID`=$nr;");
-        $typeName = $d[0]['typeName'];
+        $typeName = getTypeName($nr);
     } else {
         $typeName = 'Unknown';
     }
-    echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"$typeName (Click to open database)\">");
+    echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" target=\"_blank\" title=\"$typeName (Click to open database)\">");
 }
 
 function shipshrefedit($nr) {
@@ -1631,6 +1631,20 @@ function showPocoDetail($pocos,$income=null) {
     
 }
 
+function filterStock($inventory) {
+    foreach($inventory as $groupID => $group) {
+        foreach($group['types'] as $typeID => $item) {
+            if (!( $item['quantity'] > 0 )) {
+                unset($inventory[$groupID]['types'][$typeID]);
+            }
+            if (!(count($inventory[$groupID]['types']) > 0)) {
+                unset($inventory[$groupID]);
+            }
+        }
+    }
+    return $inventory;
+}
+
 function getStock($where='TRUE') {
     global $LM_EVEDB;
     $sql="SELECT cfs.*,itp.`typeName`,apa.*,apl.`itemName` AS locationName,app.`max` as price,itp.`groupID`, igp.`groupName` 
@@ -1646,6 +1660,56 @@ function getStock($where='TRUE') {
         LEFT JOIN $LM_EVEDB.`mapDenormalize` apl
         ON apa.`locationID`=apl.`itemID`
         WHERE $where AND (app.type='buy' OR app.type IS NULL)
+        ORDER BY itp.`groupID`, itp.`typeName`;";
+    //echo("DEBUG: $sql");
+    $rawdata=db_asocquery($sql);
+    //Data transformation (rows -> structure)
+    $inventory=array();
+    foreach ($rawdata as $row) {
+        $inventory[$row['groupID']]['groupID']=$row['groupID'];
+        $inventory[$row['groupID']]['groupName']=$row['groupName'];
+        $inventory[$row['groupID']]['types'][$row['typeID']]['typeID']=$row['typeID'];
+        $inventory[$row['groupID']]['types'][$row['typeID']]['typeName']=$row['typeName'];
+        $inventory[$row['groupID']]['types'][$row['typeID']]['amount']=$row['amount']; //required amount
+        $inventory[$row['groupID']]['types'][$row['typeID']]['quantity']+=$row['quantity']; //actual amount
+        if (!empty($row['price'])) {
+            $inventory[$row['groupID']]['types'][$row['typeID']]['value']+=$row['price']*$row['quantity']; //value = price * actual amount
+            $inventory[$row['groupID']]['types'][$row['typeID']]['price']=$row['price'];
+        } else {
+            $inventory[$row['groupID']]['types'][$row['typeID']]['value']+=0; //value = price * actual amount
+            $inventory[$row['groupID']]['types'][$row['typeID']]['price']=0;
+        }
+        if (!empty($row['locationID']) && !empty($row['locationName'])) {
+            $inventory[$row['groupID']]['types'][$row['typeID']]['locations'][$row['locationID']]['locationID']=$row['locationID']; //location
+            $inventory[$row['groupID']]['types'][$row['typeID']]['locations'][$row['locationID']]['locationName']=$row['locationName']; //location name
+        }
+        //flags in future
+    }
+    return($inventory);
+}
+
+function getBuyingStock($where='TRUE') {
+    global $LM_EVEDB;
+    $sql="SELECT cfb.`typeID`, stock.`amount`, itp.`typeName`, stock.`parentItemID`, stock.`locationID`, stock.`quantity`, stock.`flag`, stock.`singleton`, 
+        stock.`is_blueprint_copy`, stock.`rawQuantity`, stock.`corporationID`, stock.`locationName`, itp.`groupID`, igp.`groupName`, app.`max` as price
+        FROM `cfgbuying` cfb
+        JOIN $LM_EVEDB.`invTypes` itp
+        ON cfb.`typeID`=itp.`typeID`
+        JOIN $LM_EVEDB.`invGroups` igp
+        ON itp.`groupID`=igp.`groupID`
+        LEFT JOIN `apiprices` app
+        ON cfb.`typeID`=app.`typeID`
+        LEFT JOIN (
+            SELECT cfs.amount, apa.*, apl.`itemName` AS locationName
+            FROM `cfgstock` cfs
+            JOIN `apiassets` apa
+            ON cfs.`typeID` = apa.`typeID`
+            LEFT JOIN $LM_EVEDB.`mapDenormalize` apl
+            ON apa.`locationID`=apl.`itemID`
+            WHERE $where
+        ) AS stock
+        ON stock.`typeID` = cfb.`typeID`
+        WHERE (app.type='buy' OR app.type IS NULL)
         ORDER BY itp.`groupID`, itp.`typeName`;";
     //echo("DEBUG: $sql");
     $rawdata=db_asocquery($sql);

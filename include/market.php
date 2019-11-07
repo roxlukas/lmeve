@@ -434,12 +434,197 @@ function getBuyCalc($inventory) {
     }
     return($rearrange);
 }
+/**
+ * Parse contents of user paste a'la evepraisal
+ * 
+ * @param string $evepraisal
+ * @return type
+ */
+function evepraisal_parser($evepraisal) {
+    $lines = preg_split('/[\r\n]+/', $evepraisal);
+    $items = array();
+    $unknown_line = array();
+    $unknown_id = array();
+    foreach ($evepraisal as $line) {
+        $line_ = preg_replace('/\s\s+|\t+/', '|', $line);
+        if (preg_match('/^([^\|]+)\|([^\|]+)\|([\d.\,]+)/', $line_, $m)) {
+            $typeName = trim($m[1]);
+            $typeID = getTypeID($typeName);
+            $amount = preg_replace('/[,\.]/', '', $m[3]);
+            if (!($typeID === FALSE)) {
+                $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+            } else {
+                $unknown_id[$typeName] = $line;
+            }
+        } else if (preg_match('/^([^\|]+)\|([\d.\,]+)\|([^\|]+)\|([^\|]+)/', $line_, $m)) {
+            $typeName = trim($m[1]);
+            $typeID = getTypeID($typeName);
+            $amount = preg_replace('/[,\.]/', '', $m[2]);
+            if (!($typeID === FALSE)) {
+                $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+            } else {
+                $unknown_id[$typeName] = $line;
+            }
+        } else if (preg_match('/^([^\|]+)\s+([\d.\,]+)$/', $line, $m)) {
+            $typeName = trim($m[1]);
+            $typeID = getTypeID($typeName);
+            $amount = preg_replace('/[,\.]/', '', $m[2]);
+            if (!($typeID === FALSE)) {
+                $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+            } else {
+                $unknown_id[$typeName] = $line;
+            }
+        }else {
+            array_push($unknown_line, $line);
+        }
+    }
+    return array('items' => $items, 'unknown_id' => $unknown_id, 'unknown_line' => $unknown_line);
+}
+
+function showItems($items, $label="Items") {
+    global $DECIMAL_SEP, $THOUSAND_SEP;
+    
+    if (!is_array($items) || count($items) == 0) {
+        ?> <table class="lmframework"><tr><th>No items to display</th></tr></table> <?php
+    } else {
+        ?> <table class="lmframework"><tr><th colspan="3"><?=$label?></th></tr> <?php
+        foreach ($items as $item) {
+            ?> <tr><td><?= dbhrefedit($item['typeID']) ?><img src="<?= getTypeIDicon($item['typeID'])?>" title="<?=$item['typeName']?>"/></a></td>
+            <td><?= dbhrefedit($item['typeID']) . $item['typeName']?></a></td>
+            <td><?= number_format($item['amount'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td></tr> <?php
+        }
+        ?> </table> <?php
+    }
+}
+
+function showQuote($stock, $items, $label = "Quote") { 
+    global $LM_BUYCALC_SHOWHINTS, $LM_HINTGREEN, $LM_HINTYELLOW, $LM_HINTRED, $LM_HINTGREENIMG, $LM_HINTYELLOWIMG, $LM_HINTREDIMG, $LM_HINTLOW, $LM_HINTHIGH;
+    /*
+  [25590]=>
+  array(2) {
+    ["stock"]=>
+    array(6) {
+      ["typeID"]=>
+      string(5) "25590"
+      ["typeName"]=>
+      string(28) "Contaminated Nanite Compound"
+      ["amount"]=>
+      string(1) "0"
+      ["quantity"]=>
+      int(1199)
+      ["value"]=>
+      float(149875000)
+      ["price"]=>
+      string(9) "125000.00"
+    }
+    ["items"]=>
+    array(3) {
+      ["typeID"]=>
+      string(5) "25590"
+      ["typeName"]=>
+      string(28) "Contaminated Nanite Compound"
+      ["amount"]=>
+      string(1) "4"
+    }
+  }
+     */
+    $common = array();
+    
+    if(is_array($stock) && count($stock) > 0 && is_array($items) && count($items) > 0) {
+        foreach ($stock as $groupID => $group) {
+            foreach ($group['types'] as $typeID => $type) {
+                if (array_key_exists($typeID, $items)) {
+                    $common[$typeID]['stock'] = $type;
+                    $common[$typeID]['items'] = $items[$typeID];
+                }
+            }
+        }
+    }
+    
+   $total = 0;
+   
+   $buyCalcPriceModifier = getConfigItem('buyCalcPriceModifier', 1.0);
+   $buyCalcPriceModifierHigh = getConfigItem('buyCalcPriceModifierHigh', 0.9);
+   $buyCalcPriceModifierVeryHigh = getConfigItem('buyCalcPriceModifierVeryHigh', 0.8);
+
+   ?> <form method="post" action="index.php?id=3&id2=2"> <?php
+           token_generate();
+   
+   if (!is_array($items) || count($items) == 0) {
+        ?> <table class="lmframework"><tr><th>No items to display</th></tr></table> <?php
+    } else {
+        ?> <table class="lmframework"><tr><th colspan="4"><?=$label?></th></tr> <?php
+        foreach ($items as $typeID => $item) {
+            
+            if (array_key_exists($typeID, $common)) {
+                
+                if ($common[$typeID]['stock']['amount'] > 0) {
+                    $percent = 100 * $common[$typeID]['stock']['quantity'] / $common[$typeID]['stock']['amount'];
+                    if ($percent < $LM_HINTLOW) {
+                        $common[$typeID]['stock']['price'] = round($buyCalcPriceModifier * $common[$typeID]['stock']['price'],2);
+                    } else if ($percent < $LM_HINTHIGH) {
+                        $common[$typeID]['stock']['price'] = round($buyCalcPriceModifierHigh * $common[$typeID]['stock']['price'],2);
+                    } else {
+                        $common[$typeID]['stock']['price'] = round($buyCalcPriceModifierVeryHigh * $common[$typeID]['stock']['price'],2);
+                    }
+                } else { //fall back to default multiplier
+                    $common[$typeID]['stock']['price'] = round($buyCalcPriceModifier * $common[$typeID]['stock']['price'],2);
+                }
+                $total += $item['amount'] * $common[$typeID]['stock']['price'];
+                $price = number_format($item['amount'] * $common[$typeID]['stock']['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP) . " ISK";
+                $buying = showHint($common[$typeID]['stock']['quantity'], $common[$typeID]['stock']['amount']);
+                $form = "<input type=\"hidden\" name=\"q_${item['typeID']}\" value=\"${item['amount']}\">";
+            } else {
+                $price = "";
+                $buying = "";
+                $form = "";
+            }
+            ?> <tr>
+            <td><?= dbhrefedit($item['typeID']) ?><img src="<?= getTypeIDicon($item['typeID'])?>" title="<?=$item['typeName']?>"/></a></td>
+            <td><?= $buying?> <?= dbhrefedit($item['typeID']) . $item['typeName']?></a></td>
+            <td style="text-align: right;"><?= number_format($item['amount'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td>
+            <td><?= $price?><?= $form?></td>
+            </tr> <?php
+        }
+        ?> <tr><th colspan="4">Total: <?=number_format($total, 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th></tr> <?php
+        ?> </table> <?php
+    }
+    
+    ?>
+	<input type="hidden" name="id" value="<?php echo($MENUITEM); ?>">
+	<input type="submit" value="Submit contract">
+	</form>
+    <?php
+    //$_SESSION['buycalc_quote'] = $common;
+    /*echo('<pre>');
+    echo("common="); var_dump($common); echo("\r\n");
+    echo("stock="); var_dump($stock); echo("\r\n");
+    echo('</pre>');*/
+}
+
+function showHint($quantity, $amount) {
+    global $LM_BUYCALC_SHOWHINTS, $LM_HINTGREEN, $LM_HINTYELLOW, $LM_HINTRED, $LM_HINTGREENIMG, $LM_HINTYELLOWIMG, $LM_HINTREDIMG, $LM_HINTLOW, $LM_HINTHIGH;
+    
+    if ($LM_BUYCALC_SHOWHINTS && $amount > 0) {
+        $percent = 100 * $quantity / $amount;
+        if ($percent < $LM_HINTLOW) {
+            return('<img src="'.getUrl().$LM_HINTGREENIMG.'" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="'.$LM_HINTGREEN.'" />');
+        } else if ($percent < $LM_HINTHIGH) {
+            return('<img src="'.getUrl().$LM_HINTYELLOWIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTYELLOW.'" />');
+        } else {
+            return('<img src="'.getUrl().$LM_HINTREDIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTRED.'" />');
+        }
+    } else {
+        return "";
+    }
+}
 
 function showBuyCalc($buycalc,$inventory=array()) {
     global $LM_BUYCALC_SHOWHINTS, $LM_HINTGREEN, $LM_HINTYELLOW, $LM_HINTRED, $LM_HINTGREENIMG, $LM_HINTYELLOWIMG, $LM_HINTREDIMG, $LM_HINTLOW, $LM_HINTHIGH;
 
     $rights_viewdatabase=checkrights("Administrator,ViewDatabase");
     ?>
+    
     <script type="text/javascript">
     <?php echo("var all_fields=[\r\n");
         foreach($buycalc as $groupID => $group) {
@@ -453,14 +638,27 @@ function showBuyCalc($buycalc,$inventory=array()) {
 	<script type="text/javascript" src="<?=getUrl()?>buycalc.js"></script>
 	<script type="text/javascript" src="<?=getUrl()?>skrypty.js"></script>
 	<!--<form method="post" action="index.php?id=3&id2=2" onsubmit="return confirm('Are you sure you want to submit this order?');">-->
-	<form method="post" action="index.php?id=3&id2=2">
+        
         <?php token_generate(); ?>
 	<table width="100%" cellspacing="2" cellpadding="0"><tr><td style="width: 70%; text-align: left; vertical-align: top;">
+        <h3>Paste your items here:</h3>
+          <table class="lmframework" style="width: 80%; min-width: 455px;">
+              <tr><th>Evepraisal buyback quote</th></tr>
+              <tr><td>
+          <form method="post" action="index.php?id=3&id2=6">
+              <?php token_generate(); ?>
+              <textarea id="evepraisal" name="evepraisal" cols="60" rows="15" placeholder="paste data from client here..." style="width: 100%; height: 185px;"></textarea><br/>
+              <input type="submit" value="Parse list">
+          </form>
+          </td></tr></table>  
+        <h3>Or select items to sell manually below:</h3>
+	<form method="post" action="index.php?id=3&id2=2">
 	<?php
 		$tabindex=1;
                 
                 if ($LM_BUYCALC_SHOWHINTS) {
                 ?>
+                    
                     <table class="lmframework" style="width: 80%; min-width: 455px;">
                         <tr><th>Hints:</th></tr>
                         <tr><td><img src="<?=getUrl()?><?php echo($LM_HINTGREENIMG); ?>" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="<?php echo($LM_HINTGREEN); ?>" /><?php echo($LM_HINTGREEN); ?></td></tr>
@@ -503,16 +701,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
                                         //if we have corresponding typeID with amount and quantity
                                         $amount=$inventory[$groupID]['types'][$typeID]['amount']; //required amount
                                         $quantity=$inventory[$groupID]['types'][$typeID]['quantity']; //actual quantity
-                                        if ($amount>0) {
-                                            $percent=100*$quantity/$amount;
-                                            if ($percent < $LM_HINTLOW) {
-                                                echo('<img src="'.getUrl().$LM_HINTGREENIMG.'" style="display: inline; vertical-align:bottom;  margin: 0 5px;" title="'.$LM_HINTGREEN.'" />');
-                                            } else if ($percent < $LM_HINTHIGH) {
-                                                echo('<img src="'.getUrl().$LM_HINTYELLOWIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTYELLOW.'" />');
-                                            } else {
-                                                echo('<img src="'.getUrl().$LM_HINTREDIMG.'" style="display: inline; vertical-align:bottom; margin: 0 5px;" title="'.$LM_HINTRED.'" />');
-                                            }
-                                        }
+                                        echo(showHint($quantity, $amount));
                                     }
                                     //echo(' ');
                                     echo($row['typeName']);    
@@ -539,7 +728,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
          echo("Types: $type"); ?>
 	</td><td style="width: 30%; text-align: left; vertical-align: top;">
 	
-		<table class="lmframework" style="position: fixed;">
+		<table class="lmframework" style="position: fixed; top: 200px; ">
 		<tr><th colspan="2"  style="text-align: center;">
 			<h2 id="total">0.00 ISK</h2>
 		</th></tr>

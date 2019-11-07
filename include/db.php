@@ -124,6 +124,38 @@ function getAllianceLogo($allianceID,$size=64) {
     return($icon);
 }
 
+/**
+ * Returns typeName for given typeID
+ * 
+ * @global string $LM_EVEDB
+ * @param int $typeID
+ * @return mixed returns typeName or FALSE if not found
+ */
+function getTypeName($typeID) {
+    global $LM_EVEDB;
+    if (!is_numeric($typeID)) return FALSE;
+    
+    $data = db_asocquery("SELECT * FROM `$LM_EVEDB`.`invTypes` WHERE `typeID`=$typeID;");
+    if (count($data) > 0) {
+        return($data[0]['typeName']);
+    } else return FALSE;
+}
+
+/**
+ * Returns typeID for given typeName
+ * 
+ * @global string $LM_EVEDB
+ * @param string $typeName
+ * @return mixed returns typeID or FALSE if not found
+ */
+function getTypeID($typeName) {
+    global $LM_EVEDB;
+    $data = db_asocquery("SELECT * FROM `$LM_EVEDB`.`invTypes` WHERE `typeName`='$typeName';");
+    if (count($data) > 0) {
+        return($data[0]['typeID']);
+    } else return FALSE;
+}
+
 function get_remote_addr() {
     if (isset($_SERVER['HTTP_X_REAL_IP'])) return $_SERVER['HTTP_X_REAL_IP'];
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];

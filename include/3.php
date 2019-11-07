@@ -51,5 +51,8 @@
             case 3:
 		include("33.php");  //View Buy Order
 		break;
+            case 6:
+		include("36.php");  //Evepraisal
+		break;
 	    }
 ?>
