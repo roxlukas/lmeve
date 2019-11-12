@@ -33,13 +33,20 @@
             ORDER BY date DESC
             LIMIT 0,3;";
 	$errors = db_asocquery($sql);
+        
+        if (checkrights("Administrator")) {
+            foreach ($errors as $error) {
+                ?>
+                <div class="newmsg">
+                    <img src="<?=getUrl()?>img/exc.gif" alt="Warning" />
+                    <a href="?id=8&id2=7">ESI error on route <?=$error['route']?>: <?=strip_tags($error['errorMessage'])?></a>
+                </div>
+                <?php
+            }
+        }
+        
         foreach ($errors as $error) {
-            ?>
-            <div class="newmsg">
-                <img src="<?=getUrl()?>img/exc.gif" alt="Warning" />
-                <a href="?id=8&id2=7">ESI error on route <?=$error['route']?>: <?=strip_tags($error['errorMessage'])?></a>
-            </div>
-            <?php
+            error_log(date(DATE_W3C) . " ESI error on route ${error['route']}: ${error['errorMessage']}");
         }
         
 ?>

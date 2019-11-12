@@ -43,7 +43,6 @@ set_include_path("../include");
 date_default_timezone_set(@date_default_timezone_get());
 if (!is_file('../config/config.php')) die('Config file not found.');
 include_once('../config/config.php'); //load config file
-if ($LM_DEBUG==TRUE) error_reporting(E_ALL ^ E_NOTICE); else error_reporting(0);
 include_once("db.php");  //db access functions
 include_once("log.php");  //logging facility
 include_once('auth.php'); //authentication and authorization
@@ -54,6 +53,7 @@ include_once("csrf.php");  //anti-csrf token implementation (secure forms)
 include_once('configuration.php'); //configuration settings in db
 include_once('mobile.php'); //mobile device related functions
 include_once('hooks.php'); //hooks - login hook
+include_once('errorhandler.php'); //custom error handling
 
 $lmver="0.1.60 beta";
  

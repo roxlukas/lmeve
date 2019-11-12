@@ -212,6 +212,13 @@ function template_locked($meta, $msg=null) {
 	<?php
 }
 
+function template_error($meta, $msg=null) {
+    global $LM_APP_NAME;
+    $contents = '<script type="text/javascript"> var m = document.getElementById("tab-main"); m.style.background = "url(\'img/wormhole.jpg\')"; m.style.backgroundSize = "cover";</script>';
+    $contents .= "<h1>Wormhole has collapsed!</h1><p>$msg</p>";
+    template_main($contents,$LM_APP_NAME . ' - Error',$meta);    
+}
+
 function template_login($meta) {
 	global $LM_APP_NAME,$LM_DEFAULT_CSS,$LANG,$SSOENABLED;
 	?>
