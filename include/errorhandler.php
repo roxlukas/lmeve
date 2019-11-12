@@ -51,11 +51,21 @@ function lmeveErrorHandler($errno, $errstr, $errfile, $errline) {
         break;
 
     case E_USER_NOTICE:
-        $logmsg .= date(DATE_W3C) . " $id $LM_APP_NAME NOTICE [$errno] $errstr<br />\n";
-        $logmsg .=  "  Notice on line $errline in file $errfile\n";
-        error_log($logmsg);
+        if ($LM_DEBUG == TRUE) {
+            $logmsg .= date(DATE_W3C) . " $id $LM_APP_NAME NOTICE [$errno] $errstr<br />\n";
+            $logmsg .=  "  Notice on line $errline in file $errfile\n";
+            error_log($logmsg);
+        }
         break;
-
+    
+    case E_NOTICE:
+        if ($LM_DEBUG == TRUE) {
+            $logmsg .= date(DATE_W3C) . " $id $LM_APP_NAME NOTICE [$errno] $errstr<br />\n";
+            $logmsg .=  "  Notice on line $errline in file $errfile\n";
+            error_log($logmsg);
+        }
+        break;
+    
     default:
         $logmsg .= date(DATE_W3C) . " $id $LM_APP_NAME ERROR [$errno] $errstr<br />\n";
         $logmsg .=  "  Unknown error on line $errline in file $errfile\n";
