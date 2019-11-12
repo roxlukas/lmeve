@@ -269,7 +269,7 @@ function getMyChars($array=false) {
     $chars=db_asocquery("SELECT acm.characterID FROM apicorpmembers acm
 	JOIN lmchars lmc
 	ON lmc.charID=acm.characterID
-        WHERE lmc.userID=${_SESSION[granted]};");
+        WHERE lmc.userID=${_SESSION['granted']};");
     if (!empty($chars)) {
         if ($array==false) {
             foreach ($chars as $c) {
@@ -895,6 +895,8 @@ function timesheetTotals($totals,$label='Total') {
 }
     
 function showTimesheet($timesheet,$aggregate=FALSE) {
+    global $MOBILE;
+    
     $rights_viewallchars=checkrights("Administrator,ViewAllCharacters");
     
     $mychars=getMyChars(true);   
