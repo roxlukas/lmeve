@@ -1,37 +1,97 @@
 <h1>About</h1>
-
 This project was started at the request of Aideron Technologies CEO in 2013. This software is basically an advanced prototype.
 Code beauty was not a priority, moreover this is not in objective PHP, just plain-old structural PHP.
 I had plans to refactor entire project into CodeIgniter framework, but this plan is currently on hold.
-
-For the most current version check the "Releases" page. The trunk code is unstable and is not recommended to run on production.
 
 More information: http://pozniak.pl/wp/?tag=lmeve
 
 Official Discord channel: https://discord.gg/9yBhuPd
 
-<h3>Please do not contact "Lukas Rox" in game for support, because I do not read eve-mail</h3>
-If you find a problem, please come to official Discord channel here https://discord.gg/9yBhuPd and/or open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
+<h3>Please do not contact "Lukas Rox" in game for support, because he does not play eve </h3>
+If you find a problem, please come to official Discord channel here https://discord.gg/9yBhuPd 
+and/or open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
 
-Try LMeve's Database module here: http://pozniak.pl/database/index.php
+Try the LMeve Database module here: http://pozniak.pl/database/index.php
+follow lmeve production and get more information: http://pozniak.pl/wp/?tag=lmeve
 
-This app requires EVE Online corporation API keys to function.
-
+This app requires EVE Online corporation CEO ESI keys to function.
 All Eve Related Materials are Property Of CCP Games
+
+<h3>Please do not contact "Lukas Rox" in game for support, because I do not read eve-mail</h3>
+If you find a problem, please open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
 
 <h1>Setup instructions</h1>
 
-There is no installer currently, so there is some setup work to get LMeve to run
 
-<h3>1. Pre-built VMware VM</h3>
+Steps for installing LMEVE : <br>
+	1. install LmEvE core<br>
+	2. install dependancies<br>
+	3. configure apache2<br>
+	4. configure mysql<br>
+	5. lmeve graphics<br>
+	6. Registering with ccp<br>
+	7. Finalization<br>
+	<br>
+1 install lmeve core : <br>
+  cd /var/www<br>
+  sudo git clone https://github.com/roxlukas/lmeve<br>
+    	  <br>
+	  <br>
+2 install lmeve dependancies : <br>
 
-<h4>THIS VM IS OUT OF DATE - DO NOT USE</h4>
-This is the easiest way to try out LMeve. Download the VM image from https://pozniak.pl/lmeve-vm/
-You will need free VMware Player to run this VM. You can download it here: https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/7_0
+  sudo apt-get install php-mysql php-pear apache2 libapache2-mod-php<br>
+            php-cli php-dev libyaml-dev, php-mbstring <br>
+            python-yaml mysql-server mysql-client unzip<br>
+  <br>
+  <br>
+3 Configure Apache2 : <br>
+	sudo nano /etc/apache2/sites-enabled/000-default.conf<br>
+	change DocumentRoot to : /var/www/lmeve/wwwroot<br>
+	<br>
+	  <br>
+4 Configure MySQL install : <br>
+	sudo mkdir /Incoming <br>
+	cd /Incoming <br>
+	sudo wget "https://www.fuzzwork.co.uk/dump/mysql-latest.tar.bz2" <br>
+	tar -xjf mysql-latest.tar.bz2 --wildcards --no-anchored '*sql' -C /Incoming/ --strip-components 1 <br>
+	sudo mv *.sql /Incoming/staticdata.sql <br>
+	sudo mysql <br>
+	CREATE DATABASE lmeve; <br>
+	CREATE DATABASE EveStaticData; <br>
+	USE lmeve;<br>
+	source /var/www/lmeve/data/schema.sql;<br>
+	USE EveStaticData;<br>
+	source /Incoming/staticdata.sql;<br>
+	CREATE USER 'lmeve'@'%' IDENTIFIED BY 'lmpassword';  		//<-- your custom password here<br>
+	GRANT ALL PRIVILEGES ON `lmeve`.* TO 'lmeve'@'%';    		// Change % to your lmeve internal network address<br>
+	GRANT ALL PRIVILEGES ON `EveStaticData`.* TO 'lmeve'@'%'; // Change % to your lmeve internal network address<br>
+	FLUSH PRIVILEGES;<br>
+<br>
+    <br> 
+5 install lmeve icons and graphics <br>
+ //remove placeholder ccp icon and img folders, download image package <br>
+  cd /var/www/lmeve/wwwroot <br>
+  sudo rm -fr ccp_icons ccp_img <br>
+  cd /Incoming <br>
+  sudo wget www.ash-online.net/lmevegfx/lmevegfx.tar.gz <br>
+  sudo tar -zjvf lmevegfx.tar.gz -C / <br>
 
-<h3>2. Manual Installation</h3>
 
-Please refer to LMeve Wiki: https://github.com/roxlukas/lmeve/wiki/Installation-manual
+6 Configure CCP Developer application using the lmeve sso config guide : <br>
+  https://github.com/roxlukas/lmeve/wiki/Integrating-LMeve-with-EVE-SSO <br>
+
+
+7 Finalize installation : <br>
+	cd /var/www/lmeve/config <br>
+	sudo nano config-dist.php  <br>
+	edit the config file and save it as config.php  <br>
+  Set up API poller in cron to run every 15 minutes -   */15 * * * * apache2/bin/php -h /var/www/lmeve/bin/poller.php <br>
+	login to lmeve using admin / admin credentials and wait a few minutes while lmeve parses and alters database tables <br>
+	Change admin password in Settings <br>
+	Create a user accout for yourself <br>
+	Logout, Login with your new account <br>
+	Add corp ESI key in Settings -> ESI Keys <br>
+
   
 <h1>Credits and copyrights</h1>
 
