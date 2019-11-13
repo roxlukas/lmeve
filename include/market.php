@@ -452,7 +452,11 @@ function evepraisal_parser($evepraisal) {
             $typeID = getTypeID($typeName);
             $amount = preg_replace('/[,\.]/', '', $m[3]);
             if (!($typeID === FALSE)) {
-                $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+                if (is_array($items[$typeID])) {
+                    $items[$typeID]['amount'] += $amount;
+                } else {
+                    $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+                }
             } else {
                 $unknown_id[$typeName] = $line;
             }
@@ -461,7 +465,11 @@ function evepraisal_parser($evepraisal) {
             $typeID = getTypeID($typeName);
             $amount = preg_replace('/[,\.]/', '', $m[2]);
             if (!($typeID === FALSE)) {
-                $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+                if (is_array($items[$typeID])) {
+                    $items[$typeID]['amount'] += $amount;
+                } else {
+                    $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+                }
             } else {
                 $unknown_id[$typeName] = $line;
             }
@@ -470,7 +478,11 @@ function evepraisal_parser($evepraisal) {
             $typeID = getTypeID($typeName);
             $amount = preg_replace('/[,\.]/', '', $m[2]);
             if (!($typeID === FALSE)) {
-                $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+                if (is_array($items[$typeID])) {
+                    $items[$typeID]['amount'] += $amount;
+                } else {
+                    $items[$typeID] = array('typeID' => $typeID, 'typeName' => $typeName, 'amount' => $amount);
+                }
             } else {
                 $unknown_id[$typeName] = $line;
             }
