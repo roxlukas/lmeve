@@ -586,16 +586,18 @@ function showQuote($stock, $items, $label = "Quote") {
                 $price = number_format($item['amount'] * $common[$typeID]['stock']['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP) . " ISK";
                 $buying = showHint($common[$typeID]['stock']['quantity'], $common[$typeID]['stock']['amount']);
                 $form = "<input type=\"hidden\" name=\"q_${item['typeID']}\" value=\"${item['amount']}\">";
+                $css = "";
             } else {
-                $price = "";
-                $buying = "";
+                $price = "0.00 ISK";
+                $buying = showHint(2,1);
                 $form = "";
+                $css = "background: rgba(255,0,0,0.3);";
             }
             ?> <tr>
-            <td><?= dbhrefedit($item['typeID']) ?><img src="<?= getTypeIDicon($item['typeID'])?>" title="<?=$item['typeName']?>"/></a></td>
-            <td><?= $buying?> <?= dbhrefedit($item['typeID']) . $item['typeName']?></a></td>
-            <td style="text-align: right;"><?= number_format($item['amount'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td>
-            <td><?= $price?><?= $form?></td>
+            <td style="<?=$css?>"><?= dbhrefedit($item['typeID']) ?><img src="<?= getTypeIDicon($item['typeID'])?>" title="<?=$item['typeName']?>"/></a></td>
+            <td style="<?=$css?>"><?= $buying?> <?= dbhrefedit($item['typeID']) . $item['typeName']?></a></td>
+            <td style="text-align: right; <?=$css?>"><?= number_format($item['amount'], 0, $DECIMAL_SEP, $THOUSAND_SEP)?></td>
+            <td style="<?=$css?>"><?= $price?><?= $form?></td>
             </tr> <?php
         }
         ?> <tr><th colspan="4">Total: <?=number_format($total, 2, $DECIMAL_SEP, $THOUSAND_SEP)?> ISK</th></tr> <?php
