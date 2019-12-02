@@ -96,8 +96,10 @@ function getCorporationLogo($corporationID,$size=64) {
 function getCharacterPortrait($characterID,$size=64) {
     //echo("getCorporationLogo($corporationID,$size)");
     if (!is_numeric($characterID) || $characterID == 0) {
-        if (file_exists("../wwwroot/ccp_icons/DudeYourChin_64px_Icon.jpg")) {
-            return getUrl()."ccp_icons/DudeYourChin_64px_Icon.jpg";
+        if ($size == 32) {
+            return getUrl()."img/character_32.png";
+        } else if ($size == 64) {
+            return getUrl()."img/character_64.png";
         } else {
             return "";
         }
