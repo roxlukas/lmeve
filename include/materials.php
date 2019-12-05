@@ -1,5 +1,6 @@
 <?php
 //Blueprint and material related functions
+include_once '../bin/libpoller.php';
 
 function getBlueprintByProduct($typeID) {
         $DEBUG=FALSE;
@@ -1104,7 +1105,6 @@ function displayOreChart($ores, $minerals) {
           }); 
       });
     </script>
-
     <table id="minerals" class="lmframework tablesorter" width="100%">
         <thead>
             <tr>
@@ -1117,10 +1117,10 @@ function displayOreChart($ores, $minerals) {
         </thead>
         <tbody>
     <?php
+    /******* THIS LOOP IS PROCESSING HEAVY - 33s *******/
         foreach($ores as $row) {
             $value=0;
-            
-            
+
             $iskunit=number_format($row['value']/$row['portionSize'], 2, $DECIMAL_SEP, $THOUSAND_SEP);
             $iskm3=number_format($row['value']/$row['portionSize']/$row['volume'], 2, $DECIMAL_SEP, $THOUSAND_SEP);
             $value=number_format($row['value'], 2, $DECIMAL_SEP, $THOUSAND_SEP);
@@ -1144,6 +1144,7 @@ function displayOreChart($ores, $minerals) {
             </tr>
             <?php
         }
+        
     ?>
             </tbody>
     </table>
