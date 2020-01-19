@@ -69,7 +69,8 @@ try {
     inform("Main","ESI->updatePublic()...");
     $ESI->updatePublic();
     //update game server status
-    $servers=array('tranquility','singularity');
+    //$servers=array('tranquility','singularity');
+    $servers=array('tranquility');
     foreach($servers as $s) {
         $ESI->setDatasource($s);
         $ESI->Status->updateServerStatus();
