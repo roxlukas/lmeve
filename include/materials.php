@@ -1108,10 +1108,15 @@ function displayOreChart($ores, $minerals) {
     <table id="minerals" class="lmframework tablesorter" width="100%">
         <thead>
             <tr>
-                <th style="width: 32px; padding: 0px; text-align: center;">Icon</th><th>Ore name</th><th>Volume</th><th>Units/batch</th>
-                <th>ISK/batch</th><th>ISK/unit</th><th>ISK/m<sup>3</sup></th>
+                <th style="width: 32px; padding: 0px; text-align: center;" class="stickyheader">Icon</th>
+                <th class="stickyheader">Ore name</th>
+                <th class="stickyheader">Volume</th>
+                <th class="stickyheader">Units/batch</th>
+                <th class="stickyheader">ISK/batch</th>
+                <th class="stickyheader">ISK/unit</th>
+                <th class="stickyheader">ISK/m<sup>3</sup></th>
                 <?php foreach($minerals as $mineral) {
-                    echo("<th><img src=\"" . getTypeIDicon($mineral['mineralID']) . "\" alt=\"".$mineral['mineralTypeName']."\" title=\"".$mineral['mineralTypeName']."\">");
+                    echo("<th class=\"stickyheader\"><img src=\"" . getTypeIDicon($mineral['mineralID']) . "\" alt=\"".$mineral['mineralTypeName']."\" title=\"".$mineral['mineralTypeName']."\">");
                 } ?>
             </tr>
         </thead>
@@ -1148,6 +1153,9 @@ function displayOreChart($ores, $minerals) {
     ?>
             </tbody>
     </table>
+    <script>
+        $(() => $('#minerals').floatThead());
+    </script>
     <?php
     }
 

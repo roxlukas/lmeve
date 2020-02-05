@@ -5,6 +5,7 @@
 //$sqlwhere2 - second SQL parameter, in both main query and in subqueries
 
 include_once("percentage.php");
+include_once("market.php");
 
 /**
  * getTasks() get task information from db for a specific character
@@ -260,9 +261,9 @@ function edittaskhrefedit($nr) {
 	echo("<a href=\"index.php?id=1&id2=1&nr=$nr\" title=\"Click to edit this Task\">");
 }
 
-function itemhrefedit($nr) {
+/* function itemhrefedit($nr) {
 	echo("<a href=\"index.php?id=10&id2=1&nr=$nr\" title=\"Click to open Database\">");
-}
+} */
 
 function getMyChars($array=false) {
     $ret="";
@@ -950,8 +951,8 @@ function showTimesheet($timesheet,$aggregate=FALSE) {
     timesheetFooter();  
 }
 
-function charhrefedit($nr) {
+/* function charhrefedit($nr) {
     echo("<a href=\"index.php?id=9&id2=6&nr=$nr\" title=\"Click to open character information\">");
-}
+} */
 
 ?>

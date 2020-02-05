@@ -88,6 +88,7 @@ function template_main($contents,$title,$meta) {
         <script type="text/javascript" src="<?=getUrl()?>webgl.js"></script>
 	<script type="text/javascript" src="<?=getUrl()?>skin-icon.js"></script>
         <script type="text/javascript" src="<?=getUrl()?>jquery-tablesorter/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript" src="<?=getUrl()?>jquery-floatthead/jquery.floatThead.min.js"></script>
         <link rel="stylesheet" type="text/css" href="<?=getUrl()?>jquery-tablesorter/blue/style.css">
 	<script type="text/javascript">
 		function logoff() {

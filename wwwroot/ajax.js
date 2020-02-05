@@ -16,6 +16,10 @@ function ajax_get(URL,hookID) {
 		if (xmlhttp.readyState==4 && xmlhttp.status==200)
 			{
 				if (hookID!='NULL') document.getElementById(hookID).innerHTML=xmlhttp.responseText;
+                                var scripts = document.getElementById(hookID).getElementsByTagName("script");
+                                for( var i=0; i<scripts.length; i++ ) {
+                                    eval(scripts[i].innerText);
+                                }
 				return;
 			}
 	}
