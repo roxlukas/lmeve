@@ -29,11 +29,13 @@ if ($item_group_explorer) {
     $db_group_name_field = 'groupName';
     $db_group_table = 'invGroups';
     $parent_group = "`published` = 1 AND `categoryID` IN (6,7,8,18,22,23,32,39,40,46,65,66,87) ORDER BY `groupName`";
+    $mode = 'Item Group mode - check <a href="?id=5">Settings</a>.';
 } else {
     $db_group_id_field = 'marketGroupID';
     $db_group_name_field = 'marketGroupName';
     $db_group_table = 'invMarketGroups';
     $parent_group = "`parentGroupID` $wheremarket";
+    $mode = 'Market Group mode - check <a href="?id=5">Settings</a>.';
 }
 
 //BEGIN Clientside sorting:
@@ -52,7 +54,7 @@ if ($item_group_explorer) {
 	    <div class="tytul">
 		<?php echo($PANELNAME); ?><br>
 	    </div>
-	    <?php echo("<em>Static Data schema: $LM_EVEDB</em><br />"); ?>
+            <?php echo("<em><img src=\"ccp_icons/38_16_208.png\" alt=\"(i)\"/> Static Data schema: $LM_EVEDB</em> <img src=\"ccp_icons/38_16_208.png\" alt=\"(i)\"/> $mode<br />"); ?>
 	<?php
         
 		if (!empty($marketGroupID)) {

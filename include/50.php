@@ -235,7 +235,7 @@ Settings
                         </tr>
                         <tr>
                             <td>
-                                Use Item Groups instead of Market Groups in Profit Explorer<br/>
+                                Use <em>Item Groups</em> instead of <em>Market Groups</em> in Database<br/>
                             </td>
                             <td>
                                 <input type="checkbox" size="32" name="item_group_explorer" <?php if (getConfigItem('item_group_explorer','disabled')=='enabled') echo('checked'); ?> />
