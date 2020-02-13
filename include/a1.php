@@ -191,18 +191,28 @@ function decryptors($typeID, $techLevel) {
 	$wasteFactor=$blueprint[0][11]/100;
 	$produceditem=db_query("SELECT * FROM $LM_EVEDB.`invBlueprintTypes` WHERE `blueprintTypeID` = $nr;");
 	
-	$node=getMarketNode($item['marketGroupID']);
-	$breadcrumbs="&gt; ${item['typeName']}";
-	$parentGroupID=$node['parentGroupID'];
-	do {
-		$breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID=${node['marketGroupID']}\">${node['marketGroupName']}</a> $breadcrumbs";
-		if (!empty($node['parentGroupID'])) {
-			$node=getMarketNode($node['parentGroupID']);
-		} else {
-			break;
-		}
-		
-	} while(TRUE);
+        if (getConfigItem('item_group_explorer','disabled')=='enabled') $item_group_explorer = TRUE; else $item_group_explorer = FALSE;
+
+        if ($item_group_explorer) {
+            $group = db_asocquery("SELECT * FROM `$LM_EVEDB`.`invGroups` WHERE `groupID` = " . $item['groupID']);
+            $node = $group[0];
+            $breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID=${node['groupID']}\">${node['groupName']}</a>";
+        } else {
+            $node=getMarketNode($item['marketGroupID']);
+            $breadcrumbs="&gt; ${item['typeName']}";
+            $parentGroupID=$node['parentGroupID'];
+            do {
+                    $breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID=${node['marketGroupID']}\">${node['marketGroupName']}</a> $breadcrumbs";
+                    if (!empty($node['parentGroupID'])) {
+                            $node=getMarketNode($node['parentGroupID']);
+                    } else {
+                            break;
+                    }
+
+            } while(TRUE);
+        }
+        
+	
 	echo("<a href=\"?id=10&id2=0\"> Start </a> $breadcrumbs <br />");
 
 
