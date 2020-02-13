@@ -270,16 +270,17 @@ class Markets extends Route {
      * @return array Filtered array of orders
      */
     private function clearOutliers($orders, $med_buy, $stdd_buy, $med_sell, $stdd_sell) {
+        $sigma = 5;
         $r = array();
         foreach ($orders as $o) {
             //is this a buy order?
             if ($o->is_buy_order == TRUE) {
                 //is the price an outlier?
-                if (($med_buy - 3 * $stdd_buy < $o->price) && ($o->price < $med_buy + 3 * $stdd_buy)) {
+                if (($med_buy - $sigma * $stdd_buy < $o->price) && ($o->price < $med_buy + $sigma * $stdd_buy)) {
                     array_push($r,$o);
                 }
             } else {
-                if (($med_sell - 3 * $stdd_sell < $o->price) && ($o->price < $med_sell + 3 * $stdd_sell)) {
+                if (($med_sell - $sigma * $stdd_sell < $o->price) && ($o->price < $med_sell + $sigma * $stdd_sell)) {
                     array_push($r,$o);
                 }
             }
