@@ -96,11 +96,11 @@ if ($new) {
 			$singleton,
                         $structureID
 			);";
-                        //echo("DEBUG: $sql");
+                        echo("Adding Task for Item...<br/>");
 			db_uquery($sql);
 			
 			if ($autoadd_invention || $autoadd_copy || $autoadd_tech1) {
-			    $sql="SELECT itp.`typeID`, itp.`typeName`, iit.`blueprintTypeID`, iit.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel, itp.`groupID`, ing.`categoryID`, imt.`parentTypeID`, iit1.`blueprintTypeID` AS bpoT1TypeID, itp.`portionSize`
+			    /*$sql="SELECT itp.`typeID`, itp.`typeName`, iit.`blueprintTypeID`, iit.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel, itp.`groupID`, ing.`categoryID`, imt.`parentTypeID`, iit1.`blueprintTypeID` AS bpoT1TypeID, itp.`portionSize`
 				FROM $LM_EVEDB.`invTypes` itp
 				JOIN $LM_EVEDB.`invGroups` ing
 				ON itp.`groupID`=ing.`groupID`
@@ -112,8 +112,20 @@ if ($new) {
 				ON imt.`parentTypeID`=iit1.`productTypeID`
 				WHERE itp.`typeID`=$typeID
 				AND imt.`metaGroupID`=2
-				AND itp.`published`=1;";
-				//echo("DEBUG: $sql");
+				AND itp.`published`=1;";*/                            
+                            //CCP broke invMetaTypes :-(
+                            
+                            $sql="SELECT itp.`typeID` , itp.`typeName` , iit.`blueprintTypeID` , iit.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel, itp.`groupID` , ing.`categoryID` , iapt1.`productTypeID` AS `parentTypeID` , iap.`typeID` AS bpoT1TypeID, itp.`portionSize`
+                                FROM $LM_EVEDB.`invTypes` itp
+                                JOIN $LM_EVEDB.`invGroups` ing ON itp.`groupID` = ing.`groupID`
+                                LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit ON itp.`typeID` = iit.`productTypeID`
+                                LEFT JOIN $LM_EVEDB.`industryActivityProducts` iap ON iap.`productTypeID` = iit.`blueprintTypeID`
+                                LEFT JOIN $LM_EVEDB.`industryActivityProducts` iapt1 ON iapt1.`typeID` = iap.`typeID` 
+                                WHERE itp.`typeID` = $typeID
+                                AND iap.`activityID` = 8
+                                AND iapt1.`activityID` = 1
+                                AND itp.`published` =1;";
+				echo("Getting blueprint data...<br/>");
 				//return;
 				$typeName=db_asocquery($sql);
 				$typeName=$typeName[0];
@@ -135,6 +147,8 @@ if ($new) {
 				
 				$multipliedRuns=floor($multiplier*$runs/$typeName['portionSize']/$bpcRuns);
 				if ($multipliedRuns < 1) $multipliedRuns=1;
+                                
+                                var_dump($typeName);
 				
 				//insert invention task
                                 if ($autoadd_invention) {
@@ -148,6 +162,7 @@ if ($new) {
                                     $singleton,
                                     $structureID
                                     );";
+                                    echo("Adding Task for Invention...<br/>");
                                     db_uquery($sql);
                                 }
 				
@@ -163,6 +178,7 @@ if ($new) {
                                     $singleton,
                                     $structureID
                                     );";
+                                    echo("Adding Task for Copy...<br/>");
                                     db_uquery($sql);
                                 }
                                 
@@ -178,6 +194,7 @@ if ($new) {
                                     $singleton,
                                     $structureID
                                     );";
+                                    echo("Adding Task for Tech I base Item...<br/>");
                                     db_uquery($sql);
                                 }
 			}
