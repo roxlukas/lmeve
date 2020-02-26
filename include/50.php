@@ -279,6 +279,15 @@ Settings
                                 </script>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                Enable sending LMeve usage stats:<br/>
+                                <em>LMeve will anonymously send once a week the amount of active users in last 7d and 30d</em>
+                            </td>
+                            <td>
+                                <input type="checkbox" size="32" name="usageStats" <?php if (getConfigItem('usageStats','enabled')=='enabled') echo('checked'); ?> />
+                            </td>
+                        </tr>
                         <!--
                         <tr>
                             <td>

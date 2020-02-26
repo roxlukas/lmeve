@@ -23,6 +23,7 @@ require_once('Wallet.php');
 require_once('Assets.php');
 require_once('Killmails.php');
 require_once('Status.php');
+require_once('Usage.php');
 
 class ESI {
     public static $VERSION = 1;
@@ -127,6 +128,12 @@ class ESI {
     public $Status;
     
     /**
+     * Usage Stats LMeve route instance
+     * @var Usage
+     */
+    public $Usage;
+    
+    /**
      * $tokenID int - which refresh_token from cfgesitoken to use for this instance
      */
     public function __construct($tokenID) {
@@ -182,6 +189,7 @@ class ESI {
         $this->Assets = new Assets($this);
         $this->Killmails = new Killmails($this);
         $this->Status = new Status($this);
+        $this->Usage = new Usage($this);
     }
     
     /**
@@ -213,6 +221,7 @@ class ESI {
     public function updatePublic() {
         $this->Industry->updateSystemIndices();
         $this->Markets->updatePublic();
+        $this->Usage->sendUsageStats();
     }
     
     /**

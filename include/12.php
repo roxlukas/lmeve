@@ -148,7 +148,7 @@ if ($new) {
 				$multipliedRuns=floor($multiplier*$runs/$typeName['portionSize']/$bpcRuns);
 				if ($multipliedRuns < 1) $multipliedRuns=1;
                                 
-                                var_dump($typeName);
+                                //var_dump($typeName);
 				
 				//insert invention task
                                 if ($autoadd_invention) {

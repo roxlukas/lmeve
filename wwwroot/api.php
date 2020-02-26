@@ -41,6 +41,28 @@ header("Access-Control-Allow-Origin: *");
 
 if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",503);
 
+if ($LM_STATGATHERING === TRUE && $endpoint == "STATS") {
+    $seven = secureGETnum('sevenDayStats');
+    $thirty = secureGETnum('thirtyDayStats');
+    $ip = get_remote_addr();
+    if ($seven >= 0 && $thirty >= 0) {
+        //insert in db
+        db_uquery("CREATE TABLE IF NOT EXISTS `lmglobalstats` (
+        `statID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+        `sevenDayStats` INT NOT NULL DEFAULT '0',
+        `thirtyDayStats` INT NOT NULL DEFAULT '0',
+        `ip` VARCHAR( 15 ) NOT NULL ,
+        `timestamp` DATETIME NOT NULL ,
+        INDEX ( `ip` )
+        ) ENGINE = MYISAM ;");
+        db_uquery("INSERT INTO `lmglobalstats` VALUES(DEFAULT, $seven, $thirty, '$ip', NOW())");
+    }
+    $ret = new stdClass();
+    $ret->result = "ok";
+    echo(encode($ret));
+    return;
+}
+
 //check if LMeve API key is valid -OR- if user is logged on to LMeve GUI - SESSION status = 1
 //this will allow LMeve itself to use the api calls if needed
 session_start();
