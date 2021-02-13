@@ -56,11 +56,15 @@ include_once('hooks.php'); //hooks - login hook
 include_once('errorhandler.php'); //custom error handling
 
 $lmver="0.1.60 beta";
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
  
 //setting session cookie params
-$param=session_get_cookie_params();
-session_set_cookie_params($LM_SESSION,$LM_COOKIEPATH,$param['domain'],$LM_COOKIESECUREONLY,true);
-session_start();
+session_set_cookie_params($LM_SESSION,parse_url($LM_COOKIEPATH, PHP_URL_PATH),parse_url($LM_COOKIEPATH, PHP_URL_HOST),$LM_COOKIESECUREONLY,true);
+$ret = session_start();
+if ($ret === FALSE) die("Unable to open session. session_start() returned FALSE.");
 //this prevents a forced logout after $LM_SESSION seconds
 //so the user session always lasts $LM_SESSION seconds after the last action in LMeve
 setcookie(session_name(),session_id(),time()+$LM_SESSION);

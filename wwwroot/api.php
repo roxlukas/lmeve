@@ -44,8 +44,11 @@ if (getConfigItem('northboundApi')!='enabled') RESTfulError("API is disabled.",5
 if ($LM_STATGATHERING === TRUE && $endpoint == "STATS") {
     $seven = secureGETnum('sevenDayStats');
     $thirty = secureGETnum('thirtyDayStats');
+    if (empty($seven)) $seven = 0;
+    if (empty($thirty)) $thirty = 0;
+    
     $ip = get_remote_addr();
-    if ($seven >= 0 && $thirty >= 0) {
+    if ($seven > 0 && $thirty > 0) {
         //insert in db
         db_uquery("CREATE TABLE IF NOT EXISTS `lmglobalstats` (
         `statID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -57,6 +60,7 @@ if ($LM_STATGATHERING === TRUE && $endpoint == "STATS") {
         ) ENGINE = MYISAM ;");
         db_uquery("INSERT INTO `lmglobalstats` VALUES(DEFAULT, $seven, $thirty, '$ip', NOW())");
     }
+    //always return OK
     $ret = new stdClass();
     $ret->result = "ok";
     echo(encode($ret));

@@ -83,7 +83,9 @@ class Assets extends Route {
             if (count($checklist) > 0) {
                 for ($i = 0; $i < count($checklist) / $MAX_IDS; $i++) { //fix for #85 - can only ask about 1000 names in one batch
                     if ($this->ESI->getDEBUG()) inform(get_class(), "Getting page $i");
-                    $names = array_merge($names, $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS))));
+                    $tmp = $this->post('',json_encode(array_slice($checklist, $i * $MAX_IDS, $MAX_IDS)));
+                    if ($this->ESI->getDEBUG()) inform(get_class(), "ESI respondend: ". print_r($tmp, TRUE));
+                    $names = array_merge($names, $tmp);
                 }
             }
         }  else {

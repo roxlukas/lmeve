@@ -214,7 +214,7 @@ function esiUpdateApicorps() {
     $table = db_asocquery("DESCRIBE `apicorps`;");
     $found = FALSE;
     foreach ($table as $column) {
-        if ($column['Field']=='tokenID' && $column['Type']=='int(11)') {
+        if ($column['Field']=='tokenID' && ($column['Type']=='int(11)' || $column['Type']=='int')) {
             $found = TRUE;
         }
     }    
@@ -241,7 +241,7 @@ function esiUpdateApiAssets() {
     $table = db_asocquery("DESCRIBE `apiassets`;");
     $found = FALSE;
     foreach ($table as $column) {
-        if ($column['Field']=='is_blueprint_copy' && $column['Type']=='int(11)') {
+        if ($column['Field']=='is_blueprint_copy' && ($column['Type']=='int(11)' || $column['Type']=='int')) {
             $found = TRUE;
         }
     }    
@@ -289,7 +289,7 @@ function esiUpdateApimarketorders() {
     
     $found = FALSE;
     foreach ($table as $column) {
-        if ($column['Field']=='range' && $column['Type']=='int(11)') {
+        if ($column['Field']=='range' && ($column['Type']=='int(11)' || $column['Type']=='int')) {
             $found = TRUE;
         }
     }    
@@ -299,7 +299,7 @@ function esiUpdateApimarketorders() {
     
     $found = FALSE;
     foreach ($table as $column) {
-        if ($column['Field']=='stationID' && $column['Type']=='int(11)') {
+        if ($column['Field']=='stationID' && ($column['Type']=='int(11)' || $column['Type']=='int')) {
             $found = TRUE;
         }
     }    
@@ -319,7 +319,7 @@ function esiUpdateApiContractItems() {
     $table = db_asocquery("DESCRIBE `apicontractitems`;");
     $found = FALSE;
     foreach ($table as $column) {
-        if ($column['Field']=='rawQuantity' && $column['Type']=='int(11)') {
+        if ($column['Field']=='rawQuantity' && ($column['Type']=='int(11)' || $column['Type']=='int')) {
             $found = TRUE;
         }
     }    
@@ -338,7 +338,7 @@ function esiUpdateApiIndustryJobsCrius() {
     $table = db_asocquery("DESCRIBE `apiindustryjobscrius`;");
     $found = FALSE;
     foreach ($table as $column) {
-        if ($column['Field']=='status' && $column['Type']=='int(11)') {
+        if ($column['Field']=='status' && ($column['Type']=='int(11)' || $column['Type']=='int')) {
             $found = TRUE;
         }
     }    
@@ -410,7 +410,7 @@ function esiUpdateApiCorpMembers() {
                 ($column['Field']=='logonDateTime' && $column['Type']=='datetime')
                 || ($column['Field']=='logoffDateTime' && $column['Type']=='datetime') 
                 || ($column['Field']=='solarSystemID' && $column['Type']=='bigint(11)') 
-                || ($column['Field']=='shipID' && $column['Type']=='int(11)') 
+                || ($column['Field']=='shipID' && ($column['Type']=='int(11)' || $column['Type']=='int')) 
            ) {
                 $found = TRUE;
         }
