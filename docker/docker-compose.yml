@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  lmeve:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=lmeve
+      - DB_PASSWORD=lmpassword
+      - DB_NAME_LMEVE=lmeve
+      - DB_NAME_STATIC=eve_static_data
+    volumes:
+      - ./config.php:/var/www/lmeve/config/config.php
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=lmeve
+      - MYSQL_PASSWORD=lmpassword
+    ports:
+      - "3306:3306"
+
+  eve_data_updater:
+    build:
+      context: .
+      dockerfile: Dockerfile.updater
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=lmeve
+      - DB_PASSWORD=lmpassword
+      - DB_NAME_STATIC=eve_static_data
+
+volumes:
+  mysql_data:

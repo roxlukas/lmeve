@@ -1,0 +1,15 @@
+FROM ubuntu:latest
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    wget \
+    mysql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY update-eve-data.sh /app/update-eve-data.sh
+RUN chmod +x /app/update-eve-data.sh
+
+CMD ["/app/update-eve-data.sh"]
