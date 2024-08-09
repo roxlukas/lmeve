@@ -74,19 +74,21 @@ function getTypeIDicon($typeID, $size=32, $type=null) {
     }
     
     if ($size != 512) {
-        if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
+        $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
+        /*if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
             $icon=getUrl()."ccp_img/${typeID}_${size}.png";
         } else {
             //$icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
             $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
-        }
+        }*/
     } else {
-        if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
+        $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
+        /*if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
             $icon=getUrl()."ccp_renders/${typeID}.png";
         } else {
             //$icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
             $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
-        }
+        }*/
     }
     return($icon);
 }

@@ -265,10 +265,10 @@ function showInventory($data,$parentItemID=0,$corporationID=0,$hrefcallback='inv
             <div style="margin: 10px; width: 64px; height: 100px; float: left;">
                 <div style="position: absolute; <?=$bpc_div_style?>">
             <?php 
-            if (function_exists($hrefcallback)) call_user_func($hrefcallback,$row['itemID'], $row['corporationID']);
+            //if (function_exists($hrefcallback)) call_user_func($hrefcallback,$row['itemID'], $row['corporationID']);
             
 ?>
-            <img src="<?php echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName'] . $bpc_sufix?>" <?=$bpc_img_style?> /></a>
+            <img src="<?php //echo(getTypeIDicon($row['typeID'],64));?>" title="<?=$row['typeName'] . $bpc_sufix?>" <?=$bpc_img_style?> /></a>
                 </div>
                 <?php if ($row['singleton']==0) { ?>
                 <div style="position: absolute; margin-top: 50px; width: 64px; text-align: right;">

@@ -36,7 +36,7 @@ if (!function_exists('mb_internal_encoding')) die('Please make sure you\'ve inst
 
 mb_internal_encoding('UTF-8'); 
 mb_http_output('UTF-8'); 
-mb_http_input('UTF-8'); 
+mb_http_input('I'); 
 mb_regex_encoding('UTF-8'); 
 
 set_include_path("../include");

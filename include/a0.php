@@ -152,7 +152,7 @@ if ($item_group_explorer) {
             }
 	}
 
-	if (sizeof($items)>0) {
+	if (is_array($items) && sizeof($items) > 0) {
 				foreach($items as $row) {
 					echo('<tr><td style="padding: 0px; width: 32px;">');
 						hrefedit_item($row['typeID']);

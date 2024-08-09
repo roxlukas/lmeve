@@ -784,7 +784,7 @@ function getDecryptor($typeID) {
         JOIN `ramdecryptors` rd ON cd.`decryptorTypeID` = rd.`typeID`    
         WHERE cd.`typeID`=$typeID");
         
-        if (count($selected > 0)) {
+        if (is_array($selected) && count($selected > 0)) {
             $selected = $selected[0];
         } else {
             $selected = array();
