@@ -13,8 +13,6 @@ services:
       - DB_PASSWORD=lmpassword
       - DB_NAME_LMEVE=lmeve
       - DB_NAME_STATIC=eve_static_data
-    volumes:
-      - ./config.php:/var/www/lmeve/config/config.php
 
   db:
     image: mysql:5.7
@@ -39,6 +37,7 @@ services:
       - DB_USER=lmeve
       - DB_PASSWORD=lmpassword
       - DB_NAME_STATIC=eve_static_data
+      - MYSQL_ROOT_PASSWORD=rootpassword
 
 volumes:
   mysql_data:
