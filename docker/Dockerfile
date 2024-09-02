@@ -1,60 +1,46 @@
-FROM ubuntu:14.04
-MAINTAINER Eugene Ware <eugene@noblesamurai.com>
+FROM ubuntu:latest
 
-# Keep upstart from complaining
-RUN dpkg-divert --local --rename --add /sbin/initctl
-RUN ln -sf /bin/true /sbin/initctl
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Update
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get -y install wget
+RUN apt-get update && apt-get install -y \
+    git \
+    php-mysql \
+    php-pear \
+    apache2 \
+    libapache2-mod-php \
+    php-cli \
+    php-dev \
+    libyaml-dev \
+    php-mbstring \
+    python3-yaml \
+    wget \
+    unzip \
+    cron \
+    && rm -rf /var/lib/apt/lists/*
 
-# Basic Requirements
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server mysql-client apache2 libapache2-mod-php5 php5-mysql php-apc python-setuptools curl git unzip vim-tiny
+WORKDIR /var/www
 
-# Wordpress Requirements
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-intl php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-ming php5-ps php5-pspell php5-recode php5-sqlite php5-tidy php5-xmlrpc php5-xsl php5-dev
+RUN git clone https://github.com/roxlukas/lmeve
 
-# mysql config
-ADD my.cnf /etc/mysql/conf.d/my.cnf
-RUN chmod 664 /etc/mysql/conf.d/my.cnf
+RUN sed -i 's|/var/www/html|/var/www/lmeve/wwwroot|g' /etc/apache2/sites-available/000-default.conf
 
-# apache config
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
-RUN chown -R www-data:www-data /var/www/
+#RUN mkdir /Incoming && \
+#    cd /Incoming && \
+#    wget www.ash-online.net/lmevegfx/lmevegfx.tar.gz && \
+#    tar -xzvf lmevegfx.tar.gz -C /
 
-# php config
-RUN sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" /etc/php5/apache2/php.ini
-RUN sed -i -e "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" /etc/php5/apache2/php.ini
-RUN sed -i -e "s/short_open_tag\s*=\s*Off/short_open_tag = On/g" /etc/php5/apache2/php.ini
+# Download config-dist.php, rename it, and modify it
+RUN wget https://raw.githubusercontent.com/roxlukas/lmeve/master/config/config-dist.php -O /var/www/lmeve/config/config.php && \
+    sed -i "s/\$LM_dbhost='localhost'/\$LM_dbhost=getenv('DB_HOST')/" /var/www/lmeve/config/config.php && \
+    sed -i "s/\$LM_dbname='lmeve'/\$LM_dbname=getenv('DB_NAME_LMEVE')/" /var/www/lmeve/config/config.php && \
+    sed -i "s/\$LM_dbuser='lmeve'/\$LM_dbuser=getenv('DB_USER')/" /var/www/lmeve/config/config.php && \
+    sed -i "s/\$LM_dbpass='password'/\$LM_dbpass=getenv('DB_PASSWORD')/" /var/www/lmeve/config/config.php && \
+    sed -i "s/\$LM_EVEDB='eve_tia100_dbo'/\$LM_EVEDB=getenv('DB_NAME_STATIC')/" /var/www/lmeve/config/config.php
 
-# fix for php5-mcrypt
-RUN /usr/sbin/php5enmod mcrypt
+RUN echo "*/15 * * * * www-data /usr/bin/php /var/www/lmeve/bin/poller.php" >> /etc/crontab
 
-# Supervisor Config
-RUN mkdir /var/log/supervisor/
-RUN /usr/bin/easy_install supervisor
-RUN /usr/bin/easy_install supervisor-stdout
-ADD ./supervisord.conf /etc/supervisord.conf
+RUN chown www-data:www-data /var/www/lmeve/var
 
-# Initialization Startup Script
-ADD ./start.sh /start.sh
-RUN chmod 755 /start.sh
-
-EXPOSE 3306
 EXPOSE 80
 
-RUN wget https://github.com/roxlukas/lmeve/archive/master.zip
-
-RUN unzip master.zip
-
-RUN wget https://www.fuzzwork.co.uk/dump/mysql-latest.tar.bz2
-
-RUN tar -xjf mysql-latest.tar.bz2
-
-RUN pecl install yaml
-
-CMD ["/bin/bash", "/start.sh"]
+CMD apache2ctl -D FOREGROUND

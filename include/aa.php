@@ -72,6 +72,8 @@ if (!empty($typeID) && $model=getResourceFromYaml($typeID)) {
     <?php
 }
 
+
 showInventory($allships,0,0,'dbhrefedit');
+//print_r($allships);
 
 ?>

@@ -25,7 +25,7 @@ if($LM_FORCE_SSL && $_SERVER["HTTPS"] != "on")
 
 if (getConfigItem('publicKillboard')!='enabled') die('<h1>Public Killboard is disabled.</h1>Enable it in Settings');
 
-function page_kills() {
+function page_kills($id,$id2) {
     global $LM_EVEDB;
     include_once('killboard.php');
     include_once('inventory.php');
@@ -120,7 +120,7 @@ function page_kills() {
     showKills(getKills($month, $year, $corporationID, $allianceID, $characterID, $solarSystemID));
 }
 
-function page_singlekill() {
+function page_singlekill($id,$id2) {
     global $LM_EVEDB;
     include_once('killboard.php');
     include_once('inventory.php');
@@ -160,7 +160,7 @@ function page_singlekill() {
     
     
 
-    if(count($km)>0) {
+    if(is_array($km) && count($km) > 0) {
         $items=$km['items'];
 
         $iskLost=0;
@@ -195,10 +195,10 @@ function showpage_public() {
     $id2=$_GET['id2'];
     switch ($id2) {
         case 0:
-            page_kills();  //killboard
+            page_kills($id,$id2);  //killboard
             break;
         case 1:
-            page_singlekill();  //view single kill
+            page_singlekill($id,$id2);  //view single kill
             break;
     }
     $ret = ob_get_contents();

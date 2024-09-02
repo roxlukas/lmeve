@@ -344,14 +344,14 @@ if ($model) {
 	if (count($traitData) > 0) {
 		echo('<strong>Traits</strong><br/><ul>');
                 foreach($traitData as $row) { //<a href=showinfo:3307>
-                    echo("<li>".$row['bonus'].$row['displayName']." ".preg_replace_callback('/\<a href=showinfo:(\d+)\>/',url_replace,$row['bonusText'] )."</li>");
+                    echo("<li>".$row['bonus'].$row['displayName']." ".preg_replace_callback('/\<a href=showinfo:(\d+)\>/','url_replace',$row['bonusText'] )."</li>");
                 }
                 echo('</ul>');
 	} 
         if (count($bonusData) > 0) {
 		echo('<strong>Bonuses</strong><br/><ul>');
                 foreach($bonusData as $row) {
-                    echo("<li>".$row['bonus'].$row['displayName']." ".preg_replace_callback('/\<a href=showinfo:(\d+)\>/',url_replace,$row['bonusText'] )." per level</li>");
+                    echo("<li>".$row['bonus'].$row['displayName']." ".preg_replace_callback('/\<a href=showinfo:(\d+)\>/','url_replace',$row['bonusText'] )." per level</li>");
                 }
                 echo('</ul>');
 	} 

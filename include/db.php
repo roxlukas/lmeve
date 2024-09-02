@@ -34,6 +34,7 @@
 include_once(dirname(__FILE__).'/log.php');
 include_once(dirname(__FILE__).'/../config/config.php');
 include_once(dirname(__FILE__).'/materials.php');
+include_once(dirname(__FILE__).'/validator.php');
 
 $PDO_CONNECTION=null;
 
@@ -73,19 +74,21 @@ function getTypeIDicon($typeID, $size=32, $type=null) {
     }
     
     if ($size != 512) {
-        if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
+        $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
+        /*if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
             $icon=getUrl()."ccp_img/${typeID}_${size}.png";
         } else {
             //$icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
             $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
-        }
+        }*/
     } else {
-        if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
+        $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
+        /*if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
             $icon=getUrl()."ccp_renders/${typeID}.png";
         } else {
             //$icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
             $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
-        }
+        }*/
     }
     return($icon);
 }
@@ -182,10 +185,16 @@ function getTypeID($typeName) {
 }
 
 function get_remote_addr() {
-    if (isset($_SERVER['HTTP_X_REAL_IP'])) return $_SERVER['HTTP_X_REAL_IP'];
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    if (isset($_SERVER['REMOTE_ADDR'])) return $_SERVER['REMOTE_ADDR'];
-    return FALSE;
+    if (isset($_SERVER['HTTP_X_REAL_IP'])) $ip =  $_SERVER['HTTP_X_REAL_IP'];
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) $ip =  $_SERVER['HTTP_X_FORWARDED_FOR'];
+    if (isset($_SERVER['REMOTE_ADDR'])) $ip =  $_SERVER['REMOTE_ADDR'];
+       
+    if (! Validator::ipv4($ip)) {
+        loguj(dirname(__FILE__).'/../var/error.txt',"WARNING Possible SQL injection via x-forwarded-for header: '$ip'");
+        $ip = '0.0.0.0';
+    }
+    
+    return $ip;
 }
 
 function generate_title($subtitle = null) {
