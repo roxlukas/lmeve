@@ -1240,9 +1240,13 @@ CREATE TABLE IF NOT EXISTS `wiki` (
 --
 -- Funkcje
 --
+
+DROP FUNCTION IF EXISTS `findNearest`;
+DROP FUNCTION IF EXISTS `thirtyDayIncome`;
+
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION IF NOT EXISTS `findNearest`(`x1` DOUBLE, `y1` DOUBLE, `z1` DOUBLE, `solarSystemID1` INT) RETURNS int(11)
+CREATE DEFINER=`root`@`localhost` FUNCTION `findNearest`(`x1` DOUBLE, `y1` DOUBLE, `z1` DOUBLE, `solarSystemID1` INT) RETURNS int(11)
     READS SQL DATA
 RETURN (
 SELECT a.itemID FROM 
@@ -1254,7 +1258,7 @@ SELECT a.itemID FROM
     LIMIT 1) a
 )$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION IF NOT EXISTS `thirtyDayIncome`(`planetID` INT) RETURNS double
+CREATE DEFINER=`root`@`localhost` FUNCTION `thirtyDayIncome`(`planetID` INT) RETURNS double
     READS SQL DATA
 RETURN (
 SELECT SUM(awj.amount) AS amount FROM
