@@ -1275,7 +1275,7 @@ DELIMITER ;
 -- Zrzut danych tabeli `ramdecryptors`
 --
 
-INSERT INTO `ramdecryptors` (`typeID`, `meBonus`, `teBonus`, `probabilityBonus`, `runBonus`) VALUES
+INSERT IGNORE INTO `ramdecryptors` (`typeID`, `meBonus`, `teBonus`, `probabilityBonus`, `runBonus`) VALUES
 (34207, 1, -2, '0.90', 2),
 (34208, 2, 0, '-0.10', 7),
 (34204, 1, -2, '0.50', 3),
@@ -1289,7 +1289,7 @@ INSERT INTO `ramdecryptors` (`typeID`, `meBonus`, `teBonus`, `probabilityBonus`,
 -- Zrzut danych tabeli `apierrorlist`
 --
 
-INSERT INTO `apierrorlist` (`errorCode`, `errorText`) VALUES
+INSERT IGNORE INTO `apierrorlist` (`errorCode`, `errorText`) VALUES
 (100, 'Expected before ref/trans ID = 0: wallet not previously loaded.'),
 (101, 'Wallet exhausted: retry after {0}.'),
 (102, 'Expected before ref/trans ID [{0}] but supplied [{1}]: wallet previously loaded.'),
@@ -1377,7 +1377,7 @@ INSERT INTO `apierrorlist` (`errorCode`, `errorText`) VALUES
 -- Zrzut danych tabeli `apireftypes`
 --
 
-INSERT INTO `apireftypes` (`refTypeID`, `refTypeName`) VALUES
+INSERT IGNORE INTO `apireftypes` (`refTypeID`, `refTypeName`) VALUES
 (0, 'Undefined'),
 (1, 'Player Trading'),
 (2, 'Market Transaction'),
@@ -1524,7 +1524,7 @@ INSERT INTO `apireftypes` (`refTypeID`, `refTypeName`) VALUES
 -- Zrzut danych tabeli `cfgbuying`
 --
 
-INSERT INTO `cfgbuying` (`typeID`) VALUES
+INSERT IGNORE INTO `cfgbuying` (`typeID`) VALUES
 (34),
 (35),
 (36),
@@ -1538,7 +1538,7 @@ INSERT INTO `cfgbuying` (`typeID`) VALUES
 -- Zrzut danych tabeli `cfgmarket`
 --
 
-INSERT INTO `cfgmarket` (`typeID`) VALUES
+INSERT IGNORE INTO `cfgmarket` (`typeID`) VALUES
 (34),
 (35),
 (36),
@@ -1552,7 +1552,7 @@ INSERT INTO `cfgmarket` (`typeID`) VALUES
 -- Zrzut danych tabeli `cfgpoints`
 --
 
-INSERT INTO `cfgpoints` (`activityID`, `hrsPerPoint`) VALUES
+INSERT IGNORE INTO `cfgpoints` (`activityID`, `hrsPerPoint`) VALUES
 (1, 600),
 (3, 2000),
 (4, 2000),
@@ -1564,7 +1564,7 @@ INSERT INTO `cfgpoints` (`activityID`, `hrsPerPoint`) VALUES
 -- Zrzut danych tabeli `cfgstock`
 --
 
-INSERT INTO `cfgstock` (`typeID`, `amount`) VALUES
+INSERT IGNORE INTO `cfgstock` (`typeID`, `amount`) VALUES
 (34, 0),
 (35, 0),
 (36, 0),
@@ -1578,7 +1578,7 @@ INSERT INTO `cfgstock` (`typeID`, `amount`) VALUES
 -- Zrzut danych tabeli `lmrights`
 --
 
-INSERT INTO `lmrights` (`rightID`, `rightName`) VALUES
+INSERT IGNORE INTO `lmrights` (`rightID`, `rightName`) VALUES
 (1, 'Administrator'),
 (2, 'ViewTimesheet'),
 (3, 'ViewOverview'),
@@ -1622,7 +1622,7 @@ INSERT INTO `lmrights` (`rightID`, `rightName`) VALUES
 -- Zrzut danych tabeli `lmrolerights`
 --
 
-INSERT INTO `lmrolerights` (`roleID`, `rightID`) VALUES
+INSERT IGNORE INTO `lmrolerights` (`roleID`, `rightID`) VALUES
 (1, 1),
 (2, 2),
 (2, 3),
@@ -1697,7 +1697,7 @@ INSERT INTO `lmrolerights` (`roleID`, `rightID`) VALUES
 -- Zrzut danych tabeli `lmroles`
 --
 
-INSERT INTO `lmroles` (`roleID`, `roleName`) VALUES
+INSERT IGNORE INTO `lmroles` (`roleID`, `roleName`) VALUES
 (1, 'Administrator'),
 (2, 'Officer'),
 (3, 'Member'),
@@ -1710,14 +1710,14 @@ INSERT INTO `lmroles` (`roleID`, `roleName`) VALUES
 -- Zrzut danych tabeli `lmuserroles`
 --
 
-INSERT INTO `lmuserroles` (`userID`, `roleID`) VALUES
+INSERT IGNORE INTO `lmuserroles` (`userID`, `roleID`) VALUES
 (1, 1);
 
 --
 -- Zrzut danych tabeli `wiki`
 --
 
-INSERT INTO `wiki` (`idpage`, `wikipage`, `contents`) VALUES
+INSERT IGNORE INTO `wiki` (`idpage`, `wikipage`, `contents`) VALUES
 (1, 'start', '=====Wiki start page=====\r\n\r\n===Fill your wiki with information!===\r\n\r\n* it allows bullet lists\r\n* it allows bullet lists\r\n* it allows bullet lists\r\n');
 
 
