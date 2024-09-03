@@ -55,7 +55,7 @@ include_once('mobile.php'); //mobile device related functions
 include_once('hooks.php'); //hooks - login hook
 include_once('errorhandler.php'); //custom error handling
 
-$lmver="0.1.60 beta";
+$lmver="0.1.61 beta";
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
