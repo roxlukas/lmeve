@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditCharacters")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=9; //Panel ID in menu. Used in hyperlinks
@@ -57,7 +57,7 @@ global $USERSTABLE;
 		    echo('<select name="userID">');
 		    foreach($logins as $row) {
 				if ($row['userID']==$char['userID']) $select='selected'; else $select='';
-				echo("<option value=\"${row['userID']}\" $select>${row['login']}</option>");
+				echo("<option value=\"{$row['userID']}\" $select>{$row['login']}</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');
@@ -66,7 +66,7 @@ global $USERSTABLE;
 		    echo('<select name="charID">');
 		    foreach($chars as $row) {
 				if ($row['characterID']==$char['charID']) $select='selected'; else $select='';
-				echo("<option value=\"${row['characterID']}\" $select>${row['name']}</option>");
+				echo("<option value=\"{$row['characterID']}\" $select>{$row['name']}</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');

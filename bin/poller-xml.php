@@ -75,7 +75,7 @@ foreach ($api_keys as $api_key) {
 	inform("Main","Polling keyID $keyid...");
 	
 	if (!apiCheckErrors($keyid,"APIKeyInfo.xml")) {
-		$aki=get_xml_contents("$API_BASEURL/account/APIKeyInfo.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/APIKeyInfo_$keyid.xml",0*60);
+		$aki=get_xml_contents("$API_BASEURL/account/APIKeyInfo.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/APIKeyInfo_$keyid.xml",0*60);
 		if (isset($aki->error)) {
 			apiSaveWarning($keyid,$aki->error,"APIKeyInfo.xml");
 			continue;
@@ -99,7 +99,7 @@ foreach ($api_keys as $api_key) {
 	
 	//POLL CORP MEMBER NAMES
 	if (!apiCheckErrors($keyid,"MemberTracking.xml")) {
-		$mtr=get_xml_contents("$API_BASEURL/corp/MemberTracking.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/MemberTracking_$keyid.xml",60*60);
+		$mtr=get_xml_contents("$API_BASEURL/corp/MemberTracking.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/MemberTracking_$keyid.xml",60*60);
 		if (isset($mtr->error)) {
 			apiSaveWarning($keyid,$mtr->error,"MemberTracking.xml");
 		} else {
@@ -175,7 +175,7 @@ foreach ($api_keys as $api_key) {
          */
         
         if (!apiCheckErrors($keyid,"IndustryJobs.xml")) {
-		$ijl=get_xml_contents("$API_BASEURL/corp/IndustryJobs.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobs_$keyid.xml",15*60);
+		$ijl=get_xml_contents("$API_BASEURL/corp/IndustryJobs.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/IndustryJobs_$keyid.xml",15*60);
 		if (isset($ijl->error)) {
 			apiSaveWarning($keyid,$ijl->error,"IndustryJobs.xml");
 		} else {
@@ -191,7 +191,7 @@ foreach ($api_keys as $api_key) {
 	}        
         //Crius new endpoint - jobs history
         if (!apiCheckErrors($keyid,"IndustryJobsHistory")) {
-		$ijl=get_xml_contents("$API_BASEURL/corp/IndustryJobsHistory.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/IndustryJobsHistory_$keyid.xml",6*60*60);
+		$ijl=get_xml_contents("$API_BASEURL/corp/IndustryJobsHistory.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/IndustryJobsHistory_$keyid.xml",6*60*60);
 		if (isset($ijl->error)) {
 			apiSaveWarning($keyid,$ijl->error,"IndustryJobsHistory.xml");
 		} else {
@@ -210,7 +210,7 @@ foreach ($api_keys as $api_key) {
         // /corp/Facilities.xml.aspx
         // Cache: 60 min
         if (!apiCheckErrors($keyid,"Facilities.xml")) {
-		$fac=get_xml_contents("$API_BASEURL/corp/Facilities.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Facilities_$keyid.xml",60*60);
+		$fac=get_xml_contents("$API_BASEURL/corp/Facilities.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/Facilities_$keyid.xml",60*60);
 		if (isset($fac->error)) {
 			apiSaveWarning($keyid,$fac->error,"Facilities.xml");
 		} else {
@@ -244,7 +244,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID OR corporationID
 	//Cache Time (minutes)	 360
 	if (!apiCheckErrors($keyid,"CorporationSheet.xml")) {
-		$csh=get_xml_contents("$API_BASEURL/corp/CorporationSheet.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CorporationSheet_$keyid.xml",360*60);
+		$csh=get_xml_contents("$API_BASEURL/corp/CorporationSheet.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/CorporationSheet_$keyid.xml",360*60);
 		if (isset($csh->error)) {
 			apiSaveWarning($keyid,$csh->error,"CorporationSheet.xml");
 		} else {
@@ -323,7 +323,7 @@ foreach ($api_keys as $api_key) {
 		foreach($accountKeys as $acct) {
 			$accountKey=$acct['accountKey'];
 			if (!apiCheckErrors($keyid,"WalletJournal_$accountKey.xml")) {
-				$wlj=get_xml_contents("$API_BASEURL/corp/WalletJournal.xml.aspx?keyID=${keyid}&vCode=${vcode}&accountKey=$accountKey&rowCount=${MAXROWS}","${mycache}/WalletJournal_${keyid}_${accountKey}.xml",15*60);
+				$wlj=get_xml_contents("$API_BASEURL/corp/WalletJournal.xml.aspx?keyID={$keyid}&vCode={$vcode}&accountKey=$accountKey&rowCount={$MAXROWS}","{$mycache}/WalletJournal_{$keyid}_{$accountKey}.xml",15*60);
 				if (isset($wlj->error)) {
 					apiSaveWarning($keyid,$wlj->error,"WalletJournal_$accountKey.xml");
 				} else {
@@ -363,7 +363,7 @@ foreach ($api_keys as $api_key) {
 		foreach($accountKeys as $acct) {
 			$accountKey=$acct['accountKey'];
 			if (!apiCheckErrors($keyid,"WalletTransactions_$accountKey.xml")) {
-				$wlt=get_xml_contents("$API_BASEURL/corp/WalletTransactions.xml.aspx?keyID=${keyid}&vCode=${vcode}&accountKey=$accountKey","${mycache}/WalletTransactions_${keyid}_${accountKey}.xml",15*60);
+				$wlt=get_xml_contents("$API_BASEURL/corp/WalletTransactions.xml.aspx?keyID={$keyid}&vCode={$vcode}&accountKey=$accountKey","{$mycache}/WalletTransactions_{$keyid}_{$accountKey}.xml",15*60);
 				if (isset($wlt->error)) {
 					apiSaveWarning($keyid,$wlt->error,"WalletTransactions_$accountKey.xml");
 				} else {
@@ -403,7 +403,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	if (!apiCheckErrors($keyid,"MarketOrders.xml")) {
-		$mao=get_xml_contents("$API_BASEURL/corp/MarketOrders.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/MarketOrders$keyid.xml",60*60);
+		$mao=get_xml_contents("$API_BASEURL/corp/MarketOrders.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/MarketOrders$keyid.xml",60*60);
 		if (isset($mao->error)) {
 			apiSaveWarning($keyid,$mao->error,"MarketOrders.xml");
 		} else {
@@ -441,7 +441,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 360
 	if (!apiCheckErrors($keyid,"StarbaseList.xml")) {
-		$psl=get_xml_contents("$API_BASEURL/corp/StarbaseList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/StarbaseList_$keyid.xml",15*60);
+		$psl=get_xml_contents("$API_BASEURL/corp/StarbaseList.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/StarbaseList_$keyid.xml",15*60);
 		if (isset($psl->error)) {
 			apiSaveWarning($keyid,$psl->error,"StarbaseList.xml");
 		} else {
@@ -487,9 +487,9 @@ foreach ($api_keys as $api_key) {
 		foreach($starbases as $starbase) {
 			$itemID=$starbase['itemID'];
 			if (!apiCheckErrors($keyid,"StarbaseDetail.xml")) {
-				$stb=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID=${keyid}&vCode=${vcode}&itemID=$itemID","${mycache}/StarbaseDetail_${keyid}_${itemID}.xml",0);
+				$stb=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID={$keyid}&vCode={$vcode}&itemID=$itemID","{$mycache}/StarbaseDetail_{$keyid}_{$itemID}.xml",0);
 				if (isset($stb->error)) {
-					apiSaveWarning($keyid,"Error for starbase itemID=${itemID}: ".$stb->error,"StarbaseDetail.xml");
+					apiSaveWarning($keyid,"Error for starbase itemID={$itemID}: ".$stb->error,"StarbaseDetail.xml");
 				} else {
                                         $state=$stb->result->state;
                                         $stateTimestamp=$stb->result->stateTimestamp;
@@ -598,7 +598,7 @@ foreach ($api_keys as $api_key) {
 	//Cache Time (minutes)	 60
 	//<rowset name="pocos" key="itemID" columns="itemID,solarSystemID,solarSystemName,reinforceHour,allowAlliance,allowStandings,standingLevel,taxRateAlliance,taxRateCorp,taxRateStandingHigh,taxRateStandingGood,taxRateStandingNeutral,taxRateStandingBad,taxRateStandingHorrible" />
 	if (!apiCheckErrors($keyid,"CustomsOffices.xml")) {
-		$ppl=get_xml_contents("$API_BASEURL/corp/CustomsOffices.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/CustomsOffices_$keyid.xml",60*60);
+		$ppl=get_xml_contents("$API_BASEURL/corp/CustomsOffices.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/CustomsOffices_$keyid.xml",60*60);
 		if (isset($ppl->error)) {
 			apiSaveWarning($keyid,$ppl->error,"CustomsOffices.xml");
 		} else {
@@ -651,7 +651,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 keyID, vCode, itemID
 	//Cache Time (minutes)	 1380
 	//Needs specific ID from list! Need to get POS list first.
-	/*$psd=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/StarbaseDetail_$keyid.xml",1380*60);
+	/*$psd=get_xml_contents("$API_BASEURL/corp/StarbaseDetail.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/StarbaseDetail_$keyid.xml",1380*60);
 	if (isset($psd->error)) {
 		warning("StarbaseDetail.xml",$psd->error);
 	}*/
@@ -660,7 +660,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	if (!apiCheckErrors($keyid,"AccountBalance.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/AccountBalance.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/AccountBalance_$keyid.xml",60*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/AccountBalance.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/AccountBalance_$keyid.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"AccountBalance.xml");
 		} else {
@@ -686,7 +686,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 1380
 	if (!apiCheckErrors($keyid,"ContactList.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/ContactList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/ContactList_$keyid.xml",1380*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/ContactList.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/ContactList_$keyid.xml",1380*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"ContactList.xml");
 		} else {
@@ -712,7 +712,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey
 	//Cache Time (minutes)	 15
 	if (!apiCheckErrors($keyid,"Contracts.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/Contracts.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Contracts_$keyid.xml",15*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/Contracts.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/Contracts_$keyid.xml",15*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"Contracts.xml");
 		} else {
@@ -778,7 +778,7 @@ foreach ($api_keys as $api_key) {
 		foreach($contracts as $con) {
 			$contractID=$con['contractID'];
 			if (!apiCheckErrors($keyid,"ContractItems.xml")) {
-				$cit=get_xml_contents("$API_BASEURL/corp/ContractItems.xml.aspx?keyID=${keyid}&vCode=${vcode}&contractID=$contractID","${mycache}/ContractItems_${keyid}.xml",0);
+				$cit=get_xml_contents("$API_BASEURL/corp/ContractItems.xml.aspx?keyID={$keyid}&vCode={$vcode}&contractID=$contractID","{$mycache}/ContractItems_{$keyid}.xml",0);
 				if (isset($cit->error)) {
 					apiSaveWarning($keyid,$cit->error,"ContractItems.xml");
 				} else {
@@ -809,7 +809,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 Modified Short Cache
 	if (!apiCheckErrors($keyid,"ContainerLog.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/ContainerLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/ContainerLog$keyid.xml",180*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/ContainerLog.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/ContainerLog$keyid.xml",180*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"ContainerLog.xml");
 		} else {
@@ -845,7 +845,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, characterID
 	//Cache Time (minutes)	 60
 	if (!apiCheckErrors($keyid,"FacWarStats.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/FacWarStats.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/FacWarStats$keyid.xml",60*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/FacWarStats.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/FacWarStats$keyid.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"FacWarStats.xml");
 		} else {
@@ -879,7 +879,7 @@ foreach ($api_keys as $api_key) {
 	//Cache Time (minutes)	 360
 	
 	if (!apiCheckErrors($keyid,"AssetList.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/AssetList.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/AssetList_$keyid.xml",360*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/AssetList.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/AssetList_$keyid.xml",360*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"AssetList.xml");
 		} else {
@@ -916,7 +916,7 @@ foreach ($api_keys as $api_key) {
                 WHERE `corporationID`=$corporationID AND itp.`groupID`=404;");
 	$ids="";
 	foreach ($result as $row) {
-		$ids="${row['itemID']},$ids";
+		$ids="{$row['itemID']},$ids";
 	}
 	//cut the last comma
 	$ids = substr_replace($ids ,"",-1);
@@ -924,9 +924,9 @@ foreach ($api_keys as $api_key) {
 	
         if (count($result)>0) {
             if (!apiCheckErrors($keyid,"Locations.xml")) {
-                    $url="$API_BASEURL/corp/Locations.xml.aspx?keyID=${keyid}&vCode=${vcode}&ids=${ids}";
+                    $url="$API_BASEURL/corp/Locations.xml.aspx?keyID={$keyid}&vCode={$vcode}&ids={$ids}";
                     //inform("Locations.xml", $url);
-                    $dat=get_xml_contents($url,"${mycache}/Locations$keyid.xml",60*60);
+                    $dat=get_xml_contents($url,"{$mycache}/Locations$keyid.xml",60*60);
                     if (isset($dat->error)) {
                             apiSaveWarning($keyid,$dat->error,"Locations.xml");
                     } else {
@@ -959,7 +959,7 @@ foreach ($api_keys as $api_key) {
         
         //POLL BLUEPRINTS API
 	if (!apiCheckErrors($keyid,"Blueprints.xml")) {
-		$mtr=get_xml_contents("$API_BASEURL/corp/Blueprints.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/Blueprints_$keyid.xml",24*60*60);
+		$mtr=get_xml_contents("$API_BASEURL/corp/Blueprints.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/Blueprints_$keyid.xml",24*60*60);
 		if (isset($mtr->error)) {
 			apiSaveWarning($keyid,$mtr->error,"Blueprints.xml");
 		} else {
@@ -1034,7 +1034,7 @@ foreach ($api_keys as $api_key) {
 	//Parameters	 userID, apiKey, beforeKillID, characterID
 	//Cache Time (minutes)	 60
         if (!apiCheckErrors($keyid,"KillLog.xml")) {
-		$klg=get_xml_contents("$API_BASEURL/corp/KillLog.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/KillLog_$keyid.xml",60*60);
+		$klg=get_xml_contents("$API_BASEURL/corp/KillLog.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/KillLog_$keyid.xml",60*60);
                 //echo($klg);
                 if (isset($klg->error)) {
                       apiSaveWarning($keyid,$klg->error,"KillLog.xml");
@@ -1113,8 +1113,8 @@ foreach ($api_keys as $api_key) {
                                 
                                 //get kill items from CREST
                                 $killurl="$CREST_BASEURL/killmails/".$a->killID.'/'. killmail_hash($v->characterID, $finalBlowCharacterID, $v->shipTypeID, $a->killTime).'/';
-                                $crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail.json", 0);
-                                //$crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail_".$a->killID.".json", 0);
+                                $crest_killmail=get_crest_contents($killurl, "{$mycache}/crest_killmail.json", 0);
+                                //$crest_killmail=get_crest_contents($killurl, "{$mycache}/crest_killmail_".$a->killID.".json", 0);
                                 
                                 if (isset($crest_killmail->victim->items) && getConfigItem('useCRESTkillmails', 'enabled')=='enabled') {
                                     apiSaveOK(0,"CREST /killmails/");
@@ -1163,7 +1163,7 @@ foreach ($api_keys as $api_key) {
 		
 	/*//*********************************************** NEW API PARSE BLOCK
 	if (!apiCheckErrors($keyid,"EXPORT.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/EXPORT.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/EXPORT_$keyid.xml",15*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/EXPORT.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/EXPORT_$keyid.xml",15*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"EXPORT.xml");
 		} else {
@@ -1188,13 +1188,13 @@ LEFT JOIN `apicorpmembers` acm ON acm.installerID=aij.installerID
 WHERE acm.`installerID` IS NULL;");
 	$unknownIDs="";
 	foreach ($result as $row) {
-		$unknownIDs="${row['installerID']},$unknownIDs";
+		$unknownIDs="{$row['installerID']},$unknownIDs";
 	}
 	//cut the last comma
 	$unknownIDs = substr_replace($unknownIDs ,"",-1);
 	//if list of IDs isnt empty, ask EVE API for names
 	if (!empty($unknownIDs)) {
-		$ecn=get_xml_contents("$API_BASEURL/eve/CharacterName.xml.aspx?IDs=${unknownIDs}","${mycache}/CharacterName_$keyid.xml",5*60);
+		$ecn=get_xml_contents("$API_BASEURL/eve/CharacterName.xml.aspx?IDs={$unknownIDs}","{$mycache}/CharacterName_$keyid.xml",5*60);
 		if (isset($ecn->error)) {
 			warning("CharacterName.xml",$ecn->error);
 		} else {
@@ -1215,7 +1215,7 @@ inform("Main","Polling public API feeds...");
 //Parameters	 none
 //Cache Time (minutes)	 1 (1440)
 if (!apiCheckErrors($keyid,"ConquerableStationList.xml")) {
-	$dat=get_xml_contents("$API_BASEURL/eve/ConquerableStationList.xml.aspx","${mycache}/ConquerableStationList.xml",1440*60);
+	$dat=get_xml_contents("$API_BASEURL/eve/ConquerableStationList.xml.aspx","{$mycache}/ConquerableStationList.xml",1440*60);
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat->error,"ConquerableStationList.xml");
 	} else {
@@ -1251,7 +1251,7 @@ if (!apiCheckErrors($keyid,"ConquerableStationList.xml")) {
 //Parameters	 none
 //Cache Time (minutes)	 60 (1440)
 if (!apiCheckErrors(0,"ErrorList.xml")) {
-	$dat=get_xml_contents("$API_BASEURL/eve/ErrorList.xml.aspx","${mycache}/ErrorList.xml",1440*60);
+	$dat=get_xml_contents("$API_BASEURL/eve/ErrorList.xml.aspx","{$mycache}/ErrorList.xml",1440*60);
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat->error,"ErrorList.xml");
 	} else {
@@ -1283,7 +1283,7 @@ if (!apiCheckErrors(0,"ErrorList.xml")) {
 //Parameters	 none
 //Cache Time (minutes)	 1440
 if (!apiCheckErrors(0,"RefTypes.xml")) {
-	$dat=get_xml_contents("$API_BASEURL/eve/RefTypes.xml.aspx","${mycache}/RefTypes.xml",1440*60);
+	$dat=get_xml_contents("$API_BASEURL/eve/RefTypes.xml.aspx","{$mycache}/RefTypes.xml",1440*60);
 	if (isset($dat->error)) {
 		apiSaveWarning(0,$dat->error,"RefTypes.xml");
 	} else {
@@ -1336,7 +1336,7 @@ if (!apiCheckErrors(0,"CREST /market/prices/")) {
         $urladdr=$crestroot->marketPrices->href;
         //echo("DEBUG: urladdr=$urladdr\r\n");
         if ($urladdr) {
-            $dat=get_crest_contents("$CREST_BASEURL/market/prices/","${mycache}/crest_market_prices.json",23*60*60);
+            $dat=get_crest_contents("$CREST_BASEURL/market/prices/","{$mycache}/crest_market_prices.json",23*60*60);
             if (isset($dat->error)) {
                     apiSaveWarning(0,$dat,"CREST /market/prices/");
             } else {
@@ -1368,7 +1368,7 @@ if (!apiCheckErrors(0,"CREST /industry/systems/")) {
         $urladdr=$crestroot->industry->systems->href;
         //echo("DEBUG: urladdr=$urladdr\r\n");
         if ($urladdr) {
-            $dat=get_crest_contents($urladdr,"${mycache}/crest_industry_systems.json",1*60*60);
+            $dat=get_crest_contents($urladdr,"{$mycache}/crest_industry_systems.json",1*60*60);
             if (isset($dat->error)) {
                     apiSaveWarning(0,$dat,"CREST /industry/systems/");
             } else {
@@ -1466,13 +1466,13 @@ $amountTypes=$amountTypes[0][0];
 for ($i=0; $i < ceil($amountTypes / $MAXTYPES); $i++) {
 	//inform("Main","Getting data for TypeIDs... ".$i*$MAXTYPES." of $amountTypes");
 	$TYPES='';
-	$configuredTypes=db_asocquery("SELECT * FROM cfgmarket LIMIT ".$i*$MAXTYPES.",${MAXTYPES};");
+	$configuredTypes=db_asocquery("SELECT * FROM cfgmarket LIMIT ".$i*$MAXTYPES.",{$MAXTYPES};");
 	foreach ($configuredTypes as $type) {
 		$TYPES=$TYPES."&typeid=".$type['typeID'];
 	}
 	//echo("DEBUG: ".$TYPES."\r\n");
 	if (!apiCheckErrors(0,"eve-central.com")) {
-		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem=${useSystem}${TYPES}","${mycache}/marketstat_$i.xml",60*60);
+		$dat=get_xml_contents("http://api.eve-central.com/api/marketstat?usesystem={$useSystem}{$TYPES}","{$mycache}/marketstat_$i.xml",60*60);
 		if (isset($dat->error)) {
 			apiSaveWarning(0,$dat->error,"eve-central.com/marketstat.xml");
 		} else {

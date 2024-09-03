@@ -57,7 +57,7 @@ if ($argc != 3) die("Personal API Killmail loader.\r\nUse: php ".__FILE__." keyI
         $characters=array();
 	
 	if (!apiCheckErrors($keyid,"APIKeyInfo.xml")) {
-		$aki=get_xml_contents("$API_BASEURL/account/APIKeyInfo.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/APIKeyInfo_$keyid.xml",0*60);
+		$aki=get_xml_contents("$API_BASEURL/account/APIKeyInfo.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/APIKeyInfo_$keyid.xml",0*60);
 		if (isset($aki->error)) {
 			apiSaveWarning($keyid,$aki->error,"APIKeyInfo.xml");
 			continue;
@@ -82,7 +82,7 @@ if ($argc != 3) die("Personal API Killmail loader.\r\nUse: php ".__FILE__." keyI
 	//Parameters	 userID, apiKey, beforeKillID, characterID
 	//Cache Time (minutes)	 60
         if (!apiCheckErrors($keyid,"KillLog.xml")) {
-		$klg=get_xml_contents("$API_BASEURL/char/KillLog.xml.aspx?keyID=${keyid}&vCode=${vcode}&characterID=${characterID}","${mycache}/KillLog_${keyid}_${characterID}.xml",60*60);
+		$klg=get_xml_contents("$API_BASEURL/char/KillLog.xml.aspx?keyID={$keyid}&vCode={$vcode}&characterID={$characterID}","{$mycache}/KillLog_{$keyid}_{$characterID}.xml",60*60);
                 //echo($klg);
                 if (isset($klg->error)) {
                       apiSaveWarning($keyid,$klg->error,"KillLog.xml");
@@ -161,8 +161,8 @@ if ($argc != 3) die("Personal API Killmail loader.\r\nUse: php ".__FILE__." keyI
                                 
                                 //get kill items from CREST
                                 $killurl="$CREST_BASEURL/killmails/".$a->killID.'/'. killmail_hash($v->characterID, $finalBlowCharacterID, $v->shipTypeID, $a->killTime).'/';
-                                $crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail.json", 0);
-                                //$crest_killmail=get_crest_contents($killurl, "${mycache}/crest_killmail_".$a->killID.".json", 0);
+                                $crest_killmail=get_crest_contents($killurl, "{$mycache}/crest_killmail.json", 0);
+                                //$crest_killmail=get_crest_contents($killurl, "{$mycache}/crest_killmail_".$a->killID.".json", 0);
                                 
                                 if (isset($crest_killmail->victim->items) && getConfigItem('useCRESTkillmails', 'enabled')=='enabled') {
                                     apiSaveOK(0,"CREST /killmails/");
@@ -211,7 +211,7 @@ if ($argc != 3) die("Personal API Killmail loader.\r\nUse: php ".__FILE__." keyI
 		
 	/*//*********************************************** NEW API PARSE BLOCK
 	if (!apiCheckErrors($keyid,"EXPORT.xml")) {
-		$dat=get_xml_contents("$API_BASEURL/corp/EXPORT.xml.aspx?keyID=${keyid}&vCode=${vcode}","${mycache}/EXPORT_$keyid.xml",15*60);
+		$dat=get_xml_contents("$API_BASEURL/corp/EXPORT.xml.aspx?keyID={$keyid}&vCode={$vcode}","{$mycache}/EXPORT_$keyid.xml",15*60);
 		if (isset($dat->error)) {
 			apiSaveWarning($keyid,$dat->error,"EXPORT.xml");
 		} else {
@@ -236,13 +236,13 @@ LEFT JOIN `apicorpmembers` acm ON acm.installerID=aij.installerID
 WHERE acm.`installerID` IS NULL;");
 	$unknownIDs="";
 	foreach ($result as $row) {
-		$unknownIDs="${row['installerID']},$unknownIDs";
+		$unknownIDs="{$row['installerID']},$unknownIDs";
 	}
 	//cut the last comma
 	$unknownIDs = substr_replace($unknownIDs ,"",-1);
 	//if list of IDs isnt empty, ask EVE API for names
 	if (!empty($unknownIDs)) {
-		$ecn=get_xml_contents("$API_BASEURL/eve/CharacterName.xml.aspx?IDs=${unknownIDs}","${mycache}/CharacterName_$keyid.xml",5*60);
+		$ecn=get_xml_contents("$API_BASEURL/eve/CharacterName.xml.aspx?IDs={$unknownIDs}","{$mycache}/CharacterName_$keyid.xml",5*60);
 		if (isset($ecn->error)) {
 			warning("CharacterName.xml",$ecn->error);
 		} else {

@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=0; //Panel ID in menu. Used in hyperlinks
@@ -119,7 +119,7 @@ $pointsDisplayed=false;
                         $incursions="";
                         $ratting="";
                         $daystab="";
-				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h1>");
 ?>
 
 <?php
@@ -133,9 +133,9 @@ $pointsDisplayed=false;
                         
                         $sqlmis="SELECT COUNT(*) AS mission,date_format(date, '%e') AS day FROM
                         apiwalletjournal awj
-                        WHERE date BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+                        WHERE date BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
                         AND refTypeID=33
-                        AND awj.corporationID=${corp['corporationID']}
+                        AND awj.corporationID={$corp['corporationID']}
                         GROUP BY date_format(date, '%e')
                         ORDER BY date_format(date, '%e');";
                         
@@ -143,9 +143,9 @@ $pointsDisplayed=false;
                         
                         $sqlinc="SELECT COUNT(*) AS incursion,date_format(date, '%e') AS day FROM
                         apiwalletjournal awj
-                        WHERE date BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+                        WHERE date BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
                         AND refTypeID=99
-                        AND awj.corporationID=${corp['corporationID']}
+                        AND awj.corporationID={$corp['corporationID']}
                         GROUP BY date_format(date, '%e')
                         ORDER BY date_format(date, '%e');";
                         
@@ -153,9 +153,9 @@ $pointsDisplayed=false;
                         
                         $sqlrat="SELECT COUNT(*) AS ratting,date_format(date, '%e') AS day FROM
                         apiwalletjournal awj
-                        WHERE date BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+                        WHERE date BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
                         AND refTypeID=85
-                        AND awj.corporationID=${corp['corporationID']}
+                        AND awj.corporationID={$corp['corporationID']}
                         GROUP BY date_format(date, '%e')
                         ORDER BY date_format(date, '%e');";
                         

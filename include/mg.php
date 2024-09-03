@@ -226,7 +226,7 @@ function mg_load_session_data($characterID) {
         
         //find nearest
         $nearest = db_asocquery("SELECT * FROM "
-                . "(SELECT findNearest(${ls['x']}, ${ls['y']}, ${ls['z']}, ${ls['solarSystemID']}) AS itemID) obj "
+                . "(SELECT findNearest({$ls['x']}, {$ls['y']}, {$ls['z']}, {$ls['solarSystemID']}) AS itemID) obj "
                 . "JOIN `$LM_EVEDB`.`mapDenormalize` nam ON obj.`itemID` = nam.`itemID`");
         if (is_array($nearest) && count($nearest) > 0) {   
             $nearest = $nearest[0];
@@ -259,8 +259,8 @@ function mg_create_ship($characterID, $typeID, $locationID) {
     $location = db_asocquery("SELECT * FROM `$LM_EVEDB`.`mapDenormalize` WHERE `itemID`=$locationID;");
     if (is_array($location) && count($location) > 0) {
         $location = $location[0];
-        db_uquery("INSERT INTO `mg_assets` VALUES(DEFAULT, $locationID, $characterID, ${location['solarSystemID']}, $typeID, 1, NULL, ${location['x']}, ${location['y']}, ${location['z']});");
-        $assets = db_asocquery("SELECT * FROM `mg_assets` WHERE `characterID`=$characterID AND `typeID` = $typeID AND `solarSystemID` = ${location['solarSystemID']} ORDER BY `itemID` DESC LIMIT 1;");
+        db_uquery("INSERT INTO `mg_assets` VALUES(DEFAULT, $locationID, $characterID, {$location['solarSystemID']}, $typeID, 1, NULL, {$location['x']}, {$location['y']}, {$location['z']});");
+        $assets = db_asocquery("SELECT * FROM `mg_assets` WHERE `characterID`=$characterID AND `typeID` = $typeID AND `solarSystemID` = {$location['solarSystemID']} ORDER BY `itemID` DESC LIMIT 1;");
         $shipItemID = $assets[0]['itemID'];
         return $shipItemID;
     } else {
@@ -275,8 +275,8 @@ function mg_fit_item($shipItemID, $typeID, $flag) {
     $assets = db_asocquery("SELECT * FROM `mg_assets` WHERE `itemID`=$shipItemID LIMIT 1;");
     if (is_array($assets) && count($assets) > 0) {
         $assets = $assets[0];
-        db_uquery("INSERT INTO `mg_assets` VALUES(DEFAULT, $shipItemID, ${assets['characterID']}, ${assets['solarSystemID']}, $typeID, 1, $flag, ${assets['x']}, ${assets['y']}, ${assets['z']});");
-        $item = db_asocquery("SELECT * FROM `mg_assets` WHERE `characterID`=${assets['characterID']} AND `typeID` = $typeID AND `parentItemID` = $shipItemID AND `flag` = $flag ORDER BY `itemID` DESC LIMIT 1;");
+        db_uquery("INSERT INTO `mg_assets` VALUES(DEFAULT, $shipItemID, {$assets['characterID']}, {$assets['solarSystemID']}, $typeID, 1, $flag, {$assets['x']}, {$assets['y']}, {$assets['z']});");
+        $item = db_asocquery("SELECT * FROM `mg_assets` WHERE `characterID`={$assets['characterID']} AND `typeID` = $typeID AND `parentItemID` = $shipItemID AND `flag` = $flag ORDER BY `itemID` DESC LIMIT 1;");
         $itemID = $item[0]['itemID'];
         return $itemID;
     } else {
@@ -433,8 +433,8 @@ function mg_gm_teleport($itemID, $stationID) {
     $l = db_asocquery("SELECT * FROM `$LM_EVEDB`.`staStations` WHERE `stationID`=$stationID;");
     if (is_array($l) && count($l) > 0) {
         $l = $l[0];
-        db_uquery("UPDATE `mg_assets` SET `parentItemID` = $stationID, `solarSystemID` = ${l['solarSystemID']}, x=${l['x']}, y=${l['y']}, z=${l['z']} WHERE `itemID` = $itemID;");
-        db_uquery("UPDATE `mg_assets` SET `solarSystemID` = ${l['solarSystemID']}, x=${l['x']}, y=${l['y']}, z=${l['z']} WHERE `parentItemID` = $itemID;");
+        db_uquery("UPDATE `mg_assets` SET `parentItemID` = $stationID, `solarSystemID` = {$l['solarSystemID']}, x={$l['x']}, y={$l['y']}, z={$l['z']} WHERE `itemID` = $itemID;");
+        db_uquery("UPDATE `mg_assets` SET `solarSystemID` = {$l['solarSystemID']}, x={$l['x']}, y={$l['y']}, z={$l['z']} WHERE `parentItemID` = $itemID;");
         return TRUE;
     } else {
         return FALSE;

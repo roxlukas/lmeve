@@ -213,13 +213,13 @@ class Killmails extends Route {
         inform(get_class(), "importZKillboardPage('$zKillboardUrl')");
         //https://zkillboard.com/character/816121566/page/3/
         if (preg_match('/https\:\/\/zkillboard.com\/character\/(\d+)\/page\/(\d+)\//', $zKillboardUrl, $m)) {
-            $url = "https://zkillboard.com/character/${m[1]}/page/${m[2]}/";
+            $url = "https://zkillboard.com/character/{$m[1]}/page/{$m[2]}/";
             if ($this->ESI->getDEBUG()) inform(get_class(), "importZKillboardPage(): retrieving '$url'");
             $zkillPage = file_get_contents($url);
             $lines = preg_split('/[\r\n]+/', $zkillPage);
             foreach ($lines as $line) {
                 if (preg_match('/\/kill\/(\d+)\//', $line, $m)) {
-                    $this->importZKillboard("https://zkillboard.com/kill/${m[1]}/");
+                    $this->importZKillboard("https://zkillboard.com/kill/{$m[1]}/");
                     sleep(5);
                     $found = TRUE;
                 }
@@ -243,7 +243,7 @@ class Killmails extends Route {
     public function importZKillboard($zKillboardUrl) {
         inform(get_class(), "importZKillboard('$zKillboardUrl')");
         if (preg_match('/https\:\/\/zkillboard.com\/kill\/(\d+)\//', $zKillboardUrl, $m)) {
-            $zkillPage = file_get_contents("https://zkillboard.com/kill/${m[1]}/");
+            $zkillPage = file_get_contents("https://zkillboard.com/kill/{$m[1]}/");
             $lines = preg_split('/[\r\n]+/', $zkillPage);
             foreach ($lines as $line) {
                 if (preg_match('/https\:\/\/esi.evetech.net\/(dev|legacy|latest|v1)\/killmails\/(\d+)\/(\w+)\//', $line, $m)) {

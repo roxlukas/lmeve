@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditRoles")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=7; //Panel ID in menu. Used in hyperlinks
@@ -55,7 +55,7 @@ if ($new) {
 			//Insert rights
 			foreach ($rights as $right) {
 				if (secureGETstr('right_'.$right['rightID'],3)=='on') {
-					$rsql="INSERT INTO lmrolerights VALUES($newid,${right['rightID']})";
+					$rsql="INSERT INTO lmrolerights VALUES($newid,{$right['rightID']})";
 					db_uquery($rsql);
 				}
 			}
@@ -71,7 +71,7 @@ if ($new) {
 			db_uquery("DELETE FROM lmrolerights WHERE roleID=$nr;");
 			foreach ($rights as $right) {
 				if(secureGETstr('right_'.$right['rightID'],3)=='on') {
-					$rsql="INSERT INTO lmrolerights VALUES($nr,${right['rightID']})";
+					$rsql="INSERT INTO lmrolerights VALUES($nr,{$right['rightID']})";
 					//echo($rsql."<br>");
 					db_uquery($rsql);
 				}

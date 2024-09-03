@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewKillboard")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=0; //Panel ID in menu. Used in hyperlinks

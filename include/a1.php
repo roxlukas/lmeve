@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewDatabase")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
@@ -196,13 +196,13 @@ function decryptors($typeID, $techLevel) {
         if ($item_group_explorer) {
             $group = db_asocquery("SELECT * FROM `$LM_EVEDB`.`invGroups` WHERE `groupID` = " . $item['groupID']);
             $node = $group[0];
-            $breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID=${node['groupID']}\">${node['groupName']}</a>";
+            $breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID={$node['groupID']}\">{$node['groupName']}</a>";
         } else {
             $node=getMarketNode($item['marketGroupID']);
-            $breadcrumbs="&gt; ${item['typeName']}";
+            $breadcrumbs="&gt; {$item['typeName']}";
             $parentGroupID=$node['parentGroupID'];
             do {
-                    $breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID=${node['marketGroupID']}\">${node['marketGroupName']}</a> $breadcrumbs";
+                    $breadcrumbs="&gt; <a href=\"?id=10&id2=0&marketGroupID={$node['marketGroupID']}\">{$node['marketGroupName']}</a> $breadcrumbs";
                     if (!empty($node['parentGroupID'])) {
                             $node=getMarketNode($node['parentGroupID']);
                     } else {
@@ -217,7 +217,7 @@ function decryptors($typeID, $techLevel) {
 
 
         
-        //echo("<h2>${item['typeName']}</h2>");
+        //echo("<h2>{$item['typeName']}</h2>");
         //
 //CATEGORY ID DEBUG        
         
@@ -602,7 +602,7 @@ if ($model) {
 		foreach($metaTypes as $row) {
 			echo('<tr><td width="32" style="padding: 0px; text-align: center;">');
 				hrefedit_item($row['typeID']);
-				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 				echo('</a>');
 			echo('</td><td>');
 				hrefedit_item($row['typeID']);
@@ -623,7 +623,7 @@ if ($model) {
                     <tr><th>API invTypes URLs</th></tr>
 		<tr>
                     <?php
-                    $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`=${_SESSION['granted']};");
+                    $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`={$_SESSION['granted']};");
                     if (count($keys)>0) $apikey='key='.$keys[0]['apiKey'].'&'; else $apikey='';
                     ?>
                         <td>LMeve API (Database) <a href="api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?>" target="_blank">api.php?<?=$apikey?>endpoint=INVTYPES&typeID=<?=$nr?></a></td>
@@ -694,11 +694,11 @@ if (!$MOBILE) {
 	/************************* START OF DOGMA *******************************/
 	echo("<table border=\"0\" cellspacing=\"3\" cellpadding=\"0\" style=\"width: 100%;\">");
 	echo('<tr><td colspan="2" class="tab-header"><strong>Attributes</strong></td></tr>');
-	//echo("<tr><td width=\"50%\"><b>Size/Radius:</b></td><td width=\"50%\">${item[5]} m</td></tr>");
+	//echo("<tr><td width=\"50%\"><b>Size/Radius:</b></td><td width=\"50%\">{$item[5]} m</td></tr>");
         //if item is a SKIN
         if ($item['groupID']=1311) {
             $ship=getShipBySkin($nr);
-            if ($ship) echo("<tr><td class=\"tab\"><b>SKIN applies to:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${ship['typeID']}\"><img src=\"".getTypeIDicon($ship['typeID'])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px; margin-right: 3px;\" /> ${ship['typeName']}</a></td></tr>"); 
+            if ($ship) echo("<tr><td class=\"tab\"><b>SKIN applies to:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr={$ship['typeID']}\"><img src=\"".getTypeIDicon($ship['typeID'])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px; margin-right: 3px;\" /> {$ship['typeName']}</a></td></tr>"); 
         }
         //continue
 	echo("<tr><td class=\"tab\"><b>Mass:</b></td><td class=\"tab\">".number_format($item['mass'], 0, $DECIMAL_SEP, $THOUSAND_SEP)." kg</td></tr>");
@@ -711,13 +711,13 @@ if (!$MOBILE) {
         
 	if (count($blueprint) > 0 ) {
 		$blueprint=$blueprint[0];
-		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
+		echo("<tr><td class=\"tab\"><b>Blueprint:</b</td><td class=\"tab\"><a href=\"?id=10&id2=1&nr={$blueprint[0]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
 	}
 	
 	if (count($produceditem) > 0 ) {
 		$produceditem=$produceditem[0];
-		echo("<tr><td class=\"tab\"><b>Produced item:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr=${produceditem[2]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
-		if ($produceditem[4]==2) echo("<tr><td class=\"tab\"><b>Base Invention chance:</b></td><td class=\"tab\">${produceditem[12]}</td></tr>");
+		echo("<tr><td class=\"tab\"><b>Produced item:</b></td><td class=\"tab\"><a href=\"?id=10&id2=1&nr={$produceditem[2]}\"><img src=\"ccp_icons/38_16_208.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> look up</a></td></tr>");
+		if ($produceditem[4]==2) echo("<tr><td class=\"tab\"><b>Base Invention chance:</b></td><td class=\"tab\">{$produceditem[12]}</td></tr>");
 	}
 
 	$sql="SELECT COALESCE(valueFloat,valueInt),COALESCE(valueFloat,valueInt),displayName,description
@@ -732,11 +732,11 @@ if (!$MOBILE) {
 			$element[0]=sprintf("%6.1f%%",100*(1.0-$element[0]));
 		}
 		if (preg_match("/.*skill.*/i", $element[2], $regs)) {
-			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $skill=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = {$element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/50_64_11.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$skill[0][0]);
 		}
 		if ($element[2]=="Used with (chargegroup)") {
-			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = ${element[1]};");
+			if (!empty($element[1])) $groupid=db_query("SELECT groupName FROM $LM_EVEDB.`invGroups` WHERE groupID = {$element[1]};");
 			$element[0]=sprintf("%s",$groupid[0][0]);
 		}
 		if (strstr("Can be fitted to",$element[2])) {
@@ -758,7 +758,7 @@ if (!$MOBILE) {
 		}
 		//Jump Drive Fuel Need
 		if (strstr("Jump Drive Fuel Need",$element[2])) {
-			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $fuel=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = {$element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"".getTypeIDicon($element[1])."\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$fuel[0][0]);
 		}
 		if (preg_match("/.*duration$/i", $element[2], $regs)) {
@@ -774,7 +774,7 @@ if (!$MOBILE) {
 			$element[0]=sprintf("%d MB/s",$element[0]);
 		}
 		if (strstr("Planet Type Restriction",$element[2])) {
-			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = ${element[1]};");
+			if (!empty($element[1])) $planettype=db_query("SELECT typeName FROM $LM_EVEDB.`invTypes` WHERE typeID = {$element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/102_128_4.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" />  %s</a>",$element[1],$planettype[0][0]);
 		}
 
@@ -794,12 +794,12 @@ if (!$MOBILE) {
 			$element[0]=sprintf("%d s",0.001*$element[0]);
 		}
 		if (strstr("Consumption Type",$element[2])) {
-			$type=db_query("SELECT typeName FROM $LM_EVEDB.invTypes WHERE typeID = ${element[1]};");
+			$type=db_query("SELECT typeName FROM $LM_EVEDB.invTypes WHERE typeID = {$element[1]};");
 			$element[0]=sprintf("<a href=\"?id=10&id2=1&nr=%d\"><img src=\"ccp_icons/51_64_11.png\" style=\"width: 16px; height: 16px; float: left; margin-right: 3px;\" /> %s</a>",$element[1],$type[0][0]);
 		}
-		//echo("<tr><td><b>${element[2]}</b><br /><i>${element[1]}</i></td><td>${element[0]}</td></tr>");
+		//echo("<tr><td><b>{$element[2]}</b><br /><i>{$element[1]}</i></td><td>{$element[0]}</td></tr>");
 		if (isset($element[0])) $value=$element[0]; else $value=$element[1];
-		echo("<tr><td class=\"tab\"><b>${element[2]}</b><br /></td><td class=\"tab\">$value</td></tr>");
+		echo("<tr><td class=\"tab\"><b>{$element[2]}</b><br /></td><td class=\"tab\">$value</td></tr>");
 	}
 	echo('</table>');
 	/************************* END OF DOGMA *******************************/

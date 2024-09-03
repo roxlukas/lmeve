@@ -37,7 +37,7 @@ function showUsers($admini) {
    	    echo("<td$log>");
 		if ($admin['act']=="0") echo('<font color="#a0a0a0">');
 	    if (checkrights("Administrator,EditUsers")) {
-			echo("<a href=\"?id=7&id2=2&nr=${admin['userID']}\">${admin['login']}</a>");
+			echo("<a href=\"?id=7&id2=2&nr={$admin['userID']}\">{$admin['login']}</a>");
 		} else {
 			echo($admin['login']);
 		}

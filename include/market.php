@@ -125,7 +125,7 @@ function showBuyback($buybacklist) {
                 echo('</td>');
                 echo('<td>');
                         //echo($row['orderSerialized']);
-                        //echo("SAVED: ${row['fullHash']}<br />");
+                        //echo("SAVED: {$row['fullHash']}<br />");
                         //echo("CALC: $order_fullhash<br />"); 
                         if ($rights_viewbuyorders) buyhrefedit($row['orderID']);
                         if ($row['fullHash']==$order_fullhash) echo(OKIMG()." OK"); else echo(NOKIMG()." TAMPERED");
@@ -188,7 +188,7 @@ function showBuybackOrder($row) {
 	$order_fullhash=longhash($row['orderSerialized'].$row['timestmp']);
 
 	foreach($items as $item) {
-		//$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`=${item['typeID']};");
+		//$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`={$item['typeID']};");
 		//$typeName=$typeName[0][0];
 		//$items=$items.$item['quantity'].'x '.$typeName.'<br />';
 		$value+=$item['quantity']*$item['unitprice'];
@@ -197,7 +197,7 @@ function showBuybackOrder($row) {
 	echo('<table>');
 	echo("<tr><td class=\"tab-header\"><strong>Date:</strong></td><td class=\"tab\">".date('Y.m.d H:i:s',$row['timestmp'])."</td></tr>");
 	echo("<tr><td class=\"tab-header\"><strong>Buyback order price:</strong></td><td class=\"tab\">".number_format($value, 2, $DECIMAL_SEP, $THOUSAND_SEP)." ISK</td></tr>");
-	echo("<tr><td class=\"tab-header\"><strong>Contract Description:</strong></td><td class=\"tab\">${row['shortHash']}</td></tr>");
+	echo("<tr><td class=\"tab-header\"><strong>Contract Description:</strong></td><td class=\"tab\">{$row['shortHash']}</td></tr>");
 	echo("<tr><td class=\"tab-header\"><strong>Hash:</strong></td><td class=\"tab\">");
 		echo('<table border="0" cellspacing="2" cellpadding="0">');
 		echo('<tr><td class="tab"><strong>Hash:</strong></td><td class="tab">'.$order_fullhash.'</td></tr>');
@@ -230,14 +230,14 @@ function showBuybackOrder($row) {
 			echo("<tr><td><strong>Contract price</strong></td><td>");
 			echo(number_format($row['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP));
 			echo("<br /></td></tr>");
-			$charName=db_query("SELECT `name` FROM `apicorpmembers` WHERE `characterID`=${row['issuerID']};");
+			$charName=db_query("SELECT `name` FROM `apicorpmembers` WHERE `characterID`={$row['issuerID']};");
 			$charName=$charName[0][0];
 			echo("<tr><td><strong>Issued by:</strong></td><td>");
 				if ($rights_viewallchars) charhrefedit($row['issuerID']);
 					echo(stripslashes($charName));
 				if ($rights_viewallchars) echo('</a>');
 			echo("<br /></td></tr>");
-			echo("<tr><td><strong>Issue date:</strong></td><td>${row['dateIssued']}<br /></td></tr>");
+			echo("<tr><td><strong>Issue date:</strong></td><td>{$row['dateIssued']}<br /></td></tr>");
 		} else {
 			//no contract yet
 			echo(NOKIMG()." No contract<br />");
@@ -254,7 +254,7 @@ function showBuybackOrder($row) {
 		echo('<table border="0" cellspacing="2" cellpadding="0">');
 		echo('<tr><td class="tab-header">Material</td><td class="tab-header">Quantity</td></tr>');
 		foreach($items as $item) {
-			$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`=${item['typeID']};");
+			$typeName=db_query("SELECT `typeName` from $LM_EVEDB.`invTypes` WHERE `typeID`={$item['typeID']};");
 			$typeName=$typeName[0][0];
 			echo('<tr><td class="tab"><a href="?id=10&id2=1&nr='.$item['typeID'].'"><img src="'.getTypeIDicon($item['typeID']).'" style="width: 16px; height: 16px; vertical-align: text-bottom;" /> '.$typeName.'</td><td class="tab" style="text-align: right;"> '.number_format($item['quantity'], 0, $DECIMAL_SEP, $THOUSAND_SEP).'</td></tr>');
 		}
@@ -343,7 +343,7 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
 			echo('</td>');
 			echo('<td style="padding: 0px; width: 32px;">');
                             if ($rights_viewallchars) charhrefedit($row['charID']);
-                                echo("<img src=\"" . getCharacterPortrait($row['charID'], 32) . "\" title=\"${row['name']}\" />");
+                                echo("<img src=\"" . getCharacterPortrait($row['charID'], 32) . "\" title=\"{$row['name']}\" />");
                             if ($rights_viewallchars) echo("</a>");
 			echo('</td>');
                         echo('<td>');
@@ -353,7 +353,7 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
 			echo('</td>');
                         echo('<td style="padding: 0px; width: 32px;">');
                             itemhrefedit($row['typeID']);
-                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
                             echo("</a>");
 			echo('</td>');
                         echo('<td>');
@@ -362,7 +362,7 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
                             echo("</a>");
 			echo('</td>');
                         echo('<td>');
-                            echo("<span title=\"${row['stationName']}\">");
+                            echo("<span title=\"{$row['stationName']}\">");
                             echo($row['solarSystemName']);
                             echo("&nbsp;<img src=\"ccp_icons/38_16_208.png\" style=\"vertical-align: middle;\" />");
                             echo('</span>');
@@ -374,7 +374,7 @@ function showMarketOrders($orderlist,$label=null,$sell=TRUE) {
                             echo($row['volEntered']-$row['volRemaining']." of ". $row['volEntered']);
 			echo('</td>');
                         echo('<td>');
-                            percentbar(floor(100*($row['volEntered']-$row['volRemaining'])/$row['volEntered']), $row['volEntered']-$row['volRemaining']." of ${row['volEntered']}");
+                            percentbar(floor(100*($row['volEntered']-$row['volRemaining'])/$row['volEntered']), $row['volEntered']-$row['volRemaining']." of {$row['volEntered']}");
 			echo('</td>');
 			echo('</tr>');
                         $total+=$row['volRemaining']*$row['price'];
@@ -585,7 +585,7 @@ function showQuote($stock, $items, $label = "Quote") {
                 $total += $item['amount'] * $common[$typeID]['stock']['price'];
                 $price = number_format($item['amount'] * $common[$typeID]['stock']['price'], 2, $DECIMAL_SEP, $THOUSAND_SEP) . " ISK";
                 $buying = showHint($common[$typeID]['stock']['quantity'], $common[$typeID]['stock']['amount']);
-                $form = "<input type=\"hidden\" name=\"q_${item['typeID']}\" value=\"${item['amount']}\">";
+                $form = "<input type=\"hidden\" name=\"q_{$item['typeID']}\" value=\"{$item['amount']}\">";
                 $css = "";
             } else {
                 $price = "0.00 ISK";
@@ -643,7 +643,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
     <?php echo("var all_fields=[\r\n");
         foreach($buycalc as $groupID => $group) {
 	    foreach($group['types'] as $row) {
-		echo("[ 'q_${row['typeID']}', 'v_${row['typeID']}' ],\r\n");
+		echo("[ 'q_{$row['typeID']}', 'v_{$row['typeID']}' ],\r\n");
 	    }
         }
         echo("];\r\n");
@@ -705,7 +705,7 @@ function showBuyCalc($buycalc,$inventory=array()) {
 			foreach($group['types'] as $typeID => $row) {
 				echo('<tr><td style="padding: 0px; width: 32px;">');
 				if ($rights_viewdatabase) buchrefedit($row['typeID']);
-					echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+					echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 				if ($rights_viewdatabase) echo('</a>');
 				echo('</td>');
 				echo('<td>');
@@ -722,14 +722,14 @@ function showBuyCalc($buycalc,$inventory=array()) {
 				if ($rights_viewdatabase) echo('</a>');
 				echo('</td>');
 				echo('<td>');
-					echo("<input name=\"q_${row['typeID']}\" id=\"q_${row['typeID']}\" type=\"text\" size=\"10\" value=\"0\" onclick=\"select_all(this);\" onkeyup=\"calc_row('q_${row['typeID']}','p_${row['typeID']}','v_${row['typeID']}','total',all_fields,event)\" tabindex=\"$tabindex\">");
+					echo("<input name=\"q_{$row['typeID']}\" id=\"q_{$row['typeID']}\" type=\"text\" size=\"10\" value=\"0\" onclick=\"select_all(this);\" onkeyup=\"calc_row('q_{$row['typeID']}','p_{$row['typeID']}','v_{$row['typeID']}','total',all_fields,event)\" tabindex=\"$tabindex\">");
 				$tabindex+=1;
 				echo('</td>');
 				echo('<td>');
-					echo("<div id=\"p_${row['typeID']}\" style=\"text-align: right;\">${row['maxbuy']}</div>");
+					echo("<div id=\"p_{$row['typeID']}\" style=\"text-align: right;\">{$row['maxbuy']}</div>");
 				echo('</td>');
 				echo('<td>');
-					echo("<div id=\"v_${row['typeID']}\" style=\"text-align: right;\">0.00</div>");
+					echo("<div id=\"v_{$row['typeID']}\" style=\"text-align: right;\">0.00</div>");
 				echo('</td></tr>');
                                 $type++;
 			}

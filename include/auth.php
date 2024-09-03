@@ -17,7 +17,7 @@ function checksession() {
 function check_expired_accounts() {
     global $USERSTABLE,$MOBILE;
 	if (isset($_SESSION['granted'])) {
-		$sql="SELECT `act` FROM `$USERSTABLE` WHERE `userID`=${_SESSION['granted']};";
+		$sql="SELECT `act` FROM `$USERSTABLE` WHERE `userID`={$_SESSION['granted']};";
 		$result=db_query($sql);
 		if ($result[0][0]==0) { 
                     $_SESSION=array();
@@ -32,7 +32,7 @@ function check_changed_session_ip() {
 	if ($LM_IPCONTROL==1) {
 		$current_ip=get_remote_addr();
 		if ((isset($_SESSION['ip'])) && $_SESSION['ip'] != $current_ip) { //jest ustawiony, ale sie rozni
-			$do_logu="<b>IP Address has changed during session lifetime</b> Should be: ${_SESSION['ip']}";
+			$do_logu="<b>IP Address has changed during session lifetime</b> Should be: {$_SESSION['ip']}";
 			loguj("../var/access.txt",$do_logu);
 			$_SESSION['status']=0;
 			$_SESSION['granted']=-1;
@@ -77,7 +77,7 @@ function check_changed_session_path() {
     global $LM_COOKIEPATH;
     $current_path=$LM_COOKIEPATH;
 		if ((isset($_SESSION['path'])) && $_SESSION['path'] != $current_path) { //jest ustawiony, ale sie rozni
-			$do_logu="<b>Session cookiepath has changed</b>. It is $current_path, but should be: ${_SESSION['path']}";
+			$do_logu="<b>Session cookiepath has changed</b>. It is $current_path, but should be: {$_SESSION['path']}";
 			loguj("../var/access.txt",$do_logu);
 			$_SESSION['status']=0;
 			$_SESSION['granted']=-1;
@@ -91,7 +91,7 @@ function check_changed_session_path() {
 function userexists($userID="") {
 	global $USERSTABLE;
 	if ($userID=="") { //this user
-		$count=db_count("SELECT * FROM `$USERSTABLE` WHERE `userID`=${_SESSION['granted']};");
+		$count=db_count("SELECT * FROM `$USERSTABLE` WHERE `userID`={$_SESSION['granted']};");
 		if ($count>0) {
 			return TRUE;
 		} else {
@@ -117,7 +117,7 @@ function getmyrights() {
 	lur.`roleID`=lrr.`roleID`
 	JOIN `lmrights` lmr ON
 	lrr.`rightID`=lmr.`rightID`
-	WHERE ut.`userID`=${_SESSION['granted']};");
+	WHERE ut.`userID`={$_SESSION['granted']};");
 	return $rights;
 }
 
@@ -141,7 +141,7 @@ function checkright($rightName) {
 	JOIN `lmrights` lmr ON
 	lrr.`rightID`=lmr.`rightID`
 	WHERE lmr.`rightName`='$rightName'
-	AND ut.`userID`=${_SESSION['granted']};");
+	AND ut.`userID`={$_SESSION['granted']};");
 	if ($count>0) {
 		return TRUE;
 	} else {
@@ -177,7 +177,7 @@ function checkrights($rightNames) { //comma-separated string
 	JOIN `lmrights` lmr ON
 	lrr.`rightID`=lmr.`rightID`
 	WHERE lmr.`rightName` IN ($tmp)
-	AND ut.`userID`=${_SESSION['granted']};";
+	AND ut.`userID`={$_SESSION['granted']};";
 	//echo("DEBUG: $sql");
 	$count=db_count($sql);
 	if ($count>0) {
@@ -191,7 +191,7 @@ function getcss() {
 	if (!userexists()) return FALSE;
 	global $USERSTABLE;
 	if (isset($_SESSION['granted'])) {
-			$sql="SELECT `css` FROM `$USERSTABLE` WHERE `userID`=${_SESSION['granted']};";
+			$sql="SELECT `css` FROM `$USERSTABLE` WHERE `userID`={$_SESSION['granted']};";
 			$result=db_query($sql);
 			return $result[0][0];
 		} else {
@@ -203,7 +203,7 @@ function getusername() { //obsolete and stupid!!
 	//if (!userexists()) return FALSE;
 	global $USERSTABLE;
 	if (isset($_SESSION['granted'])) {
-		$sql="SELECT `login` FROM `$USERSTABLE` WHERE `userID`=${_SESSION['granted']};";
+		$sql="SELECT `login` FROM `$USERSTABLE` WHERE `userID`={$_SESSION['granted']};";
 		$result=db_query($sql);
 		return $result[0][0];
 	} else {
@@ -219,9 +219,9 @@ function setprefs($prefs) {
 	global $USERSTABLE;
 	if (isset($_SESSION['granted'])) {		
 			$sql="UPDATE `$USERSTABLE` SET
-			`defaultPage`='${prefs['defaultPage']}',
-			`css`='${prefs['css']}'
-			WHERE `userID`=${_SESSION['granted']};";
+			`defaultPage`='{$prefs['defaultPage']}',
+			`css`='{$prefs['css']}'
+			WHERE `userID`={$_SESSION['granted']};";
 			db_uquery($sql);
 	}
 }
@@ -230,7 +230,7 @@ function getprefs() {
 	if (!userexists()) return FALSE;
 	global $USERSTABLE;
 	if (isset($_SESSION['granted'])) {
-			$sql="SELECT * FROM `$USERSTABLE` WHERE `userID`=${_SESSION['granted']};";
+			$sql="SELECT * FROM `$USERSTABLE` WHERE `userID`={$_SESSION['granted']};";
 			$result=db_asocquery($sql);
 			return $result[0];
 	}
@@ -250,7 +250,7 @@ function updatelast($date,$ip) {
 			$sql="UPDATE `$USERSTABLE` SET
 			last='$date',
 			lastip='$ip'
-			WHERE `userID`=${_SESSION['granted']};";
+			WHERE `userID`={$_SESSION['granted']};";
 			db_uquery($sql);
 	}	
 }
@@ -276,13 +276,13 @@ function checkpass($pass) {
 	global $USERSTABLE;
 	if (isset($_SESSION['granted'])) {
 		$hash=hashpass($pass);
-		$result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='${_SESSION['granted']}' AND pass='$hash';");
+		$result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='{$_SESSION['granted']}' AND pass='$hash';");
 		if (count($result)==1) {
 			return TRUE;
 		} else {
                     //fallback to md5 password
                     $hash=hashpassLegacy($pass);
-                    $result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='${_SESSION['granted']}' AND pass='$hash';");
+                    $result=db_query("SELECT `userID` FROM `$USERSTABLE` WHERE `userID`='{$_SESSION['granted']}' AND pass='$hash';");
                     if (count($result)==1) {
                             return TRUE;
                     }
@@ -297,7 +297,7 @@ function setpass($newpass) {
         updateUserstable();
 	$newpass=hashpass($newpass);
 	if (isset($_SESSION['granted'])) {
-			$sql="UPDATE `$USERSTABLE` SET pass='$newpass' WHERE `userID`=${_SESSION['granted']};";
+			$sql="UPDATE `$USERSTABLE` SET pass='$newpass' WHERE `userID`={$_SESSION['granted']};";
 			db_uquery($sql);
 	}
 }

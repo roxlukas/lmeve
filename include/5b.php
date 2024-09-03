@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditHoursPerPoint")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
@@ -52,7 +52,7 @@ global $LM_EVEDB;
 		    echo('</td></tr>');
 		    
 		    echo('<tr><td width="150" class="tab">Points per hour:<br></td><td width="200" class="tab">');
-                        echo("<input type=\"text\" name=\"hrsPerPoint\" value=\"${data['hrsPerPoint']}\" />");
+                        echo("<input type=\"text\" name=\"hrsPerPoint\" value=\"{$data['hrsPerPoint']}\" />");
 		    echo('</td></tr>');
 
 		    echo('</table>');

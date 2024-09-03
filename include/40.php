@@ -3,14 +3,14 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewMessages")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=4; //Panel ID in menu. Used in hyperlinks
 $PANELNAME='Messages'; //Panel name (optional)
 //standard header ends here
 
-		$message=message("WHERE `msgto`=${_SESSION['granted']}");
+		$message=message("WHERE `msgto`={$_SESSION['granted']}");
 
 		include('filter.php');
 		//$idmsg=range(0,$ilemsg-1);
@@ -64,7 +64,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 		    if ($row['msgread']==0) $wyl=formatowanie(0,1,0,-1);
 		    echo(stripslashes($row['msgdate']));
 		    odformatowanie($wyl);
-		    echo("</a></td><td class=\"tab\"><a href=\"index.php?id=4&id2=4&nr=${row['id']}\"><img src=\"img/del.gif\" alt=\"x\"></a></td></tr>");
+		    echo("</a></td><td class=\"tab\"><a href=\"index.php?id=4&id2=4&nr={$row['id']}\"><img src=\"img/del.gif\" alt=\"x\"></a></td></tr>");
 		}
 		?>
 		</table>

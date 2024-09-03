@@ -32,7 +32,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	JOIN $LM_EVEDB.ramActivities rac
 	ON lmt.activityID=rac.activityID
 	WHERE $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)) OR (singleton=0))
 	) AS a
 	LEFT JOIN	
 	(SELECT lmt.taskID, SUM(aij.runs)*itp.portionSize AS runsDone, COUNT(*) AS jobsDone
@@ -41,9 +41,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	ON lmt.typeID=itp.typeID
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS b
 	ON a.taskID=b.taskID
@@ -52,9 +52,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	FROM lmtasks lmt
 	JOIN apiindustryjobs aij
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
-	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS c
 	ON a.taskID=c.taskID
@@ -65,9 +65,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
         JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
-	WHERE aij.completed=1 AND beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	WHERE aij.completed=1 AND beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (singleton=0))
+	AND ((singleton=1 AND beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS d
 	ON a.taskID=d.taskID
@@ -78,9 +78,9 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
 	ON lmt.typeID=aij.outputTypeID AND lmt.activityID=aij.activityID AND lmt.characterID=aij.installerID
         JOIN $LM_EVEDB.invTypes itp
 	ON lmt.typeID=itp.typeID
-	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day) AND aij.endProductionTime < UTC_TIMESTAMP()
+	WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day) AND aij.endProductionTime < UTC_TIMESTAMP()
 	AND $MYTASKS AND $SELECTEDCHAR
-	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (singleton=0))
+	AND ((singleton=1 AND lmt.taskCreateTimestamp BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)) OR (singleton=0))
 	GROUP BY lmt.characterID, lmt.typeID, lmt.activityID, lmt.taskID
 	) AS e
 	ON a.taskID=e.taskID
@@ -94,7 +94,7 @@ function getTasks($MYTASKS, $SELECTEDCHAR, $ORDERBY, $year, $month) {
          * jobsCompleted - how many industry jobs actually completed 
          * runsCompleted - how many individual items actually completed */
         $howOldSingletons=getConfigItem('singletonTaskExpiration','90');
-        $thisMonth="BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)";
+        $thisMonth="BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)";
         $singletonOrNot="((singleton=0 AND beginProductionTime $thisMonth) OR (singleton=1 AND taskCreateTimestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL $howOldSingletons day) AND beginProductionTime > taskCreateTimestamp))";
         //$singletonOrNot="beginProductionTime $thisMonth";
         
@@ -226,7 +226,7 @@ function getTasksByLab($nr = NULL) {
     $year=date("Y"); $month=date("m");
     if (!is_null($nr)) $where = "`structureID`=$nr"; else $where = "TRUE";
     $tasks=db_asocquery("SELECT * FROM `lmtasks` WHERE  $where
-    AND ((`singleton`=1 AND `taskCreateTimestamp` BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)) OR (`singleton`=0));");
+    AND ((`singleton`=1 AND `taskCreateTimestamp` BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)) OR (`singleton`=0));");
     return ($tasks);
 }
 
@@ -270,7 +270,7 @@ function getMyChars($array=false) {
     $chars=db_asocquery("SELECT acm.characterID FROM apicorpmembers acm
 	JOIN lmchars lmc
 	ON lmc.charID=acm.characterID
-        WHERE lmc.userID=${_SESSION['granted']};");
+        WHERE lmc.userID={$_SESSION['granted']};");
     if (!empty($chars)) {
         if ($array==false) {
             foreach ($chars as $c) {
@@ -350,9 +350,9 @@ function showTasks($tasklist) {
                     //end dirty hack
                     
 			echo('<tr><td style="padding: 0px; width: 32px;">');
-                        echo("<a name=\"kit_anchor_${row['taskID']}\"></a>");
+                        echo("<a name=\"kit_anchor_{$row['taskID']}\"></a>");
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['name']}\" />");
+				echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"{$row['name']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -372,7 +372,7 @@ function showTasks($tasklist) {
                     }
                         echo('<td style="padding: 0px; width: 32px;">');
 			itemhrefedit($row['typeID']);
-				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 			echo('</a>');
 			echo('</td>');
                     if(!$MOBILE) {
@@ -400,7 +400,7 @@ function showTasks($tasklist) {
                                 if ($MOBILE) {
                                     echo($percent1.'%');
                                 } else {
-                                    percentbar2($percent1,$percent2,"Done ${row['runsDone']} of ${row['runs']}");
+                                    percentbar2($percent1,$percent2,"Done {$row['runsDone']} of {$row['runs']}");
                                 }
 				echo('</td><td style="text-align: center;">');
 				if (empty($row['jobsCompleted'])) $row['jobsCompleted']=0;
@@ -410,14 +410,14 @@ function showTasks($tasklist) {
                                 if ($MOBILE) {
                                     echo($realperc.'%');
                                 } else {   
-                                    percentbar($realperc,"${row['jobsSuccess']} successful in ${row['runsCompleted']} attempts");
+                                    percentbar($realperc,"{$row['jobsSuccess']} successful in {$row['runsCompleted']} attempts");
                                 }
 				}
 			echo('</td><td style="text-align: center; padding: 0px; width: 48px;">');
                                 //$row['runs'] - total number of runs, $row['runsDone'] - number of completed runs
                                 $remainingRuns=$row['runs']-$row['runsDone']; if ($remainingRuns<0) $remainingRuns=0;
                                 //v1
-				//echo("<a href=\"#kit_anchor_${row['taskID']}\" title=\"FULL kit for this task\" onclick=\"getKit('kit_row_".$row['taskID']."','kit_".$row['taskID']."',".$row['typeID'].",".$row['activityID'].",".$row['runs'].")\">");
+				//echo("<a href=\"#kit_anchor_{$row['taskID']}\" title=\"FULL kit for this task\" onclick=\"getKit('kit_row_".$row['taskID']."','kit_".$row['taskID']."',".$row['typeID'].",".$row['activityID'].",".$row['runs'].")\">");
                                 //v2
                                 //echo("<span title=\"FULL kit for this task\" onclick=\"getKit('kit_row_".$row['taskID']."','kit_".$row['taskID']."',".$row['typeID'].",".$row['activityID'].",".$row['runs'].")\">");
                                 //v3
@@ -430,7 +430,7 @@ function showTasks($tasklist) {
                                 //12_64_3 - market box <- best!
                                 echo("<img src=\"ccp_icons/12_64_3.png\" style=\"width: 24px; height: 24px;\" /></span>");
                                 //v1
-                                //echo("<a href=\"#kit_anchor_${row['taskID']}\" title=\"REMAINING kit for this task\" onclick=\"getKit('kit_row_".$row['taskID']."','kit_".$row['taskID']."',".$row['typeID'].",".$row['activityID'].",".$remainingRuns.")\">");
+                                //echo("<a href=\"#kit_anchor_{$row['taskID']}\" title=\"REMAINING kit for this task\" onclick=\"getKit('kit_row_".$row['taskID']."','kit_".$row['taskID']."',".$row['typeID'].",".$row['activityID'].",".$remainingRuns.")\">");
                                 //v2
                                 //echo("<span title=\"REMAINING kit for this task\" onclick=\"getKit('kit_row_".$row['taskID']."','kit_".$row['taskID']."',".$row['typeID'].",".$row['activityID'].",".$remainingRuns.")\">");
                                 //v3
@@ -443,8 +443,8 @@ function showTasks($tasklist) {
                         echo("<tr style=\"display: none\"><td colspan=\"10\">");
                         echo('</td></tr>');
                         //Kit holder
-                        echo("<tr id=\"kit_row_${row['taskID']}\" style=\"display: none\"><td colspan=\"10\">");
-                        echo("<div id=\"kit_${row['taskID']}\"><em>Loading kit data...</em></div>");
+                        echo("<tr id=\"kit_row_{$row['taskID']}\" style=\"display: none\"><td colspan=\"10\">");
+                        echo("<div id=\"kit_{$row['taskID']}\"><em>Loading kit data...</em></div>");
                         echo('</td></tr>');
 		}
 		echo('</table>');
@@ -490,7 +490,7 @@ function showTasks_old($tasklist) {
 		foreach($tasklist as $row) {
 			echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 			taskhrefedit($row['characterID'],$year.$month);
-				echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['name']}\" />");
+				echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"{$row['name']}\" />");
 			echo('</a>');
 			echo('</td><td class="tab">');
 			taskhrefedit($row['characterID'],$year.$month);
@@ -498,7 +498,7 @@ function showTasks_old($tasklist) {
 			echo('</a>');
 			echo('</td><td class="tab" style="padding: 0px; width: 32px;">');
 			if ($rights) edittaskhrefedit($row['taskID']);
-				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 			if ($rights) echo('</a>');
 			echo('</td><td class="tab">');
 			if ($rights) edittaskhrefedit($row['taskID']);
@@ -515,13 +515,13 @@ function showTasks_old($tasklist) {
 				echo($row['runs']);
 			echo('</td><td class="tab">');
 				if ($row['runs'] > 0) $realperc=round(100*$row['runsDone']/$row['runs']); else $realperc=0;
-                                percentbar($realperc,"Done ${row['runsDone']} of ${row['runs']}");
+                                percentbar($realperc,"Done {$row['runsDone']} of {$row['runs']}");
 				echo('</td><td class="tab">');
 				if (empty($row['jobsCompleted'])) $row['jobsCompleted']=0;
 				if (empty($row['jobsSuccess'])) $row['jobsSuccess']=0;
 				if (($row['activityID']==7) || ($row['activityID']==8)) {
 				if ($row['jobsCompleted'] > 0) $realperc=round(100*$row['jobsSuccess']/$row['jobsCompleted']); else $realperc=0;
-                                percentbar($realperc,"${row['jobsSuccess']} successful in ${row['jobsCompleted']} attempts");
+                                percentbar($realperc,"{$row['jobsSuccess']} successful in {$row['jobsCompleted']} attempts");
 				}
 			echo('</td>');
 			
@@ -606,7 +606,7 @@ function showCurrentJobs($jobslist) {
 	<?php
 		foreach($jobslist as $row) {
 			echo('<tr><td style="padding: 0px; width: 32px;">');
-                            echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"${row['name']}\" />");
+                            echo("<img src=\"" . getCharacterPortrait($row['characterID'], 32) . "\" title=\"{$row['name']}\" />");
 			echo('</td>');
                         if (!$MOBILE) {
                             echo('<td>');
@@ -616,7 +616,7 @@ function showCurrentJobs($jobslist) {
                         echo('<td>');
                             echo($row['activityName']);    
 			echo('</td><td style="padding: 0px; width: 32px;">');
-				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 			echo('</td><td>');
                                 itemhrefedit($row['typeID']);
 				echo($row['typeName']);
@@ -705,7 +705,7 @@ function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
 	ON aij.activityID=cpt.activityID
 	JOIN apicorpmembers acm
 	ON aij.installerID=acm.characterID
-	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 	AND aij.corporationID=$corporationID
 	GROUP BY `characterID`,`name`,`activityName`
 	ORDER BY `name`,`activityName`) AS wages;";
@@ -724,7 +724,7 @@ function getTimesheet($corporationID, $year, $month, $aggregate=FALSE) {
         ON aij.`installerID`=lmc.`charID`
         JOIN lmusers lmu
         ON lmc.`userID`=lmu.`userID`
-	WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+	WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 	AND aij.corporationID=$corporationID
 	GROUP BY lmu.`userID`,lmu.`login`,`activityName`
 	ORDER BY lmu.`login`,`activityName`) AS wages;";

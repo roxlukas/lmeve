@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=1; //Panel ID in menu. Used in hyperlinks
@@ -88,7 +88,7 @@ function althrefedit($nr) {
 				foreach($items as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 						althrefedit($row[typeID]);
-						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 						echo('</a>');
 					echo('</td><td class="tab">');
 						althrefedit($row[typeID]);

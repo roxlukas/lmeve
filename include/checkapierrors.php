@@ -46,7 +46,7 @@
         }
         
         foreach ($errors as $error) {
-            error_log(date(DATE_W3C) . " ESI error on route ${error['route']}: ${error['errorMessage']}");
+            error_log(date(DATE_W3C) . " ESI error on route {$error['route']}: {$error['errorMessage']}");
         }
         
 ?>

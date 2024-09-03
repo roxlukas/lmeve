@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewProfitCalc")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
@@ -95,7 +95,7 @@ if ($item_group_explorer) {
 		$node=getMarketNode($marketGroupID,$db_group_table,$db_group_id_field);
 		$parentGroupID=$node['parentGroupID'];
 		do {
-			$breadcrumbs="&gt; <a href=\"?id=10&id2=8&marketGroupID=${node[$db_group_id_field]}\">${node[$db_group_name_field]}</a> $breadcrumbs";
+			$breadcrumbs="&gt; <a href=\"?id=10&id2=8&marketGroupID={$node[$db_group_id_field]}\">{$node[$db_group_name_field]}</a> $breadcrumbs";
 			if (!empty($node['parentGroupID'])) {
 				$node=getMarketNode($node['parentGroupID'],$db_group_table,$db_group_id_field);
 			} else {
@@ -144,7 +144,7 @@ if ($item_group_explorer) {
 				foreach($groups as $row) {
 					echo('<tr><td style="padding: 0px; width: 32px;">');
 						hrefedit_group($row[$db_group_id_field]);
-						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"${row[$db_group_name_field]}\" />");
+						echo("<img src=\"".getUrl()."ccp_icons/22_32_29.png\" title=\"{$row[$db_group_name_field]}\" />");
 						echo('</a>');
 					echo('</td><td>');
 						hrefedit_group($row[$db_group_id_field]);
@@ -158,7 +158,7 @@ if ($item_group_explorer) {
 
 	if (sizeof($items)>0) {
 				foreach($items as $row) {
-                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='${EC_PRICE_TO_USE_FOR_SELL['type']}';");
+                                    $priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`={$row['typeID']} AND `type`='{$EC_PRICE_TO_USE_FOR_SELL['type']}';");
                                     if ($priceData[0][$EC_PRICE_TO_USE_FOR_SELL['price']] > 0) {
                                         $cost=calcTotalCosts($row['typeID']);
                                         $unitprofit=$priceData[0][$EC_PRICE_TO_USE_FOR_SELL['price']]-$cost;
@@ -166,7 +166,7 @@ if ($item_group_explorer) {
 
                                         echo('<tr><td style="padding: 0px; width: 32px;">');
                                                 hrefedit_item($row['typeID']);
-                                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+                                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
                                                 echo('</a>');
                                         echo('</td><td>');
                                                 hrefedit_item($row['typeID']);

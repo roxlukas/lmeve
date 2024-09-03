@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditRoles")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=7; //Panel ID in menu. Used in hyperlinks
@@ -63,7 +63,7 @@ global $USERSTABLE;
 			foreach($roles as $row) {
 				echo('<tr><td class="tab">');
 				hrefedit($row['roleID']);
-				echo("${row['roleID']}");
+				echo("{$row['roleID']}");
 				echo('</a></td><td class="tab">');
 				hrefedit($row['roleID']);
 				echo(stripslashes($row['roleName']));

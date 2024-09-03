@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=1; //Panel ID in menu. Used in hyperlinks
@@ -155,7 +155,7 @@ if ($new) {
                                     $sql="INSERT INTO `lmtasks` VALUES (
                                     DEFAULT,
                                     $characterID,
-                                    ${typeName['blueprintTypeID']},
+                                    {$typeName['blueprintTypeID']},
                                     8,
                                     $multipliedRuns,
                                     UTC_TIMESTAMP(),
@@ -171,7 +171,7 @@ if ($new) {
                                     $sql="INSERT INTO `lmtasks` VALUES (
                                     DEFAULT,
                                     $characterID,
-                                    ${typeName['bpoT1TypeID']},
+                                    {$typeName['bpoT1TypeID']},
                                     5,
                                     $multipliedRuns,
                                     UTC_TIMESTAMP(),
@@ -187,7 +187,7 @@ if ($new) {
                                     $sql="INSERT INTO `lmtasks` VALUES (
                                     DEFAULT,
                                     $characterID,
-                                    ${typeName['parentTypeID']},
+                                    {$typeName['parentTypeID']},
                                     1,
                                     $runs,
                                     UTC_TIMESTAMP(),

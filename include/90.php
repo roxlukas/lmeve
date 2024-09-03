@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewOwnCharacters,ViewAllCharacters,EditCharacters")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=9; //Panel ID in menu. Used in hyperlinks
@@ -107,14 +107,14 @@ global $USERSTABLE;
 				foreach($rearrange as $row) {
 					echo('<tr><td class="tab"  style="text-align: center;">');
                                         if ($row['active']==0) echo('<img src="'.getUrl().'ccp_icons/38_16_169.png" alt="[x]" style="vertical-align: middle;" />');
-					echo("<strong>${row['login']}</strong>");
+					echo("<strong>{$row['login']}</strong>");
 					echo('</td><td class="tab">');
 	
 					echo('<table cellspacing="0" width="100%" cellpadding="0">');
 					foreach($row['chars'] as $contrib) {
 						echo('<tr><td class="tab" width="32" style="padding: 0px;">');
 						althrefedit($contrib['charID']);
-                                                        echo("<img src=\"" . getCharacterPortrait($contrib['charID'], 32) . "\" title=\"${contrib['name']}\" />");
+                                                        echo("<img src=\"" . getCharacterPortrait($contrib['charID'], 32) . "\" title=\"{$contrib['name']}\" />");
 						echo('</a>');
 						echo('</td><td class="tab" width="240" style="text-align: left;">');
 						althrefedit($contrib['charID']);

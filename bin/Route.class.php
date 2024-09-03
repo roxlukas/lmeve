@@ -90,7 +90,7 @@ abstract class Route {
         } else if (preg_match('/0000\-00\-00T00\:00\:00Z/',$string,$m)) {
             return "NULL";
         } else if (preg_match('/(\d{4,4}\-\d{2,2}\-\d{2,2})T(\d{2,2}\:\d{2,2}\:\d{2,2})Z/',$string,$m)) {
-            if($this->ESI->getDEBUG()) inform('Route', "Converting '$string' to '${m[1]} ${m[2]}'");
+            if($this->ESI->getDEBUG()) inform('Route', "Converting '$string' to '{$m[1]} {$m[2]}'");
             $string = $m[1] . ' ' . $m[2];
         }
         return "'" . addslashes($string) . "'";
@@ -205,7 +205,7 @@ abstract class Route {
                                 throw new Exception($msg);
                             }
                             //additional logging!!
-                            loguj($this->ESI->getHttplog(),"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
+                            loguj($this->ESI->getHttplog(),"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n{$http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
                             $this->status='error';
                             return FALSE;
                     } else {
@@ -299,7 +299,7 @@ abstract class Route {
                 if ($this->ESI->getDEBUG()) echo($header);
                 if (preg_match('/(HTTP)\/([0-9\.]+)\s+(\d+)\s+(.+)/', $header, $m)) {
                     return $m[3];
-                    if ($this->ESI->getDEBUG()) echo("Found HTTP/${m[3]}\r\n");
+                    if ($this->ESI->getDEBUG()) echo("Found HTTP/{$m[3]}\r\n");
                 }
             }
         }

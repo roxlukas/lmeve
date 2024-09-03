@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewOwnCharacters,ViewAllCharacters")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=9; //Panel ID in menu. Used in hyperlinks
@@ -44,7 +44,7 @@ if (strlen($date)==6) {
 				ON lmc.charID=acm.characterID
 				JOIN $USERSTABLE lmu
 				ON lmu.userID=lmc.userID
-				WHERE `characterID`=$nr AND lmu.userID=${_SESSION['granted']};";
+				WHERE `characterID`=$nr AND lmu.userID={$_SESSION['granted']};";
 			} else {
 				$sql="SELECT `characterID` from `apicorpmembers` WHERE `characterID`=$nr";
 			}
@@ -58,14 +58,14 @@ if (strlen($date)==6) {
 			$char=db_asocquery("SELECT * from `apicorpmembers` WHERE `characterID`=$nr");
 			$char=$char[0];
                         
-			$corp=db_asocquery("SELECT * from `apicorps` WHERE `corporationID`=${char['corporationID']}");
+			$corp=db_asocquery("SELECT * from `apicorps` WHERE `corporationID`={$char['corporationID']}");
 		    $corp=$corp[0];
 		    $stats=db_asocquery("SELECT `activityName`, COUNT(*) AS jobs,SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
 			FROM `apiindustryjobs` aij
 			JOIN $LM_EVEDB.`ramActivities` rac
 			ON aij.activityID=rac.activityID
-			WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
-			AND aij.installerID=${char['characterID']}
+			WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND LAST_DAY('{$year}-{$month}-01')
+			AND aij.installerID={$char['characterID']}
 			GROUP BY `activityName`
 			ORDER BY `activityName`;");
 			
@@ -75,7 +75,7 @@ JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
 JOIN $LM_EVEDB.invTypes inv ON aij.`outputTypeID` = inv.`typeID`
 JOIN apicorpmembers acm ON aij.`installerID` = acm.`characterID`
 WHERE rac.`activityID` IS NOT NULL
-AND beginProductionTime BETWEEN '${year}-${month}-01' AND LAST_DAY('${year}-${month}-01')
+AND beginProductionTime BETWEEN '{$year}-{$month}-01' AND LAST_DAY('{$year}-{$month}-01')
 AND `installerID` = $nr
 GROUP BY `typeID` , `typeName` , `name` , `installerID`, rac.activityName
 ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
@@ -83,14 +83,14 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 		    
 		    echo('<table border="0" cellspacing="2" cellpadding=""><tr><td width="256" class="tab">');
                     $image = getCharacterPortrait($char['characterID'], 256);
-		    echo("<img src=\"$image\" title=\"${char['name']}\" />");
+		    echo("<img src=\"$image\" title=\"{$char['name']}\" />");
 		    echo('</td><td width="256" class="tab" style="vertical-align:top;">');
-		    echo("<h2>${char['name']}</h2>");
-		    if (!empty($char['title'])) echo("${char['title']}<br>");	
+		    echo("<h2>{$char['name']}</h2>");
+		    if (!empty($char['title'])) echo("{$char['title']}<br>");	
                     $corp['corporationName']=str_replace(' ','&nbsp;',$corp['corporationName']);
-                    echo("<h3><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h3>");
-		    echo("<strong>Joined:</strong> ${char['startDateTime']}<br>");
-		    if (!empty($char['base'])) echo("<strong>Base:</strong> ${char['base']}<br>");
+                    echo("<h3><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h3>");
+		    echo("<strong>Joined:</strong> {$char['startDateTime']}<br>");
+		    if (!empty($char['base'])) echo("<strong>Base:</strong> {$char['base']}<br>");
                     //real name ident
                     if (checkrights("Administrator,ViewRealNames")) {
                         $sql="SELECT lmu.login FROM `lmchars` lmc 
@@ -100,12 +100,12 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
                         $realnames=db_asocquery($sql);
                         if (count($realnames)==1) {
                             $realname=$realnames[0];
-                            echo("<strong>Character owner:</strong> ${realname['login']}<br>");
+                            echo("<strong>Character owner:</strong> {$realname['login']}<br>");
                         }
                     }
                     
-                    $title = generate_title("${char['name']} (${realname['login']})");
-                    $description = "LMeve Characters - viewing character ${char['name']} owned by ${realname['login']}";
+                    $title = generate_title("{$char['name']} ({$realname['login']})");
+                    $description = "LMeve Characters - viewing character {$char['name']} owned by {$realname['login']}";
                     generate_meta($description, $title, $image);
                     
 		    echo('</td><td width="256" class="tab" style="vertical-align:top;">');
@@ -145,7 +145,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			echo('</td></tr><tr><td class="tab" colspan="3">');
 			echo('<h2>Produced items:</h2>');
 			foreach($industry_tasks as $items) {
-				echo("<img src=\"".getTypeIDicon($items['typeID'])."\" title=\"${items['typeName']}\n${items['activityName']}\nJobs: ${items['jobsCount']}\nAmount: ${items['runCount']}\" />");
+				echo("<img src=\"".getTypeIDicon($items['typeID'])."\" title=\"{$items['typeName']}\n{$items['activityName']}\nJobs: {$items['jobsCount']}\nAmount: {$items['runCount']}\" />");
 			}
 		    echo('</td></tr><tr><td class="tab" colspan="3">');
 			echo('<h2>Tasks assigned:</h2>');

@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=8; //Panel ID in menu. Used in hyperlinks
@@ -108,7 +108,7 @@ if (strlen($date)==6) {
 		    		    
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
-				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h1>");
 				
 						
 if ($mychars==1) {
@@ -129,8 +129,8 @@ JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
 JOIN $LM_EVEDB.invTypes inv ON aij.outputTypeID = inv.typeID
 JOIN apicorpmembers acm ON aij.installerID = acm.characterID
 WHERE rac.activityID IS NOT NULL
-AND aij.corporationID = ${corp['corporationID']}
-AND beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+AND aij.corporationID = {$corp['corporationID']}
+AND beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 AND $mycharssql
 GROUP BY `typeID` , `typeName` , `name` , `installerID`, rac.activityName
 ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
@@ -168,7 +168,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 			foreach($rearrange as $row) {
 				echo('<tr><td>');
 					if ($rights_viewallchars) hrefedit($row['installerID']);
-                                                echo("<img src=\"" . getCharacterPortrait($row['installerID'], 32) . "\" title=\"${row['name']}\" />");
+                                                echo("<img src=\"" . getCharacterPortrait($row['installerID'], 32) . "\" title=\"{$row['name']}\" />");
 					if ($rights_viewallchars) echo('</a>');
 				echo('</td><td>');
 					if ($rights_viewallchars) hrefedit($row['installerID']);
@@ -180,7 +180,7 @@ ORDER BY name ASC, typeName ASC, SUM( runs ) DESC;";
 						echo('<a href="?id=1&id2=1&nr=new&typeID='.$items['typeID'].'&activityID='.$items['activityID'].'&characterID='.$row['installerID'].'&runs='.$items['runCount'].'">');
 						$CLICK="\n&raquo; Click to assign this task &laquo;";
 					}
-					echo("<img src=\"".getTypeIDicon($items['typeID'])."\" title=\"${items['typeName']}\n${items['activityName']}\nJobs: ${items['jobsCount']}\nAmount: ${items['runCount']}${CLICK}\" />");
+					echo("<img src=\"".getTypeIDicon($items['typeID'])."\" title=\"{$items['typeName']}\n{$items['activityName']}\nJobs: {$items['jobsCount']}\nAmount: {$items['runCount']}{$CLICK}\" />");
 					if ($rights_edittasks) echo('</a>');
 				}
 				echo('</td>');

@@ -80,7 +80,7 @@ $PANELNAME='Today'; //Panel name (optional)
 		$mi=date('m');
 		printf("%s, %s %s",$dnityg[$dow], str2num($d), $miesiace[str2num($mi)]);
 	?></h2><?php
-		$message=message("WHERE `msgto`=${_SESSION['granted']} AND `msgread`=0");
+		$message=message("WHERE `msgto`={$_SESSION['granted']} AND `msgread`=0");
 		$nowe_wiad=0;
 		foreach($message as $row) {
 			$nowe_wiad=1;
@@ -94,7 +94,7 @@ $PANELNAME='Today'; //Panel name (optional)
 			foreach($rights as $right) {
 				$reply=checkright($right['rightName']);
 				if ($reply) $reply='TRUE'; else $reply='FALSE';
-				echo("Right: ${right['rightName']} = $reply<br/>");
+				echo("Right: {$right['rightName']} = $reply<br/>");
 			}
 			echo("<br/>Testing multiple rights: checkrights(\"Administrator,ViewOverview\") = ");
 			$reply=checkrights("Administrator,ViewOverview");

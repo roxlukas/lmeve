@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,UseNorthboundApi")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
@@ -44,7 +44,7 @@ function nbapihrefedit($nr) {
     <?php
     if (!checkrights("Administrator")) {
         //if user is not admin, he can only delete their own keys
-        $owner="lma.`userID`=${_SESSION['granted']}";
+        $owner="lma.`userID`={$_SESSION['granted']}";
     } else {
         //if user is admin, he can delete any key
         $owner="TRUE";

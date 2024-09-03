@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditUsers")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=7; //Panel ID in menu. Used in hyperlinks
@@ -110,7 +110,7 @@ global $USERSTABLE;
 			echo('<table border="0" cellspacing="2" cellpadding="">');
 			foreach ($roles as $role) {
 				echo('<tr><td width="150" class="tab">');
-				echo("<input type=\"checkbox\" name=\"role_${role['roleID']}\" ");
+				echo("<input type=\"checkbox\" name=\"role_{$role['roleID']}\" ");
 				$found=FALSE;
 				if (count($userroles) > 0) {
 					foreach ($userroles as $userrole) {

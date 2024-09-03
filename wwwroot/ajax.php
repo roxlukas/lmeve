@@ -28,7 +28,7 @@ if ($act=='') $act=0;
     switch ($act) {
         case 'GET_MATERIALS':
             if (!checkrights("Administrator,ViewDatabase")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $typeID=secureGETnum('typeID');
@@ -38,7 +38,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_PROXY_STATS':
             if (!checkrights("Administrator,ViewCDNStats")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             ?>
@@ -73,7 +73,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_CACHE_SIZE':
             if (!checkrights("Administrator,ViewCDNStats")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             ?>
@@ -82,7 +82,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_CACHE_STATS':
             if (!checkrights("Administrator,ViewCDNStats")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $cache_total=getRequestsInLast24h(); $cache_total=$cache_total['count'];
@@ -112,7 +112,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_QUOTE':
             if (!checkrights("Administrator,ViewDatabase")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $typeID=secureGETnum('typeID');
@@ -120,7 +120,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_KIT2': //NEW! THIS IS THE CURRENT ONE
             if (!checkrights("Administrator,ViewOwnTasks")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $taskID=secureGETnum('taskID');
@@ -163,7 +163,7 @@ if ($act=='') $act=0;
             $page=secureGETstr('page');
             if (array_key_exists($page, $pages)) {
                 if (!checkrights($pages[$page]['rights'])) {
-                    echo("<h2>${LANG['NORIGHTS']}</h2>");
+                    echo("<h2>{$LANG['NORIGHTS']}</h2>");
                     return;
                 } else {
                     //everything ok! include the content function and check caches
@@ -194,7 +194,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_PROFIT_CALC':
             if (!checkrights("Administrator,ViewProfitCalc")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $rowcount=10;
@@ -205,7 +205,7 @@ if ($act=='') $act=0;
                 return;
             }
             if (isset($_GET['getlength'])) {
-                $length=db_count("SELECT itp.`typeID`, itp.`typeName`, app.${EC_PRICE_TO_USE_FOR_SELL['price']}, app.`volume`
+                $length=db_count("SELECT itp.`typeID`, itp.`typeName`, app.{$EC_PRICE_TO_USE_FOR_SELL['price']}, app.`volume`
                 FROM `$LM_EVEDB`.`invTypes` itp
                 JOIN `$LM_EVEDB`.`yamlBlueprintProducts` ybp
                 ON itp.`typeID`=ybp.`productTypeID`
@@ -215,8 +215,8 @@ if ($act=='') $act=0;
                 ON itp.`typeID`=app.`typeID`
                 WHERE itp.`published` = 1
                 AND ybp.`activityID` = 1
-                AND app.`type` = '${EC_PRICE_TO_USE_FOR_SELL['type']}'
-                AND app.${EC_PRICE_TO_USE_FOR_SELL['price']} > 0
+                AND app.`type` = '{$EC_PRICE_TO_USE_FOR_SELL['type']}'
+                AND app.{$EC_PRICE_TO_USE_FOR_SELL['price']} > 0
                 ORDER BY itp.`typeName`");
                 echo($length);
                 return;
@@ -224,7 +224,7 @@ if ($act=='') $act=0;
             
             global $LM_EVEDB, $EC_PRICE_TO_USE_FOR_SELL;
 
-            $items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, app.${EC_PRICE_TO_USE_FOR_SELL['price']}, app.`volume`
+            $items=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, app.{$EC_PRICE_TO_USE_FOR_SELL['price']}, app.`volume`
                 FROM `$LM_EVEDB`.`invTypes` itp
                 JOIN `$LM_EVEDB`.`yamlBlueprintProducts` ybp
                 ON itp.`typeID`=ybp.`productTypeID`
@@ -234,8 +234,8 @@ if ($act=='') $act=0;
                 ON itp.`typeID`=app.`typeID`
                 WHERE itp.`published` = 1
                 AND ybp.`activityID` = 1
-                AND app.`type` = '${EC_PRICE_TO_USE_FOR_SELL['type']}'
-                AND app.${EC_PRICE_TO_USE_FOR_SELL['price']} > 0
+                AND app.`type` = '{$EC_PRICE_TO_USE_FOR_SELL['type']}'
+                AND app.{$EC_PRICE_TO_USE_FOR_SELL['price']} > 0
                 ORDER BY itp.`typeName`
                 LIMIT $offset, $rowcount
                 ;");
@@ -243,14 +243,14 @@ if ($act=='') $act=0;
 
             if (sizeof($items)>0) {
                 foreach($items as $row) {
-                        //$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`=${row['typeID']} AND `type`='sell';");
+                        //$priceData=db_asocquery("SELECT * FROM `apiprices` WHERE `typeID`={$row['typeID']} AND `type`='sell';");
                         $cost=calcTotalCosts($row['typeID']);
                         $unitprofit=$row[$EC_PRICE_TO_USE_FOR_SELL['price']]-$cost;
                         $profit=100*($unitprofit)/$cost;
 
                         echo('<tr><td style="padding: 0px; width: 32px;">');
                                 hrefedit_item($row['typeID']);
-                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+                                echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
                                 echo('</a>');
                         echo('</td><td>');
                                 hrefedit_item($row['typeID']);
@@ -295,7 +295,7 @@ if ($act=='') $act=0;
             break;
         case 'GET_POLLERMESSAGE':
             if (!checkrights("Administrator,ViewAPIStats")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $sql="SELECT *
@@ -312,7 +312,7 @@ if ($act=='') $act=0;
             break;    
         case 'GET_POLLERESIMESSAGE':
             if (!checkrights("Administrator,ViewAPIStats")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             $sql="SELECT *
@@ -330,7 +330,7 @@ if ($act=='') $act=0;
 /************************** MG **************************/
         case 'MG_CALL_STATE':
             if (!checkrights("Administrator,ViewOwnCharacters")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -347,7 +347,7 @@ if ($act=='') $act=0;
             break;
         case 'MG_LOCAL_LIST':
             if (!checkrights("Administrator,ViewOwnCharacters")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -364,7 +364,7 @@ if ($act=='') $act=0;
             break;
         case 'MG_LOCAL_ENTRY':
             if (!checkrights("Administrator,ViewOwnCharacters")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -379,7 +379,7 @@ if ($act=='') $act=0;
             break;    
         case 'MG_LOCAL_GET_MESSAGES':
             if (!checkrights("Administrator,ViewOwnCharacters")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -394,7 +394,7 @@ if ($act=='') $act=0;
             break;  
         case 'MG_STATION_LAYOUT':
             if (!checkrights("Administrator,ViewOwnCharacters")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -410,7 +410,7 @@ if ($act=='') $act=0;
             break;
         case 'MG_IN_SPACE_LAYOUT':
             if (!checkrights("Administrator,ViewOwnCharacters")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -426,7 +426,7 @@ if ($act=='') $act=0;
             break;
         case 'MG_INDUSTRY_GET_TASKS':
             if (!checkrights("Administrator,ViewOwnTasks,ViewAllTasks,EditTasks")) { //"Administrator,ViewOverview"
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {
@@ -450,7 +450,7 @@ if ($act=='') $act=0;
             break;
         case 'MG_GM_TELEPORT':
             if (!checkrights("Administrator")) {
-                echo("<h2>${LANG['NORIGHTS']}</h2>");
+                echo("<h2>{$LANG['NORIGHTS']}</h2>");
                 return;
             }
             if (!isset($_SESSION['mg_character_id'])) {

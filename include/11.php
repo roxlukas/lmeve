@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditTasks")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=1; //Panel ID in menu. Used in hyperlinks
@@ -79,7 +79,7 @@ $runs=secureGETnum('runs');
 		    echo('Item:<br></td><td width="200">');
 		    if ((!$new)||(isset($task['activityID']))) {
 				//variables are set, so we can dig DB for a typeName
-				/*$typeName=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE `typeID`=${task['typeID']}");
+				/*$typeName=db_asocquery("SELECT `typeName` FROM $LM_EVEDB.`invTypes` WHERE `typeID`={$task['typeID']}");
 				$typeName=$typeName[0]['typeName'];*/
 				$typeName=db_asocquery("SELECT itp.`typeID`, itp.`typeName`, ibt.`blueprintTypeID`, iit.`productTypeID`, ibt.`techLevel` AS bpoTechLevel, iit.`techLevel` AS itemTechLevel
 				FROM $LM_EVEDB.`invTypes` itp
@@ -87,12 +87,12 @@ $runs=secureGETnum('runs');
 				ON itp.typeID=ibt.blueprintTypeID
 				LEFT JOIN $LM_EVEDB.`invBlueprintTypes` iit
 				ON itp.typeID=iit.productTypeID
-				WHERE `typeID`=${task['typeID']}
+				WHERE `typeID`={$task['typeID']}
 				AND ( (ibt.`blueprintTypeID` IS NOT NULL) OR (iit.`productTypeID` IS NOT NULL) )
 				AND itp.`published`=1;");
 				$typeName=$typeName[0];
 				echo('<table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td width="36">');
-				echo("<img src=\"".getTypeIDicon($task['typeID'])."\" title=\"${typeName['typeName']}\" /></td><td style=\"vertical-align: middle;\"> ${typeName['typeName']}</td></tr></table>");
+				echo("<img src=\"".getTypeIDicon($task['typeID'])."\" title=\"{$typeName['typeName']}\" /></td><td style=\"vertical-align: middle;\"> {$typeName['typeName']}</td></tr></table>");
 				//var_dump($typeName);
 			} else {
 				echo("No item selected.<br/>");
@@ -113,7 +113,7 @@ $runs=secureGETnum('runs');
                         } else if (isset($_SESSION['taskActivityID'])) {
                             if ( $row['activityID'] == $_SESSION['taskActivityID'] ) $select='selected'; else $select='';
                         }
-			echo("<option value=\"${row['activityID']}\" $select>${row['activityName']}</option>");
+			echo("<option value=\"{$row['activityID']}\" $select>{$row['activityName']}</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');
@@ -126,7 +126,7 @@ $runs=secureGETnum('runs');
                         } else {
                             if ( isset($_SESSION['taskCharacterID']) && $row['characterID'] == $_SESSION['taskCharacterID'] ) $select='selected'; else $select='';
                         }
-			echo("<option value=\"${row['characterID']}\" $select>${row['name']}</option>");
+			echo("<option value=\"{$row['characterID']}\" $select>{$row['name']}</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');
@@ -141,7 +141,7 @@ $runs=secureGETnum('runs');
                         } else {
                             if ( isset($_SESSION['taskFacilityID']) && $row['facilityID'] == $_SESSION['taskFacilityID'] ) $select='selected'; else $select='';
                         }
-			echo("<option value=\"${row['facilityID']}\" $select>".stripslashes($row['itemName'])."</option>");
+			echo("<option value=\"{$row['facilityID']}\" $select>".stripslashes($row['itemName'])."</option>");
 		    }
 		    echo('</select>');
 		    echo('</td></tr>');

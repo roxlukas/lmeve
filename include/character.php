@@ -85,7 +85,7 @@ function getCharactersDropdown() {
 function getCharacterPortrait($characterID, $size = 32) {
     if (!is_numeric($characterID)) $characterID=0;
     if (!is_numeric($size) || ($size!=32 && $size!=64 && $size!=256 && $size!=512)) $size=32;
-    $icon="https://imageserver.eveonline.com/character/${characterID}_${size}.jpg";
+    $icon="https://imageserver.eveonline.com/character/{$characterID}_{$size}.jpg";
     return($icon);
 }
 */

@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewDatabase")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=10; //Panel ID in menu. Used in hyperlinks
@@ -77,7 +77,7 @@ $marketGroupID=secureGETnum('marketGroupID');
 				foreach($items as $row) {
 					echo('<tr><td class="tab" style="padding: 0px; width: 32px;">');
 						hrefedit_item($row['typeID']);
-						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+						echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 						echo('</a>');
 					echo('</td><td class="tab">');
 						hrefedit_item($row['typeID']);

@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewPOS")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=2; //Panel ID in menu. Used in hyperlinks
@@ -21,7 +21,7 @@ include_once 'inventory.php';
 <?php
     $corps=db_asocquery("SELECT * FROM apicorps;");
     foreach ($corps as $corp) { //begin corps loop
-        echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+        echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h1>");
         showECAndTasks(getECAndTasks($corp['corporationID']));
         showLabsAndTasks(getLabsAndTasks($corp['corporationID']));
     }//end corps loop

@@ -10,7 +10,7 @@ function percentbar($percentage,$title) {
     if ($percentage<=100) $dispperc=$percentage; else $dispperc=100;
     $percleft=100-$dispperc;
     //echo("DEBUG dispperc=$dispperc percleft=$percleft title=$title");
-    echo("<div class=\"percent\"><div style=\"width: ${dispperc}px;\" class=\"percentdone\"></div>
+    echo("<div class=\"percent\"><div style=\"width: {$dispperc}px;\" class=\"percentdone\"></div>
     <div style=\"width: 100px;\" class=\"percentnum\" title=\"$title\">$percentage%</div></div>");
     return true;
 }
@@ -38,7 +38,7 @@ function percentbar2($percentage1,$percentage2,$title) {
         $darker=0;
         $lighter=$dispperc1;
     }
-    echo("<div class=\"percent\"><div style=\"width: ${lighter}px;\" class=\"percentrecent\"><div style=\"width: ${darker}px;\" class=\"percentdone\"></div></div>
+    echo("<div class=\"percent\"><div style=\"width: {$lighter}px;\" class=\"percentrecent\"><div style=\"width: {$darker}px;\" class=\"percentdone\"></div></div>
     <div style=\"width: 100px;\" class=\"percentnum\" title=\"$title\">$percentage1%</div></div>");
     return true;
 }

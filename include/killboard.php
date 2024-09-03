@@ -94,7 +94,7 @@ function getKills($month,$year,$corporationID=0,$allianceID=0,$characterID=0,$so
     if ($allianceID>0) $whereAlly="akv.`allianceID`=$allianceID OR aka.`allianceID`=$allianceID OR inv.`allianceID`=$allianceID"; else $whereAlly="TRUE";
     if ($solarSystemID>0) $whereSystem="apk.`solarSystemID`=$solarSystemID"; else $whereSystem="TRUE";
     if ($limit_records>0) $limit="LIMIT $limit_records"; else if ($limit_records>0 && $limit_offset>0) $limit="LIMIT $limit_records,$limit_offset"; else $limit="";
-    if ($year>0 && $month>0) $whereTime="apk.`killTime` BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)"; else $whereTime="TRUE";
+    if ($year>0 && $month>0) $whereTime="apk.`killTime` BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)"; else $whereTime="TRUE";
     $sql="SELECT DISTINCT apk.*,akv.*,
     aka.`characterID` AS atkCharacterID,
     aka.`corporationID` AS atkCorporationID,

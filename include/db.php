@@ -74,20 +74,20 @@ function getTypeIDicon($typeID, $size=32, $type=null) {
     }
     
     if ($size != 512) {
-        $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
-        /*if (file_exists("../wwwroot/ccp_img/${typeID}_${size}.png")) {
-            $icon=getUrl()."ccp_img/${typeID}_${size}.png";
+        $icon="https://images.evetech.net/types/{$typeID}/$type?size={$size}";
+        /*if (file_exists("../wwwroot/ccp_img/{$typeID}_{$size}.png")) {
+            $icon=getUrl()."ccp_img/{$typeID}_{$size}.png";
         } else {
-            //$icon="https://imageserver.eveonline.com/Type/${typeID}_${size}.png";
-            $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
+            //$icon="https://imageserver.eveonline.com/Type/{$typeID}_{$size}.png";
+            $icon="https://images.evetech.net/types/{$typeID}/$type?size={$size}";
         }*/
     } else {
-        $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
-        /*if (file_exists("../wwwroot/ccp_renders/${typeID}.png")) {
-            $icon=getUrl()."ccp_renders/${typeID}.png";
+        $icon="https://images.evetech.net/types/{$typeID}/$type?size={$size}";
+        /*if (file_exists("../wwwroot/ccp_renders/{$typeID}.png")) {
+            $icon=getUrl()."ccp_renders/{$typeID}.png";
         } else {
-            //$icon="https://imageserver.eveonline.com/Render/${typeID}_${size}.png";
-            $icon="https://images.evetech.net/types/${typeID}/$type?size=${size}";
+            //$icon="https://imageserver.eveonline.com/Render/{$typeID}_{$size}.png";
+            $icon="https://images.evetech.net/types/{$typeID}/$type?size={$size}";
         }*/
     }
     return($icon);
@@ -547,7 +547,7 @@ function getUrl(){
     $_SERVER['REQUEST_URI']
   ));
   if (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT']!=80 && $_SERVER['SERVER_PORT']!=443) {
-      $port=":${_SERVER['SERVER_PORT']}"; 
+      $port=":{$_SERVER['SERVER_PORT']}"; 
   } else {
       $port='';
   }

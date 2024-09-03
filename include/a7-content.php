@@ -15,7 +15,7 @@ function cachedContent() {
     //echo("<h3>Ores</h3><pre>"); var_dump($ores); echo("</pre>");
     //echo("<h3>Minerals</h3><pre>"); var_dump($minerals); echo("</pre>");
 
-    $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`=${_SESSION['granted']};");
+    $keys=db_asocquery("SELECT * FROM `lmnbapi` lma LEFT JOIN `$USERSTABLE` lmu ON lma.`userID`=lmu.`userID` WHERE lma.`userID`={$_SESSION['granted']};");
     if (count($keys)>0) $apikey='key='.$keys[0]['apiKey'].'&'; else $apikey='';
     ?>
     Also available in LMeve API <a href="api.php?<?=$apikey?>endpoint=ORECHART" target="_blank">api.php?<?=$apikey?>endpoint=ORECHART</a><br/>

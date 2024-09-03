@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewInventory")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 include_once('inventory.php');
@@ -28,7 +28,7 @@ global $LM_EVEDB,$DECIMAL_SEP,$THOUSAND_SEP;
     if ($corporationID==0 && $nr==0) {
         $corps=db_asocquery("SELECT * FROM apicorps;");
         foreach ($corps as $corp) { //begin corps loop
-            echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+            echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h1>");
             showInventory(getInventory($nr,$corp['corporationID']));
         }//end corps loop
     } else {

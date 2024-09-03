@@ -175,7 +175,7 @@ function get_xml_contents($url, $cache, $interval, $getCachedFile=FALSE) {
                             if (empty($http_code)) $http_code=500;
                             $xml_data=new SimpleXMLElement('<?phpxml version="1.0" encoding="UTF-8"?><eveapi version="2">  <currentTime></currentTime><error code="'.$http_code.'">HTTP ERROR! Return code: '.$http_response_header[0].'</error><cachedUntil></cachedUntil></eveapi>');
                             //additional logging!!
-                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
+                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n{$http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
                     } else {
                             file_put_contents($cache, $data, LOCK_EX);
                             $xml_data = simplexml_load_file( $cache );
@@ -235,7 +235,7 @@ class crestError {
 
 function get_crest_root($root_crest_url) {
     global $mycache;
-    $root=get_crest_contents($root_crest_url,"${mycache}/crest_root.json",0);
+    $root=get_crest_contents($root_crest_url,"{$mycache}/crest_root.json",0);
     //if (isset($root->userCounts))
     if (isset($root)) {
         apiSaveOK(0,"CREST /");
@@ -278,7 +278,7 @@ function get_crest_contents($url, $cache, $interval) {
                                 return $ret;
                             }
                             //additional logging!!
-                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
+                            loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n{$http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
                     } else {
                             file_put_contents($cache, $data, LOCK_EX);
                     }
@@ -609,7 +609,7 @@ function get_esi_contents($url, $cache, $interval, $type='GET', $postdata = null
                             return $ret;
                         }
                         //additional logging!!
-                        loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n${http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
+                        loguj($httplog,"\r\nREQUEST URI:\r\n$url\r\nHTTP RESPONSE:\r\n{$http_response_header[0]}\r\n-------- HTTP RESPONSE BELOW THIS LINE --------\r\n$data\r\n------------- END OF HTTP RESPONSE ------------\r\n");
                 } else {
                         file_put_contents($cache, $data, LOCK_EX);
                 }

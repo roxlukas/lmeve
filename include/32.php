@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewBuyCalc")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=3; //Panel ID in menu. Used in hyperlinks
@@ -73,7 +73,7 @@ db_uquery("INSERT INTO lmbuyback VALUES(
 	$timestamp,
 	'$order_shorthash',
 	'$order_fullhash',
-	${_SESSION['granted']}
+	{$_SESSION['granted']}
 );");
 
 ?>	    <div class="tytul">

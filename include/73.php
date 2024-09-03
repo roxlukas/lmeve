@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,EditUsers")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=7; //Panel ID in menu. Used in hyperlinks
@@ -70,7 +70,7 @@ if ($new) {
 			//Insert roles
 			foreach ($roles as $role) {
 				if (secureGETstr('role_'.$role['roleID'],3)=='on') {
-					$rsql="INSERT INTO lmuserroles VALUES($userid,${role['roleID']})";
+					$rsql="INSERT INTO lmuserroles VALUES($userid,{$role['roleID']})";
 					//echo($rsql."<br>");
 					db_uquery($rsql);
 				}
@@ -91,7 +91,7 @@ if ($new) {
 			db_uquery("DELETE FROM `lmuserroles` WHERE `userID`=$nr;");
 			foreach ($roles as $role) {
 				if(secureGETstr('role_'.$role['roleID'],3)=='on') {
-					$rsql="INSERT INTO `lmuserroles` VALUES($nr,${role['roleID']})";
+					$rsql="INSERT INTO `lmuserroles` VALUES($nr,{$role['roleID']})";
 					//echo($rsql."<br>");
 					db_uquery($rsql);
 				}

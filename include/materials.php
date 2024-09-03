@@ -243,7 +243,7 @@ function getBaseMaterialsOld($typeID,$runs=1,$melvl_override=null) {
 				$tech1itemID=0;
                                 if ($materials) {
                                     foreach ($materials as $row) {
-                                            //echo("DEBUG: Looking for recycle material, typeID=${row['typeID']}, recycle=${row['recycle']}<br>");
+                                            //echo("DEBUG: Looking for recycle material, typeID={$row['typeID']}, recycle={$row['recycle']}<br>");
                                             if ($row['recycle']==1) $tech1itemID=$row['typeID']; //if recycle=1, then found it
                                     }
                                 }
@@ -416,7 +416,7 @@ function displayBaseMaterials($recycle,$melevel=0,$wasteFactor=0) {
 		foreach ($recycle as $row) {
 			//$notperfect=round($row['quantity']*$multiplier);
                         $notperfect=$row['notperfect'];
-			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td><strong>${notperfect}</strong> (base: ${row['quantity']})</td></tr>");
+			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr={$row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> {$row['typeName']}</a></td><td><strong>{$notperfect}</strong> (base: {$row['quantity']})</td></tr>");
 		}
 		echo("</table>");
 	}
@@ -461,7 +461,7 @@ function displaySkills($skills) {
 			echo("<table class=\"lmframework\" width=\"100%\">");
 			echo("<tr colspan=\"2\"><th>Skill</th><th>Required level</th></tr>");
 			foreach ($skills as $row) {
-				if ($row['level']>0)	echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['skillTypeID']}\"><img src=\"".getTypeIDicon($row['skillTypeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['level']}</td></tr>");
+				if ($row['level']>0)	echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr={$row['skillTypeID']}\"><img src=\"".getTypeIDicon($row['skillTypeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> {$row['typeName']}</a></td><td>{$row['level']}</td></tr>");
 			}
 			echo("</table>");
 		}
@@ -522,7 +522,7 @@ function displayExtraMats($materials) {
 			echo("<tr colspan=\"3\"><th>Extra Material</th><th>Quantity</th><th>dmg per job</th></tr>");
 			foreach ($materials as $row) {
 				$row['damagePerJob']=sprintf("%d%%",$row['damagePerJob']*100);
-				if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${row['quantity']}</td><td>${row['damagePerJob']}</td></tr>");
+				if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr={$row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> {$row['typeName']}</a></td><td>{$row['quantity']}</td><td>{$row['damagePerJob']}</td></tr>");
 			}
 			echo("</table>");
 		}
@@ -541,7 +541,7 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
     if ($location) {
         echo("<table class=\"lmframework\" width=\"100%\">");
         echo("<tr><th colspan=\"2\" style=\"width: 100%\">Location</th></tr>");
-        echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"".getTypeIDicon($location['typeID'])."\" title=\"${location['typeName']}\"></td><td style=\"width: 95%;\"><strong>${location['itemName']}</strong><br/>${location['moonName']}</td></tr>");
+        echo("<tr><td style=\"padding: 0px; width: 32px;\"><img src=\"".getTypeIDicon($location['typeID'])."\" title=\"{$location['typeName']}\"></td><td style=\"width: 95%;\"><strong>{$location['itemName']}</strong><br/>{$location['moonName']}</td></tr>");
 	echo("</table>");		
     }
     if ($materials!=false) {
@@ -550,7 +550,7 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
 			foreach ($materials as $row) {
                             //data interface workaround
                             if (strpos($row['typeName'],'Data Interface')!==false) $row['quantity']=1;
-			    if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
+			    if ($row['quantity']>0) echo("<tr colspan=\"3\"><td><a href=\"?id=10&id2=1&nr={$row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> {$row['typeName']}</a></td><td>".$row['quantity']*$row['damagePerJob']."</td></tr>");
 			}
 			echo("</table>");
     }
@@ -562,7 +562,7 @@ function displayKit2($recycle,$materials=null,$melevel=null,$wasteFactor=null,$l
 			//$notperfect=round($row['quantity']*$multiplier);
                         if (strpos($row['typeName'],'Data Interface')!==false) $row['notperfect']=1;
                         $notperfect=$row['notperfect'];
-			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr=${row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> ${row['typeName']}</a></td><td>${notperfect}</td></tr>");
+			echo("<tr colspan=\"2\"><td><a href=\"?id=10&id2=1&nr={$row['typeID']}\"><img src=\"".getTypeIDicon($row['typeID'])."\" style=\"width: 16px; height: 16px; float: left;\" /> {$row['typeName']}</a></td><td>{$notperfect}</td></tr>");
 		}
 		echo("</table>");
     }
@@ -641,19 +641,19 @@ function getEveCentralPrice($typeID,$type='sell',$minmax='min') {
             if ($row['type']==$type) {
                 switch ($minmax) {
                     case 'min':
-                        //echo("min: ${row['min']} <br/>");
+                        //echo("min: {$row['min']} <br/>");
                         return $row['min'];
                         break;
                     case 'max':
-                        //echo("max: ${row['max']} <br/>");
+                        //echo("max: {$row['max']} <br/>");
                         return $row['max'];
                         break;
                     case 'avg':
-                        //echo("avg: ${row['avg']} <br/>");
+                        //echo("avg: {$row['avg']} <br/>");
                         return $row['avg'];
                         break;
                     case 'median':
-                        //echo("median: ${row['median']} <br/>");
+                        //echo("median: {$row['median']} <br/>");
                         return $row['median'];
                         break;
                     default:
@@ -717,7 +717,7 @@ function calcManufacturingCost($typeID) {
     $completeMats = array();
     if($baseMats) {
         foreach ($baseMats as $mat) {
-            //echo("${mat['typeName']} = ${mat['quantity']} * $multiplier = ".$mat['quantity']*$multiplier."<br/>");
+            //echo("{$mat['typeName']} = {$mat['quantity']} * $multiplier = ".$mat['quantity']*$multiplier."<br/>");
             $completeMats[$mat['typeID']]['qty']+=$mat['notperfect'];
             $completeMats[$mat['typeID']]['typeName']=$mat['typeName'];
         }
@@ -740,7 +740,7 @@ function calcManufacturingCost($typeID) {
                     $returns['price']+=$mat['qty']*$unitPrice;
                 } else {
                     $returns['accurate']=false;
-                    if ($DEBUG) echo("Missing price: ${mat['typeName']}<br/>");
+                    if ($DEBUG) echo("Missing price: {$mat['typeName']}<br/>");
                 }
             }
         }
@@ -886,7 +886,7 @@ function calcInventionCost($typeID) {
                 $returns['price']+=$mat['qty']*$unitPrice;
             } else {
                 $returns['accurate']=false;
-                //echo("Missing price: ${mat['typeName']}<br/>");
+                //echo("Missing price: {$mat['typeName']}<br/>");
             }
         }
         //echo("DEBUG invchance=$invchance bpcruns=$bpcruns portionSize=$portionSize<br/>");

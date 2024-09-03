@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,UseNorthboundApi")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
@@ -20,7 +20,7 @@ if (!token_verify()) die("Invalid or expired token.");
 Creating key...
 <?php
     $token = substr(preg_replace('/[0-9_\/]+/','',base64_encode(sha1(random_pseudo_bytes_wrapper(64)))),0,32);
-    $sql="INSERT INTO `lmnbapi` VALUES(DEFAULT,${_SESSION['granted']},'$token',DEFAULT,DEFAULT);";
+    $sql="INSERT INTO `lmnbapi` VALUES(DEFAULT,{$_SESSION['granted']},'$token',DEFAULT,DEFAULT);";
     db_uquery($sql);
 ?>
 <input type="button" value="OK" onclick="location.href='?id=5&id2=14';"/>

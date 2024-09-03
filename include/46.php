@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewMessages")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=4; //Panel ID in menu. Used in hyperlinks
@@ -11,7 +11,7 @@ $PANELNAME='Messages'; //Panel name (optional)
 //standard header ends here
 	
 	
-		$message=message_sent("WHERE `msgfrom`=${_SESSION['granted']}");
+		$message=message_sent("WHERE `msgfrom`={$_SESSION['granted']}");
 
 		include('filter.php');
 		//$idmsg=range(0,$ilemsg-1);

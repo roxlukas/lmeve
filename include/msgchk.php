@@ -34,7 +34,7 @@
 	if ($_SESSION['status']!=1) die("Wrong script call. <a href=\"index.php\">LMeve</a>");
 		//include('message.php');
 		
-		$message=message("WHERE `msgto`=${_SESSION['granted']} AND `msgread`=0");
+		$message=message("WHERE `msgto`={$_SESSION['granted']} AND `msgread`=0");
 		include('lang.php');
 	$g=0;
 	foreach($message as $row) {

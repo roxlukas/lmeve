@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 if (!checkrights("Administrator,ViewActivity")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }
 $MENUITEM=8; //Panel ID in menu. Used in hyperlinks
@@ -97,7 +97,7 @@ if (strlen($date)==6) {
 		    		    
 		    $corps=db_asocquery("SELECT * FROM apicorps;");
 		    foreach ($corps as $corp) { //begin corps loop
-				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+				echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h1>");
 				
 if ($mychars==1) {
         echo('<em>The list is filtered by your characters only. Click "All characters" button to show entire corp.</em>');
@@ -115,8 +115,8 @@ FROM apiindustryjobs aij
 JOIN $LM_EVEDB.ramActivities rac ON aij.`activityID` = rac.`activityID`
 JOIN $LM_EVEDB.invTypes inv ON aij.outputTypeID = inv.typeID
 JOIN apicorpmembers acm ON aij.installerID = acm.characterID
-AND aij.corporationID = ${corp['corporationID']}
-AND beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+AND aij.corporationID = {$corp['corporationID']}
+AND beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
 WHERE $mycharssql
 GROUP BY `typeID` , `typeName` , `name` , `installerID`, rac.`activityName`
 ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
@@ -175,7 +175,7 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 			foreach($rearrange as $row) {
 				echo('<tr><td>');
 				althrefedit($row['typeID']);
-				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"${row['typeName']}\" />");
+				echo("<img src=\"".getTypeIDicon($row['typeID'])."\" title=\"{$row['typeName']}\" />");
 				echo('</a>');
 				echo('</td><td>');
 				althrefedit($row['typeID']);
@@ -190,7 +190,7 @@ ORDER BY typeName ASC, name ASC, SUM( runs ) DESC;";
 				echo('<table class="lmframework" width="100%">');
 				foreach($row['characters'] as $contrib) {
 					echo('<tr><td width="32" style="padding: 0px;">');
-                                        echo("<img src=\"" . getCharacterPortrait($contrib['installerID'], 32) . "\" title=\"${contrib['name']}\" />");
+                                        echo("<img src=\"" . getCharacterPortrait($contrib['installerID'], 32) . "\" title=\"{$contrib['name']}\" />");
 					echo('</td><td style="text-align: left;">');
 						if ($rights_viewallchars) hrefedit($contrib['installerID']);
 							echo(stripslashes($contrib['name']));

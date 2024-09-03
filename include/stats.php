@@ -24,7 +24,7 @@ function getVisitorsMonthly($year,$month) {
     $sql="SELECT DATE_FORMAT(timestamp,'%e') AS date,
         COUNT(DISTINCT ip) AS visits
         FROM `$LM_CCPWGL_CACHESCHEMA`.`lmproxylog`
-        WHERE timestamp BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+        WHERE timestamp BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
         GROUP BY DATE_FORMAT(timestamp,'%e');";
     return(db_asocquery($sql));
 }
@@ -404,15 +404,15 @@ function showLastProxyRequests($stats) {
 function getIndustryStats($corporationID,$year,$month) {
     global $LM_EVEDB;
     //OLD date condition:
-        //date_format(beginProductionTime, '%Y%m') = '${year}${month}'
+        //date_format(beginProductionTime, '%Y%m') = '{$year}{$month}'
     //NEW (otpimized) date condition:
-        //beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
+        //beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
     $stats=db_asocquery("SELECT `activityName`,rac.`activityID`, COUNT(*) AS jobs, SUM(TIME_TO_SEC(TIMEDIFF(`endProductionTime`,`beginProductionTime`))/3600) AS hours
 	FROM `apiindustryjobs` aij
 	JOIN $LM_EVEDB.`ramActivities` rac
 	ON aij.activityID=rac.activityID
-        WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
-	AND aij.corporationID=${corporationID}
+        WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
+	AND aij.corporationID={$corporationID}
 	GROUP BY `activityName`,`activityID`
 	ORDER BY `activityName`;");
     return $stats;
@@ -475,8 +475,8 @@ function getIndustryActivity($corporationID,$year,$month,$activityID=-1) {
     if ($activityID!=-1) $sqlActivityID="AND `activityID`=$activityID";
     $sqlact="SELECT COUNT(*) AS activity,date_format(beginProductionTime, '%e') AS day FROM
             apiindustryjobs aij
-            WHERE beginProductionTime BETWEEN '${year}-${month}-01' AND DATE_ADD(LAST_DAY('${year}-${month}-01'), INTERVAL 1 day)
-            AND aij.corporationID=${corporationID}
+            WHERE beginProductionTime BETWEEN '{$year}-{$month}-01' AND DATE_ADD(LAST_DAY('{$year}-{$month}-01'), INTERVAL 1 day)
+            AND aij.corporationID={$corporationID}
             $sqlActivityID
             GROUP BY date_format(beginProductionTime, '%e')
             ORDER BY date_format(beginProductionTime, '%e');";

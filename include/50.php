@@ -3,7 +3,7 @@
 checksession(); //check if we are called by a valid session
 /*if (!checkrights("Administrator,ViewTimesheet")) { //"Administrator,ViewOverview"
 	global $LANG;
-	echo("<h2>${LANG['NORIGHTS']}</h2>");
+	echo("<h2>{$LANG['NORIGHTS']}</h2>");
 	return;
 }*/
 $MENUITEM=5; //Panel ID in menu. Used in hyperlinks
@@ -252,7 +252,7 @@ Settings
                                         $currentSystem=getConfigItem('marketSystemID', '30000142');
                                         $systems=db_asocquery("SELECT `solarSystemName` FROM `$LM_EVEDB`.`mapSolarSystems` WHERE `solarSystemID`=$currentSystem;");
                                         $row=$systems[0];
-                                        echo("<option value=\"${row['solarSystemID']}\" selected>${row['solarSystemName']}</option>");
+                                        echo("<option value=\"{$row['solarSystemID']}\" selected>{$row['solarSystemName']}</option>");
                                     ?>
                                 </select>
                                 <script type="text/javascript">
@@ -271,7 +271,7 @@ Settings
                                         $currentSystem=getConfigItem('indexSystemID', '30000142');
                                         $systems=db_asocquery("SELECT `solarSystemName` FROM `$LM_EVEDB`.`mapSolarSystems` WHERE `solarSystemID`=$currentSystem;");
                                         $row=$systems[0];
-                                        echo("<option value=\"${row['solarSystemID']}\" selected>${row['solarSystemName']}</option>");
+                                        echo("<option value=\"{$row['solarSystemID']}\" selected>{$row['solarSystemName']}</option>");
                                     ?>
                                 </select>
                                 <script type="text/javascript">

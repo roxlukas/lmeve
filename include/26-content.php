@@ -11,9 +11,9 @@ function cachedContent() {
     <?php
     $corps=db_asocquery("SELECT * FROM apicorps;");
     foreach ($corps as $corp) { //begin corps loop
-        echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> ${corp['corporationName']}</h1>");
+        echo("<h1><img src=\"" . getCorporationLogo($corp['corporationID'], 64) . "\" style=\"vertical-align: middle;\"> {$corp['corporationName']}</h1>");
 
-        $pocos=getPocos("apo.`corporationID`=${corp['corporationID']}");
+        $pocos=getPocos("apo.`corporationID`={$corp['corporationID']}");
         $income=getPocoIncome($corp['corporationID']);
 
         //echo("DEBUG: <pre>"); print_r($pocos); echo('</pre>');
