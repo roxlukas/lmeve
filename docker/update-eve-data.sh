@@ -6,6 +6,22 @@ set -e
 
 LOCK_FILE="schema_installed.lock"
 
+# Port to check
+PORT=3306
+
+# Timeout in seconds (adjust as needed)
+TIMEOUT=60
+
+echo "Waiting for port $PORT to be open..."
+
+# Loop until the port is open or timeout is reached
+until nc -z ${DB_HOST} "$PORT" &> /dev/null; do
+  echo "Port $PORT not yet open. Sleeping for 5 seconds..."
+  sleep 5
+done
+
+echo "Port $PORT is now open!"
+
 if [ -e "$LOCK_FILE" ]; then
     echo "LMeve Schema already imported"
 else

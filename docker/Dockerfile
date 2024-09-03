@@ -37,6 +37,11 @@ RUN wget https://raw.githubusercontent.com/roxlukas/lmeve/master/config/config-d
     sed -i "s/\$LM_dbpass='password'/\$LM_dbpass=getenv('DB_PASSWORD')/" /var/www/lmeve/config/config.php && \
     sed -i "s/\$LM_EVEDB='eve_tia100_dbo'/\$LM_EVEDB=getenv('DB_NAME_STATIC')/" /var/www/lmeve/config/config.php
 
+RUN apt-get install libyaml-0-2 libyaml-dev && \
+    printf "\n" | pecl install yaml && \
+    echo "extension=yaml.so" >> /etc/php/8.3/apache2/php.ini && \
+    echo "extension=yaml.so" >> /etc/php/8.3/cli/php.ini
+
 RUN echo "*/15 * * * * www-data /usr/bin/php /var/www/lmeve/bin/poller.php" >> /etc/crontab
 
 RUN chown www-data:www-data /var/www/lmeve/var

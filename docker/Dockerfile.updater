@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     mysql-client \
     bzip2 \
     findutils \
+    netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
