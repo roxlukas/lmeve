@@ -20,7 +20,28 @@ All Eve Related Materials are Property Of CCP Games
 <h3>Please do not contact "Lukas Rox" in game for support, because I do not read eve-mail</h3>
 If you find a problem, please open an Issue on GitHub project page: https://github.com/roxlukas/lmeve/issues
 
-<h1>Setup instructions</h1>
+<h1>Docker Setup Instructions</h1>
+
+Login to you linux host. You need `docker.io` and `docker-compose` installed.
+
+1 `wget https://github.com/roxlukas/lmeve/raw/master/docker/lmeve-docker.tbz2`
+2 `tar -xjf lmeve-docker.tbz2`
+3 `cd lmeve`
+4 `docker-compose up`
+
+Wait for the containers to build and static data to download and update.
+
+5 Login to your LMeve, by default user and password is `admin`
+6 Change password in GUI: `Settings` -&gt; `Change password`
+7 Remove INSTALL file in LMeve root `docker exec -it lmeve_lmeve_1 rm /var/www/lmeve/INSTALL`
+
+By default app is exposed on port 80. Consider using nginx reverse proxy with TLS/HTTPS in front of it in order to encrypt traffic.
+
+To update static data:
+
+`docker start lmeve_eve_data_updater_1`
+
+<h1>Manual Setup instructions</h1>
 
 
 Steps for installing LMEVE : <br>
