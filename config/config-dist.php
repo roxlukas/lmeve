@@ -1,6 +1,13 @@
 <?php
 //APP NAME - for example "Aideron Technologies' LMeve"
 $LM_APP_NAME='LMeve';
+
+//use EVE SSO - see https://wiki.eveonline.com/en/wiki/EVE_SSO_Documentation
+$SSOENABLED=FALSE;
+$SSO_REDIRECT_URL='https://lmeve.com/ssologin.php';
+$SSO_CLIENT_ID='sso_client_id';
+$SSO_CLIENT_SECRET='sso_client_secret';
+
 //locked
 $LM_LOCKED=0;
 //read-only
@@ -29,18 +36,13 @@ $LM_SALT='abcde12345';
 $THOUSAND_SEP=",";
 $DECIMAL_SEP=".";
 //default CSS style
-$LM_DEFAULT_CSS="css/rixxjavix.css";
+$LM_DEFAULT_CSS="css/rixx_fullscreen.css";
 //force SSL
 $LM_FORCE_SSL=FALSE;
 //use CSRF tokens in forms
 $LM_SECUREFORMS=TRUE;
-//use EVE SSO - see https://wiki.eveonline.com/en/wiki/EVE_SSO_Documentation
-$SSOENABLED=FALSE;
-$SSO_REDIRECT_URL='https://lmeve.com/ssologin.php';
-$SSO_CLIENT_ID='sso_client_id';
-$SSO_CLIENT_SECRET='sso_client_secret';
 //Auth server can be either login.eveonline.com for Tranquility, or sisilogin.testeveonline.com when trying to use Sisi.
-$SSO_AUTH_SERVER='sisilogin.testeveonline.com';
+$SSO_AUTH_SERVER='login.eveonline.com';
 $API_BASEURL="https://api.eveonline.com"; 
 $CREST_BASEURL="https://crest-tq.eveonline.com";
 $ESI_BASEURL = "https://esi.evetech.net";
